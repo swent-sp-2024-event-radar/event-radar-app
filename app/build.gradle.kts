@@ -6,6 +6,7 @@ plugins {
     id("com.ncorti.ktfmt.gradle") version "0.16.0"
     id("com.google.gms.google-services")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("org.sonarqube") version "4.4.1.3373"
 }
 
 android {
@@ -186,3 +187,10 @@ tasks.withType<Test> {
     }
 }
 
+sonar {
+    properties {
+        property("sonar.projectKey", "swent-sp-2024-party-radar_party-radar-app")
+        property("sonar.organization", "swent-sp-2024-party-radar")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
+}
