@@ -26,4 +26,6 @@ replay_pid*
 /.idea
 
 # secret files
+local.properties
 secrets.properties
+app/local.properties
