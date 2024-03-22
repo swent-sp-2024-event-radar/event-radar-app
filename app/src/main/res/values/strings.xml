@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="web_client_id">957415054330-j5fa1cl19qlthoshv7l2cccqv5v4icj4.apps.googleusercontent.com</string>
+    <string name="test1">test1</string>
+    <string name="test2">test2</string>
+    <string name="overview">Overview</string>
+    <string name="map">Map</string>
+    <string name="search">Search a Task</string>
+    <string name="title">Title</string>
+    <string name="assignee_name">Assignee Name</string>
+    <string name="title_placeholder">Name the task</string>
+    <string name="assignee_name_placeholder">Assign a person</string>
+    <string name="description">Description</string>
+    <string name="description_placeholder">Describe the task</string>
+    <string name="location">Location</string>
+    <string name="location_placeholder">Enter an address</string>
+    <string name="due_date">Due Date</string>
+    <string name="due_date_placeholder">-- / -- / ----</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+</resources>
