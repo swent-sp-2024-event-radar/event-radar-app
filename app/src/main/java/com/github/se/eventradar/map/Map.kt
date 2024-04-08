@@ -6,7 +6,8 @@ import com.github.se.eventradar.ui.navigation.NavigationActions
 
 @Composable
 fun Map(viewModel: MapViewModel = viewModel(), navigationActions: NavigationActions) {
-// The following block is temporarily commented out as part of the transition from managing ToDos to Events.
+  // The following block is temporarily commented out as part of the transition from managing ToDos
+  // to Events.
   /*
   val uiState by viewModel.uiState.collectAsState()
 
@@ -18,7 +19,7 @@ fun Map(viewModel: MapViewModel = viewModel(), navigationActions: NavigationActi
    */
 }
 
-//Temporarily commenting out MapUI as we transition from ToDos to Events.
+// Temporarily commenting out MapUI as we transition from ToDos to Events.
 /*
 @Composable
 fun MapUI(todoList: List<ToDo>, navigationActions: NavigationActions) {

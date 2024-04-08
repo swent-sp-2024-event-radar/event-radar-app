@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.navigation.TopLevelDestination
 
-
 @Composable
 fun BottomNavigationMenu(
     onTabSelected: (TopLevelDestination) -> Unit,

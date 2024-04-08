@@ -21,9 +21,9 @@ class OverviewViewModel(db: FirebaseFirestore = Firebase.firestore) : ViewModel(
   }
 
   fun onTaskClicked(id: String) {
-      // Temporarily commented out as we transition from handling to-dos to handling events.
+    // Temporarily commented out as we transition from handling to-dos to handling events.
 
-      /*
+    /*
     val to_Do = _uiState.value.toDoList.getAllTask.find { it.id == id }
     _uiState.value =
         _uiState.value.copy(

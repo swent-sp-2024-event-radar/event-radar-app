@@ -16,8 +16,8 @@ fun NavGraph(navController: NavHostController) {
     composable(Route.LOGIN) { LoginScreen(navigationActions = navActions) }
     composable(Route.OVERVIEW) { Overview(navigationActions = navActions) }
     composable(Route.MAP) { Map(navigationActions = navActions) }
-      //The NEW_TASK and EDIT_TASK routes are being temporarily disabled as we restructure our app
-      /*
+    // The NEW_TASK and EDIT_TASK routes are being temporarily disabled as we restructure our app
+    /*
     composable(Route.NEW_TASK) { CreateToDo(navigationActions = navActions) }
     composable(
         "${Route.EDIT_TASK}/{taskId}",
