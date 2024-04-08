@@ -2,25 +2,22 @@ package com.github.se.eventradar.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import com.github.se.eventradar.map.Map
-import com.github.se.eventradar.model.ToDoViewModel
-import com.github.se.eventradar.ui.CreateToDo
-import com.github.se.eventradar.ui.EditToDo
 import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.overview.Overview
 
 @Composable
-fun TodoNavGraph(navController: NavHostController) {
+fun NavGraph(navController: NavHostController) {
   val navActions = NavigationActions(navController)
 
   NavHost(navController, startDestination = Route.LOGIN) {
     composable(Route.LOGIN) { LoginScreen(navigationActions = navActions) }
     composable(Route.OVERVIEW) { Overview(navigationActions = navActions) }
     composable(Route.MAP) { Map(navigationActions = navActions) }
+      //The NEW_TASK and EDIT_TASK routes are being temporarily disabled as we restructure our app
+      /*
     composable(Route.NEW_TASK) { CreateToDo(navigationActions = navActions) }
     composable(
         "${Route.EDIT_TASK}/{taskId}",
@@ -31,5 +28,6 @@ fun TodoNavGraph(navController: NavHostController) {
               viewModel = ToDoViewModel(uid = taskId),
               navigationActions = navActions)
         }
+       */
   }
 }

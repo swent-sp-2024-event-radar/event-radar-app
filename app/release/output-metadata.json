@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.swent.bootcamp",
+  "applicationId": "com.github.se.eventradar",
   "variantName": "release",
   "elements": [
     {

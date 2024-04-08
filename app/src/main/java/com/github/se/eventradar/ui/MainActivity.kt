@@ -8,7 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.github.se.eventradar.ui.navigation.TodoNavGraph
+import com.github.se.eventradar.ui.navigation.NavGraph
 import com.github.se.eventradar.ui.theme.MyApplicationTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
           val navController = rememberNavController()
-          TodoNavGraph(navController = navController)
+          NavGraph(navController = navController)
         }
       }
     }

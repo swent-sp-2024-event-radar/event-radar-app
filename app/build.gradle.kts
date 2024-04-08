@@ -10,11 +10,11 @@ plugins {
 }
 
 android {
-    namespace = "com.swent.bootcamp"
+    namespace = "com.github.se.eventradar"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.swent.bootcamp"
+        applicationId = "com.github.se.eventradar"
         minSdk = 29
         targetSdk = 34
         versionCode = 1
