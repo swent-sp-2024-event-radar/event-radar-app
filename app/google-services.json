@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1043895872028:android:81fa8fc9cdb73998924dd9",
+        "mobilesdk_app_id": "1:1043895872028:android:bf783830147e399f924dd9",
         "android_client_info": {
-          "package_name": "com.android.application"
+          "package_name": "com.github.se.eventradar"
         }
       },
       "oauth_client": [],
