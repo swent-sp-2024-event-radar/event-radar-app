@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "859627128333",
-    "project_id": "swent-bootcamp-geason",
-    "storage_bucket": "swent-bootcamp-geason.appspot.com"
+    "project_number": "1043895872028",
+    "project_id": "event-radar-e6a76",
+    "storage_bucket": "event-radar-e6a76.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:859627128333:android:d4adb5a985bc1c70897744",
+        "mobilesdk_app_id": "1:1043895872028:android:81fa8fc9cdb73998924dd9",
         "android_client_info": {
-          "package_name": "com.github.se.eventradar"
+          "package_name": "com.android.application"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "859627128333-t6d63ccp23bj9hv7p1gd4bh45fs2rdlb.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDTLvHFLog9zdrIshWgWXlEuIq8bTy5daw"
+          "current_key": "AIzaSyCSsyVzBHrtEzBMeGjCATj-Y8IIhbcnnoA"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "859627128333-t6d63ccp23bj9hv7p1gd4bh45fs2rdlb.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
