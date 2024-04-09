@@ -1,41 +1,26 @@
 package com.github.se.eventradar.map
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.github.se.eventradar.model.todo.ToDo
-import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.NavigationActions
-import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.CameraPositionState
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
 
 @Composable
 fun Map(viewModel: MapViewModel = viewModel(), navigationActions: NavigationActions) {
+  // The following block is temporarily commented out as part of the transition from managing ToDos
+  // to Events.
+  /*
   val uiState by viewModel.uiState.collectAsState()
 
-  if (uiState.toDoList.getAllTask.isEmpty()) {
+    if (uiState.toDoList.getAllTask.isEmpty()) {
     viewModel.getToDos()
   }
 
   MapUI(uiState.toDoList.getAllTask, navigationActions)
+   */
 }
 
+// Temporarily commenting out MapUI as we transition from ToDos to Events.
+/*
 @Composable
 fun MapUI(todoList: List<ToDo>, navigationActions: NavigationActions) {
   val mapProperties by remember {
@@ -74,3 +59,4 @@ fun MapUI(todoList: List<ToDo>, navigationActions: NavigationActions) {
             }
       }
 }
+*/
