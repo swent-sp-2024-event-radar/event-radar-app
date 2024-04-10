@@ -1,4 +1,11 @@
 <resources>
+    <string name="scan_QR">Scan QR</string>
+    <string name="message_chats">Messages</string>
+    <string name="homeScreen_events">Home</string>
+    <string name="user_profile">Profile</string>
+    <string name="my_hosted_events">My hosting</string>
+
+    <string name="default_web_client_id" translatable="false">webClientId.apps.googleusercontent.com</string>
     <string name="app_name">My Application</string>
     <string name="web_client_id">957415054330-j5fa1cl19qlthoshv7l2cccqv5v4icj4.apps.googleusercontent.com</string>
     <string name="test1">test1</string>
