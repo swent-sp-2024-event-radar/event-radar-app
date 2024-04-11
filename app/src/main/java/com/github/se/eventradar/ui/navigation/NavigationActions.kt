@@ -48,30 +48,30 @@ class NavigationActions(val navController: NavController) {
 }
 
 val TOP_LEVEL_DESTINATIONS =
-  listOf(
-    TopLevelDestination(
-      route = Route.SCANNER,
-      icon = R.drawable.qr_code,
-      textId = R.string.scan_QR,
-    ),
-    TopLevelDestination(
-      route = Route.MESSAGE,
-      icon = R.drawable.chat_bubble,
-      textId = R.string.message_chats,
-    ),
-    TopLevelDestination(
-      route = Route.EVENTS,
-      icon = R.drawable.home,
-      textId = R.string.homeScreen_events,
-    ),
-    TopLevelDestination(
-      route = Route.PROFILE,
-      icon = R.drawable.user_profile,
-      textId = R.string.user_profile,
-    ),
-    TopLevelDestination(
-      route = Route.MY_HOSTING,
-      icon = R.drawable.celebration,
-      textId = R.string.my_hosted_events,
-    ),
-  )
+    listOf(
+        TopLevelDestination(
+            route = Route.SCANNER,
+            icon = R.drawable.qr_code,
+            textId = R.string.scan_QR,
+        ),
+        TopLevelDestination(
+            route = Route.MESSAGE,
+            icon = R.drawable.chat_bubble,
+            textId = R.string.message_chats,
+        ),
+        TopLevelDestination(
+            route = Route.EVENTS,
+            icon = R.drawable.home,
+            textId = R.string.homeScreen_events,
+        ),
+        TopLevelDestination(
+            route = Route.PROFILE,
+            icon = R.drawable.user_profile,
+            textId = R.string.user_profile,
+        ),
+        TopLevelDestination(
+            route = Route.MY_HOSTING,
+            icon = R.drawable.celebration,
+            textId = R.string.my_hosted_events,
+        ),
+    )

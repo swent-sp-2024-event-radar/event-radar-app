@@ -18,19 +18,11 @@ fun NavGraph(navController: NavHostController) {
     composable(Route.LOGIN) { LoginScreen(navigationActions = navActions) }
     composable(Route.OVERVIEW) { Overview(navigationActions = navActions) }
 
-    //TODO replace the Toast message with the corresponding screen function of the route
-    composable(Route.SCANNER) {
-      context.toast("Scanner screen needs to be implemented")
-    }
-    composable(Route.MESSAGE) {
-      context.toast("Message main screen needs to be implemented")
-    }
-    composable(Route.EVENTS) {
-      context.toast("Event main screen needs to be implemented")
-    }
-    composable(Route.PROFILE) {
-      context.toast("Profile screen needs to be implemented")
-    }
+    // TODO replace the Toast message with the corresponding screen function of the route
+    composable(Route.SCANNER) { context.toast("Scanner screen needs to be implemented") }
+    composable(Route.MESSAGE) { context.toast("Message main screen needs to be implemented") }
+    composable(Route.EVENTS) { context.toast("Event main screen needs to be implemented") }
+    composable(Route.PROFILE) { context.toast("Profile screen needs to be implemented") }
     composable(Route.MY_HOSTING) {
       context.toast("My hosted events screen needs to be implemented")
     }
