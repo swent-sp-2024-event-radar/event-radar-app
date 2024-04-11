@@ -1,6 +1,5 @@
 package com.github.se.eventradar.ui.login
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.BorderStroke
@@ -39,6 +38,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ChainStyle
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.ConstraintSet
+import androidx.constraintlayout.compose.layoutId
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.github.se.eventradar.R
@@ -48,19 +51,16 @@ import com.github.se.eventradar.ui.navigation.Route
 @Composable
 fun ErrorDialogBox(openErrorDialog: MutableState<Boolean>) {
   val display by openErrorDialog
-  if (display == true) {
+  if (display) {
     AlertDialog(
         icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Account Icon") },
         text = { Text("Sign in Failed. Please try again.", textAlign = TextAlign.Center) },
         title = { Text("Sign in Failed") },
         onDismissRequest = { openErrorDialog.value = false },
-        confirmButton = {
-          TextButton(onClick = { openErrorDialog.value = false }) { Text("Confirm") }
-        })
+        confirmButton = { TextButton(onClick = { openErrorDialog.value = false }) { Text("Ok") } })
   }
 }
 
-@SuppressLint("UnrememeredMutableState", "UnrememberedMutableState")
 @Composable
 fun LoginScreen(navigationActions: NavigationActions) {
   val openErrorDialog = remember { mutableStateOf(false) }
@@ -69,7 +69,8 @@ fun LoginScreen(navigationActions: NavigationActions) {
           contract = FirebaseAuthUIActivityResultContract(),
           onResult = { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-              navigationActions.navController.navigate(Route.OVERVIEW)
+              navigationActions.navController.navigate(
+                  Route.OVERVIEW) // Note: Change to Route.Events When Nav Bar Is Done.
             } else {
               openErrorDialog.value = true
             }
@@ -86,94 +87,104 @@ fun LoginScreen(navigationActions: NavigationActions) {
           .setIsSmartLockEnabled(false)
           .setAvailableProviders(providers)
           .build()
+
   Column(
       modifier = Modifier.fillMaxSize().testTag("loginScreen"),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically) {
-          Image(
-              painter = painterResource(R.drawable.event_radar_logo),
-              contentDescription = "Logo",
-              modifier = Modifier.padding(1.dp).width(43.dp).height(68.dp).testTag("logo"),
-          )
-          Text(
-              text = "Event Radar",
-              modifier = Modifier.width(253.dp).height(55.dp).testTag("loginTitle"),
-              style =
-                  TextStyle(
-                      fontSize = 40.sp,
-                      lineHeight = 17.sp,
-                      fontFamily = FontFamily(Font(R.font.roboto)),
-                      fontWeight = FontWeight(700),
-                      color = Color(0xFF000000),
-                      textAlign = TextAlign.Center,
-                      letterSpacing = 0.25.sp,
-                  ))
-        }
+    ConstraintLayout {
+      val (titleRow, signInButton, signUpRow) = createRefs()
+      Row(
+          modifier = Modifier.constrainAs(ref = titleRow, {top.linkTo(parent.top, margin = 16.dp)}),
+          horizontalArrangement = Arrangement.Center,
+          verticalAlignment = Alignment.CenterVertically
+            ) {
+            Image(
+                painter = painterResource(R.drawable.event_radar_logo),
+                contentDescription = "Logo",
+                modifier = Modifier.padding(1.dp).width(43.dp).height(68.dp).testTag("logo"),
+            )
+            Text(
+                text = "Event Radar",
+                modifier = Modifier.width(253.dp).height(55.dp).testTag("loginTitle"),
+                style =
+                    TextStyle(
+                        fontSize = 40.sp,
+                        lineHeight = 17.sp,
+                        fontFamily = FontFamily(Font(R.font.roboto)),
+                        fontWeight = FontWeight(700),
+                        color = Color(0xFF000000),
+                        textAlign = TextAlign.Center,
+                        letterSpacing = 0.25.sp,
+                    ))
+          }
 
-    Spacer(modifier = Modifier.height(240.dp))
-    Button(
-        onClick = { launcher.launch(intent) },
-        modifier = Modifier.wrapContentSize().testTag("loginButton"),
-        border = BorderStroke(width = 1.dp, color = Color(0xFFDADCE0)),
-        colors =
-            ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFB422D9),
-            ),
-    ) {
-      Image(
-          painter = painterResource(id = R.drawable.logo),
-          contentDescription = "Google Logo",
-          modifier = Modifier.width(24.dp).height(24.dp).align(Alignment.CenterVertically),
-      )
-      Spacer(modifier = Modifier.width(25.dp))
-      Text(
-          text = "Sign in with Google",
-          style =
-              TextStyle(
-                  fontSize = 14.sp,
-                  lineHeight = 17.sp,
-                  fontFamily = FontFamily(Font(R.font.roboto)),
-                  fontWeight = FontWeight(500),
-                  color = Color(0xFFFFFFFF),
-                  textAlign = TextAlign.Center,
-                  letterSpacing = 0.25.sp,
-              ))
-      Spacer(modifier = Modifier.width(25.dp))
+      Button(
+          onClick = { launcher.launch(intent) },
+          modifier = Modifier.wrapContentSize().constrainAs(ref = signInButton,
+              {top.linkTo(titleRow.bottom, margin = 240.dp)
+                  centerHorizontallyTo(titleRow)
+              }).testTag("loginButton"),
+          border = BorderStroke(width = 1.dp, color = Color(0xFFDADCE0)),
+          colors =
+              ButtonDefaults.buttonColors(
+                  containerColor = Color(0xFFB422D9),
+              ),
+      ) {
+        Image(
+            painter = painterResource(id = R.drawable.logo),
+            contentDescription = "Google Logo",
+            modifier = Modifier.width(24.dp).height(24.dp).padding(end = 8.dp).align(Alignment.CenterVertically),
+        )
+        Text(
+            text = "Sign in with Google",
+            modifier = Modifier.padding(horizontal = 25.dp),
+            style =
+                TextStyle(
+                    fontSize = 14.sp,
+                    lineHeight = 17.sp,
+                    fontFamily = FontFamily(Font(R.font.roboto)),
+                    fontWeight = FontWeight(500),
+                    color = Color(0xFFFFFFFF),
+                    textAlign = TextAlign.Center,
+                    letterSpacing = 0.25.sp,
+                ))
+      }
+      Row(
+          modifier = Modifier.constrainAs(ref = signUpRow, {
+              top.linkTo(signInButton.bottom, margin = 20.dp)
+              centerHorizontallyTo(signInButton)
+          }),
+          horizontalArrangement = Arrangement.Center,
+          verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "Not a registered user?",
+                modifier = Modifier.width(140.dp).height(27.dp),
+                style =
+                    TextStyle(
+                        fontSize = 14.sp,
+                        lineHeight = 17.sp,
+                        fontFamily = FontFamily(Font(R.font.roboto)),
+                        fontWeight = FontWeight(500),
+                        color = Color(0xFF000000),
+                        textAlign = TextAlign.Center,
+                        letterSpacing = 0.25.sp,
+                    ))
+            Text(
+                text = "Sign up here",
+                modifier = Modifier.width(101.dp).height(27.dp),
+                style =
+                    TextStyle(
+                        fontSize = 14.sp,
+                        lineHeight = 17.sp,
+                        fontFamily = FontFamily(Font(R.font.roboto)),
+                        fontWeight = FontWeight(500),
+                        color = Color(0xFFB422D9),
+                        textAlign = TextAlign.Center,
+                        letterSpacing = 0.25.sp,
+                    ))
+          }
     }
-    Spacer(modifier = Modifier.height(20.dp))
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically) {
-          Text(
-              text = "Not a registered user?",
-              modifier = Modifier.width(140.dp).height(27.dp),
-              style =
-                  TextStyle(
-                      fontSize = 14.sp,
-                      lineHeight = 17.sp,
-                      fontFamily = FontFamily(Font(R.font.roboto)),
-                      fontWeight = FontWeight(500),
-                      color = Color(0xFF000000),
-                      textAlign = TextAlign.Center,
-                      letterSpacing = 0.25.sp,
-                  ))
-          Text(
-              text = "Sign up here",
-              modifier = Modifier.width(101.dp).height(27.dp),
-              style =
-                  TextStyle(
-                      fontSize = 14.sp,
-                      lineHeight = 17.sp,
-                      fontFamily = FontFamily(Font(R.font.roboto)),
-                      fontWeight = FontWeight(500),
-                      color = Color(0xFFB422D9),
-                      textAlign = TextAlign.Center,
-                      letterSpacing = 0.25.sp,
-                  ))
-        }
   }
 }
