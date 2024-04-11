@@ -12,7 +12,20 @@
           "package_name": "com.github.se.eventradar"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1043895872028-9ioo4qv653erkc4mjk2iamgnb05aoccm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.se.eventradar",
+            "certificate_hash": "2c45b8ed3561a0f5fc5965ca4ec994f84eb1fff2"
+          }
+        },
+        {
+          "client_id": "1043895872028-8m8f4kpcmqe60ofkef734vbgqph8g5ut.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCSsyVzBHrtEzBMeGjCATj-Y8IIhbcnnoA"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1043895872028-8m8f4kpcmqe60ofkef734vbgqph8g5ut.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
