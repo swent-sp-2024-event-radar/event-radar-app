@@ -1,5 +1,6 @@
 package com.github.se.eventradar.ui.login
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.BorderStroke
@@ -11,10 +12,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,17 +43,35 @@ import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 
 @Composable
-fun LoginScreen(navigationActions: NavigationActions) {
+fun ErrorDialogBox(openErrorDialog: MutableState<Boolean>) {
+  val display by openErrorDialog
+  if (display == true) {
+    AlertDialog(
+        icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Account Icon") },
+        text = { Text("Sign in Failed. Please try again.", textAlign = TextAlign.Center) },
+        title = { Text("Sign in Failed") },
+        onDismissRequest = { openErrorDialog.value = false },
+        confirmButton = {
+          TextButton(onClick = { openErrorDialog.value = false }) { Text("Confirm") }
+        })
+  }
+}
 
+@SuppressLint("UnrememeredMutableState", "UnrememberedMutableState")
+@Composable
+fun LoginScreen(navigationActions: NavigationActions) {
+  val openErrorDialog = remember { mutableStateOf(false) }
   val launcher =
       rememberLauncherForActivityResult(
           contract = FirebaseAuthUIActivityResultContract(),
           onResult = { result ->
-            if (result.resultCode == Activity.RESULT_OK)
-                navigationActions.navController.navigate(Route.OVERVIEW)
-            else navigationActions.navController.navigate(Route.LOGIN)
+            if (result.resultCode == Activity.RESULT_OK) {
+              navigationActions.navController.navigate(Route.OVERVIEW)
+            } else {
+              openErrorDialog.value = true
+            }
           })
-
+  ErrorDialogBox(openErrorDialog)
   val providers =
       arrayListOf(
           AuthUI.IdpConfig.GoogleBuilder().build(),
@@ -77,10 +105,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
             ),
         modifier = Modifier.testTag("loginTitle"))
     Button(
-        onClick = {
-          launcher.launch(intent)
-          navigationActions.navController.navigate(Route.OVERVIEW)
-        },
+        onClick = { launcher.launch(intent) },
         modifier = Modifier.wrapContentSize().testTag("loginButton"),
         border = BorderStroke(width = 1.dp, color = Color(0xFFDADCE0)),
         colors =
