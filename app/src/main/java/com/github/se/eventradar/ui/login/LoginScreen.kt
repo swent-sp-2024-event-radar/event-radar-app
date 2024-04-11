@@ -7,12 +7,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.AlertDialog
@@ -28,7 +28,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -38,10 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.ConstraintSet
-import androidx.constraintlayout.compose.layoutId
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.github.se.eventradar.R
@@ -114,7 +110,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
                         lineHeight = 17.sp,
                         fontFamily = FontFamily(Font(R.font.roboto)),
                         fontWeight = FontWeight(700),
-                        color = Color(0xFF000000),
+                        color = MaterialTheme.colors.onBackground,
                         textAlign = TextAlign.Center,
                         letterSpacing = 0.25.sp,
                     ))
@@ -126,10 +122,10 @@ fun LoginScreen(navigationActions: NavigationActions) {
               {top.linkTo(titleRow.bottom, margin = 240.dp)
                   centerHorizontallyTo(titleRow)
               }).testTag("loginButton"),
-          border = BorderStroke(width = 1.dp, color = Color(0xFFDADCE0)),
+          border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.primary),
           colors =
               ButtonDefaults.buttonColors(
-                  containerColor = Color(0xFFB422D9),
+                  containerColor = MaterialTheme.colors.primary, //Note: Change to Primary Container once Vicky Merges Request
               ),
       ) {
         Image(
@@ -146,7 +142,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
                     lineHeight = 17.sp,
                     fontFamily = FontFamily(Font(R.font.roboto)),
                     fontWeight = FontWeight(500),
-                    color = Color(0xFFFFFFFF),
+                    color = MaterialTheme.colors.onPrimary,
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.25.sp,
                 ))
@@ -167,7 +163,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
                         lineHeight = 17.sp,
                         fontFamily = FontFamily(Font(R.font.roboto)),
                         fontWeight = FontWeight(500),
-                        color = Color(0xFF000000),
+                        color = MaterialTheme.colors.onBackground,
                         textAlign = TextAlign.Center,
                         letterSpacing = 0.25.sp,
                     ))
@@ -180,7 +176,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
                         lineHeight = 17.sp,
                         fontFamily = FontFamily(Font(R.font.roboto)),
                         fontWeight = FontWeight(500),
-                        color = Color(0xFFB422D9),
+                        color = MaterialTheme.colors.secondary,
                         textAlign = TextAlign.Center,
                         letterSpacing = 0.25.sp,
                     ))
