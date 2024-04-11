@@ -64,15 +64,15 @@ fun LoginScreen(navigationActions: NavigationActions) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
-            painter = painterResource(R.drawable.smile),
+            painter = painterResource(R.drawable.event_radar_logo),
             contentDescription = "Logo",
             modifier = Modifier
                 .align(Alignment.CenterHorizontally) // Center horizontally
-                .width(132.dp) // Constrain on both sides
-                .height(132.dp)
+                .width(300.dp) // Constrain on both sides
+                .height(100.dp)
                 .testTag("logo"),
         )
-        Spacer(modifier = Modifier.height(100.dp)) // Space between logo and Text
+        Spacer(modifier = Modifier.height(10.dp)) // Space between logo and Text
         Text(
             text = "Welcome", style = TextStyle(
                 fontSize = 57.sp,
@@ -93,7 +93,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
                 .testTag("loginButton"),
             border = BorderStroke(width = 1.dp, color = Color(0xFFDADCE0)),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFFFFFFF),
+                containerColor = Color(0xFFB422D9),
             ),
         ) {
             Image(
@@ -111,7 +111,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
                     lineHeight = 17.sp,
                     fontFamily = FontFamily.SansSerif,
                     fontWeight = FontWeight(500),
-                    color = Color(0xFF3C4043),
+                    color = Color(0xFFFFFFFF),
                     letterSpacing = 0.25.sp,
                 ),
                 modifier = Modifier.padding(start = 8.dp),
@@ -119,7 +119,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
         }
         Spacer(modifier = Modifier.height(16.dp)) // Space between button and text
         Text(
-            text = "New User?",
+            text = "Not a registered user?",
             style = TextStyle(
                 fontSize = 14.sp,
                 lineHeight = 17.sp,
@@ -131,13 +131,13 @@ fun LoginScreen(navigationActions: NavigationActions) {
             modifier = Modifier.padding(start = 8.dp),
         )
         Text(
-            text = "Sign Up",
+            text = "Sign Up here",
             style = TextStyle(
                 fontSize = 14.sp,
                 lineHeight = 17.sp,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight(500),
-                color = Color(0xFF3C4043),
+                color = Color(0xFFB422D9),
                 letterSpacing = 0.25.sp,
                 textDecoration = TextDecoration.Underline
             ),

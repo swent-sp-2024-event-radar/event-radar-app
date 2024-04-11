@@ -118,12 +118,12 @@ fun SignUpScreen(navigationActions: NavigationActions) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
-            painter = painterResource(R.drawable.smile),
+            painter = painterResource(R.drawable.event_radar_logo),
             contentDescription = "Logo",
             modifier = Modifier
                 .align(Alignment.CenterHorizontally) // Center horizontally
-                .width(132.dp) // Constrain on both sides
-                .height(132.dp)
+                .width(300.dp) // Constrain on both sides
+                .height(100.dp)
                 .testTag("logo"),
         )
         Spacer(modifier = Modifier.height(16.dp)) // Space between logo and button
@@ -157,7 +157,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
             label = { Text("Name") },
             modifier = Modifier.width(320.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFFF7009), unfocusedBorderColor = Color(0xFFFF7009)
+                focusedBorderColor = Color(0xFFB422D9), unfocusedBorderColor = Color(0xFFB422D9)
             ),
             shape = RoundedCornerShape(12.dp),
             isError = name.value.isEmpty()
@@ -168,7 +168,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
             label = { Text("Surname") },
             modifier = Modifier.width(320.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFFF7009), unfocusedBorderColor = Color(0xFFFF7009)
+                focusedBorderColor = Color(0xFFB422D9), unfocusedBorderColor = Color(0xFFB422D9)
             ),
             shape = RoundedCornerShape(12.dp),
             isError = name.value.isEmpty()
@@ -188,7 +188,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
             label = { Text("Birth Date") },
             modifier = Modifier.width(320.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFFF7009), unfocusedBorderColor = Color(0xFFFF7009)
+                focusedBorderColor = Color(0xFFB422D9), unfocusedBorderColor = Color(0xFFB422D9)
             ),
             shape = RoundedCornerShape(12.dp),
             isError = name.value.isEmpty()
@@ -202,8 +202,8 @@ fun SignUpScreen(navigationActions: NavigationActions) {
             modifier = Modifier
                 .wrapContentSize()
                 .testTag("loginButton"),
-            border = BorderStroke(width = 1.dp, color = Color(0xFFDADCE0)),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF)),
+            border = BorderStroke(width = 1.dp, color = Color(0xFFB422D9)),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB422D9)),
         ) {
             Image(
                 painter = painterResource(id = R.drawable.logo),
@@ -220,7 +220,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                     lineHeight = 17.sp,
                     fontFamily = FontFamily.SansSerif,
                     fontWeight = FontWeight(500),
-                    color = Color(0xFF3C4043),
+                    color = Color(0xFFFFFFFF),
                     letterSpacing = 0.25.sp,
                 ),
                 modifier = Modifier.padding(start = 8.dp),
@@ -243,7 +243,7 @@ fun PhoneNumberInput(
         label = { Text("Phone Number") },
         modifier = Modifier.width(320.dp),
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = Color(0xFFFF7009), unfocusedBorderColor = Color(0xFFFF7009)
+            focusedBorderColor = Color(0xFFB422D9), unfocusedBorderColor = Color(0xFFB422D9)
         ),
         shape = RoundedCornerShape(12.dp),
         leadingIcon = {
