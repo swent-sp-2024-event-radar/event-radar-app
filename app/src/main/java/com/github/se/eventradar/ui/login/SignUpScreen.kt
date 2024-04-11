@@ -8,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,8 +16,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -37,6 +40,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -54,6 +58,8 @@ import com.github.se.eventradar.ui.navigation.Route
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import coil.compose.rememberImagePainter
+import kotlinx.coroutines.tasks.await
 
 private const val TAG = "SignUpScreen"
 
@@ -61,6 +67,7 @@ private const val TAG = "SignUpScreen"
 @Composable
 fun SignUpScreen(navigationActions: NavigationActions) {
     val selectedImageUri = rememberSaveable { mutableStateOf<Uri?>(null) }
+    val username = rememberSaveable { mutableStateOf("") }
     val name = rememberSaveable { mutableStateOf("") }
     val surname = rememberSaveable { mutableStateOf("") }
     val phoneNumber = rememberSaveable { mutableStateOf("") }
@@ -126,31 +133,48 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                 .height(100.dp)
                 .testTag("logo"),
         )
-        Spacer(modifier = Modifier.height(16.dp)) // Space between logo and button
-        Button(
-            onClick = {
-                imagePickerLauncher.launch("image/*") // Launch the image picker
+        Spacer(modifier = Modifier.height(16.dp)) // Space between logo and profile picture
+        val imagePickerLauncher =
+            rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
+                onResult = { uri ->
+                    // Handle the returned Uri
+                    selectedImageUri.value = uri
+                })
 
-            },
-            modifier = Modifier
-                .wrapContentSize()
-                .testTag("profilePictureButton"),
-            border = BorderStroke(width = 1.dp, color = Color(0xFFDADCE0)),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFFFF)),
-        ) {
-            Text(
-                text = "Choose Profile Picture",
-                style = TextStyle(
-                    fontSize = 14.sp,
-                    lineHeight = 17.sp,
-                    fontFamily = FontFamily.SansSerif,
-                    fontWeight = FontWeight(500),
-                    color = Color(0xFF3C4043),
-                    letterSpacing = 0.25.sp,
-                ),
-                modifier = Modifier.padding(start = 8.dp),
+        val imageUri = selectedImageUri.value
+        if (imageUri != null) {
+            val imageBitmap = rememberImagePainter(data = imageUri)
+            Image(
+                painter = imageBitmap,
+                contentDescription = "Selected Profile Picture",
+                modifier = Modifier
+                    .size(200.dp) // Adjust size as needed
+                    .clickable { imagePickerLauncher.launch("image/*") } // Launch the image picker when the image is clicked
+            )
+        } else {
+            Image(
+                painter = painterResource(id = R.drawable.placeholder), // Replace with your placeholder image resource
+                contentDescription = "Profile Picture Placeholder",
+                modifier = Modifier
+                    .size(200.dp) // Adjust size as needed
+                    .clickable { imagePickerLauncher.launch("image/*") } // Launch the image picker when the placeholder is clicked
             )
         }
+
+        Spacer(modifier = Modifier.height(32.dp)) // Space between profile picture and text fields
+        OutlinedTextField(
+            value = username.value,
+            onValueChange = { username.value = it },
+            label = { Text("Username") },
+            modifier = Modifier.width(320.dp),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = Color(0xFFB422D9), unfocusedBorderColor = Color(0xFFB422D9)
+            ),
+            shape = RoundedCornerShape(12.dp),
+            leadingIcon = { Text("@", Modifier.padding(start = 12.dp), Color(0xFFB422D9)) }, // Add "@" as leading icon
+            isError = username.value.isEmpty(),
+
+        )
         Spacer(modifier = Modifier.height(16.dp)) // Space between button and text fields
         OutlinedTextField(value = name.value,
             onValueChange = { name.value = it },
@@ -201,6 +225,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
             },
             modifier = Modifier
                 .wrapContentSize()
+                .width(250.dp)
                 .testTag("loginButton"),
             border = BorderStroke(width = 1.dp, color = Color(0xFFB422D9)),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB422D9)),
@@ -249,7 +274,7 @@ fun PhoneNumberInput(
         leadingIcon = {
             Box {
                 TextButton(onClick = { isDropdownExpanded = true }) {
-                    Text(selectedCountryCode.value)
+                    Text(selectedCountryCode.value, color = Color(0xFFB422D9))
                 }
                 DropdownMenu(expanded = isDropdownExpanded,
                     onDismissRequest = { isDropdownExpanded = false }) {
@@ -280,4 +305,10 @@ fun isValidPhoneNumber(phoneNumber: String, countryCode: String): Boolean {
         else -> 0
     }
     return phoneNumber.length == validLength
+}
+
+suspend fun isUsernameUnique(username: String): Boolean {
+    val db = Firebase.firestore
+    val docSnapshot = db.collection("users").document(username).get().await()
+    return !docSnapshot.exists()
 }

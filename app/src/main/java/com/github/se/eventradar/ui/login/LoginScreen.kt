@@ -72,15 +72,6 @@ fun LoginScreen(navigationActions: NavigationActions) {
                 .height(100.dp)
                 .testTag("logo"),
         )
-        Spacer(modifier = Modifier.height(10.dp)) // Space between logo and Text
-        Text(
-            text = "Welcome", style = TextStyle(
-                fontSize = 57.sp,
-                fontFamily = FontFamily.SansSerif,
-                fontWeight = FontWeight(400),
-                textAlign = TextAlign.Center,
-            ), modifier = Modifier.testTag("loginTitle")
-        )
 
         Spacer(modifier = Modifier.height(16.dp)) // Space between logo and button
         Button(
@@ -90,6 +81,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
             },
             modifier = Modifier
                 .wrapContentSize()
+                .width(250.dp)
                 .testTag("loginButton"),
             border = BorderStroke(width = 1.dp, color = Color(0xFFDADCE0)),
             colors = ButtonDefaults.buttonColors(
