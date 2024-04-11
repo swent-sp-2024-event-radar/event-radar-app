@@ -34,46 +34,42 @@ private val selectedColor = Color(0xFFB422D9)
 
 @Composable
 fun BottomNavigationMenu(
-  onTabSelected: (TopLevelDestination) -> Unit,
-  tabList: List<TopLevelDestination>,
-  selectedItem: TopLevelDestination,
-  modifier: Modifier = Modifier,
+    onTabSelected: (TopLevelDestination) -> Unit,
+    tabList: List<TopLevelDestination>,
+    selectedItem: TopLevelDestination,
+    modifier: Modifier = Modifier,
 ) {
   BottomNavigation(
-    backgroundColor = lightBackgroundColor,
-    modifier = modifier,
+      backgroundColor = lightBackgroundColor,
+      modifier = modifier,
   ) {
     tabList.forEach { tab ->
       val boxModifier =
-        if (tab == selectedItem) {
-          Modifier
-            .clip(shape = RoundedCornerShape(50))
-            .background(selectedColor)
-            .width(58.dp)
-            .height(36.dp)
-        } else Modifier
+          if (tab == selectedItem) {
+            Modifier.clip(shape = RoundedCornerShape(50))
+                .background(selectedColor)
+                .width(58.dp)
+                .height(36.dp)
+          } else Modifier
 
       val t = if (selectedItem == tab) stringResource(tab.textId) else ""
 
       BottomNavigationItem(
-        icon = { NavBarIcon(tab, boxModifier) },
-        label = { Text(text = t, color = iconColor, fontSize = 12.sp) },
-        selected = selectedItem == tab,
-        onClick = { onTabSelected(tab) },
-        modifier =
-        Modifier
-          .align(Alignment.CenterVertically)
-          .testTag(
-            when (tab.textId) {
-              R.string.scan_QR -> "scanQRBottomNav"
-              R.string.message_chats -> "messageChatBottomNav"
-              R.string.homeScreen_events -> "homeScreenEventBottomNav"
-              R.string.user_profile -> "userProfileBottomNav"
-              R.string.my_hosted_events -> "myHostingBottomNav"
-              else -> "itemBottomNav"
-            }
-          )
-      )
+          icon = { NavBarIcon(tab, boxModifier) },
+          label = { Text(text = t, color = iconColor, fontSize = 12.sp) },
+          selected = selectedItem == tab,
+          onClick = { onTabSelected(tab) },
+          modifier =
+              Modifier.align(Alignment.CenterVertically)
+                  .testTag(
+                      when (tab.textId) {
+                        R.string.scan_QR -> "scanQRBottomNav"
+                        R.string.message_chats -> "messageChatBottomNav"
+                        R.string.homeScreen_events -> "homeScreenEventBottomNav"
+                        R.string.user_profile -> "userProfileBottomNav"
+                        R.string.my_hosted_events -> "myHostingBottomNav"
+                        else -> "itemBottomNav"
+                      }))
     }
   }
 }
@@ -82,12 +78,10 @@ fun BottomNavigationMenu(
 fun NavBarIcon(tab: TopLevelDestination, modifier: Modifier) {
   Box(modifier = modifier, contentAlignment = Alignment.Center) {
     Icon(
-      painter = painterResource(id = tab.icon),
-      tint = iconColor,
-      contentDescription = null,
-      modifier = Modifier
-        .width(24.dp)
-        .height(24.dp),
+        painter = painterResource(id = tab.icon),
+        tint = iconColor,
+        contentDescription = null,
+        modifier = Modifier.width(24.dp).height(24.dp),
     )
   }
 }
@@ -99,10 +93,7 @@ fun EventDetailsPreview() {
     Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFFFFFFFF)) {
       val selectedItem = TOP_LEVEL_DESTINATIONS[2]
       BottomNavigationMenu(
-        onTabSelected = { },
-        tabList = TOP_LEVEL_DESTINATIONS,
-        selectedItem = selectedItem
-      )
+          onTabSelected = {}, tabList = TOP_LEVEL_DESTINATIONS, selectedItem = selectedItem)
     }
   }
 }
