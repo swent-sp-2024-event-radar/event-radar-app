@@ -92,10 +92,10 @@ fun LoginScreen(navigationActions: NavigationActions) {
     ConstraintLayout {
       val (titleRow, signInButton, signUpRow) = createRefs()
       Row(
-          modifier = Modifier.constrainAs(ref = titleRow, {top.linkTo(parent.top, margin = 16.dp)}),
+          modifier =
+              Modifier.constrainAs(ref = titleRow, { top.linkTo(parent.top, margin = 16.dp) }),
           horizontalArrangement = Arrangement.Center,
-          verticalAlignment = Alignment.CenterVertically
-            ) {
+          verticalAlignment = Alignment.CenterVertically) {
             Image(
                 painter = painterResource(R.drawable.event_radar_logo),
                 contentDescription = "Logo",
@@ -118,20 +118,31 @@ fun LoginScreen(navigationActions: NavigationActions) {
 
       Button(
           onClick = { launcher.launch(intent) },
-          modifier = Modifier.wrapContentSize().constrainAs(ref = signInButton,
-              {top.linkTo(titleRow.bottom, margin = 240.dp)
-                  centerHorizontallyTo(titleRow)
-              }).testTag("loginButton"),
+          modifier =
+              Modifier.wrapContentSize()
+                  .constrainAs(
+                      ref = signInButton,
+                      {
+                        top.linkTo(titleRow.bottom, margin = 240.dp)
+                        centerHorizontallyTo(titleRow)
+                      })
+                  .testTag("loginButton"),
           border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.primary),
           colors =
               ButtonDefaults.buttonColors(
-                  containerColor = MaterialTheme.colors.primary, //Note: Change to Primary Container once Vicky Merges Request
+                  containerColor =
+                      MaterialTheme.colors
+                          .primary, // Note: Change to Primary Container once Vicky Merges Request
               ),
       ) {
         Image(
             painter = painterResource(id = R.drawable.logo),
             contentDescription = "Google Logo",
-            modifier = Modifier.width(24.dp).height(24.dp).padding(end = 8.dp).align(Alignment.CenterVertically),
+            modifier =
+                Modifier.width(24.dp)
+                    .height(24.dp)
+                    .padding(end = 8.dp)
+                    .align(Alignment.CenterVertically),
         )
         Text(
             text = "Sign in with Google",
@@ -148,10 +159,13 @@ fun LoginScreen(navigationActions: NavigationActions) {
                 ))
       }
       Row(
-          modifier = Modifier.constrainAs(ref = signUpRow, {
-              top.linkTo(signInButton.bottom, margin = 20.dp)
-              centerHorizontallyTo(signInButton)
-          }),
+          modifier =
+              Modifier.constrainAs(
+                  ref = signUpRow,
+                  {
+                    top.linkTo(signInButton.bottom, margin = 20.dp)
+                    centerHorizontallyTo(signInButton)
+                  }),
           horizontalArrangement = Arrangement.Center,
           verticalAlignment = Alignment.CenterVertically) {
             Text(
