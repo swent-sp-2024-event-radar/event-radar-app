@@ -1,7 +1,6 @@
 package com.github.se.eventradar.ui.event
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,9 +29,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
+import com.github.se.eventradar.ui.BottomNavigationMenu
+import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.theme.MyApplicationTheme
-
 
 // Temporary text field values
 private val headerDescription: String = "Description"
@@ -66,174 +68,108 @@ private val DT_lightBackgroundColor = Color(0xFF24292F)
 
 private val DT_special1Color = Color(0xFFAA23AA)
 
-
 private val eventImage = R.drawable.ic_launcher_background
 
 @Composable
-// TODO new header for nav and viewModel
-// fun EventDetails(EventviewViewModel: ViewModel = viewModel(), navigationActions: NavigationActions){
-fun EventDetails() {
+fun EventDetails(navigationActions: NavigationActions) {
 
+  Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween) {
+    Image(
+        painter = painterResource(eventImage),
+        contentDescription = "Event Image",
+        modifier = Modifier.fillMaxWidth().height(imageHeight),
+        contentScale = ContentScale.FillWidth)
 
-    Column(
-        modifier = Modifier.fillMaxHeight(),
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        Image(
-            painter = painterResource(eventImage),
-            contentDescription = "Event Image",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(imageHeight),
-            contentScale = ContentScale.FillWidth
-
-        )
-
-        // go back button
-        Button(
-            onClick = { /*TODO*/ },
-            modifier = Modifier
-                .wrapContentSize()
-                .align(Alignment.Start)
-                .testTag("backButton"),
-            colors =
+    // go back button
+    Button(
+        onClick = { navigationActions.goBack() },
+        modifier = Modifier.wrapContentSize().align(Alignment.Start).testTag("backButton"),
+        colors =
             ButtonDefaults.buttonColors(
                 contentColor = DT_titleColor,
                 containerColor = Color(0x00FFFFFF),
             ),
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.back_arrow),
-                contentDescription = "Back navigation arrow",
-                tint = DT_titleColor,
-                modifier = Modifier
-                    .width(24.dp)
-                    .height(24.dp)
-                    .align(Alignment.CenterVertically)
-
-            )
-        }
-
-
-        Text(
-            text = "Event Title",
-            color = DT_titleColor,
-            lineHeight = 20.sp,
-            fontWeight = FontWeight.Bold,
-            fontSize = titleTextSize,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-
-
-        Column(
-            modifier = Modifier
-                .padding(start = widthPadding, end = widthPadding)
-        ) {
-            Text(text = headerDescription, color = DT_fieldTitleColor, fontSize = contentTextSize)
-            Text(
-                text = contentDescription,
-                color = DT_fieldContentColor,
-                fontSize = contentTextSize
-            )
-        }
-
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = widthPadding, end = widthPadding)
-                .height(64.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(text = headerDistance, color = DT_fieldTitleColor, fontSize = contentTextSize)
-                Text(
-                    text = contentDistance,
-                    color = DT_fieldContentColor,
-                    fontSize = contentTextSize
-                )
-            }
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(text = headerDate, color = DT_fieldTitleColor, fontSize = contentTextSize)
-                Text(text = contentDate, color = DT_fieldContentColor, fontSize = contentTextSize)
-            }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = widthPadding, end = widthPadding)
-                .height(64.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = headerCategory, color = DT_fieldTitleColor, fontSize = contentTextSize)
-                Text(
-                    text = contentCategory,
-                    color = DT_fieldContentColor,
-                    fontSize = contentTextSize
-                )
-            }
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(text = headerTime, color = DT_fieldTitleColor, fontSize = contentTextSize)
-                Text(text = contentTime, color = DT_fieldContentColor, fontSize = contentTextSize)
-            }
-        }
-
-        // register button
-        FloatingActionButton(
-            onClick = { /*TODO*/ },
-            modifier = Modifier
-                .padding(bottom = 16.dp, end = 16.dp)
-                .align(Alignment.End), // Ajustez l'espacement par le bas selon vos besoins
-            containerColor = DT_lightBackgroundColor,
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.menu),
-                contentDescription = "register to event button",
-                modifier = Modifier.size(32.dp),
-                tint = DT_special1Color,
-            )
-
-        }
-
-        //TODO add BottomNavBar (placeholder)
-        Row(
-            modifier = Modifier
-                .background(DT_fieldContentColor)
-                .height(80.dp)
-                .fillMaxWidth()
-        ) {
-            Text(text = "add bottom nav bar")
-        }
+    ) {
+      Icon(
+          painter = painterResource(id = R.drawable.back_arrow),
+          contentDescription = "Back navigation arrow",
+          tint = DT_titleColor,
+          modifier = Modifier.width(24.dp).height(24.dp).align(Alignment.CenterVertically))
     }
 
-}
+    Text(
+        text = "Event Title",
+        color = DT_titleColor,
+        lineHeight = 20.sp,
+        fontWeight = FontWeight.Bold,
+        fontSize = titleTextSize,
+        modifier = Modifier.align(Alignment.CenterHorizontally))
 
+    Column(modifier = Modifier.padding(start = widthPadding, end = widthPadding)) {
+      Text(text = headerDescription, color = DT_fieldTitleColor, fontSize = contentTextSize)
+      Text(text = contentDescription, color = DT_fieldContentColor, fontSize = contentTextSize)
+    }
+
+    Row(
+        modifier =
+            Modifier.fillMaxWidth().padding(start = widthPadding, end = widthPadding).height(64.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center) {
+          Column(modifier = Modifier.weight(1f)) {
+            Text(text = headerDistance, color = DT_fieldTitleColor, fontSize = contentTextSize)
+            Text(text = contentDistance, color = DT_fieldContentColor, fontSize = contentTextSize)
+          }
+
+          Column(modifier = Modifier.weight(1f)) {
+            Text(text = headerDate, color = DT_fieldTitleColor, fontSize = contentTextSize)
+            Text(text = contentDate, color = DT_fieldContentColor, fontSize = contentTextSize)
+          }
+        }
+
+    Row(
+        modifier =
+            Modifier.fillMaxWidth().padding(start = widthPadding, end = widthPadding).height(64.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center) {
+          Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.SpaceBetween) {
+            Text(text = headerCategory, color = DT_fieldTitleColor, fontSize = contentTextSize)
+            Text(text = contentCategory, color = DT_fieldContentColor, fontSize = contentTextSize)
+          }
+
+          Column(modifier = Modifier.weight(1f)) {
+            Text(text = headerTime, color = DT_fieldTitleColor, fontSize = contentTextSize)
+            Text(text = contentTime, color = DT_fieldContentColor, fontSize = contentTextSize)
+          }
+        }
+
+    // register button
+    FloatingActionButton(
+        onClick = { /*TODO*/},
+        modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).align(Alignment.End),
+        containerColor = DT_lightBackgroundColor,
+    ) {
+      Icon(
+          painter = painterResource(id = R.drawable.ticket),
+          contentDescription = "register to event button",
+          modifier = Modifier.size(32.dp),
+          tint = DT_special1Color,
+      )
+    }
+
+    BottomNavigationMenu(
+        onTabSelected = { tab -> navigationActions.navigateTo(tab) },
+        tabList = TOP_LEVEL_DESTINATIONS,
+        selectedItem = TOP_LEVEL_DESTINATIONS[0])
+  }
+}
 
 @Preview(showBackground = true)
 @Composable
 fun EventDetailsPreview() {
-    MyApplicationTheme {
-        // A surface container using the 'background' color from the theme
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = DT_backgroundColor
-        ) {
-            EventDetails()
-        }
+  MyApplicationTheme {
+    Surface(modifier = Modifier.fillMaxSize(), color = DT_backgroundColor) {
+      val nav = NavigationActions(rememberNavController())
+      EventDetails(nav)
     }
+  }
 }
