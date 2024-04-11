@@ -7,6 +7,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -83,34 +86,48 @@ fun LoginScreen(navigationActions: NavigationActions) {
           .setIsSmartLockEnabled(false)
           .setAvailableProviders(providers)
           .build()
-
   Column(
       modifier = Modifier.fillMaxSize().testTag("loginScreen"),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    Image(
-        painter = painterResource(R.drawable.image1),
-        contentDescription = "Logo",
-        modifier = Modifier.width(132.dp).height(132.dp).testTag("logo"),
-    )
-    Text(
-        text = "Welcome",
-        style =
-            TextStyle(
-                fontSize = 57.sp,
-                fontFamily = FontFamily.SansSerif,
-                fontWeight = FontWeight(400),
-                textAlign = TextAlign.Center,
-            ),
-        modifier = Modifier.testTag("loginTitle"))
+      Row(horizontalArrangement = Arrangement.Center,
+         verticalAlignment = Alignment.CenterVertically){
+          Image(
+              painter = painterResource(R.drawable.event_radar_logo),
+              contentDescription = "Logo",
+              modifier = Modifier
+                  .padding(1.dp)
+                  .width(43.dp)
+                  .height(68.dp)
+                  .testTag("logo"),
+          )
+          Text(
+              text = "Event Radar",
+              modifier = Modifier
+                  .width(253.dp)
+                  .height(55.dp).testTag("loginTitle"),
+              style = TextStyle(
+                  fontSize = 40.sp,
+                  lineHeight = 17.sp,
+                  fontFamily = FontFamily(Font(R.font.roboto)),
+                  fontWeight = FontWeight(700),
+                  color = Color(0xFF000000),
+
+                  textAlign = TextAlign.Center,
+                  letterSpacing = 0.25.sp,
+              )
+          )
+      }
+
+      Spacer(modifier = Modifier.height(240.dp))
     Button(
         onClick = { launcher.launch(intent) },
         modifier = Modifier.wrapContentSize().testTag("loginButton"),
         border = BorderStroke(width = 1.dp, color = Color(0xFFDADCE0)),
         colors =
             ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFFFFFFF),
+                containerColor = Color(0xFFB422D9),
             ),
     ) {
       Image(
@@ -118,19 +135,56 @@ fun LoginScreen(navigationActions: NavigationActions) {
           contentDescription = "Google Logo",
           modifier = Modifier.width(24.dp).height(24.dp).align(Alignment.CenterVertically),
       )
-      Text(
-          text = "Sign in with Google",
-          style =
-              TextStyle(
+        Spacer(modifier = Modifier.width(25.dp))
+        Text(
+            text = "Sign in with Google",
+            style = TextStyle(
+                fontSize = 14.sp,
+                lineHeight = 17.sp,
+                fontFamily = FontFamily(Font(R.font.roboto)),
+                fontWeight = FontWeight(500),
+                color = Color(0xFFFFFFFF),
+
+                textAlign = TextAlign.Center,
+                letterSpacing = 0.25.sp,
+            )
+        )
+        Spacer(modifier = Modifier.width(25.dp))
+    }
+      Spacer(modifier = Modifier.height(20.dp))
+      Row(horizontalArrangement = Arrangement.Center,
+          verticalAlignment = Alignment.CenterVertically){
+          Text(
+              text = "Not a registered user?",
+              modifier = Modifier
+                  .width(140.dp)
+                  .height(27.dp),
+              style = TextStyle(
                   fontSize = 14.sp,
                   lineHeight = 17.sp,
-                  fontFamily = FontFamily.SansSerif,
+                  fontFamily = FontFamily(Font(R.font.roboto)),
                   fontWeight = FontWeight(500),
-                  color = Color(0xFF3C4043),
+                  color = Color(0xFF000000),
+                  textAlign = TextAlign.Center,
                   letterSpacing = 0.25.sp,
-              ),
-          modifier = Modifier.padding(start = 8.dp),
-      )
-    }
+              )
+          )
+          Text(
+              text = "Sign up here",
+              modifier = Modifier
+                  .width(101.dp)
+                  .height(27.dp),
+              style = TextStyle(
+                  fontSize = 14.sp,
+                  lineHeight = 17.sp,
+                  fontFamily = FontFamily(Font(R.font.roboto)),
+                  fontWeight = FontWeight(500),
+                  color = Color(0xFFB422D9),
+                  textAlign = TextAlign.Center,
+                  letterSpacing = 0.25.sp,
+              )
+          )
+      }
+
   }
 }
