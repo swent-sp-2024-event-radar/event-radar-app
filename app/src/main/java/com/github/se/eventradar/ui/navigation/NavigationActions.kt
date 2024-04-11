@@ -5,9 +5,10 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.github.se.eventradar.R
 
 object Route {
-  const val LOGIN = "login/Login"
-  const val OVERVIEW = "overview/Overview"
-  const val MAP = "map/Map"
+    const val LOGIN = "login/Login"
+    const val OVERVIEW = "overview/Overview"
+    const val MAP = "map/Map"
+    const val SIGN_UP = "sign_up"
   // The NEW_TASK and EDIT_TASK routes are being temporarily disabled as we restructure our app
   /*
   const val NEW_TASK = "newTask/NewTask"

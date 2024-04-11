@@ -4,8 +4,11 @@ import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,6 +27,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.firebase.ui.auth.AuthUI
@@ -35,77 +39,111 @@ import com.github.se.eventradar.ui.navigation.Route
 @Composable
 fun LoginScreen(navigationActions: NavigationActions) {
 
-  val launcher =
-      rememberLauncherForActivityResult(
-          contract = FirebaseAuthUIActivityResultContract(),
-          onResult = { result ->
-            if (result.resultCode == Activity.RESULT_OK)
-                navigationActions.navController.navigate(Route.OVERVIEW)
-            else navigationActions.navController.navigate(Route.LOGIN)
-          })
+    val launcher =
+        rememberLauncherForActivityResult(contract = FirebaseAuthUIActivityResultContract(),
+            onResult = { result ->
+                if (result.resultCode == Activity.RESULT_OK) navigationActions.navController.navigate(
+                    Route.OVERVIEW
+                )
+                else navigationActions.navController.navigate(Route.LOGIN)
+            })
 
-  val providers =
-      arrayListOf(
-          AuthUI.IdpConfig.GoogleBuilder().build(),
-      )
-
-  val intent =
-      AuthUI.getInstance()
-          .createSignInIntentBuilder()
-          .setIsSmartLockEnabled(false)
-          .setAvailableProviders(providers)
-          .build()
-
-  Column(
-      modifier = Modifier.fillMaxSize().testTag("loginScreen"),
-      verticalArrangement = Arrangement.Center,
-      horizontalAlignment = Alignment.CenterHorizontally,
-  ) {
-    Image(
-        painter = painterResource(R.drawable.image1),
-        contentDescription = "Logo",
-        modifier = Modifier.width(132.dp).height(132.dp).testTag("logo"),
+    val providers = arrayListOf(
+        AuthUI.IdpConfig.GoogleBuilder().build(),
     )
-    Text(
-        text = "Welcome",
-        style =
-            TextStyle(
+
+    val intent = AuthUI.getInstance().createSignInIntentBuilder().setIsSmartLockEnabled(false)
+        .setAvailableProviders(providers).build()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .testTag("loginScreen"),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Image(
+            painter = painterResource(R.drawable.smile),
+            contentDescription = "Logo",
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally) // Center horizontally
+                .width(132.dp) // Constrain on both sides
+                .height(132.dp)
+                .testTag("logo"),
+        )
+        Spacer(modifier = Modifier.height(100.dp)) // Space between logo and Text
+        Text(
+            text = "Welcome", style = TextStyle(
                 fontSize = 57.sp,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight(400),
                 textAlign = TextAlign.Center,
-            ),
-        modifier = Modifier.testTag("loginTitle"))
-    Button(
-        onClick = {
-          launcher.launch(intent)
-          navigationActions.navController.navigate(Route.OVERVIEW)
-        },
-        modifier = Modifier.wrapContentSize().testTag("loginButton"),
-        border = BorderStroke(width = 1.dp, color = Color(0xFFDADCE0)),
-        colors =
-            ButtonDefaults.buttonColors(
+            ), modifier = Modifier.testTag("loginTitle")
+        )
+
+        Spacer(modifier = Modifier.height(16.dp)) // Space between logo and button
+        Button(
+            onClick = {
+                launcher.launch(intent)
+                navigationActions.navController.navigate(Route.OVERVIEW)
+            },
+            modifier = Modifier
+                .wrapContentSize()
+                .testTag("loginButton"),
+            border = BorderStroke(width = 1.dp, color = Color(0xFFDADCE0)),
+            colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFFFFFFFF),
             ),
-    ) {
-      Image(
-          painter = painterResource(id = R.drawable.logo),
-          contentDescription = "Google Logo",
-          modifier = Modifier.width(24.dp).height(24.dp).align(Alignment.CenterVertically),
-      )
-      Text(
-          text = "Sign in with Google",
-          style =
-              TextStyle(
-                  fontSize = 14.sp,
-                  lineHeight = 17.sp,
-                  fontFamily = FontFamily.SansSerif,
-                  fontWeight = FontWeight(500),
-                  color = Color(0xFF3C4043),
-                  letterSpacing = 0.25.sp,
-              ),
-          modifier = Modifier.padding(start = 8.dp),
-      )
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Google Logo",
+                modifier = Modifier
+                    .width(24.dp)
+                    .height(24.dp)
+                    .align(Alignment.CenterVertically),
+            )
+            Text(
+                text = "Sign in with Google",
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    lineHeight = 17.sp,
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight(500),
+                    color = Color(0xFF3C4043),
+                    letterSpacing = 0.25.sp,
+                ),
+                modifier = Modifier.padding(start = 8.dp),
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp)) // Space between button and text
+        Text(
+            text = "New User?",
+            style = TextStyle(
+                fontSize = 14.sp,
+                lineHeight = 17.sp,
+                fontFamily = FontFamily.SansSerif,
+                fontWeight = FontWeight(500),
+                color = Color(0xFF3C4043),
+                letterSpacing = 0.25.sp,
+            ),
+            modifier = Modifier.padding(start = 8.dp),
+        )
+        Text(
+            text = "Sign Up",
+            style = TextStyle(
+                fontSize = 14.sp,
+                lineHeight = 17.sp,
+                fontFamily = FontFamily.SansSerif,
+                fontWeight = FontWeight(500),
+                color = Color(0xFF3C4043),
+                letterSpacing = 0.25.sp,
+                textDecoration = TextDecoration.Underline
+            ),
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .clickable { navigationActions.navController.navigate(Route.SIGN_UP) },
+        )
     }
-  }
 }
