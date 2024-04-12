@@ -77,7 +77,8 @@ fun EventDetails(navigationActions: NavigationActions) {
         modifier = Modifier.wrapContentSize().align(Alignment.Start).testTag("backButton"),
         colors =
             ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = Color.Transparent,
+                containerColor = Color.Transparent,
             ),
     ) {
       Icon(
