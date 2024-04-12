@@ -3,8 +3,6 @@ package com.github.se.eventradar.ui.login
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.net.Uri
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -22,12 +20,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -42,7 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+// import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -60,13 +58,9 @@ import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.google.firebase.firestore.firestore
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 
-private const val TAG = "SignUpScreen"
+// private const val TAG = "SignUpScreen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,7 +68,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
 
     val openErrorDialog = remember { mutableStateOf(false) }
 
-    val context = LocalContext.current
+    // val context = LocalContext.current
     val selectedImageUri = rememberSaveable { mutableStateOf<Uri?>(null) }
     val username = rememberSaveable { mutableStateOf("") }
     val name = rememberSaveable { mutableStateOf("") }
@@ -89,6 +83,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
         contract = FirebaseAuthUIActivityResultContract(),
         onResult = { result ->
             if (result.resultCode == Activity.RESULT_OK) {
+                /*
                 val user = Firebase.auth.currentUser
                 val userValues = hashMapOf(
                     "Name" to name.value,
@@ -113,6 +108,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                         Toast.makeText(context, "Error adding user data", Toast.LENGTH_SHORT)
                             .show()
                     }
+                 */
 
                 navigationActions.navController.navigate(Route.OVERVIEW)
 
@@ -225,7 +221,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                             Modifier.padding(start = 12.dp),
                             MaterialTheme.colorScheme.primary
                         )
-                    }, // Add "@" as leading icon
+                    },
                     isError = username.value.isEmpty(),
 
                     )
@@ -336,6 +332,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                             // User is not authenticated, launch Google authentication
                             launcher.launch(intent)
                         } else {
+                            /* Nothing yet -> separation of the 2 PRs
                             // User is already authenticated, store user data in Firestore
                             CoroutineScope(Dispatchers.Main).launch {
                                 val imageUri = selectedImageUri.value
@@ -362,6 +359,11 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                                         Log.w(TAG, "Error adding document", e)
                                     }
                             }
+
+                             */
+
+                            // Navigate to the overview page
+                            navigationActions.navController.navigate(Route.OVERVIEW)
                         }
                     },
                     modifier = Modifier

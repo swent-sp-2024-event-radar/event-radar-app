@@ -128,7 +128,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
                     .testTag("loginButton"),
                 border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary, // Note: Change to Primary Container once Vicky Merges Request
+                    containerColor = MaterialTheme.colorScheme.primary,
                 ),
 
                 ) {
