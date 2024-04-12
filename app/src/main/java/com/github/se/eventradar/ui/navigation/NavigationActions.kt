@@ -59,13 +59,13 @@ val TOP_LEVEL_DESTINATIONS =
             textId = R.string.homeScreen_events,
         ),
         TopLevelDestination(
-            route = Route.PROFILE,
-            icon = R.drawable.user_profile,
-            textId = R.string.user_profile,
-        ),
-        TopLevelDestination(
             route = Route.MY_HOSTING,
             icon = R.drawable.celebration,
             textId = R.string.my_hosted_events,
+        ),
+        TopLevelDestination(
+            route = Route.PROFILE,
+            icon = R.drawable.user_profile,
+            textId = R.string.user_profile,
         ),
     )
