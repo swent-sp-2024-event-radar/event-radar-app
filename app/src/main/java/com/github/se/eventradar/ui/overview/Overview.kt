@@ -1,6 +1,7 @@
 package com.github.se.eventradar.ui.overview
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,4 +31,5 @@ fun OverviewUI(
     navigationActions: NavigationActions
 ) {
   var isActive by remember { mutableStateOf(false) }
+  Text(text = "HomePage")
 }
