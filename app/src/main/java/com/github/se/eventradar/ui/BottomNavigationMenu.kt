@@ -50,12 +50,7 @@ fun BottomNavigationMenu(
 
       BottomNavigationItem(
           icon = { NavBarIcon(tab, boxModifier) },
-          label = {
-            Text(
-                text = labelText,
-                color = iconColor,
-                fontSize = 12.sp)
-          },
+          label = { Text(text = labelText, color = iconColor, fontSize = 12.sp) },
           selected = selectedItem == tab,
           onClick = { onTabSelected(tab) },
           modifier =
