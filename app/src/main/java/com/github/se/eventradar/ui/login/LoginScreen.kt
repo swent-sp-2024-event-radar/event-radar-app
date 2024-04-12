@@ -50,8 +50,8 @@ fun ErrorDialogBox(openErrorDialog: MutableState<Boolean>) {
   if (display) {
     AlertDialog(
         icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Account Icon") },
-        text = { Text("Sign in Failed. Please try again.", textAlign = TextAlign.Center) },
-        title = { Text("Sign in Failed") },
+        text = { Text(text = "Sign in Failed. Please try again.", textAlign = TextAlign.Center, modifier = Modifier.testTag("loginErrorDisplayText")) },
+        title = { Text(text = "Sign in Failed", modifier = Modifier.testTag("loginErrorTitle"),) },
         onDismissRequest = { openErrorDialog.value = false },
         confirmButton = { TextButton(onClick = { openErrorDialog.value = false }) { Text("Ok") } })
   }
@@ -85,7 +85,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
           .build()
 
   Column(
-      modifier = Modifier.fillMaxSize().testTag("loginScreen"),
+      modifier = Modifier.fillMaxSize(),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally,
   ) {
@@ -99,7 +99,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
             Image(
                 painter = painterResource(R.drawable.event_radar_logo),
                 contentDescription = "Logo",
-                modifier = Modifier.padding(1.dp).width(43.dp).height(68.dp).testTag("logo"),
+                modifier = Modifier.padding(1.dp).width(43.dp).height(68.dp).testTag("loginLogo"),
             )
             Text(
                 text = "Event Radar",
