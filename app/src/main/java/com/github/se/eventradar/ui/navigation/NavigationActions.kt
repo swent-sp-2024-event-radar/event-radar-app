@@ -18,6 +18,7 @@ object Route {
   const val LOGIN = "login/Login"
   const val SIGNUP = "login/SignUp"
   const val OVERVIEW = "overview/Overview"
+  const val HOME = "home/Home"
 }
 
 data class TopLevelDestination(val route: String, val icon: Int, val textId: Int)

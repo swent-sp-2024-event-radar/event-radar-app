@@ -5,6 +5,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.github.se.eventradar.ui.home.HomeScreen
 import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.login.SignUpScreen
 import com.github.se.eventradar.ui.overview.Overview
@@ -19,6 +20,7 @@ fun NavGraph(navController: NavHostController) {
     composable(Route.LOGIN) { LoginScreen(navigationActions = navActions) }
     composable(Route.SIGNUP) { SignUpScreen(navigationActions = navActions) }
     composable(Route.OVERVIEW) { Overview(navigationActions = navActions) }
+    composable(Route.HOME) { HomeScreen() }
 
     // TODO replace the Toast message with the corresponding screen function of the route
     composable(Route.SCANNER) { context.toast("Scanner screen needs to be implemented") }
