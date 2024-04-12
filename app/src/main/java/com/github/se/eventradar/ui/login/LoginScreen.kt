@@ -106,12 +106,12 @@ fun LoginScreen(navigationActions: NavigationActions) {
             ) {
                 Image(
                     painter = painterResource(R.drawable.event_radar_logo),
-                    contentDescription = "Logo",
+                    contentDescription = "Event Radar Logo",
                     modifier = Modifier
                         .padding(1.dp)
                         .width(300.dp)
                         .height(100.dp)
-                        .testTag("logo"),
+                        .testTag("eventRadarLogo"),
                 )
             }
 
