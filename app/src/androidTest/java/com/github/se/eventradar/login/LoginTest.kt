@@ -1,4 +1,4 @@
-package com.github.se.eventradar.login
+package com.github.se.eventradar.ui.login
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.intent.Intents.intended
