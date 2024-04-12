@@ -170,7 +170,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                 modifier = Modifier.constrainAs(ref = profilePicture) {
                     top.linkTo(
                         titleRow.bottom,
-                        margin = 16.dp
+                        margin = 32.dp
                     )
                     centerHorizontallyTo(parent)
                 },
@@ -184,7 +184,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                         painter = imageBitmap,
                         contentDescription = "Selected Profile Picture",
                         modifier = Modifier
-                            .size(200.dp) // Adjust size as needed
+                            .size(150.dp) // Adjust size as needed
                             .clickable { imagePickerLauncher.launch("image/*") } // Launch the image picker when the image is clicked
                     )
                 } else {
@@ -192,7 +192,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                         painter = painterResource(id = R.drawable.placeholder), // Replace with your placeholder image resource
                         contentDescription = "Profile Picture Placeholder",
                         modifier = Modifier
-                            .size(200.dp) // Adjust size as needed
+                            .size(150.dp) // Adjust size as needed
                             .clickable { imagePickerLauncher.launch("image/*") } // Launch the image picker when the placeholder is clicked
                     )
                 }
