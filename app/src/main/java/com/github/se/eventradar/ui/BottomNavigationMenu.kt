@@ -44,7 +44,7 @@ fun BottomNavigationMenu(
 
       val labelText = if (selectedItem == tab) stringResource(tab.textId) else ""
 
-      val iconCOlor =
+      val iconColor =
           if (selectedItem == tab) MaterialTheme.colorScheme.onPrimary
           else MaterialTheme.colorScheme.onSurfaceVariant
 
@@ -53,7 +53,7 @@ fun BottomNavigationMenu(
           label = {
             Text(
                 text = labelText,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = iconColor,
                 fontSize = 12.sp)
           },
           selected = selectedItem == tab,
