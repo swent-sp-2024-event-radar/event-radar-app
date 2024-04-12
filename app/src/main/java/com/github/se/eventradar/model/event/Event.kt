@@ -4,7 +4,11 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 enum class EventCategory {
-    MUSIC, SPORTS, CONFERENCE, EXHIBITION, COMMUNITY
+  MUSIC,
+  SPORTS,
+  CONFERENCE,
+  EXHIBITION,
+  COMMUNITY
 }
 
 data class Event(
