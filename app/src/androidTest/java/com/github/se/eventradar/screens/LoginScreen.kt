@@ -13,10 +13,10 @@ class LoginScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
     ComposeScreen<LoginScreen>(
         semanticsProvider = semanticsProvider, viewBuilderAction = { hasTestTag("loginScreen") }) {
 
-    // Structural elements of the UI
-    val loginLogo: KNode = onNode { hasTestTag("loginLogo") }
-    val loginTitle: KNode = onNode { hasTestTag("loginTitle") }
-    val loginButton: KNode = onNode { hasTestTag("loginButton") }
-    val loginErrorDisplayText: KNode = onNode { hasTestTag("loginErrorDisplayText") }
-    val loginErrorTitle: KNode = onNode { hasTestTag("loginErrorTitle") }
-    }
+  // Structural elements of the UI
+  val loginLogo: KNode = onNode { hasTestTag("loginLogo") }
+  val loginTitle: KNode = onNode { hasTestTag("loginTitle") }
+  val loginButton: KNode = onNode { hasTestTag("loginButton") }
+  val loginErrorDisplayText: KNode = onNode { hasTestTag("loginErrorDisplayText") }
+  val loginErrorTitle: KNode = onNode { hasTestTag("loginErrorTitle") }
+}

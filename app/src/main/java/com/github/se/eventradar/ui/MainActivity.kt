@@ -20,12 +20,11 @@ class MainActivity : ComponentActivity() {
       MyApplicationTheme {
         // A surface container using the 'background' color from the theme
         Surface(
-          modifier = Modifier.fillMaxSize().testTag("LoginScreen"),
-          color = MaterialTheme.colorScheme.background
-        ) {
-          val navController = rememberNavController()
-          NavGraph(navController = navController)
-        }
+            modifier = Modifier.fillMaxSize().testTag("LoginScreen"),
+            color = MaterialTheme.colorScheme.background) {
+              val navController = rememberNavController()
+              NavGraph(navController = navController)
+            }
       }
     }
   }
