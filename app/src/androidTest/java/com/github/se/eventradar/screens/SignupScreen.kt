@@ -11,11 +11,11 @@ class SignupScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
 
   // Structural elements of the UI of the Signup screen
   val eventRadarLogo: KNode = onNode { hasTestTag("eventRadarLogo") }
-  val usernameTextField: KNode = onNode { hasTestTag("signUpUsernameField") }
-  val nameTextField: KNode = onNode { hasTestTag("signUpNameField") }
-  val surnameTextField: KNode = onNode { hasTestTag("signUpSurnameField") }
-  val phoneTextField: KNode = onNode { hasTestTag("signUpPhoneField") }
-  val birthDateTextField: KNode = onNode { hasTestTag("signUpBirthDateField") }
-  val signUpButton: KNode = onNode { hasTestTag("signUpLoginButton") }
-  val profilePicture: KNode = onNode { hasTestTag("signUpProfilePicture") }
+  // val usernameTextField: KNode = onNode { hasTestTag("signUpUsernameField") }
+  // val nameTextField: KNode = onNode { hasTestTag("signUpNameField") }
+  // val surnameTextField: KNode = onNode { hasTestTag("signUpSurnameField") }
+  // val phoneTextField: KNode = onNode { hasTestTag("signUpPhoneField") }
+  // val birthDateTextField: KNode = onNode { hasTestTag("signUpBirthDateField") }
+  // val signUpButton: KNode = onNode { hasTestTag("signUpLoginButton") }
+  // val profilePicture: KNode = onNode { hasTestTag("signUpProfilePicture") }
 }
