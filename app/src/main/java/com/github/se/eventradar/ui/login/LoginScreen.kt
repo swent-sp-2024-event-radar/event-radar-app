@@ -51,8 +51,8 @@ fun ErrorDialogBox(openErrorDialog: MutableState<Boolean>) {
   if (display) {
     AlertDialog(
         icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Account Icon") },
-        text = { Text("Sign in Failed. Please try again.", textAlign = TextAlign.Center) },
-        title = { Text("Sign in Failed") },
+        text = { Text(text = "Sign in Failed. Please try again.", textAlign = TextAlign.Center, modifier = Modifier.testTag("loginErrorDisplayText")) },
+        title = { Text(text = "Sign in Failed", modifier = Modifier.testTag("loginErrorTitle"),) },
         onDismissRequest = { openErrorDialog.value = false },
         confirmButton = { TextButton(onClick = { openErrorDialog.value = false }) { Text("Ok") } })
   }
@@ -170,6 +170,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
                 modifier =
                     Modifier.width(101.dp)
                         .height(27.dp)
+                        .testTag("signUpButton")
                         .clickable(
                             onClick = { navigationActions.navController.navigate(Route.SIGNUP) }),
                 style =
