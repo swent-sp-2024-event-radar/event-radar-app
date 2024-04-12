@@ -185,7 +185,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
                     modifier = Modifier
                         .width(101.dp)
                         .height(27.dp)
-                        .clickable(onClick = { navigationActions.navController.navigate(Route.SIGN_UP) }),
+                        .clickable(onClick = { navigationActions.navController.navigate(Route.SIGNUP) }),
                     style = TextStyle(
                         fontSize = 14.sp,
                         lineHeight = 17.sp,
