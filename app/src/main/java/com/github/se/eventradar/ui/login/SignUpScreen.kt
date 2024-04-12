@@ -360,7 +360,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                   modifier = Modifier.width(24.dp).height(24.dp).align(Alignment.CenterVertically),
               )
               Text(
-                  text = "Log In with Google",
+                  text = "Sign Up with Google",
                   style =
                       TextStyle(
                           fontSize = 14.sp,
