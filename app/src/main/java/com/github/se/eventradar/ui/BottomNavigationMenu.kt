@@ -50,7 +50,9 @@ fun BottomNavigationMenu(
 
       val labelText = if (selectedItem == tab) stringResource(tab.textId) else ""
 
-      val iconCOlor = if (selectedItem == tab) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+      val iconCOlor =
+          if (selectedItem == tab) MaterialTheme.colorScheme.onPrimary
+          else MaterialTheme.colorScheme.onSurfaceVariant
 
       BottomNavigationItem(
           icon = { NavBarIcon(tab, boxModifier) },

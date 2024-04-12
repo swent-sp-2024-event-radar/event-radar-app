@@ -26,22 +26,5 @@ fun NavGraph(navController: NavHostController) {
     composable(Route.MY_HOSTING) {
       context.toast("My hosted events screen needs to be implemented")
     }
-
-    // The NEW_TASK and EDIT_TASK routes are being temporarily disabled as we restructure our app
-
-    // composable(Route.MAP) { Map(navigationActions = navActions) }
-
-    /*
-    composable(Route.NEW_TASK) { CreateToDo(navigationActions = navActions) }
-    composable(
-        "${Route.EDIT_TASK}/{taskId}",
-        arguments = listOf(navArgument("taskId") { type = NavType.StringType })) {
-          val taskId = it.arguments!!.getString("taskId")!!
-          EditToDo(
-              taskId = taskId,
-              viewModel = ToDoViewModel(uid = taskId),
-              navigationActions = navActions)
-        }
-       */
   }
 }
