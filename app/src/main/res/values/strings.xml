@@ -19,4 +19,12 @@
     <string name="due_date_placeholder">-- / -- / ----</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
+    <string name="scan_QR">Scan QR</string>
+    <string name="message_chats">Messages</string>
+    <string name="homeScreen_events">Home</string>
+    <string name="user_profile">Profile</string>
+    <string name="my_hosted_events">My hosting</string>
 </resources>
+
+
+
