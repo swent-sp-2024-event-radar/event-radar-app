@@ -5,41 +5,42 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.github.se.eventradar.R
 
 object Route {
-  // Event radar main screens
-  const val SCANNER = "scanner"
-  const val MESSAGE = "message"
-  const val EVENTS = "events"
-  const val PROFILE = "profile"
-  const val MY_HOSTING = "my_hosting"
+    // Event radar main screens
+    const val SCANNER = "scanner"
+    const val MESSAGE = "message"
+    const val EVENTS = "events"
+    const val PROFILE = "profile"
+    const val MY_HOSTING = "my_hosting"
 
-  // Event radar secondary screens
-  const val EVENT_DETAILS = "event_details"
+    // Event radar secondary screens
+    const val EVENT_DETAILS = "event_details"
 
-  const val LOGIN = "login/Login"
-  const val SIGNUP = "login/SignUp"
-  const val OVERVIEW = "overview/Overview"
+    const val LOGIN = "login/Login"
+    const val SIGNUP = "login/SignUp"
+    const val OVERVIEW = "overview/Overview"
+    const val HOME = "home/Home"
 }
 
 data class TopLevelDestination(val route: String, val icon: Int, val textId: Int)
 
 class NavigationActions(val navController: NavController) {
-  fun navigateTo(destination: TopLevelDestination) {
-    navController.navigate(destination.route) {
-      // Pop up to the start destination of the graph to
-      // avoid building up a large stack of destinations
-      // on the back stack as users select items
-      popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-      // Avoid multiple copies of the same destination when
-      // reselecting the same item
-      launchSingleTop = true
-      // Restore state when reselecting a previously selected item
-      restoreState = true
+    fun navigateTo(destination: TopLevelDestination) {
+        navController.navigate(destination.route) {
+            // Pop up to the start destination of the graph to
+            // avoid building up a large stack of destinations
+            // on the back stack as users select items
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            // Avoid multiple copies of the same destination when
+            // reselecting the same item
+            launchSingleTop = true
+            // Restore state when reselecting a previously selected item
+            restoreState = true
+        }
     }
-  }
 
-  fun goBack() {
-    navController.popBackStack()
-  }
+    fun goBack() {
+        navController.popBackStack()
+    }
 }
 
 val TOP_LEVEL_DESTINATIONS =

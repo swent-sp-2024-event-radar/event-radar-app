@@ -114,7 +114,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                     Log.w(TAG, "Error adding document", e)
                     context.toast("Error adding user data")
                   }
-              navigationActions.navController.navigate(Route.OVERVIEW)
+              navigationActions.navController.navigate(Route.HOME)
             } else {
               // Handle the error
               openErrorDialog.value = true

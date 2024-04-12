@@ -43,16 +43,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.eventradar.ui.navigation.NavigationActions
 import java.time.LocalDate
 import java.time.LocalTime
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navigationActions: NavigationActions) {
   val mockEvents =
       listOf(
           Event(
@@ -239,5 +241,5 @@ fun EventCard(event: Event) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun HomeScreenPreview() {
-  HomeScreen()
+  HomeScreen(navigationActions = NavigationActions(navController = rememberNavController()))
 }
