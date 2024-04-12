@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.AlertDialog
@@ -126,9 +126,9 @@ fun LoginScreen(navigationActions: NavigationActions) {
                         centerHorizontallyTo(titleRow)
                     }
                     .testTag("loginButton"),
-                border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.primary),
+                border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colors.primary, // Note: Change to Primary Container once Vicky Merges Request
+                    containerColor = MaterialTheme.colorScheme.primary, // Note: Change to Primary Container once Vicky Merges Request
                 ),
 
                 ) {
@@ -149,7 +149,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
                         lineHeight = 17.sp,
                         fontFamily = FontFamily(Font(R.font.roboto)),
                         fontWeight = FontWeight(500),
-                        color = MaterialTheme.colors.onPrimary,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         textAlign = TextAlign.Center,
                         letterSpacing = 0.25.sp,
                     )
@@ -175,7 +175,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
                         lineHeight = 17.sp,
                         fontFamily = FontFamily(Font(R.font.roboto)),
                         fontWeight = FontWeight(500),
-                        color = MaterialTheme.colors.onBackground,
+                        color = MaterialTheme.colorScheme.onBackground,
                         textAlign = TextAlign.Center,
                         letterSpacing = 0.25.sp,
                     )
@@ -191,7 +191,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
                         lineHeight = 17.sp,
                         fontFamily = FontFamily(Font(R.font.roboto)),
                         fontWeight = FontWeight(500),
-                        color = MaterialTheme.colors.secondary,
+                        color = MaterialTheme.colorScheme.secondary,
                         textAlign = TextAlign.Center,
                         letterSpacing = 0.25.sp,
                     )

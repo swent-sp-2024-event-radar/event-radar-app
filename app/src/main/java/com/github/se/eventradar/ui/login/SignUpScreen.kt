@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -215,15 +215,15 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                     label = { Text("Username") },
                     modifier = Modifier.width(320.dp),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = MaterialTheme.colors.primary,
-                        unfocusedBorderColor = MaterialTheme.colors.primary
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.primary
                     ),
                     shape = RoundedCornerShape(12.dp),
                     leadingIcon = {
                         Text(
                             "@",
                             Modifier.padding(start = 12.dp),
-                            MaterialTheme.colors.primary
+                            MaterialTheme.colorScheme.primary
                         )
                     }, // Add "@" as leading icon
                     isError = username.value.isEmpty(),
@@ -247,8 +247,8 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                     label = { Text("Name") },
                     modifier = Modifier.width(320.dp),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = MaterialTheme.colors.primary,
-                        unfocusedBorderColor = MaterialTheme.colors.primary
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.primary
                     ),
                     shape = RoundedCornerShape(12.dp),
                     isError = name.value.isEmpty()
@@ -271,8 +271,8 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                     label = { Text("Surname") },
                     modifier = Modifier.width(320.dp),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = MaterialTheme.colors.primary,
-                        unfocusedBorderColor = MaterialTheme.colors.primary
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.primary
                     ),
                     shape = RoundedCornerShape(12.dp),
                     isError = name.value.isEmpty()
@@ -311,8 +311,8 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                     label = { Text("Birth Date (DD/MM/YYYY)") },
                     modifier = Modifier.width(320.dp),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = MaterialTheme.colors.primary,
-                        unfocusedBorderColor = MaterialTheme.colors.primary
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.primary
                     ),
                     shape = RoundedCornerShape(12.dp),
                     isError = !isValidDate(birthDate.value),
@@ -368,8 +368,8 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                         .wrapContentSize()
                         .width(250.dp)
                         .testTag("loginButton"),
-                    border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.primary),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colors.primary),
+                    border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.logo),
@@ -414,14 +414,14 @@ fun PhoneNumberInput(
         label = { Text("Phone Number") },
         modifier = Modifier.width(320.dp),
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = MaterialTheme.colors.primary,
-            unfocusedBorderColor = MaterialTheme.colors.primary
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.primary
         ),
         shape = RoundedCornerShape(12.dp),
         leadingIcon = {
             Box {
                 TextButton(onClick = { isDropdownExpanded = true }) {
-                    Text(selectedCountryCode.value, color = MaterialTheme.colors.primary)
+                    Text(selectedCountryCode.value, color = MaterialTheme.colorScheme.primary)
                 }
                 DropdownMenu(expanded = isDropdownExpanded,
                     onDismissRequest = { isDropdownExpanded = false }) {
