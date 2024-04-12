@@ -16,6 +16,7 @@ object Route {
   const val EVENT_DETAILS = "event_details"
 
   const val LOGIN = "login/Login"
+  const val SIGNUP = "login/SignUp"
   const val OVERVIEW = "overview/Overview"
 }
 
