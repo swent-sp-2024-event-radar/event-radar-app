@@ -1,27 +1,28 @@
 package com.github.se.eventradar.ui.login
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -40,8 +41,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -50,6 +51,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import coil.compose.rememberImagePainter
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.github.se.eventradar.R
@@ -58,14 +61,20 @@ import com.github.se.eventradar.ui.navigation.Route
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
-import coil.compose.rememberImagePainter
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 
 private const val TAG = "SignUpScreen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(navigationActions: NavigationActions) {
+
+    val openErrorDialog = remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
     val selectedImageUri = rememberSaveable { mutableStateOf<Uri?>(null) }
     val username = rememberSaveable { mutableStateOf("") }
     val name = rememberSaveable { mutableStateOf("") }
@@ -76,34 +85,45 @@ fun SignUpScreen(navigationActions: NavigationActions) {
     // List of country codes. You can replace this with your own list.
     val countryCodes = listOf("+1", "+33", "+41", "+44", "+91", "+61", "+81")
 
-    val launcher =
-        rememberLauncherForActivityResult(contract = FirebaseAuthUIActivityResultContract(),
-            onResult = { result ->
-                if (result.resultCode == Activity.RESULT_OK) {
-                    val user = Firebase.auth.currentUser
-                    val userValues = hashMapOf(
-                        "Name" to name.value,
-                        "Surname" to surname.value,
-                        "Phone Number" to phoneNumber.value,
-                        "Birth Date" to birthDate.value,
-                        "Email" to user?.email
-                        // TODO: Add picture to userValues
+    val launcher = rememberLauncherForActivityResult(
+        contract = FirebaseAuthUIActivityResultContract(),
+        onResult = { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val user = Firebase.auth.currentUser
+                val userValues = hashMapOf(
+                    "Name" to name.value,
+                    "Surname" to surname.value,
+                    "Phone Number" to phoneNumber.value,
+                    "Birth Date" to birthDate.value,
+                    "Email" to user?.email,
+                    "Profile Picture" to selectedImageUri.value.toString()
+                )
 
-                    )
+                // Add a new document with a generated ID into collection "users"
+                Firebase.firestore.collection("users").add(userValues)
+                    .addOnSuccessListener { documentReference ->
+                        Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+                        Toast.makeText(
+                            context,
+                            "User data added successfully",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }.addOnFailureListener { e ->
+                        Log.w(TAG, "Error adding document", e)
+                        Toast.makeText(context, "Error adding user data", Toast.LENGTH_SHORT)
+                            .show()
+                    }
 
-                    // Add a new document with a generated ID into collection "users"
-                    Firebase.firestore.collection("users").add(userValues)
-                        .addOnSuccessListener { documentReference ->
-                            Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
-                        }.addOnFailureListener { e ->
-                            Log.w(TAG, "Error adding document", e)
-                        }
+                navigationActions.navController.navigate(Route.OVERVIEW)
 
-                    navigationActions.navController.navigate(Route.OVERVIEW)
-                } else {
-                    navigationActions.navController.navigate(Route.LOGIN)
-                }
-            })
+            } else {
+                // Handle the error
+                openErrorDialog.value = true
+            }
+        }
+    )
+
+    ErrorDialogBox(openErrorDialog = openErrorDialog)
 
     val imagePickerLauncher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
@@ -119,138 +139,263 @@ fun SignUpScreen(navigationActions: NavigationActions) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
             .testTag("signUpScreen"),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Image(
-            painter = painterResource(R.drawable.event_radar_logo),
-            contentDescription = "Logo",
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally) // Center horizontally
-                .width(300.dp) // Constrain on both sides
-                .height(100.dp)
-                .testTag("logo"),
-        )
-        Spacer(modifier = Modifier.height(16.dp)) // Space between logo and profile picture
-        val imagePickerLauncher =
-            rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
-                onResult = { uri ->
-                    // Handle the returned Uri
-                    selectedImageUri.value = uri
-                })
+        ConstraintLayout {
+            val (titleRow, profilePicture, usernameField, nameField, surnameField, phoneField, birthDateField, signInButton) = createRefs()
+            Row(
+                modifier = Modifier.constrainAs(ref = titleRow) {
+                    top.linkTo(
+                        parent.top,
+                        margin = 16.dp
+                    )
+                    centerHorizontallyTo(parent)
+                },
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.event_radar_logo),
+                    contentDescription = "Logo",
+                    modifier = Modifier
+                        .padding(1.dp)
+                        .width(300.dp)
+                        .height(100.dp)
+                        .testTag("logo"),
+                )
+            }
+            Row(
+                modifier = Modifier.constrainAs(ref = profilePicture) {
+                    top.linkTo(
+                        titleRow.bottom,
+                        margin = 16.dp
+                    )
+                    centerHorizontallyTo(parent)
+                },
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val imageUri = selectedImageUri.value
+                if (imageUri != null) {
+                    val imageBitmap = rememberImagePainter(data = imageUri)
+                    Image(
+                        painter = imageBitmap,
+                        contentDescription = "Selected Profile Picture",
+                        modifier = Modifier
+                            .size(200.dp) // Adjust size as needed
+                            .clickable { imagePickerLauncher.launch("image/*") } // Launch the image picker when the image is clicked
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.placeholder), // Replace with your placeholder image resource
+                        contentDescription = "Profile Picture Placeholder",
+                        modifier = Modifier
+                            .size(200.dp) // Adjust size as needed
+                            .clickable { imagePickerLauncher.launch("image/*") } // Launch the image picker when the placeholder is clicked
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier
+                    .constrainAs(ref = usernameField) {
+                        top.linkTo(
+                            profilePicture.bottom,
+                            margin = 16.dp
+                        )
+                        centerHorizontallyTo(parent)
+                    },
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    value = username.value,
+                    onValueChange = { username.value = it },
+                    label = { Text("Username") },
+                    modifier = Modifier.width(320.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = MaterialTheme.colors.primary,
+                        unfocusedBorderColor = MaterialTheme.colors.primary
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    leadingIcon = {
+                        Text(
+                            "@",
+                            Modifier.padding(start = 12.dp),
+                            MaterialTheme.colors.primary
+                        )
+                    }, // Add "@" as leading icon
+                    isError = username.value.isEmpty(),
 
-        val imageUri = selectedImageUri.value
-        if (imageUri != null) {
-            val imageBitmap = rememberImagePainter(data = imageUri)
-            Image(
-                painter = imageBitmap,
-                contentDescription = "Selected Profile Picture",
-                modifier = Modifier
-                    .size(200.dp) // Adjust size as needed
-                    .clickable { imagePickerLauncher.launch("image/*") } // Launch the image picker when the image is clicked
-            )
-        } else {
-            Image(
-                painter = painterResource(id = R.drawable.placeholder), // Replace with your placeholder image resource
-                contentDescription = "Profile Picture Placeholder",
-                modifier = Modifier
-                    .size(200.dp) // Adjust size as needed
-                    .clickable { imagePickerLauncher.launch("image/*") } // Launch the image picker when the placeholder is clicked
-            )
+                    )
+            }
+            Row(
+                modifier = Modifier.constrainAs(ref = nameField) {
+                    top.linkTo(
+                        usernameField.bottom,
+                        margin = 16.dp
+                    )
+                    centerHorizontallyTo(parent)
+                },
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    value = name.value,
+                    onValueChange = { name.value = it },
+                    label = { Text("Name") },
+                    modifier = Modifier.width(320.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = MaterialTheme.colors.primary,
+                        unfocusedBorderColor = MaterialTheme.colors.primary
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    isError = name.value.isEmpty()
+                )
+            }
+            Row(
+                modifier = Modifier.constrainAs(ref = surnameField) {
+                    top.linkTo(
+                        nameField.bottom,
+                        margin = 16.dp
+                    )
+                    centerHorizontallyTo(parent)
+                },
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    value = surname.value,
+                    onValueChange = { surname.value = it },
+                    label = { Text("Surname") },
+                    modifier = Modifier.width(320.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = MaterialTheme.colors.primary,
+                        unfocusedBorderColor = MaterialTheme.colors.primary
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    isError = name.value.isEmpty()
+                )
+            }
+            Row(
+                modifier = Modifier.constrainAs(ref = phoneField) {
+                    top.linkTo(
+                        surnameField.bottom,
+                        margin = 16.dp
+                    )
+                    centerHorizontallyTo(parent)
+                },
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                PhoneNumberInput(
+                    phoneNumber = phoneNumber,
+                    selectedCountryCode = selectedCountryCode,
+                    countryCodes = countryCodes
+                )
+            }
+            Row(
+                modifier = Modifier.constrainAs(ref = birthDateField) {
+                    top.linkTo(
+                        phoneField.bottom,
+                        margin = 16.dp
+                    )
+                },
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    value = birthDate.value,
+                    onValueChange = { birthDate.value = it },
+                    label = { Text("Birth Date (DD/MM/YYYY)") },
+                    modifier = Modifier.width(320.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = MaterialTheme.colors.primary,
+                        unfocusedBorderColor = MaterialTheme.colors.primary
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    isError = !isValidDate(birthDate.value),
+                )
+            }
+            Row(
+                modifier = Modifier.constrainAs(ref = signInButton) {
+                    top.linkTo(
+                        birthDateField.bottom,
+                        margin = 16.dp
+                    )
+                    centerHorizontallyTo(parent)
+                },
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(
+                    onClick = {
+                        val user = Firebase.auth.currentUser
+                        if (user == null) {
+                            // User is not authenticated, launch Google authentication
+                            launcher.launch(intent)
+                        } else {
+                            // User is already authenticated, store user data in Firestore
+                            CoroutineScope(Dispatchers.Main).launch {
+                                val imageUri = selectedImageUri.value
+                                    ?: Uri.parse("android.resource://" + context.packageName + "/" + R.drawable.placeholder)
+                                val userValues = hashMapOf(
+                                    "Name" to name.value,
+                                    "Surname" to surname.value,
+                                    "Phone Number" to phoneNumber.value,
+                                    "Birth Date" to birthDate.value,
+                                    "Email" to user.email,
+                                    "Profile Picture" to imageUri.toString()
+                                )
+
+                                // Add a new document with a generated ID into collection "users"
+                                Firebase.firestore.collection("users").add(userValues)
+                                    .addOnSuccessListener { documentReference ->
+                                        Log.d(
+                                            TAG,
+                                            "DocumentSnapshot added with ID: ${documentReference.id}"
+                                        )
+                                        // Navigate to the overview page
+                                        navigationActions.navController.navigate(Route.OVERVIEW)
+                                    }.addOnFailureListener { e ->
+                                        Log.w(TAG, "Error adding document", e)
+                                    }
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .width(250.dp)
+                        .testTag("loginButton"),
+                    border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.primary),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colors.primary),
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.logo),
+                        contentDescription = "Google Logo",
+                        modifier = Modifier
+                            .width(24.dp)
+                            .height(24.dp)
+                            .align(Alignment.CenterVertically),
+                    )
+                    Text(
+                        text = "Log In with Google",
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            lineHeight = 17.sp,
+                            fontFamily = FontFamily.SansSerif,
+                            fontWeight = FontWeight(500),
+                            color = Color(0xFFFFFFFF),
+                            letterSpacing = 0.25.sp,
+                        ),
+                        modifier = Modifier.padding(start = 8.dp),
+                    )
+                }
+            }
         }
 
-        Spacer(modifier = Modifier.height(32.dp)) // Space between profile picture and text fields
-        OutlinedTextField(
-            value = username.value,
-            onValueChange = { username.value = it },
-            label = { Text("Username") },
-            modifier = Modifier.width(320.dp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFB422D9), unfocusedBorderColor = Color(0xFFB422D9)
-            ),
-            shape = RoundedCornerShape(12.dp),
-            leadingIcon = { Text("@", Modifier.padding(start = 12.dp), Color(0xFFB422D9)) }, // Add "@" as leading icon
-            isError = username.value.isEmpty(),
 
-        )
-        Spacer(modifier = Modifier.height(16.dp)) // Space between button and text fields
-        OutlinedTextField(value = name.value,
-            onValueChange = { name.value = it },
-            label = { Text("Name") },
-            modifier = Modifier.width(320.dp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFB422D9), unfocusedBorderColor = Color(0xFFB422D9)
-            ),
-            shape = RoundedCornerShape(12.dp),
-            isError = name.value.isEmpty()
-        )
-        Spacer(modifier = Modifier.height(16.dp)) // Space between text fields
-        OutlinedTextField(value = surname.value,
-            onValueChange = { surname.value = it },
-            label = { Text("Surname") },
-            modifier = Modifier.width(320.dp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFB422D9), unfocusedBorderColor = Color(0xFFB422D9)
-            ),
-            shape = RoundedCornerShape(12.dp),
-            isError = name.value.isEmpty()
-        )
-        Spacer(modifier = Modifier.height(16.dp)) // Space between text fields
-        PhoneNumberInput(
-            phoneNumber = phoneNumber,
-            selectedCountryCode = selectedCountryCode,
-            countryCodes = countryCodes
-        )
-
-        Spacer(modifier = Modifier.height(16.dp)) // Space between text fields
-        // TODO: Replace this TextField with an OutlinedTextField that formats the date as
-        //  "dd/MM/yyyy" and validates the input
-        OutlinedTextField(value = birthDate.value,
-            onValueChange = { birthDate.value = it },
-            label = { Text("Birth Date") },
-            modifier = Modifier.width(320.dp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFB422D9), unfocusedBorderColor = Color(0xFFB422D9)
-            ),
-            shape = RoundedCornerShape(12.dp),
-            isError = name.value.isEmpty()
-        )
-        Spacer(modifier = Modifier.height(16.dp)) // Space between text fields
-
-        Button(
-            onClick = {
-                launcher.launch(intent)
-            },
-            modifier = Modifier
-                .wrapContentSize()
-                .width(250.dp)
-                .testTag("loginButton"),
-            border = BorderStroke(width = 1.dp, color = Color(0xFFB422D9)),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB422D9)),
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Google Logo",
-                modifier = Modifier
-                    .width(24.dp)
-                    .height(24.dp)
-                    .align(Alignment.CenterVertically),
-            )
-            Text(
-                text = "Log In with Google",
-                style = TextStyle(
-                    fontSize = 14.sp,
-                    lineHeight = 17.sp,
-                    fontFamily = FontFamily.SansSerif,
-                    fontWeight = FontWeight(500),
-                    color = Color(0xFFFFFFFF),
-                    letterSpacing = 0.25.sp,
-                ),
-                modifier = Modifier.padding(start = 8.dp),
-            )
-        }
     }
 }
 
@@ -263,18 +408,20 @@ fun PhoneNumberInput(
 ) {
     var isDropdownExpanded by remember { mutableStateOf(false) }
 
-    OutlinedTextField(value = phoneNumber.value,
+    OutlinedTextField(
+        value = phoneNumber.value,
         onValueChange = { phoneNumber.value = it },
         label = { Text("Phone Number") },
         modifier = Modifier.width(320.dp),
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = Color(0xFFB422D9), unfocusedBorderColor = Color(0xFFB422D9)
+            focusedBorderColor = MaterialTheme.colors.primary,
+            unfocusedBorderColor = MaterialTheme.colors.primary
         ),
         shape = RoundedCornerShape(12.dp),
         leadingIcon = {
             Box {
                 TextButton(onClick = { isDropdownExpanded = true }) {
-                    Text(selectedCountryCode.value, color = Color(0xFFB422D9))
+                    Text(selectedCountryCode.value, color = MaterialTheme.colors.primary)
                 }
                 DropdownMenu(expanded = isDropdownExpanded,
                     onDismissRequest = { isDropdownExpanded = false }) {
@@ -307,8 +454,14 @@ fun isValidPhoneNumber(phoneNumber: String, countryCode: String): Boolean {
     return phoneNumber.length == validLength
 }
 
-suspend fun isUsernameUnique(username: String): Boolean {
-    val db = Firebase.firestore
-    val docSnapshot = db.collection("users").document(username).get().await()
-    return !docSnapshot.exists()
+@SuppressLint("SimpleDateFormat")
+fun isValidDate(date: String): Boolean {
+    val format = SimpleDateFormat("dd/MM/yyyy")
+    format.isLenient = false
+    return try {
+        format.parse(date)
+        true
+    } catch (e: Exception) {
+        false
+    }
 }
