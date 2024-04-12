@@ -17,7 +17,7 @@ import org.junit.runner.RunWith
 class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
 
   @get:Rule val composeTestRule = createComposeRule()
-  
+
   @Before
   fun testSetup() {
     composeTestRule.setContent { HomeScreen() }

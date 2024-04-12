@@ -131,23 +131,26 @@ fun HomeScreen() {
                     ),
                 modifier = Modifier.padding(bottom = 8.dp))
           }
-          Tab(selected = selectedTabIndex == 1, onClick = { selectedTabIndex = 1 }, modifier = Modifier.testTag("upcomingTab")) {
-            Text(
-                text = "Upcoming",
-                style =
-                    TextStyle(
-                        fontSize = 19.sp,
-                        lineHeight = 17.sp,
-                        fontFamily = FontFamily(Font(R.font.roboto)),
-                        fontWeight = FontWeight(500),
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        textAlign = TextAlign.Center,
-                        letterSpacing = 0.25.sp,
-                    ),
-                modifier = Modifier.padding(bottom = 8.dp))
-          }
+          Tab(
+              selected = selectedTabIndex == 1,
+              onClick = { selectedTabIndex = 1 },
+              modifier = Modifier.testTag("upcomingTab")) {
+                Text(
+                    text = "Upcoming",
+                    style =
+                        TextStyle(
+                            fontSize = 19.sp,
+                            lineHeight = 17.sp,
+                            fontFamily = FontFamily(Font(R.font.roboto)),
+                            fontWeight = FontWeight(500),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            textAlign = TextAlign.Center,
+                            letterSpacing = 0.25.sp,
+                        ),
+                    modifier = Modifier.padding(bottom = 8.dp))
+              }
         }
-    
+
     if (selectedTabIndex == 0) {
       EventList(
           mockEvents,
@@ -170,12 +173,11 @@ fun HomeScreen() {
         tabList = TOP_LEVEL_DESTINATIONS,
         selectedItem = TOP_LEVEL_DESTINATIONS[2],
         modifier =
-            Modifier.testTag("bottomNavMenu")
-                .constrainAs(bottomNav) {
-                  bottom.linkTo(parent.bottom)
-                  start.linkTo(parent.start)
-                  end.linkTo(parent.end)
-                })
+            Modifier.testTag("bottomNavMenu").constrainAs(bottomNav) {
+              bottom.linkTo(parent.bottom)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
+            })
   }
 }
 
