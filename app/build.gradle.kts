@@ -109,6 +109,9 @@ dependencies {
     implementation("com.google.android.play:core-ktx:1.8.1")
     implementation("com.google.firebase:firebase-database-ktx")
     
+    // Coil
+    implementation("io.coil-kt:coil-compose:1.4.0")
+    
     // JUnit
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
