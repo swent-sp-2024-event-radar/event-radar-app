@@ -10,4 +10,36 @@ TODO: Add detailed app description and demo
 ## Architecture Diagram
 ![architecture diagram](images/architecture-diagram.png)
 [Image Link](https://excalidraw.com/#json=1c_DrTFZCSGprCvJNBYHn,B0sXrISCY8YdKgiTqy9xDA)
-_revised 9/4/2024_
+
+## Backend
+### User database
+The structure of the user database is as follows:
+```json
+{
+  "users": {
+    "user_id": {
+      "private": {
+        "private_id": {
+          "age": 22,
+          "email": "christineha127@gmail.com",
+          "firstName": "Christine",
+          "lastName": "Ha",
+          "phoneNumber": "0779642510"
+        }
+      },
+      "public": {
+        "public_id": {
+          "accountStatus": "active",
+          "eventsAttendeeList": ["event_id1", "event_id2"],
+          "eventsHostList": ["event_id1", "event_id2"],
+          "profilePicUrl": "https://stackoverflow.com/questions/46585330/firestore-security-rules-for-public-and-private-fields",
+          "qrCodeUrl": "https://stackoverflow.com/questions/46585330/firestore-security-rules-for-public-and-private-fields",
+          "username": "chaha"
+        }
+      }
+    }
+  }
+}
+```
+
+_revised 12/4/2024_
