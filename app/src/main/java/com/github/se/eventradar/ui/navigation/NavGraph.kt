@@ -5,10 +5,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.github.se.eventradar.ui.home.HomeScreen
 import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.login.SignUpScreen
 import com.github.se.eventradar.ui.overview.Overview
-import com.github.se.eventradar.ui.home.HomeScreen
 import com.github.se.eventradar.util.toast
 
 @Composable
