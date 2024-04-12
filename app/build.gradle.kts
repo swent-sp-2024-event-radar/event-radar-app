@@ -112,6 +112,9 @@ dependencies {
     // Coil
     implementation("io.coil-kt:coil-compose:1.4.0")
     
+    // Coil
+    implementation("io.coil-kt:coil-compose:1.4.0")
+    
     // JUnit
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
