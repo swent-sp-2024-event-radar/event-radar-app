@@ -91,14 +91,3 @@ fun NavBarIcon(tab: TopLevelDestination, modifier: Modifier) {
   }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun EventDetailsPreview() {
-  MyApplicationTheme {
-    Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFFFFFFFF)) {
-      val selectedItem = TOP_LEVEL_DESTINATIONS[2]
-      BottomNavigationMenu(
-          onTabSelected = {}, tabList = TOP_LEVEL_DESTINATIONS, selectedItem = selectedItem)
-    }
-  }
-}
