@@ -20,7 +20,7 @@ fun NavGraph(navController: NavHostController) {
     composable(Route.LOGIN) { LoginScreen(navigationActions = navActions) }
     composable(Route.SIGNUP) { SignUpScreen(navigationActions = navActions) }
     composable(Route.OVERVIEW) { Overview(navigationActions = navActions) }
-    composable(Route.HOME) { HomeScreen(navigationActions = navActions) }
+    composable(Route.HOME) { HomeScreen() }
 
     // TODO replace the Toast message with the corresponding screen function of the route
     composable(Route.SCANNER) { context.toast("Scanner screen needs to be implemented") }
