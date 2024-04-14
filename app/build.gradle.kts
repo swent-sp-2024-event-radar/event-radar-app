@@ -119,7 +119,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     
-    testImplementation("androidx.arch.core:core-testing:2.1.0")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
     
     testImplementation("org.json:json:20220924")
     
@@ -140,6 +140,9 @@ dependencies {
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.12.0"))
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
+
+    //QR CODE
+    implementation ("com.google.zxing:core:3.4.1")
 }
 
 secrets {
