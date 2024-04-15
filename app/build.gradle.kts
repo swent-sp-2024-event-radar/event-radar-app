@@ -6,6 +6,7 @@ plugins {
     id("com.ncorti.ktfmt.gradle") version "0.16.0"
     id("com.google.gms.google-services")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("jacoco")
     id("org.sonarqube") version "4.4.1.3373"
 }
 
@@ -199,5 +200,6 @@ sonar {
         property("sonar.projectKey", "swent-sp-2024-event-radar_event-radar-app")
         property("sonar.organization", "swent-sp-2024-party-radar")
         property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
     }
 }
