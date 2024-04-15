@@ -196,7 +196,7 @@ tasks.withType<Test> {
 
 sonar {
     properties {
-        property("sonar.projectKey", "swent-sp-2024-party-radar_party-radar-app")
+        property("sonar.projectKey", "swent-sp-2024-event-radar_event-radar-app")
         property("sonar.organization", "swent-sp-2024-party-radar")
         property("sonar.host.url", "https://sonarcloud.io")
     }
