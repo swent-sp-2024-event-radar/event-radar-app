@@ -49,7 +49,6 @@ import com.github.se.eventradar.R
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
-import com.github.se.eventradar.model.event.EventViewModel
 import com.github.se.eventradar.model.event.Ticket
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
@@ -60,7 +59,7 @@ import java.time.LocalTime
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun HomeScreen(viewModel: EventViewModel = viewModel()) {
+fun HomeScreen() { // viewModel: EventViewModel = viewModel() + Navigation
   val mockEvents =
       listOf(
           Event(
@@ -73,6 +72,7 @@ fun HomeScreen(viewModel: EventViewModel = viewModel()) {
               Ticket("Standard", 0.0, 500),
               "jg@joytigoel.com",
               mutableSetOf("2989jdgj23", "32923jkbd23"),
+              mutableSetOf("20982jwdwk", "j1ou1e]d8223"),
               EventCategory.MUSIC,
               "89379"
           ),
@@ -86,6 +86,7 @@ fun HomeScreen(viewModel: EventViewModel = viewModel()) {
           Ticket("regular", 0.0, 10000),
           "valerian@joytigoel.com",
           mutableSetOf("298jhk", "jwj8223"),
+          mutableSetOf("20982jhk", "j1ou1e8223"),
           EventCategory.SPORTS,
           "89298"
           ),
@@ -99,6 +100,7 @@ fun HomeScreen(viewModel: EventViewModel = viewModel()) {
               Ticket("regular", 0.0, 10000),
               "valerian@joytigoel.com",
               mutableSetOf("298jhk", "jwj8223"),
+              mutableSetOf("20982e2hk", "j1ou223e8223"),
               EventCategory.COMMUNITY,
               "89298"
           ))

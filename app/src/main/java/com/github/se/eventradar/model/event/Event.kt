@@ -14,6 +14,7 @@ enum class EventCategory {
 data class Ticket(
     val name: String, val price: Double, val quantity: Int
 )
+//new event struct final
 data class Event(
     val eventName: String,
     val eventPhoto: String,
