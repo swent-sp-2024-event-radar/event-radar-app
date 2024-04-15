@@ -6,6 +6,7 @@ plugins {
     id("com.ncorti.ktfmt.gradle") version "0.16.0"
     id("com.google.gms.google-services")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("jacoco")
     id("org.sonarqube") version "4.4.1.3373"
 }
 
@@ -108,6 +109,12 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.android.play:core-ktx:1.8.1")
     implementation("com.google.firebase:firebase-database-ktx")
+
+    // Coil
+    implementation("io.coil-kt:coil-compose:1.4.0")
+    
+    // Coil
+    implementation("io.coil-kt:coil-compose:1.4.0")
     
     // JUnit
     testImplementation("junit:junit:4.13.2")
@@ -190,8 +197,9 @@ tasks.withType<Test> {
 
 sonar {
     properties {
-        property("sonar.projectKey", "swent-sp-2024-party-radar_party-radar-app")
+        property("sonar.projectKey", "swent-sp-2024-event-radar_event-radar-app")
         property("sonar.organization", "swent-sp-2024-party-radar")
         property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
     }
 }
