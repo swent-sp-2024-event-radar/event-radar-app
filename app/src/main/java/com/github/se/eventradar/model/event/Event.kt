@@ -1,8 +1,7 @@
 package com.github.se.eventradar.model.event
+
 import com.github.se.eventradar.model.Location
-import com.google.firebase.firestore.DocumentReference
 import java.time.LocalDateTime
-import java.util.Date
 
 enum class EventCategory {
   MUSIC,
@@ -11,10 +10,9 @@ enum class EventCategory {
   EXHIBITION,
   COMMUNITY
 }
-data class Ticket(
-    val name: String, val price: Double, val quantity: Int
-)
-//new event struct final
+
+data class Ticket(val name: String, val price: Double, val quantity: Int)
+// new event struct final
 data class Event(
     val eventName: String,
     val eventPhoto: String,

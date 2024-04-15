@@ -1,6 +1,6 @@
 package com.github.se.eventradar.ui.home
+
 import android.annotation.SuppressLint
-import java.util.Date
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -44,7 +44,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
@@ -52,10 +51,7 @@ import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.Ticket
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
-
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
@@ -64,46 +60,43 @@ fun HomeScreen() { // viewModel: EventViewModel = viewModel() + Navigation
       listOf(
           Event(
               "NYE2025",
-              "User1",//todo
+              "User1", // todo
               LocalDateTime.MIN,
               LocalDateTime.MAX,
-              Location(83.39, 2.992, "EPFL" ),
-              "enjoy your time on the dacefloor" ,
+              Location(83.39, 2.992, "EPFL"),
+              "enjoy your time on the dacefloor",
               Ticket("Standard", 0.0, 500),
               "jg@joytigoel.com",
               mutableSetOf("2989jdgj23", "32923jkbd23"),
               mutableSetOf("20982jwdwk", "j1ou1e]d8223"),
               EventCategory.MUSIC,
-              "89379"
-          ),
+              "89379"),
           Event(
-          "NYE2026",
-          "User2",//todo
-          LocalDateTime.now(),
-          LocalDateTime.MAX,
-          Location(83.49, 56.992, "161 makepeace avenue, n666es" ),
-          "Forget and Enjoy" ,
-          Ticket("regular", 0.0, 10000),
-          "valerian@joytigoel.com",
-          mutableSetOf("298jhk", "jwj8223"),
-          mutableSetOf("20982jhk", "j1ou1e8223"),
-          EventCategory.SPORTS,
-          "89298"
-          ),
+              "NYE2026",
+              "User2", // todo
+              LocalDateTime.now(),
+              LocalDateTime.MAX,
+              Location(83.49, 56.992, "161 makepeace avenue, n666es"),
+              "Forget and Enjoy",
+              Ticket("regular", 0.0, 10000),
+              "valerian@joytigoel.com",
+              mutableSetOf("298jhk", "jwj8223"),
+              mutableSetOf("20982jhk", "j1ou1e8223"),
+              EventCategory.SPORTS,
+              "89298"),
           Event(
               "NYE2027",
-              "User3",//todo
+              "User3", // todo
               LocalDateTime.now(),
               LocalDateTime.MIN,
-              Location(83.39, 66.992, "161 makepeace avenue, n666es" ),
-              "Join the Community" ,
+              Location(83.39, 66.992, "161 makepeace avenue, n666es"),
+              "Join the Community",
               Ticket("regular", 0.0, 10000),
               "valerian@joytigoel.com",
               mutableSetOf("298jhk", "jwj8223"),
               mutableSetOf("20982e2hk", "j1ou223e8223"),
               EventCategory.COMMUNITY,
-              "89298"
-          ))
+              "89298"))
 
   var selectedTabIndex by remember { mutableIntStateOf(0) }
   val context = LocalContext.current
@@ -113,7 +106,6 @@ fun HomeScreen() { // viewModel: EventViewModel = viewModel() + Navigation
     Row(
         modifier =
             Modifier.fillMaxWidth()
-
                 .constrainAs(logo) {
                   top.linkTo(parent.top, margin = 32.dp)
                   start.linkTo(parent.start, margin = 16.dp)
