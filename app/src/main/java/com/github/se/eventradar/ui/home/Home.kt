@@ -53,7 +53,7 @@ import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import java.time.LocalDateTime
 
-@SuppressLint("SuspiciousIndentation")
+
 @Composable
 fun HomeScreen() { // viewModel: EventViewModel = viewModel() + Navigation
   val mockEvents =
