@@ -1,6 +1,5 @@
 package com.github.se.eventradar.ui.home
 
-import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -53,7 +52,6 @@ import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import java.time.LocalDateTime
 
-@SuppressLint("SuspiciousIndentation")
 @Composable
 fun HomeScreen() { // viewModel: EventViewModel = viewModel() + Navigation
   val mockEvents =
