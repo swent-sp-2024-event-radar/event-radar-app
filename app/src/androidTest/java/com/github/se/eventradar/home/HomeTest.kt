@@ -1,9 +1,11 @@
 package com.github.se.eventradar.home
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.screens.HomeScreen
 import com.github.se.eventradar.ui.home.HomeScreen
+import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -20,7 +22,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
 
   @Before
   fun testSetup() {
-    composeTestRule.setContent { HomeScreen() }
+    composeTestRule.setContent { HomeScreen(NavigationActions(rememberNavController())) }
   }
 
   @Test
