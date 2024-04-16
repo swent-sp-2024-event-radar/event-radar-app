@@ -59,92 +59,102 @@ fun EventDetails(navigationActions: NavigationActions) {
   val contentCategory = "Cat x"
   val contentTime = "xx:xx"
 
-  Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween) {
-    Image(
-        painter = painterResource(eventImage),
-        contentDescription = "Event Image",
-        modifier = Modifier.fillMaxWidth().height(imageHeight),
-        contentScale = ContentScale.FillWidth)
+  Column(
+      modifier = Modifier.fillMaxHeight().testTag("eventDetailsScreen"),
+      verticalArrangement = Arrangement.SpaceBetween) {
+        Image(
+            painter = painterResource(eventImage),
+            contentDescription = "Event Image",
+            modifier = Modifier.fillMaxWidth().height(imageHeight),
+            contentScale = ContentScale.FillWidth)
 
-    // Go back button
-    Button(
-        onClick = { navigationActions.goBack() },
-        modifier = Modifier.wrapContentSize().align(Alignment.Start).testTag("backButton"),
-        colors =
-            ButtonDefaults.buttonColors(
-                contentColor = Color.Transparent,
-                containerColor = Color.Transparent,
-            ),
-    ) {
-      Icon(
-          painter = painterResource(id = R.drawable.back_arrow),
-          contentDescription = "Back navigation arrow",
-          tint = MaterialTheme.colorScheme.onSurface,
-          modifier = Modifier.width(24.dp).height(24.dp).align(Alignment.CenterVertically))
-    }
-
-    Text(
-        text = eventTitle,
-        color = MaterialTheme.colorScheme.onSurface,
-        lineHeight = 20.sp,
-        fontWeight = FontWeight.Bold,
-        fontSize = titleTextSize,
-        modifier = Modifier.align(Alignment.CenterHorizontally))
-
-    Column(modifier = Modifier.padding(start = widthPadding, end = widthPadding)) {
-      Text(text = headerDescription, color = fieldTitleColor, fontSize = contentTextSize)
-      Text(text = contentDescription, color = fieldContentColor, fontSize = contentTextSize)
-    }
-
-    Row(
-        modifier =
-            Modifier.fillMaxWidth().padding(start = widthPadding, end = widthPadding).height(64.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center) {
-          Column(modifier = Modifier.weight(1f)) {
-            Text(text = headerDistance, color = fieldTitleColor, fontSize = contentTextSize)
-            Text(text = contentDistance, color = fieldContentColor, fontSize = contentTextSize)
-          }
-
-          Column(modifier = Modifier.weight(1f)) {
-            Text(text = headerDate, color = fieldTitleColor, fontSize = contentTextSize)
-            Text(text = contentDate, color = fieldContentColor, fontSize = contentTextSize)
-          }
+        // Go back button
+        Button(
+            onClick = { navigationActions.goBack() },
+            modifier = Modifier.wrapContentSize().align(Alignment.Start).testTag("backButton"),
+            colors =
+                ButtonDefaults.buttonColors(
+                    contentColor = Color.Transparent,
+                    containerColor = Color.Transparent,
+                ),
+        ) {
+          Icon(
+              painter = painterResource(id = R.drawable.back_arrow),
+              contentDescription = "Back navigation arrow",
+              tint = MaterialTheme.colorScheme.onSurface,
+              modifier = Modifier.width(24.dp).height(24.dp).align(Alignment.CenterVertically))
         }
 
-    Row(
-        modifier =
-            Modifier.fillMaxWidth().padding(start = widthPadding, end = widthPadding).height(64.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center) {
-          Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.SpaceBetween) {
-            Text(text = headerCategory, color = fieldTitleColor, fontSize = contentTextSize)
-            Text(text = contentCategory, color = fieldContentColor, fontSize = contentTextSize)
-          }
+        Text(
+            text = eventTitle,
+            color = MaterialTheme.colorScheme.onSurface,
+            lineHeight = 20.sp,
+            fontWeight = FontWeight.Bold,
+            fontSize = titleTextSize,
+            modifier = Modifier.align(Alignment.CenterHorizontally))
 
-          Column(modifier = Modifier.weight(1f)) {
-            Text(text = headerTime, color = fieldTitleColor, fontSize = contentTextSize)
-            Text(text = contentTime, color = fieldContentColor, fontSize = contentTextSize)
-          }
+        Column(modifier = Modifier.padding(start = widthPadding, end = widthPadding)) {
+          Text(text = headerDescription, color = fieldTitleColor, fontSize = contentTextSize)
+          Text(text = contentDescription, color = fieldContentColor, fontSize = contentTextSize)
         }
 
-    // register button
-    FloatingActionButton(
-        onClick = { /*TODO*/},
-        modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).align(Alignment.End),
-        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-    ) {
-      Icon(
-          painter = painterResource(id = R.drawable.ticket),
-          contentDescription = "register to event button",
-          modifier = Modifier.size(32.dp),
-          tint = MaterialTheme.colorScheme.primaryContainer,
-      )
-    }
+        Row(
+            modifier =
+                Modifier.fillMaxWidth()
+                    .padding(start = widthPadding, end = widthPadding)
+                    .height(64.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center) {
+              Column(modifier = Modifier.weight(1f)) {
+                Text(text = headerDistance, color = fieldTitleColor, fontSize = contentTextSize)
+                Text(text = contentDistance, color = fieldContentColor, fontSize = contentTextSize)
+              }
 
-    BottomNavigationMenu(
-        onTabSelected = { tab -> navigationActions.navigateTo(tab) },
-        tabList = TOP_LEVEL_DESTINATIONS,
-        selectedItem = TOP_LEVEL_DESTINATIONS[0])
-  }
+              Column(modifier = Modifier.weight(1f)) {
+                Text(text = headerDate, color = fieldTitleColor, fontSize = contentTextSize)
+                Text(text = contentDate, color = fieldContentColor, fontSize = contentTextSize)
+              }
+            }
+
+        Row(
+            modifier =
+                Modifier.fillMaxWidth()
+                    .padding(start = widthPadding, end = widthPadding)
+                    .height(64.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center) {
+              Column(
+                  modifier = Modifier.weight(1f), verticalArrangement = Arrangement.SpaceBetween) {
+                    Text(text = headerCategory, color = fieldTitleColor, fontSize = contentTextSize)
+                    Text(
+                        text = contentCategory,
+                        color = fieldContentColor,
+                        fontSize = contentTextSize)
+                  }
+
+              Column(modifier = Modifier.weight(1f)) {
+                Text(text = headerTime, color = fieldTitleColor, fontSize = contentTextSize)
+                Text(text = contentTime, color = fieldContentColor, fontSize = contentTextSize)
+              }
+            }
+
+        // register button
+        FloatingActionButton(
+            onClick = { /*TODO*/},
+            modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).align(Alignment.End),
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        ) {
+          Icon(
+              painter = painterResource(id = R.drawable.ticket),
+              contentDescription = "register to event button",
+              modifier = Modifier.size(32.dp),
+              tint = MaterialTheme.colorScheme.primary,
+          )
+        }
+
+        BottomNavigationMenu(
+            onTabSelected = { tab -> navigationActions.navigateTo(tab) },
+            tabList = TOP_LEVEL_DESTINATIONS,
+            selectedItem = TOP_LEVEL_DESTINATIONS[0])
+      }
 }
