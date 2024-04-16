@@ -1,7 +1,6 @@
 package com.github.se.eventradar.event
 
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.screens.EventDetailsScreen
 import com.github.se.eventradar.ui.event.EventDetails
@@ -10,6 +9,10 @@ import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
+import io.mockk.confirmVerified
+import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.junit4.MockKRule
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -20,9 +23,15 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
 
   @get:Rule val composeTestRule = createComposeRule()
 
+  // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
+  @get:Rule val mockkRule = MockKRule(this)
+
+  // Relaxed mocks methods have a default implementation returning values
+  @RelaxedMockK lateinit var mockNavActions: NavigationActions
+
   @Before
   fun testSetup() {
-    composeTestRule.setContent { EventDetails(NavigationActions(rememberNavController())) }
+    composeTestRule.setContent { EventDetails(navigationActions = mockNavActions) }
   }
 
   @Test
@@ -52,5 +61,22 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
       timeStartContent { assertIsDisplayed() }
       timeEndContent { assertIsDisplayed() }
     }
+  }
+
+  @Test
+  fun goBackButtonTriggersBackNavigation() = run {
+    ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
+      goBackButton {
+        // arrange: verify the pre-conditions
+        assertIsDisplayed()
+        assertIsEnabled()
+
+        // act: go back !
+        performClick()
+      }
+    }
+    // assert: the nav action has been called
+    verify { mockNavActions.goBack() }
+    confirmVerified(mockNavActions)
   }
 }
