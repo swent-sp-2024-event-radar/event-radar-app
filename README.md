@@ -10,6 +10,7 @@ TODO: Add detailed app description and demo
 ## Architecture Diagram
 ![architecture diagram](images/architecture-diagram.png)
 [Image Link](https://excalidraw.com/#json=1c_DrTFZCSGprCvJNBYHn,B0sXrISCY8YdKgiTqy9xDA)
+_revised 9/4/2024_
 
 ## Backend
 ### Users database
@@ -45,8 +46,3 @@ Note:
 - Private and public collection created to manage permissions access using this link: https://stackoverflow.com/questions/46585330/firestore-security-rules-for-public-and-private-fields
     - Check Firestore rules for more information / details
 - Images should be stored in Firebase Storage ( firebase_storage ) to upload the image file and then you store the download url of the image inside the document in the Cloud Firestore ( cloud_firestore ).
-
-### Events database
-The structure of the user database is as follows:
-
-_revised 12/4/2024_
