@@ -68,7 +68,6 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import java.time.LocalDate
 import java.time.LocalTime
-import java.util.EventListener
 
 @Composable
 fun HomeScreen(navigationActions: NavigationActions) {
@@ -239,6 +238,7 @@ fun EventMap(events: List<Event>, navigationActions: NavigationActions, modifier
   }
   val mapUiSettings by remember { mutableStateOf(MapUiSettings(mapToolbarEnabled = false)) }
   
+  // TODO: Use actual user location
   val epflCameraPosition = LatLng(46.51890374606943, 6.566587868510539)
   val cameraPositionState: CameraPositionState = rememberCameraPositionState {
     position = CameraPosition.fromLatLngZoom(epflCameraPosition, 11f)
