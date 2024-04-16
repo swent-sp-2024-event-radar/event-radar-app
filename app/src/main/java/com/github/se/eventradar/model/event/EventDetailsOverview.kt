@@ -21,7 +21,6 @@ class EventDetailsOverview(
 
   fun getEventData(eventId: String): Unit {
 
-    try {
       // Fetch the specific document from Firebase
       db.collection("EVENT")
           .document(eventId)
@@ -59,13 +58,10 @@ class EventDetailsOverview(
             // You may want to log the error or show a message to the user
             println("Error fetching event: $exception")
           }
-    } catch (e: Exception) {
-      // Handle any errors that occur during fetching
-      // You may want to log the error or show a message to the user
-      println("Error fetching event: $e")
-    }
   }
 }
+
+
 
 private fun initialEventState(): EventUiState {
   return EventUiState(
