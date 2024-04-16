@@ -17,8 +17,6 @@ class AllEventOverview(private val db: FirebaseFirestore = Firebase.firestore): 
     val uiState: StateFlow<List<EventListingUiState>> = _uiState
 
     fun getEventData(): Unit {
-        viewModelScope.launch {
-            try {
                 db.collection("EVENT")
                     .get()
                     .addOnSuccessListener { documents ->
@@ -36,10 +34,6 @@ class AllEventOverview(private val db: FirebaseFirestore = Firebase.firestore): 
                     .addOnFailureListener { exception ->
                         println("Error fetching events: $exception")
                     }
-            } catch (e: Exception) {
-                println("Error fetching events: $e")
-            }
-        }
     }
     data class EventListingUiState(
         var eventName: String = "",
