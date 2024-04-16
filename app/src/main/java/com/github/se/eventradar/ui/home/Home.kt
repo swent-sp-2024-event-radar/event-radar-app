@@ -15,16 +15,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CardDefaults.cardElevation
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -47,9 +54,20 @@ import com.github.se.eventradar.R
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.ui.BottomNavigationMenu
+import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.CameraPositionState
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.EventListener
 
 @Composable
 fun HomeScreen() {
@@ -81,10 +99,11 @@ fun HomeScreen() {
               EventCategory.CONFERENCE))
 
   var selectedTabIndex by remember { mutableIntStateOf(0) }
+  var viewToggleBrowseIndex by remember { mutableIntStateOf(0) }
   val context = LocalContext.current
 
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("homeScreen")) {
-    val (logo, tabs, eventList, bottomNav) = createRefs()
+    val (logo, tabs, eventList, bottomNav, viewToggle) = createRefs()
     Row(
         modifier =
             Modifier.fillMaxWidth()
@@ -152,13 +171,24 @@ fun HomeScreen() {
         }
 
     if (selectedTabIndex == 0) {
-      EventList(
-          mockEvents,
-          Modifier.fillMaxWidth().constrainAs(eventList) {
-            top.linkTo(tabs.bottom, margin = 8.dp)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-          })
+      if (viewToggleBrowseIndex == 0) {
+        EventList(
+            mockEvents,
+            Modifier.fillMaxWidth().constrainAs(eventList) {
+              top.linkTo(tabs.bottom, margin = 8.dp)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
+            })
+      } else {
+        EventMap(
+            mockEvents,
+            navigationActions,
+            Modifier.fillMaxWidth().constrainAs(eventList) {
+              top.linkTo(tabs.bottom, margin = 8.dp)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
+            })
+      }
     } else {
       // "Upcoming" tab content
       // TODO: Implement upcoming events
@@ -178,12 +208,68 @@ fun HomeScreen() {
               start.linkTo(parent.start)
               end.linkTo(parent.end)
             })
+
+    var viewToggleIcon =
+        if (viewToggleBrowseIndex == 0) Icons.Default.Place else Icons.AutoMirrored.Filled.List
+    FloatingActionButton(
+        onClick = {
+          viewToggleBrowseIndex = if (viewToggleBrowseIndex == 0) 1 else 0
+          viewToggleIcon =
+              if (viewToggleBrowseIndex == 0) Icons.Default.Place
+              else Icons.AutoMirrored.Filled.List
+        },
+        modifier =
+            Modifier.testTag("viewToggleFab").constrainAs(viewToggle) {
+              bottom.linkTo(bottomNav.top, margin = 16.dp)
+              start.linkTo(parent.start, margin = 16.dp)
+            }) {
+          Icon(imageVector = viewToggleIcon, contentDescription = null)
+        }
   }
 }
 
 @Composable
 fun EventList(events: List<Event>, modifier: Modifier = Modifier) {
   LazyColumn(modifier = modifier) { items(events) { event -> EventCard(event) } }
+}
+
+@Composable
+fun EventMap(events: List<Event>, navigationActions: NavigationActions, modifier: Modifier = Modifier) {
+  val mapProperties by remember {
+    mutableStateOf(MapProperties(maxZoomPreference = 50f, minZoomPreference = 0f))
+  }
+  val mapUiSettings by remember { mutableStateOf(MapUiSettings(mapToolbarEnabled = false)) }
+  
+  val epflCameraPosition = LatLng(46.51890374606943, 6.566587868510539)
+  val cameraPositionState: CameraPositionState = rememberCameraPositionState {
+    position = CameraPosition.fromLatLngZoom(epflCameraPosition, 11f)
+  }
+  
+  Scaffold(
+    bottomBar = {
+      BottomNavigationMenu(
+        onTabSelected = navigationActions::navigateTo,
+        tabList = TOP_LEVEL_DESTINATIONS,
+        selectedItem = TOP_LEVEL_DESTINATIONS[1])
+    },
+    modifier = Modifier.testTag("mapScreen")) {
+    GoogleMap(
+      properties = mapProperties,
+      uiSettings = mapUiSettings,
+      cameraPositionState = cameraPositionState,
+      modifier = Modifier.fillMaxSize().padding(it).testTag("map")) {
+      for (event in events) {
+        Marker(
+          contentDescription = "Marker for ${event.name}",
+          state =
+          rememberMarkerState(
+            position = LatLng(event.location.latitude, event.location.longitude)),
+          title = event.name,
+          snippet = event.description,
+        )
+      }
+    }
+  }
 }
 
 @Composable
