@@ -8,7 +8,6 @@ import androidx.navigation.compose.composable
 import com.github.se.eventradar.ui.home.HomeScreen
 import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.login.SignUpScreen
-import com.github.se.eventradar.ui.overview.Overview
 import com.github.se.eventradar.util.toast
 
 @Composable
@@ -19,15 +18,23 @@ fun NavGraph(navController: NavHostController) {
   NavHost(navController, startDestination = Route.LOGIN) {
     composable(Route.LOGIN) { LoginScreen(navigationActions = navActions) }
     composable(Route.SIGNUP) { SignUpScreen(navigationActions = navActions) }
-    composable(Route.OVERVIEW) { Overview(navigationActions = navActions) }
-    composable(Route.HOME) { HomeScreen() }
+    composable(Route.HOME) { HomeScreen(navigationActions = navActions) }
 
     // TODO replace the Toast message with the corresponding screen function of the route
-    composable(Route.SCANNER) { context.toast("Scanner screen needs to be implemented") }
-    composable(Route.MESSAGE) { context.toast("Message main screen needs to be implemented") }
-    composable(Route.EVENTS) { context.toast("Event main screen needs to be implemented") }
-    composable(Route.PROFILE) { context.toast("Profile screen needs to be implemented") }
+    composable(Route.SCANNER) {
+      HomeScreen(navigationActions = navActions)
+      context.toast("Scanner screen needs to be implemented")
+    }
+    composable(Route.MESSAGE) {
+      HomeScreen(navigationActions = navActions)
+      context.toast("Message main screen needs to be implemented")
+    }
+    composable(Route.PROFILE) {
+      HomeScreen(navigationActions = navActions)
+      context.toast("Profile screen needs to be implemented")
+    }
     composable(Route.MY_HOSTING) {
+      HomeScreen(navigationActions = navActions)
       context.toast("My hosted events screen needs to be implemented")
     }
   }

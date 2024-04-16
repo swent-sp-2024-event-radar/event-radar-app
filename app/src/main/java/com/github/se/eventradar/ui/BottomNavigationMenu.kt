@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,8 +50,13 @@ fun BottomNavigationMenu(
           else MaterialTheme.colorScheme.onSurfaceVariant
 
       BottomNavigationItem(
-          icon = { NavBarIcon(tab, boxModifier) },
-          label = { Text(text = labelText, color = iconColor, fontSize = 12.sp) },
+          icon = { NavBarIcon(tab, boxModifier, iconColor) },
+          label = {
+            Text(
+                text = labelText,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 12.sp)
+          },
           selected = selectedItem == tab,
           onClick = { onTabSelected(tab) },
           modifier =
@@ -69,11 +75,11 @@ fun BottomNavigationMenu(
 }
 
 @Composable
-fun NavBarIcon(tab: TopLevelDestination, modifier: Modifier) {
+fun NavBarIcon(tab: TopLevelDestination, modifier: Modifier, iconColor: Color) {
   Box(modifier = modifier, contentAlignment = Alignment.Center) {
     Icon(
         painter = painterResource(id = tab.icon),
-        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        tint = iconColor,
         contentDescription = null,
         modifier = Modifier.width(24.dp).height(24.dp),
     )
