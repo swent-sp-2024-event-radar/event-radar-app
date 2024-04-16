@@ -6,6 +6,6 @@ data class Location(
     var address: String,
 )
 
-fun getLocation(name: String, lat: Double, lng: Double): Location {
+fun createLocation(name: String, lat: Double, lng: Double): Location {
   return Location(lat, lng, name)
 }
