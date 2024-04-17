@@ -1,8 +1,6 @@
 package com.github.se.eventradar.ui.event
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -81,93 +79,14 @@ val standardTextStyle =
         fontWeight = FontWeight.Normal,
     )
 
-@Composable
-fun EventDescription(modifier: Modifier, contentColor: Color, titleColor: Color) {
-  Column(modifier = modifier) {
-    Text(
-        text = headerDescription,
-        style = subTitleTextStyle,
-        color = titleColor,
-        modifier = Modifier.testTag("descriptionTitle"))
-    Text(
-        text = contentDescription,
-        style = standardTextStyle,
-        color = contentColor,
-        modifier = Modifier.testTag("descriptionContent"))
-  }
-}
+
+
+
 
 @Composable
-fun EventDistance(modifier: Modifier, contentColor: Color, titleColor: Color) {
-  Column(modifier = modifier) {
-    Text(
-        text = headerDistance,
-        style = subTitleTextStyle,
-        color = titleColor,
-        modifier = Modifier.testTag("distanceTitle"))
-    Text(
-        text = contentDistance,
-        style = standardTextStyle,
-        color = contentColor,
-        modifier = Modifier.testTag("distanceContent"))
-  }
-}
+fun EventDetails(/*viewModel : EventDetailsViewModel = viewModel(),*/ navigationActions: NavigationActions) {
 
-@Composable
-fun EventDate(modifier: Modifier, contentColor: Color, titleColor: Color) {
-  Column(modifier = modifier) {
-    Text(
-        text = headerDate,
-        style = subTitleTextStyle,
-        color = titleColor,
-        modifier = Modifier.testTag("dateTitle"))
-    Text(
-        text = contentDate,
-        style = standardTextStyle,
-        color = contentColor,
-        modifier = Modifier.testTag("dateContent"))
-  }
-}
-
-@Composable
-fun EventCategory(modifier: Modifier, contentColor: Color, titleColor: Color) {
-  Column(modifier = modifier, verticalArrangement = Arrangement.SpaceBetween) {
-    Text(
-        text = headerCategory,
-        style = subTitleTextStyle,
-        color = titleColor,
-        modifier = Modifier.testTag("categoryTitle"))
-    Text(
-        text = contentCategory,
-        style = standardTextStyle,
-        color = contentColor,
-        modifier = Modifier.testTag("categoryContent"))
-  }
-}
-
-@Composable
-fun EventTime(modifier: Modifier, contentColor: Color, titleColor: Color) {
-  Column(modifier = modifier) {
-    Text(
-        text = headerTime,
-        style = subTitleTextStyle,
-        color = titleColor,
-        modifier = Modifier.testTag("timeTitle"))
-    Text(
-        text = "start $contentTime",
-        style = standardTextStyle,
-        color = contentColor,
-        modifier = Modifier.testTag("timeStartContent"))
-    Text(
-        text = "end $contentTime",
-        style = standardTextStyle,
-        color = contentColor,
-        modifier = Modifier.testTag("timeEndContent"))
-  }
-}
-
-@Composable
-fun EventDetails(navigationActions: NavigationActions) {
+  //val eventUiState = viewModel.uiState.collectAsState().value
 
   val fieldTitleColor = MaterialTheme.colorScheme.onSurfaceVariant
   val fieldContentColor = MaterialTheme.colorScheme.onSurface
@@ -284,7 +203,7 @@ fun EventDetails(navigationActions: NavigationActions) {
                   },
               fieldContentColor,
               fieldTitleColor)
-          EventTime(
+          EventTimeDate(
               modifier =
                   Modifier.constrainAs(time) {
                     top.linkTo(distance.bottom, margin = 32.dp)
