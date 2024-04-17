@@ -6,6 +6,7 @@ plugins {
     id("com.ncorti.ktfmt.gradle") version "0.16.0"
     id("com.google.gms.google-services")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("jacoco")
     id("org.sonarqube") version "4.4.1.3373"
 }
 
@@ -141,7 +142,9 @@ dependencies {
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.12.0"))
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
-    
+
+    //QR CODE
+    implementation ("com.google.zxing:core:3.4.1")
 }
 
 secrets {
@@ -198,8 +201,9 @@ tasks.withType<Test> {
 
 sonar {
     properties {
-        property("sonar.projectKey", "swent-sp-2024-party-radar_party-radar-app")
+        property("sonar.projectKey", "swent-sp-2024-event-radar_event-radar-app")
         property("sonar.organization", "swent-sp-2024-party-radar")
         property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
     }
 }

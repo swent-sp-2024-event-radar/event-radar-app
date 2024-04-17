@@ -8,7 +8,7 @@ object Route {
   // Event radar main screens
   const val SCANNER = "scanner"
   const val MESSAGE = "message"
-  const val EVENTS = "events"
+  const val HOME = "home/Home"
   const val PROFILE = "profile"
   const val MY_HOSTING = "my_hosting"
 
@@ -17,8 +17,6 @@ object Route {
 
   const val LOGIN = "login/Login"
   const val SIGNUP = "login/SignUp"
-  const val OVERVIEW = "overview/Overview"
-  const val HOME = "home/Home"
 }
 
 data class TopLevelDestination(val route: String, val icon: Int, val textId: Int)
@@ -56,7 +54,7 @@ val TOP_LEVEL_DESTINATIONS =
             textId = R.string.message_chats,
         ),
         TopLevelDestination(
-            route = Route.EVENTS,
+            route = Route.HOME,
             icon = R.drawable.home,
             textId = R.string.homeScreen_events,
         ),

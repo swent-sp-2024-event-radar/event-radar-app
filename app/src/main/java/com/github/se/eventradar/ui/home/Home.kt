@@ -43,17 +43,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.Ticket
 import com.github.se.eventradar.ui.BottomNavigationMenu
+import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import java.time.LocalDateTime
 
 @Composable
-fun HomeScreen() { // viewModel: EventViewModel = viewModel() + Navigation
+fun HomeScreen(navigationActions: NavigationActions) {
+
   val mockEvents =
       listOf(
           Event(
@@ -183,9 +186,7 @@ fun HomeScreen() { // viewModel: EventViewModel = viewModel() + Navigation
     }
 
     BottomNavigationMenu(
-        onTabSelected = {
-          Toast.makeText(context, "Action not yet available", Toast.LENGTH_SHORT).show()
-        },
+        onTabSelected = { tab -> navigationActions.navigateTo(tab) },
         tabList = TOP_LEVEL_DESTINATIONS,
         selectedItem = TOP_LEVEL_DESTINATIONS[2],
         modifier =
@@ -255,5 +256,5 @@ fun EventCard(event: Event) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun HomeScreenPreview() {
-  HomeScreen()
+  HomeScreen(NavigationActions(rememberNavController()))
 }
