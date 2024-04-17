@@ -25,6 +25,8 @@ replay_pid*
 /.gradle
 /.idea
 
+.DS_store
+
 # secret files
 local.properties
 secrets.properties
