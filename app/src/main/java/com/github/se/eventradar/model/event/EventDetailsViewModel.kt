@@ -11,7 +11,7 @@ import java.time.ZoneId
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class EventDetailsOverview(
+class EventDetailsViewModel(
     private val db: FirebaseFirestore = Firebase.firestore,
     eventId: String
 ) : ViewModel() {
