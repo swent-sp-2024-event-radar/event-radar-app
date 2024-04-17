@@ -55,7 +55,7 @@ import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import java.time.LocalDateTime
 
 @Composable
-fun HomeScreen() { // viewModel: EventViewModel = viewModel() + Navigation
+fun HomeScreen(navigationActions: NavigationActions) {
 
   val mockEvents =
       listOf(
