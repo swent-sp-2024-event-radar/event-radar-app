@@ -51,7 +51,7 @@ import com.github.se.eventradar.R
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
-import com.github.se.eventradar.model.event.Ticket
+import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.home.EventList
 import com.github.se.eventradar.ui.navigation.NavigationActions
@@ -69,7 +69,7 @@ fun HostingScreen(navigationActions: NavigationActions) {
               LocalDateTime.MAX,
               Location(83.39, 2.992, "EPFL"),
               "enjoy your time on the dacefloor",
-              Ticket("Standard", 0.0, 500),
+              EventTicket("Standard", 0.0, 500),
               "jg@joytigoel.com",
               mutableSetOf("2989jdgj23", "32923jkbd23"),
               mutableSetOf("20982jwdwk", "j1ou1e]d8223"),
@@ -82,7 +82,7 @@ fun HostingScreen(navigationActions: NavigationActions) {
               LocalDateTime.MAX,
               Location(83.49, 56.992, "161 makepeace avenue, n666es"),
               "Forget and Enjoy",
-              Ticket("regular", 0.0, 10000),
+              EventTicket("regular", 0.0, 10000),
               "valerian@joytigoel.com",
               mutableSetOf("298jhk", "jwj8223"),
               mutableSetOf("20982jhk", "j1ou1e8223"),
@@ -95,7 +95,7 @@ fun HostingScreen(navigationActions: NavigationActions) {
               LocalDateTime.MIN,
               Location(83.39, 66.992, "161 makepeace avenue, n666es"),
               "Join the Community",
-              Ticket("regular", 0.0, 10000),
+              EventTicket("regular", 0.0, 10000),
               "valerian@joytigoel.com",
               mutableSetOf("298jhk", "jwj8223"),
               mutableSetOf("20982e2hk", "j1ou223e8223"),
@@ -179,29 +179,29 @@ fun HostingScreen(navigationActions: NavigationActions) {
         verticalAlignment = Alignment.CenterVertically) {
           ExtendedFloatingActionButton(
               text = {
-                  Text(
-                      text = "Create New Event",
-                      style =
-                      TextStyle(
-                          fontSize = 16.sp,
-                          lineHeight = 17.sp,
-                          fontFamily = FontFamily(Font(R.font.roboto)),
-                          fontWeight = FontWeight(500),
-                          textAlign = TextAlign.Center,
-                          letterSpacing = 0.25.sp,
-                      ))
+                Text(
+                    text = "Create New Event",
+                    style =
+                        TextStyle(
+                            fontSize = 16.sp,
+                            lineHeight = 17.sp,
+                            fontFamily = FontFamily(Font(R.font.roboto)),
+                            fontWeight = FontWeight(500),
+                            textAlign = TextAlign.Center,
+                            letterSpacing = 0.25.sp,
+                        ))
               },
               icon = { Icon(Icons.Filled.Add, "Floating action button.") },
               onClick = { /*TODO*/},
               modifier = Modifier.fillMaxWidth(0.8f).testTag("createEventButton"),
               containerColor = MaterialTheme.colorScheme.secondaryContainer,
               contentColor = MaterialTheme.colorScheme.onSecondaryContainer)
-        Spacer(modifier = Modifier.width(16.dp))
-        FloatingActionButton( // to be replaced with mapview later.
+          Spacer(modifier = Modifier.width(16.dp))
+          FloatingActionButton( // to be replaced with mapview later.
               onClick = { /*TODO*/},
               modifier = Modifier.fillMaxWidth().testTag("switchViewButton"),
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+              containerColor = MaterialTheme.colorScheme.secondaryContainer,
+              contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
           ) {
             Icon(
                 painter = painterResource(id = R.drawable.map),

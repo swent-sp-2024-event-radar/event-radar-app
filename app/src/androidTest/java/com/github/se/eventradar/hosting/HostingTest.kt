@@ -16,26 +16,25 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()){
-    @get:Rule
-    val composeTestRule = createComposeRule()
+class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
+  @get:Rule val composeTestRule = createComposeRule()
 
-    @Before
-    fun testSetup() {
-        composeTestRule.setContent { HostingScreen(NavigationActions(rememberNavController())) }
-    }
+  @Before
+  fun testSetup() {
+    composeTestRule.setContent { HostingScreen(NavigationActions(rememberNavController())) }
+  }
 
-    @Test
-    fun screenDisplaysAllElementsCorrectly() = run {
-        ComposeScreen.onComposeScreen<HostingScreen>(composeTestRule) {
-            logo { assertIsDisplayed() }
-            tabs { assertIsDisplayed() }
-            myHostedEventsTab{assertIsDisplayed()}
-            eventCard { assertIsDisplayed() }
-            bottomNav { assertIsDisplayed() }
-            floatingActionButtons{assertIsDisplayed()}
-            createEventButton{assertIsDisplayed()}
-            switchViewButton{assertIsDisplayed()}
-        }
+  @Test
+  fun screenDisplaysAllElementsCorrectly() = run {
+    ComposeScreen.onComposeScreen<HostingScreen>(composeTestRule) {
+      logo { assertIsDisplayed() }
+      tabs { assertIsDisplayed() }
+      myHostedEventsTab { assertIsDisplayed() }
+      eventCard { assertIsDisplayed() }
+      bottomNav { assertIsDisplayed() }
+      floatingActionButtons { assertIsDisplayed() }
+      createEventButton { assertIsDisplayed() }
+      switchViewButton { assertIsDisplayed() }
     }
+  }
 }
