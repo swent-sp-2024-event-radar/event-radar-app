@@ -53,7 +53,7 @@ class EventsOverviewViewModel(db: FirebaseFirestore = Firebase.firestore) : View
               }
           _uiState.value =
               _uiState.value.copy(
-                  eventList = EventList(events, events, _uiState.value.eventList.getEvent))
+                  eventList = EventList(events, events, _uiState.value.eventList.selectedEvent))
         }
         .addOnFailureListener { exception ->
           Log.d("EventsOverviewViewModel", "Error getting documents: ", exception)

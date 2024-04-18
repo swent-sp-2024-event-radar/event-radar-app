@@ -5,7 +5,8 @@ enum class EventCategory {
   SPORTS,
   CONFERENCE,
   EXHIBITION,
-  COMMUNITY
+  COMMUNITY,
+  SOCIAL
 }
 
 fun getEventCategory(categoryString: String): EventCategory {
@@ -15,6 +16,7 @@ fun getEventCategory(categoryString: String): EventCategory {
     "CONFERENCE" -> EventCategory.CONFERENCE
     "EXHIBITION" -> EventCategory.EXHIBITION
     "COMMUNITY" -> EventCategory.COMMUNITY
-    else -> EventCategory.MUSIC // default is MUSIC
+    "SOCIAL" -> EventCategory.SOCIAL
+    else -> EventCategory.SOCIAL // default is SOCIAL
   }
 }
