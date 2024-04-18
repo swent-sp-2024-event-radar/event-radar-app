@@ -80,6 +80,33 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       browseTab { assertIsDisplayed() }
       eventCard { assertIsDisplayed() }
       bottomNav { assertIsDisplayed() }
+      viewToggleFab { assertIsDisplayed() }
+    }
+  }
+
+  @Test
+  fun mapDisplaysOnceViewToggleFabIsClicked() = run {
+    onComposeScreen<HomeScreen>(composeTestRule) {
+      step("Click on view toggle fab") {
+        viewToggleFab {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+
+      step("Check if map is displayed") { map { assertIsDisplayed() } }
+
+      step("Click on view toggle fab again") {
+        viewToggleFab {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+
+      step("Check if map is hidden") {
+        map { assertDoesNotExist() }
+        eventCard { assertIsDisplayed() }
+      }
     }
   }
 

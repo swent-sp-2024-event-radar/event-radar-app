@@ -15,9 +15,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CardDefaults.cardElevation
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -51,6 +56,7 @@ import com.github.se.eventradar.R
 import com.github.se.eventradar.model.EventsOverviewViewModel
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.ui.BottomNavigationMenu
+import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 
@@ -64,10 +70,11 @@ fun HomeScreen(
   LaunchedEffect(key1 = uiState.eventList) { viewModel.getEvents() }
 
   var selectedTabIndex by remember { mutableIntStateOf(0) }
+  var viewToggleBrowseIndex by remember { mutableIntStateOf(0) }
   val context = LocalContext.current
 
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("homeScreen")) {
-    val (logo, tabs, eventList, bottomNav) = createRefs()
+    val (logo, tabs, eventList, eventMap, bottomNav, viewToggle) = createRefs()
     Row(
         modifier =
             Modifier.fillMaxWidth()
@@ -135,13 +142,24 @@ fun HomeScreen(
         }
 
     if (selectedTabIndex == 0) {
-      EventList(
-          uiState.eventList.allEvents,
-          Modifier.fillMaxWidth().constrainAs(eventList) {
-            top.linkTo(tabs.bottom, margin = 8.dp)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-          })
+      if (viewToggleBrowseIndex == 0) {
+        EventList(
+            uiState.eventList.allEvents,
+            Modifier.fillMaxWidth().constrainAs(eventList) {
+              top.linkTo(tabs.bottom, margin = 8.dp)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
+            })
+      } else {
+        EventMap(
+            uiState.eventList.allEvents,
+            navigationActions,
+            Modifier.fillMaxWidth().constrainAs(eventMap) {
+              top.linkTo(tabs.bottom, margin = 8.dp)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
+            })
+      }
     } else {
       // "Upcoming" tab content
       // TODO: Implement upcoming events
@@ -159,6 +177,23 @@ fun HomeScreen(
               start.linkTo(parent.start)
               end.linkTo(parent.end)
             })
+
+    var viewToggleIcon =
+        if (viewToggleBrowseIndex == 0) Icons.Default.Place else Icons.AutoMirrored.Filled.List
+    FloatingActionButton(
+        onClick = {
+          viewToggleBrowseIndex = if (viewToggleBrowseIndex == 0) 1 else 0
+          viewToggleIcon =
+              if (viewToggleBrowseIndex == 0) Icons.Default.Place
+              else Icons.AutoMirrored.Filled.List
+        },
+        modifier =
+            Modifier.testTag("viewToggleFab").constrainAs(viewToggle) {
+              bottom.linkTo(bottomNav.top, margin = 16.dp)
+              start.linkTo(parent.start, margin = 16.dp)
+            }) {
+          Icon(imageVector = viewToggleIcon, contentDescription = null)
+        }
   }
 }
 
