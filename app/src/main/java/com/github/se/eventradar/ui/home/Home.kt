@@ -2,7 +2,9 @@ package com.github.se.eventradar.ui.home
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -11,24 +13,45 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CardDefaults.cardElevation
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -43,75 +66,44 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
-import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.EventsOverviewViewModel
 import com.github.se.eventradar.model.event.Event
-import com.github.se.eventradar.model.event.EventCategory
-import com.github.se.eventradar.model.event.EventTicket
+import com.github.se.eventradar.model.event.eventCategoryToList
 import com.github.se.eventradar.ui.BottomNavigationMenu
+import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
-import java.time.LocalDateTime
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navigationActions: NavigationActions) {
+fun HomeScreen(
+    viewModel: EventsOverviewViewModel = viewModel(),
+    navigationActions: NavigationActions
+) {
+  val uiState by viewModel.uiState.collectAsState()
 
-  val mockEvents =
-      listOf(
-          Event(
-              "NYE2025",
-              "User1", // todo
-              LocalDateTime.MIN,
-              LocalDateTime.MAX,
-              Location(83.39, 2.992, "EPFL"),
-              "enjoy your time on the dacefloor",
-              EventTicket("Standard", 0.0, 500),
-              "jg@joytigoel.com",
-              mutableSetOf("2989jdgj23", "32923jkbd23"),
-              mutableSetOf("20982jwdwk", "j1ou1e]d8223"),
-              EventCategory.MUSIC,
-              "89379"),
-          Event(
-              "NYE2026",
-              "User2", // todo
-              LocalDateTime.now(),
-              LocalDateTime.MAX,
-              Location(83.49, 56.992, "161 makepeace avenue, n666es"),
-              "Forget and Enjoy",
-              EventTicket("regular", 0.0, 10000),
-              "valerian@joytigoel.com",
-              mutableSetOf("298jhk", "jwj8223"),
-              mutableSetOf("20982jhk", "j1ou1e8223"),
-              EventCategory.SPORTS,
-              "89298"),
-          Event(
-              "NYE2027",
-              "User3", // todo
-              LocalDateTime.now(),
-              LocalDateTime.MIN,
-              Location(83.39, 66.992, "161 makepeace avenue, n666es"),
-              "Join the Community",
-              EventTicket("regular", 0.0, 10000),
-              "valerian@joytigoel.com",
-              mutableSetOf("298jhk", "jwj8223"),
-              mutableSetOf("20982e2hk", "j1ou223e8223"),
-              EventCategory.COMMUNITY,
-              "89298"))
+  LaunchedEffect(key1 = uiState.eventList) { viewModel.getEvents() }
 
   var selectedTabIndex by remember { mutableIntStateOf(0) }
+  var viewToggleBrowseIndex by remember { mutableIntStateOf(0) }
   val context = LocalContext.current
 
-  ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("homeScreen")) {
-    val (logo, tabs, eventList, bottomNav) = createRefs()
+  ConstraintLayout(modifier = Modifier
+      .fillMaxSize()
+      .testTag("homeScreen")) {
+    val (logo, tabs, searchAndFilter, filterPopUp, eventList, eventMap, bottomNav, viewToggle) = createRefs()
     Row(
         modifier =
-            Modifier.fillMaxWidth()
-                .constrainAs(logo) {
-                  top.linkTo(parent.top, margin = 32.dp)
-                  start.linkTo(parent.start, margin = 16.dp)
-                }
-                .testTag("logo"),
+        Modifier
+            .fillMaxWidth()
+            .constrainAs(logo) {
+                top.linkTo(parent.top, margin = 32.dp)
+                start.linkTo(parent.start, margin = 16.dp)
+            }
+            .testTag("logo"),
         verticalAlignment = Alignment.CenterVertically) {
           Image(
               painter = painterResource(id = R.drawable.event_logo),
@@ -122,14 +114,15 @@ fun HomeScreen(navigationActions: NavigationActions) {
     TabRow(
         selectedTabIndex = selectedTabIndex,
         modifier =
-            Modifier.fillMaxWidth()
-                .padding(top = 8.dp)
-                .constrainAs(tabs) {
-                  top.linkTo(logo.bottom, margin = 16.dp)
-                  start.linkTo(parent.start)
-                  end.linkTo(parent.end)
-                }
-                .testTag("tabs"),
+        Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+            .constrainAs(tabs) {
+                top.linkTo(logo.bottom, margin = 16.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
+            .testTag("tabs"),
         contentColor = MaterialTheme.colorScheme.primary) {
           Tab(
               selected = selectedTabIndex == 0,
@@ -170,14 +163,45 @@ fun HomeScreen(navigationActions: NavigationActions) {
               }
         }
 
+      var searchQuery by remember { mutableStateOf("") }
+      var showFilterPopUp by remember { mutableStateOf(false) }
+
+      SearchBarAndFilter(
+          searchQuery = searchQuery,
+          onSearchQueryChange = { searchQuery = it },
+          onSearchButtonClick = {
+              // Handle search button click
+          },
+          showFilterPopUp = showFilterPopUp,
+          setShowFilterPopUp = { showFilterPopUp = it },
+          modifier = Modifier
+              .padding(horizontal = 16.dp, vertical = 8.dp)
+              .constrainAs(searchAndFilter) {
+                  top.linkTo(tabs.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+              }
+      )
+
     if (selectedTabIndex == 0) {
-      EventList(
-          mockEvents,
-          Modifier.fillMaxWidth().constrainAs(eventList) {
-            top.linkTo(tabs.bottom, margin = 8.dp)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-          })
+      if (viewToggleBrowseIndex == 0) {
+        EventList(
+            uiState.eventList.allEvents,
+            Modifier.fillMaxWidth().constrainAs(eventList) {
+              top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
+            })
+      } else {
+        EventMap(
+            uiState.eventList.allEvents,
+            navigationActions,
+            Modifier.fillMaxWidth().constrainAs(eventMap) {
+              top.linkTo(tabs.bottom, margin = 8.dp)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
+            })
+      }
     } else {
       // "Upcoming" tab content
       // TODO: Implement upcoming events
@@ -185,17 +209,245 @@ fun HomeScreen(navigationActions: NavigationActions) {
       selectedTabIndex = 0
     }
 
+      if(showFilterPopUp) {
+          FilterPopUp(
+              onRadiusChange = { radius ->
+                  // Handle radius change
+              },
+              onFreeSelectionChange = { isFree ->
+                  // Handle free selection change
+              },
+              onCategorySelectionChange = { selectedCategories ->
+                  // Handle category selection change
+              },
+              modifier = Modifier
+                  .height(320.dp)
+                  .width(230.dp)
+                  .constrainAs(filterPopUp) {
+                      top.linkTo(searchAndFilter.bottom)
+                      end.linkTo(parent.end)
+                  }
+          )
+      }
+
     BottomNavigationMenu(
         onTabSelected = { tab -> navigationActions.navigateTo(tab) },
         tabList = TOP_LEVEL_DESTINATIONS,
         selectedItem = TOP_LEVEL_DESTINATIONS[2],
         modifier =
-            Modifier.testTag("bottomNavMenu").constrainAs(bottomNav) {
-              bottom.linkTo(parent.bottom)
-              start.linkTo(parent.start)
-              end.linkTo(parent.end)
+        Modifier
+            .testTag("bottomNavMenu")
+            .constrainAs(bottomNav) {
+                bottom.linkTo(parent.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
             })
+
+    var viewToggleIcon =
+        if (viewToggleBrowseIndex == 0) Icons.Default.Place else Icons.AutoMirrored.Filled.List
+    FloatingActionButton(
+        onClick = {
+          viewToggleBrowseIndex = if (viewToggleBrowseIndex == 0) 1 else 0
+          viewToggleIcon =
+              if (viewToggleBrowseIndex == 0) Icons.Default.Place
+              else Icons.AutoMirrored.Filled.List
+        },
+        modifier =
+            Modifier.testTag("viewToggleFab").constrainAs(viewToggle) {
+              bottom.linkTo(bottomNav.top, margin = 16.dp)
+              start.linkTo(parent.start, margin = 16.dp)
+            }) {
+          Icon(imageVector = viewToggleIcon, contentDescription = null)
+        }
   }
+}
+
+@Composable
+fun SearchBarAndFilter(
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onSearchButtonClick: () -> Unit,
+    showFilterPopUp: Boolean,
+    setShowFilterPopUp: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+    ) {
+        // Search bar
+        TextField(
+            value = searchQuery,
+            onValueChange = { onSearchQueryChange(it) },
+            modifier = Modifier.weight(1f),
+            shape = RoundedCornerShape(32.dp),
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+            ),
+            placeholder = { Text("Search event...") },
+            trailingIcon = {
+                IconButton(
+                    onClick = onSearchButtonClick,
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                ) {
+                    Icon(Icons.Default.Search, contentDescription = null)
+                }
+            }
+        )
+
+        // Filter button
+        Button(
+            onClick = { setShowFilterPopUp(!showFilterPopUp) },
+            modifier = Modifier.padding(start = 8.dp)
+        ) {
+            Text("Filter")
+        }
+    }
+}
+
+@Composable
+fun FilterPopUp(
+    onRadiusChange: (Int) -> Unit,
+    onFreeSelectionChange: (Boolean) -> Unit,
+    onCategorySelectionChange: (List<String>) -> Unit,
+    modifier: Modifier = Modifier,
+    ) {
+    var radius by remember { mutableStateOf(0) }
+    var isFree by remember { mutableStateOf(false) }
+    var selectedCategories by remember { mutableStateOf(emptyList<String>()) }
+
+    Box(
+        modifier = modifier
+    ) {
+        Card(
+            modifier = Modifier.padding(12.dp),
+            elevation = cardElevation(defaultElevation = 4.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp)
+            ) {
+                // Text input for radius
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = "Radius: ",
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                        )
+                    )
+                    TextField(
+                        value = radius.toString(),
+                        onValueChange = { radius = it.toIntOrNull() ?: 0 },
+                        modifier = Modifier
+                            .width(70.dp)
+                            .height(10.dp),
+                    )
+                    Text(
+                        text = " km",
+                        modifier = Modifier.weight(1f),
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                        )
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Slider for free selection
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = "Free:  ",
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                        )
+                    )
+                    Switch(
+                        checked = isFree,
+                        onCheckedChange = { isFree = it },
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Buttons for category selection
+                Text(
+                    text = "Category: ",
+                    modifier = Modifier.weight(1f),
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                    )
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    CategorySelection(eventCategoryToList())
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Button to apply filter
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        onClick = {
+                            // Apply filter
+                            onRadiusChange(radius)
+                            onFreeSelectionChange(isFree)
+                            onCategorySelectionChange(selectedCategories)
+                        }
+                    ) {
+                        Text("Apply")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CategorySelection(eventCategoryList: List<String>) {
+    LazyColumn {
+        items(eventCategoryList.size) { index ->
+            var isChecked by remember { mutableStateOf(false) }
+
+            val category = eventCategoryList[index]
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start,
+                modifier = Modifier.padding(vertical = 0.dp)
+            ) {
+                Checkbox(
+                    checked = isChecked,
+                    onCheckedChange = { isChecked = it },
+                    modifier = Modifier
+                        .scale(0.6f)
+                        .size(10.dp)
+                        .padding(start = 10.dp)
+                )
+                Text(
+                    text = category.lowercase().replaceFirstChar { it.uppercase() },
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                    ),
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -209,9 +461,10 @@ fun EventCard(event: Event) {
   val context = LocalContext.current
   Card(
       modifier =
-          Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-              .height(IntrinsicSize.Min)
-              .testTag("eventCard"),
+      Modifier
+          .padding(horizontal = 16.dp, vertical = 8.dp)
+          .height(IntrinsicSize.Min)
+          .testTag("eventCard"),
       colors = cardColors(containerColor = MaterialTheme.colorScheme.surface),
       elevation = cardElevation(defaultElevation = 4.dp),
       onClick = {
@@ -220,8 +473,9 @@ fun EventCard(event: Event) {
         Row(modifier = Modifier.fillMaxSize()) {
           Column(
               modifier =
-                  Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 8.dp)
-                      .weight(1f),
+              Modifier
+                  .padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 8.dp)
+                  .weight(1f),
               verticalArrangement = Arrangement.Center) {
                 Text(
                     text = event.eventName,
@@ -248,7 +502,9 @@ fun EventCard(event: Event) {
               painter = painterResource(id = R.drawable.placeholder),
               contentDescription = "Event Image",
               contentScale = ContentScale.FillBounds,
-              modifier = Modifier.weight(0.3f).fillMaxHeight())
+              modifier = Modifier
+                  .weight(0.3f)
+                  .fillMaxHeight())
         }
       }
 }
@@ -256,5 +512,5 @@ fun EventCard(event: Event) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun HomeScreenPreview() {
-  HomeScreen(NavigationActions(rememberNavController()))
+  HomeScreen(EventsOverviewViewModel(), NavigationActions(rememberNavController()))
 }

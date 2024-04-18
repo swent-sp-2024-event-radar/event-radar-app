@@ -46,3 +46,44 @@ Note:
 - Private and public collection created to manage permissions access using this link: https://stackoverflow.com/questions/46585330/firestore-security-rules-for-public-and-private-fields
     - Check Firestore rules for more information / details
 - Images should be stored in Firebase Storage ( firebase_storage ) to upload the image file and then you store the download url of the image inside the document in the Cloud Firestore ( cloud_firestore ).
+
+### Events database
+The structure of the event database is as follows:
+ ```json
+{
+  "events": {
+    "event_id": {
+      "name": "New Years Eve Party",
+      "photo_url": "https://stackoverflow.com/questions/46585330/firestore-security-rules-for-public-and-private-fields",
+      "description": "Get Ready for NYE 2025, dress classy and dance all night",
+      "category": "MUSIC",
+      "start": "31/12/2024 23:00:00",
+      "end": "01/01/2025 06:00:00",
+      "location": {
+        "location_name": "Starling Hotel",
+        "location_lat": 19.4783892,
+        "location_lng": 192.198489
+      },
+      "ticket": {
+        "ticket_name": "Standard",
+        "ticket_price": 20.00,
+        "ticket_quantity": 450
+      },
+      "main_organiser": "xu378csh",
+      "organisers_list": [
+        "xu378csh",
+        "qwglei7"
+      ],
+      "attendees_list": [
+        "xu378csh",
+        "qwglei7",
+        "bfndn3"
+      ]
+    }
+  }
+}
+```
+Note:
+- Co-Organiser list: List of references (in Firebase).  
+       
+         
