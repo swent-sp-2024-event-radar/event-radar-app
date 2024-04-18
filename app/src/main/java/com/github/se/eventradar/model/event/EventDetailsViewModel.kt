@@ -57,17 +57,17 @@ class EventDetailsViewModel(
     val category = document.getString("category") ?: ""
 
     _uiState.value =
-      _uiState.value.copy(
-        eventName = document.getString("name") ?: "",
-        eventPhoto = document.getString("photo") ?: "",
-        start = LocalDateTime.ofInstant(startInstant, ZoneId.systemDefault()),
-        end = LocalDateTime.ofInstant(endInstant, ZoneId.systemDefault()),
-        location = Location(latitude, longitude, address),
-        description = document.getString("description") ?: "",
-        ticket = EventTicket(ticketName, ticketPrice, ticketQuantity),
-        contact = document.getString("contact") ?: "",
-        category = getEventCategory(category),
-      )
+        _uiState.value.copy(
+            eventName = document.getString("name") ?: "",
+            eventPhoto = document.getString("photo") ?: "",
+            start = LocalDateTime.ofInstant(startInstant, ZoneId.systemDefault()),
+            end = LocalDateTime.ofInstant(endInstant, ZoneId.systemDefault()),
+            location = Location(latitude, longitude, address),
+            description = document.getString("description") ?: "",
+            ticket = EventTicket(ticketName, ticketPrice, ticketQuantity),
+            contact = document.getString("contact") ?: "",
+            category = getEventCategory(category),
+        )
   }
 }
 
