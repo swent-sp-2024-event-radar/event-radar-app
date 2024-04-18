@@ -38,6 +38,10 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.eventradar.R
+import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.event.Event
+import com.github.se.eventradar.model.event.EventCategory
+import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.*
 import com.github.se.eventradar.ui.home.EventList
