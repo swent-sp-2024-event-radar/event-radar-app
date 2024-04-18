@@ -3,7 +3,6 @@ package com.github.se.eventradar.model.event
 import com.github.se.eventradar.model.Location
 import java.time.LocalDateTime
 
-// new event struct final
 data class Event(
     val eventName: String,
     val eventPhoto: String,
