@@ -9,6 +9,10 @@ enum class EventCategory {
   SOCIAL
 }
 
+fun eventCategoryToList(): List<String> {
+  return enumValues<EventCategory>().map { it.name }
+}
+
 fun getEventCategory(categoryString: String): EventCategory {
   return when (categoryString.uppercase()) {
     "MUSIC" -> EventCategory.MUSIC
