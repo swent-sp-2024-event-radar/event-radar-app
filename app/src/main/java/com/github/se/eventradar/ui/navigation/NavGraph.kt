@@ -24,13 +24,12 @@ fun NavGraph(navController: NavHostController) {
     composable(Route.SIGNUP) { SignUpScreen(navigationActions = navActions) }
     composable(Route.HOME) { HomeScreen(navigationActions = navActions) }
     composable(
-      "${Route.EVENT_DETAILS}/{eventId}",
-      arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
-      val eventId = it.arguments!!.getString("eventId")!!
-      EventDetails(
-        viewModel = EventDetailsViewModel(eventId = eventId),
-        navigationActions = navActions)
-    }
+        "${Route.EVENT_DETAILS}/{eventId}",
+        arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
+          val eventId = it.arguments!!.getString("eventId")!!
+          EventDetails(
+              viewModel = EventDetailsViewModel(eventId = eventId), navigationActions = navActions)
+        }
 
     // TODO replace the Toast message with the corresponding screen function of the route
     composable(Route.SCANNER) {

@@ -10,9 +10,6 @@ import com.github.se.eventradar.model.event.Ticket
 import com.github.se.eventradar.screens.EventDetailsScreen
 import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.navigation.NavigationActions
-import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -22,47 +19,40 @@ import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.verify
+import java.time.LocalDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.LocalDateTime
-
 
 @RunWith(AndroidJUnit4::class)
 class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
 
-  @get:Rule
-  val composeTestRule = createComposeRule()
+  @get:Rule val composeTestRule = createComposeRule()
 
   // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
-  @get:Rule
-  val mockkRule = MockKRule(this)
+  @get:Rule val mockkRule = MockKRule(this)
 
   // Relaxed mocks methods have a default implementation returning values
-  @RelaxedMockK
-  lateinit var mockNavActions: NavigationActions
-  @RelaxedMockK
-  lateinit var mockViewModel: EventDetailsViewModel
+  @RelaxedMockK lateinit var mockNavActions: NavigationActions
+  @RelaxedMockK lateinit var mockViewModel: EventDetailsViewModel
 
   private val sampleEventStates =
-    MutableStateFlow(
-      EventUiState(
-        eventName = "Debugging",
-        eventPhoto = "path",
-        start = LocalDateTime.MIN,
-        end = LocalDateTime.MAX,
-        location = Location(0.0, 0.0, "base address"),
-        description = "Let's debug some code together because we all enjoy kotlin !",
-        ticket = Ticket("Luck", 0.0, 7),
-        contact = "some.name@host.com",
-        category = EventCategory.COMMUNITY,
-      )
-    )
+      MutableStateFlow(
+          EventUiState(
+              eventName = "Debugging",
+              eventPhoto = "path",
+              start = LocalDateTime.MIN,
+              end = LocalDateTime.MAX,
+              location = Location(0.0, 0.0, "base address"),
+              description = "Let's debug some code together because we all enjoy kotlin !",
+              ticket = Ticket("Luck", 0.0, 7),
+              contact = "some.name@host.com",
+              category = EventCategory.COMMUNITY,
+          ))
 
   val eventId = "tdjWMT9Eon2ROTVakQb"
-
 
   @Before
   fun testSetup() {
@@ -72,7 +62,6 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
 
     composeTestRule.setContent { EventDetails(mockViewModel, navigationActions = mockNavActions) }
   }
-
 
   @Test
   fun screenDisplaysNavigationElementsCorrectly() = run {
@@ -122,5 +111,3 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
     confirmVerified(mockNavActions)
   }
 }
-
-

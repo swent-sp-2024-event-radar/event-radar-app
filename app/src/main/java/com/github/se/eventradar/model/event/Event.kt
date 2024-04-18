@@ -1,7 +1,6 @@
 package com.github.se.eventradar.model.event
 
 import android.content.Context
-import androidx.compose.ui.res.stringResource
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.Location
 import java.time.LocalDateTime
@@ -44,5 +43,3 @@ data class Event(
     val category: EventCategory,
     val fireBaseID: String
 )
-
-
