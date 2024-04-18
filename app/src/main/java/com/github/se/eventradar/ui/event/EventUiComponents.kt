@@ -6,6 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -73,8 +74,7 @@ fun EventDistance(modifier: Modifier, eventUiState: EventUiState, style: EventCo
         color = style.subTitleColor,
         modifier = Modifier.testTag("distanceTitle"))
     Text(
-        // TODO implement a function that convert event location to distance from user
-        // TODO require user data class
+        // TODO the distance between the user and the event should be display instead
         text = eventUiState.location.address,
         style = style.contentStyle,
         color = style.contentColor,
@@ -93,7 +93,7 @@ fun EventCategory(modifier: Modifier, eventUiState: EventUiState, style: EventCo
     Text(
         text =
             eventUiState.category
-                .toString(), // TODO is that the correct way to convert category object to string ?
+                .toString(LocalContext.current),
         style = style.contentStyle,
         color = style.contentColor,
         modifier = Modifier.testTag("categoryContent"))

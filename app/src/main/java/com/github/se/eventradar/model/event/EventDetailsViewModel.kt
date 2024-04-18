@@ -30,8 +30,7 @@ class EventDetailsViewModel(
           .get()
           .addOnSuccessListener { document ->
             if (document.exists()) {
-              val event = createEventFromDocument(document, eventId)
-              fillUIStateFromEvent(event)
+              createEventFromDocument(document)
             } else {
               // TODO Document does not exist, popup message error ? Could not load event
               Log.d(tag, "Document does not exist")
@@ -46,22 +45,7 @@ class EventDetailsViewModel(
     }
   }
 
-  private fun fillUIStateFromEvent(event: Event) {
-    _uiState.value =
-        _uiState.value.copy(
-            eventName = event.eventName,
-            eventPhoto = event.eventPhoto,
-            start = event.start,
-            end = event.end,
-            location = event.location,
-            description = event.description,
-            ticket = event.ticket,
-            contact = event.contact,
-            category = event.category,
-        )
-  }
-
-  private fun createEventFromDocument(document: DocumentSnapshot, eventId: String): Event {
+  private fun createEventFromDocument(document: DocumentSnapshot) {
     val startInstant: Instant = document.getTimestamp("start")!!.toDate().toInstant()
     val endInstant: Instant = document.getTimestamp("end")!!.toDate().toInstant()
     val latitude = document.getGeoPoint("location")!!.latitude
@@ -72,30 +56,18 @@ class EventDetailsViewModel(
     val ticketQuantity = document.getLong("ticketQuantity")!!.toInt()
     val category = document.getString("category") ?: ""
 
-    return Event(
+    _uiState.value =
+      _uiState.value.copy(
         eventName = document.getString("name") ?: "",
         eventPhoto = document.getString("photo") ?: "",
         start = LocalDateTime.ofInstant(startInstant, ZoneId.systemDefault()),
         end = LocalDateTime.ofInstant(endInstant, ZoneId.systemDefault()),
         location = Location(latitude, longitude, address),
         description = document.getString("description") ?: "",
-        ticket = Ticket(ticketName, ticketPrice, ticketQuantity),
+        ticket = EventTicket(ticketName, ticketPrice, ticketQuantity),
         contact = document.getString("contact") ?: "",
-        organiserList = (document["organiserList"] as List<*>).map { it.toString() }.toSet(),
-        attendeeList = (document["attendeeList"] as List<*>).map { it.toString() }.toSet(),
-        category = getCategory(category),
-        fireBaseID = eventId,
-    )
-  }
-
-  private fun getCategory(value: String): EventCategory {
-    var category = EventCategory.UNDEFINED
-    try {
-      category = EventCategory.valueOf(value)
-    } catch (e: IllegalArgumentException) {
-      Log.d(tag, "No valid category")
-    }
-    return category
+        category = getEventCategory(category),
+      )
   }
 }
 
@@ -106,7 +78,7 @@ data class EventUiState(
     val end: LocalDateTime = LocalDateTime.MAX,
     val location: Location = Location(0.0, 0.0, ""), // TODO add standard val to location class ?
     val description: String = "",
-    val ticket: Ticket = Ticket("", 0.0, 0),
+    val ticket: EventTicket = EventTicket("", 0.0, 0),
     val contact: String = "",
     val category: EventCategory = EventCategory.MUSIC,
 )

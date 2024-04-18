@@ -14,7 +14,7 @@
     <string name="event_category_exhibition">Exhibition</string>
     <string name="event_category_communities">Community</string>
     <string name="event_category_party">Party</string>
-    <string name="event_category_undefined">Undefined</string>
+    <string name="event_category_social">Social</string>
 </resources>
 
 
