@@ -1,4 +1,4 @@
-package com.github.se.eventradar.map
+package com.github.se.eventradar.ui.map
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
