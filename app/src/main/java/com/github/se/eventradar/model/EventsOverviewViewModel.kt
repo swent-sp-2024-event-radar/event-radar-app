@@ -3,6 +3,7 @@ package com.github.se.eventradar.model
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.eventradar.model.event.Event
+import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.event.getEventCategory
 import com.github.se.eventradar.model.event.getEventTicket
@@ -30,9 +31,10 @@ class EventsOverviewViewModel(db: FirebaseFirestore = Firebase.firestore) : View
         val query = _uiState.value.searchQuery
         val filteredEvents =
             _uiState.value.eventList.allEvents.filter { it.eventName.contains(query, ignoreCase = true) }
-        _uiState.value =
-            _uiState.value.copy(
-                eventList = _uiState.value.eventList.copy(filteredEvent = filteredEvents))
+
+        _uiState.value = _uiState.value.copy(
+            eventList = _uiState.value.eventList.copy(filteredEvent = filteredEvents)
+        )
     }
 
   fun getEvents() {
@@ -116,4 +118,7 @@ class EventsOverviewViewModel(db: FirebaseFirestore = Firebase.firestore) : View
 data class EventsOverviewUiState(
     val eventList: EventList = EventList(emptyList(), emptyList(), null),
     val searchQuery: String = "",
+    val radiusQuery: Int = -1, // -1 means no radius query
+    val isFreeQuery: Boolean = false,
+    val categoryQuery: Set<EventCategory> = emptySet()
 )
