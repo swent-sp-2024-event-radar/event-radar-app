@@ -45,7 +45,7 @@ class EventDetailsViewModel(
             _uiState.value.end = LocalDateTime.ofInstant(endInstant, ZoneId.systemDefault())
             _uiState.value.location = Location(latitude, longitude, address)
             _uiState.value.description = document.getString("Description") ?: ""
-            _uiState.value.ticket = Ticket(ticketName, ticketPrice, ticketQuantity)
+            _uiState.value.ticket = EventTicket(ticketName, ticketPrice, ticketQuantity)
             _uiState.value.contact = document.getString("Contact") ?: ""
             _uiState.value.category = EventCategory.valueOf(category)
           } else {
@@ -69,7 +69,7 @@ private fun initialEventState(): EventUiState {
       LocalDateTime.MAX,
       Location(0.0, 0.0, ""),
       "",
-      Ticket("", 0.0, 0),
+      EventTicket("", 0.0, 0),
       "",
       EventCategory.MUSIC,
   )
@@ -82,7 +82,7 @@ data class EventUiState(
     var end: LocalDateTime,
     var location: Location,
     var description: String,
-    var ticket: Ticket,
+    var ticket: EventTicket,
     var contact: String,
     var category: EventCategory,
 )
