@@ -5,8 +5,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.github.se.eventradar.ui.hosting.HostedEvents
 import com.github.se.eventradar.ui.home.HomeScreen
-import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.login.SignUpScreen
 import com.github.se.eventradar.util.toast
 
@@ -16,7 +16,7 @@ fun NavGraph(navController: NavHostController) {
   val context = LocalContext.current
 
   NavHost(navController, startDestination = Route.LOGIN) {
-    composable(Route.LOGIN) { LoginScreen(navigationActions = navActions) }
+    composable(Route.LOGIN) { HostedEvents(navigationActions = navActions) }
     composable(Route.SIGNUP) { SignUpScreen(navigationActions = navActions) }
     composable(Route.HOME) { HomeScreen(navigationActions = navActions) }
 
