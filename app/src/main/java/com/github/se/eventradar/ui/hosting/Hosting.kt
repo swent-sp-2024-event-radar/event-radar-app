@@ -59,7 +59,7 @@ import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import java.time.LocalDateTime
 
 @Composable
-fun HostedEvents(navigationActions: NavigationActions) {
+fun HostingScreen(navigationActions: NavigationActions) {
   val mockEvents =
       listOf(
           Event(
@@ -105,7 +105,7 @@ fun HostedEvents(navigationActions: NavigationActions) {
   var selectedTabIndex by remember { mutableIntStateOf(0) }
   val context = LocalContext.current
 
-  ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("hostedEventsScreen")) {
+  ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("hostingScreen")) {
     val (logo, tabs, eventList, bottomNav, buttons) = createRefs()
     Row(
         modifier =
@@ -172,6 +172,7 @@ fun HostedEvents(navigationActions: NavigationActions) {
                   bottom.linkTo(bottomNav.top, margin = 10.dp)
                   centerHorizontallyTo(parent)
                 }
+                .testTag("floatingActionButtons")
                 .fillMaxWidth()
                 .padding(16.dp),
         horizontalArrangement = Arrangement.Absolute.Left,
@@ -192,13 +193,13 @@ fun HostedEvents(navigationActions: NavigationActions) {
               },
               icon = { Icon(Icons.Filled.Add, "Floating action button.") },
               onClick = { /*TODO*/},
-              modifier = Modifier.fillMaxWidth(0.8f),
+              modifier = Modifier.fillMaxWidth(0.8f).testTag("createEventButton"),
               containerColor = MaterialTheme.colorScheme.secondaryContainer,
               contentColor = MaterialTheme.colorScheme.onSecondaryContainer)
         Spacer(modifier = Modifier.width(16.dp))
         FloatingActionButton( // to be replaced with mapview later.
               onClick = { /*TODO*/},
-              modifier = Modifier.fillMaxWidth(),
+              modifier = Modifier.fillMaxWidth().testTag("switchViewButton"),
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
           ) {
@@ -214,7 +215,7 @@ fun HostedEvents(navigationActions: NavigationActions) {
     BottomNavigationMenu(
         onTabSelected = { tab -> navigationActions.navigateTo(tab) },
         tabList = TOP_LEVEL_DESTINATIONS,
-        selectedItem = TOP_LEVEL_DESTINATIONS[2],
+        selectedItem = TOP_LEVEL_DESTINATIONS[3],
         modifier =
             Modifier.testTag("bottomNavMenu").constrainAs(bottomNav) {
               bottom.linkTo(parent.bottom)
