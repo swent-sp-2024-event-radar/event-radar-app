@@ -70,7 +70,6 @@ The structure of the event database is as follows:
         "ticket_price": 20.00,
         "ticket_quantity": 450
       },
-      "contact_email": "valerian@joytigoel.com",
       "main_organiser": "xu378csh",
       "organisers_list": [
         "xu378csh",
