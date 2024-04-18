@@ -12,6 +12,7 @@ TODO: Add detailed app description and demo
 [Image Link](https://excalidraw.com/#json=1c_DrTFZCSGprCvJNBYHn,B0sXrISCY8YdKgiTqy9xDA)
 _revised 9/4/2024_
 
+<<<<<<< HEAD
 ## Backend
 ### Users database
 The structure of the user database is as follows:
@@ -46,3 +47,39 @@ Note:
 - Private and public collection created to manage permissions access using this link: https://stackoverflow.com/questions/46585330/firestore-security-rules-for-public-and-private-fields
     - Check Firestore rules for more information / details
 - Images should be stored in Firebase Storage ( firebase_storage ) to upload the image file and then you store the download url of the image inside the document in the Cloud Firestore ( cloud_firestore ).
+
+
+The structure of the event database is as follows:
+ ```json
+{
+  "Event": {
+    "Name": "New Years Eve Party",
+    "Photo": "https://stackoverflow.com/questions/46585330/firestore-security-rules-for-public-and-private-fields",
+    "Description": "Get Ready for NYE 2025, dress classy and dance all night",
+    "Category": "Party",
+    "Start": {
+      "Date": "31.12.2024",
+      "Time": "23:00"
+    },
+    "End": {
+      "Date": "01.01.2025",
+      "Time": "06:00"
+    },
+    "Location": "Starling Hotel",
+    "Ticket": {
+      "Ticket Name": "Standard",
+      "Ticket price": 20.00,
+      "Ticket Quantity": 450
+    },
+    "Contact Email": "valerian@joytigoel.com",
+    "Co-organiser List": [
+      "xu378csh",
+      "qwglei7"
+    ] 
+    
+  }
+}
+```
+/// Co-Organiser list: List of references (in Firebase).  
+       
+         
