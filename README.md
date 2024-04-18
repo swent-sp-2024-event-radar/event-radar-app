@@ -12,7 +12,6 @@ TODO: Add detailed app description and demo
 [Image Link](https://excalidraw.com/#json=1c_DrTFZCSGprCvJNBYHn,B0sXrISCY8YdKgiTqy9xDA)
 _revised 9/4/2024_
 
-<<<<<<< HEAD
 ## Backend
 ### Users database
 The structure of the user database is as follows:
