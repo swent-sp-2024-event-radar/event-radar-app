@@ -15,14 +15,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CardDefaults.cardElevation
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -43,67 +50,31 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
-import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.EventsOverviewViewModel
 import com.github.se.eventradar.model.event.Event
-import com.github.se.eventradar.model.event.EventCategory
-import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.ui.BottomNavigationMenu
+import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
-import java.time.LocalDateTime
 
 @Composable
-fun HomeScreen(navigationActions: NavigationActions) {
+fun HomeScreen(
+    viewModel: EventsOverviewViewModel = viewModel(),
+    navigationActions: NavigationActions
+) {
+  val uiState by viewModel.uiState.collectAsState()
 
-  val mockEvents =
-      listOf(
-          Event(
-              "NYE2025",
-              "User1", // todo
-              LocalDateTime.MIN,
-              LocalDateTime.MAX,
-              Location(83.39, 2.992, "EPFL"),
-              "enjoy your time on the dacefloor",
-              EventTicket("Standard", 0.0, 500),
-              "jg@joytigoel.com",
-              mutableSetOf("2989jdgj23", "32923jkbd23"),
-              mutableSetOf("20982jwdwk", "j1ou1e]d8223"),
-              EventCategory.MUSIC,
-              "89379"),
-          Event(
-              "NYE2026",
-              "User2", // todo
-              LocalDateTime.now(),
-              LocalDateTime.MAX,
-              Location(83.49, 56.992, "161 makepeace avenue, n666es"),
-              "Forget and Enjoy",
-              EventTicket("regular", 0.0, 10000),
-              "valerian@joytigoel.com",
-              mutableSetOf("298jhk", "jwj8223"),
-              mutableSetOf("20982jhk", "j1ou1e8223"),
-              EventCategory.SPORTS,
-              "89298"),
-          Event(
-              "NYE2027",
-              "User3", // todo
-              LocalDateTime.now(),
-              LocalDateTime.MIN,
-              Location(83.39, 66.992, "161 makepeace avenue, n666es"),
-              "Join the Community",
-              EventTicket("regular", 0.0, 10000),
-              "valerian@joytigoel.com",
-              mutableSetOf("298jhk", "jwj8223"),
-              mutableSetOf("20982e2hk", "j1ou223e8223"),
-              EventCategory.COMMUNITY,
-              "89298"))
+  LaunchedEffect(key1 = uiState.eventList) { viewModel.getEvents() }
 
   var selectedTabIndex by remember { mutableIntStateOf(0) }
+  var viewToggleBrowseIndex by remember { mutableIntStateOf(0) }
   val context = LocalContext.current
 
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("homeScreen")) {
-    val (logo, tabs, eventList, bottomNav) = createRefs()
+    val (logo, tabs, eventList, eventMap, bottomNav, viewToggle) = createRefs()
     Row(
         modifier =
             Modifier.fillMaxWidth()
@@ -171,13 +142,24 @@ fun HomeScreen(navigationActions: NavigationActions) {
         }
 
     if (selectedTabIndex == 0) {
-      EventList(
-          mockEvents,
-          Modifier.fillMaxWidth().constrainAs(eventList) {
-            top.linkTo(tabs.bottom, margin = 8.dp)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-          })
+      if (viewToggleBrowseIndex == 0) {
+        EventList(
+            uiState.eventList.allEvents,
+            Modifier.fillMaxWidth().constrainAs(eventList) {
+              top.linkTo(tabs.bottom, margin = 8.dp)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
+            })
+      } else {
+        EventMap(
+            uiState.eventList.allEvents,
+            navigationActions,
+            Modifier.fillMaxWidth().constrainAs(eventMap) {
+              top.linkTo(tabs.bottom, margin = 8.dp)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
+            })
+      }
     } else {
       // "Upcoming" tab content
       // TODO: Implement upcoming events
@@ -195,6 +177,23 @@ fun HomeScreen(navigationActions: NavigationActions) {
               start.linkTo(parent.start)
               end.linkTo(parent.end)
             })
+
+    var viewToggleIcon =
+        if (viewToggleBrowseIndex == 0) Icons.Default.Place else Icons.AutoMirrored.Filled.List
+    FloatingActionButton(
+        onClick = {
+          viewToggleBrowseIndex = if (viewToggleBrowseIndex == 0) 1 else 0
+          viewToggleIcon =
+              if (viewToggleBrowseIndex == 0) Icons.Default.Place
+              else Icons.AutoMirrored.Filled.List
+        },
+        modifier =
+            Modifier.testTag("viewToggleFab").constrainAs(viewToggle) {
+              bottom.linkTo(bottomNav.top, margin = 16.dp)
+              start.linkTo(parent.start, margin = 16.dp)
+            }) {
+          Icon(imageVector = viewToggleIcon, contentDescription = null)
+        }
   }
 }
 
@@ -256,5 +255,5 @@ fun EventCard(event: Event) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun HomeScreenPreview() {
-  HomeScreen(NavigationActions(rememberNavController()))
+  HomeScreen(EventsOverviewViewModel(), NavigationActions(rememberNavController()))
 }
