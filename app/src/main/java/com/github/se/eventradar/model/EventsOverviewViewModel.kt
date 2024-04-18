@@ -45,7 +45,7 @@ class EventsOverviewViewModel(db: FirebaseFirestore = Firebase.firestore) : View
                             document.data?.get("ticket_price") as Double,
                             document.data?.get("ticket_quantity") as Int,
                         ),
-                    contact = document.data?.get("contact_email") as String,
+                    contact = getEventContact(document.data?.get("main_organiser") as String),
                     organiserList = getSetOfStrings(document.data?.get("organisers_list")),
                     attendeeList = getSetOfStrings(document.data?.get("attendees_list")),
                     category = getEventCategory(document.data?.get("category") as String),
@@ -58,6 +58,29 @@ class EventsOverviewViewModel(db: FirebaseFirestore = Firebase.firestore) : View
         .addOnFailureListener { exception ->
           Log.d("EventsOverviewViewModel", "Error getting documents: ", exception)
         }
+  }
+
+  private val userRef = db.collection("users")
+
+  private fun getEventContact(contactId: String): String {
+    var contactEmail = ""
+
+    userRef
+        .document(contactId)
+        .collection("private")
+        .limit(1) // Limit the query to retrieve only one document
+        .get()
+        .addOnSuccessListener { querySnapshot ->
+          for (documentSnapshot in querySnapshot.documents) {
+            contactEmail = documentSnapshot.data?.get("email") as String
+            break
+          }
+        }
+        .addOnFailureListener { exception ->
+          Log.d("EventsOverviewViewModel", "Error getting event contact: ", exception)
+        }
+
+    return contactEmail
   }
 
   companion object {
