@@ -48,7 +48,7 @@ import com.github.se.eventradar.R
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
-import com.github.se.eventradar.model.event.Ticket
+import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
@@ -66,7 +66,7 @@ fun HomeScreen(navigationActions: NavigationActions) {
               LocalDateTime.MAX,
               Location(83.39, 2.992, "EPFL"),
               "enjoy your time on the dacefloor",
-              Ticket("Standard", 0.0, 500),
+              EventTicket("Standard", 0.0, 500),
               "jg@joytigoel.com",
               mutableSetOf("2989jdgj23", "32923jkbd23"),
               mutableSetOf("20982jwdwk", "j1ou1e]d8223"),
@@ -79,7 +79,7 @@ fun HomeScreen(navigationActions: NavigationActions) {
               LocalDateTime.MAX,
               Location(83.49, 56.992, "161 makepeace avenue, n666es"),
               "Forget and Enjoy",
-              Ticket("regular", 0.0, 10000),
+              EventTicket("regular", 0.0, 10000),
               "valerian@joytigoel.com",
               mutableSetOf("298jhk", "jwj8223"),
               mutableSetOf("20982jhk", "j1ou1e8223"),
@@ -92,7 +92,7 @@ fun HomeScreen(navigationActions: NavigationActions) {
               LocalDateTime.MIN,
               Location(83.39, 66.992, "161 makepeace avenue, n666es"),
               "Join the Community",
-              Ticket("regular", 0.0, 10000),
+              EventTicket("regular", 0.0, 10000),
               "valerian@joytigoel.com",
               mutableSetOf("298jhk", "jwj8223"),
               mutableSetOf("20982e2hk", "j1ou223e8223"),

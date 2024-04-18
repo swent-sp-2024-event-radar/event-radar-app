@@ -1,7 +1,7 @@
 package com.github.se.eventradar.model.event
 
 data class EventList(
-    val getAllEvent: List<Event>,
-    val getFilteredEvent: List<Event> = getAllEvent,
-    val getEvent: Event? = null,
+    val allEvents: List<Event>,
+    val filteredEvent: List<Event> = allEvents,
+    val selectedEvent: Event? = null,
 )
