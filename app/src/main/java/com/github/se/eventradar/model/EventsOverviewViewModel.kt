@@ -21,6 +21,20 @@ class EventsOverviewViewModel(db: FirebaseFirestore = Firebase.firestore) : View
 
     private val eventRef = db.collection("events")
 
+    fun onSearchQueryChanged(query: String) {
+        _uiState.value = _uiState.value.copy(searchQuery = query)
+        filterEvents()
+    }
+
+    private fun filterEvents() {
+        val query = _uiState.value.searchQuery
+        val filteredEvents =
+            _uiState.value.eventList.getAllEvent.filter { it.eventName.contains(query, ignoreCase = true) }
+        _uiState.value =
+            _uiState.value.copy(
+                eventList = _uiState.value.eventList.copy(getFilteredEvent = filteredEvents))
+    }
+
     fun getEvents() {
         eventRef
             .get()
