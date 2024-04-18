@@ -1,5 +1,8 @@
 package com.github.se.eventradar.model.event
 
+import android.content.Context
+import androidx.compose.ui.res.stringResource
+import com.github.se.eventradar.R
 import com.github.se.eventradar.model.Location
 import java.time.LocalDateTime
 
@@ -8,7 +11,21 @@ enum class EventCategory {
   SPORTS,
   CONFERENCE,
   EXHIBITION,
-  COMMUNITY
+  COMMUNITY,
+  PARTY,
+  UNDEFINED;
+
+  fun toString(context: Context): String {
+    return when (this) {
+      MUSIC -> context.getString(R.string.event_category_music)
+      SPORTS -> context.getString(R.string.event_category_sport)
+      CONFERENCE -> context.getString(R.string.event_category_conference)
+      PARTY -> context.getString(R.string.event_category_party)
+      EXHIBITION -> context.getString(R.string.event_category_exhibition)
+      COMMUNITY -> context.getString(R.string.event_category_communities)
+      UNDEFINED -> context.getString(R.string.event_category_undefined)
+    }
+  }
 }
 
 data class Ticket(val name: String, val price: Double, val quantity: Int)
@@ -27,3 +44,5 @@ data class Event(
     val category: EventCategory,
     val fireBaseID: String
 )
+
+
