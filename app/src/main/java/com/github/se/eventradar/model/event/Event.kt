@@ -12,7 +12,7 @@ data class Event(
     val location: Location,
     val description: String,
     val ticket: EventTicket,
-    val contact: String,
+    val hostUserId: String,
     val organiserList: Set<String>,
     val attendeeList: Set<String>,
     val category: EventCategory,

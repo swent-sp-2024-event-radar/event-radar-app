@@ -26,30 +26,30 @@ class EventsOverviewViewModel(db: FirebaseFirestore = Firebase.firestore) : View
         .get()
         .addOnSuccessListener { result ->
           val events =
-              result.documents.map { document ->
-                Event(
-                    eventName = document.data?.get("name") as String,
-                    eventPhoto = document.data?.get("photo_url") as String,
-                    start = getLocalDateTime(document.data?.get("start") as String),
-                    end = getLocalDateTime(document.data?.get("end") as String),
-                    location =
-                        getLocation(
-                            document.data?.get("location_name") as String,
-                            document.data?.get("location_lat") as Double,
-                            document.data?.get("location_lng") as Double,
-                        ),
-                    description = document.data?.get("description") as String,
-                    ticket =
-                        getEventTicket(
-                            document.data?.get("ticket_name") as String,
-                            document.data?.get("ticket_price") as Double,
-                            document.data?.get("ticket_quantity") as Int,
-                        ),
-                    contact = getEventContact(document.data?.get("main_organiser") as String),
-                    organiserList = getSetOfStrings(document.data?.get("organisers_list")),
-                    attendeeList = getSetOfStrings(document.data?.get("attendees_list")),
-                    category = getEventCategory(document.data?.get("category") as String),
-                    fireBaseID = document.id)
+              result.documents.mapNotNull { document ->
+                document.data?.let {
+                  Event(
+                      eventName = it["name"] as? String ?: "Unknown Event",
+                      eventPhoto = it["photo_url"] as? String ?: "",
+                      start = getLocalDateTime(it["start"] as? String ?: "01/01/1970 00:00:00"),
+                      end = getLocalDateTime(it["end"] as? String ?: "01/01/1970 00:00:00"),
+                      location =
+                          getLocation(
+                              it["location_name"] as? String ?: "Unknown Location",
+                              (it["location_lat"] as? Number)?.toDouble() ?: 0.0,
+                              (it["location_lng"] as? Number)?.toDouble() ?: 0.0),
+                      description = it["description"] as? String ?: "",
+                      ticket =
+                          getEventTicket(
+                              it["ticket_name"] as? String ?: "",
+                              (it["ticket_price"] as? Number)?.toDouble() ?: 0.0,
+                              (it["ticket_quantity"] as? Number)?.toInt() ?: 0),
+                      hostUserId = it["main_organiser"] as? String ?: "", // Create User data class
+                      organiserList = getSetOfStrings(it["organisers_list"]),
+                      attendeeList = getSetOfStrings(it["attendees_list"]),
+                      category = getEventCategory(it["category"] as? String ?: "Not Specified"),
+                      fireBaseID = document.id)
+                }
               }
           _uiState.value =
               _uiState.value.copy(
@@ -60,27 +60,49 @@ class EventsOverviewViewModel(db: FirebaseFirestore = Firebase.firestore) : View
         }
   }
 
-  private val userRef = db.collection("users")
-
-  private fun getEventContact(contactId: String): String {
-    var contactEmail = ""
-
-    userRef
-        .document(contactId)
-        .collection("private")
-        .limit(1) // Limit the query to retrieve only one document
+  fun getUpcomingEvents(uid: String) {
+    eventRef
+        .whereArrayContains("attendees_list", uid)
         .get()
-        .addOnSuccessListener { querySnapshot ->
-          for (documentSnapshot in querySnapshot.documents) {
-            contactEmail = documentSnapshot.data?.get("email") as String
-            break
-          }
+        .addOnSuccessListener { result ->
+          val upcomingEvents =
+              result.documents.mapNotNull { document ->
+                document.data?.let {
+                  Event(
+                      eventName = it["name"] as? String ?: "Unknown Event",
+                      eventPhoto = it["photo_url"] as? String ?: "",
+                      start = getLocalDateTime(it["start"] as? String ?: "01/01/2000 00:00:00"),
+                      end = getLocalDateTime(it["end"] as? String ?: "01/01/2000 00:00:00"),
+                      location =
+                          getLocation(
+                              it["location_name"] as? String ?: "Unknown Location",
+                              (it["location_lat"] as? Number)?.toDouble() ?: 0.0,
+                              (it["location_lng"] as? Number)?.toDouble() ?: 0.0),
+                      description = it["description"] as? String ?: "",
+                      ticket =
+                          getEventTicket(
+                              it["ticket_name"] as? String ?: "",
+                              (it["ticket_price"] as? Number)?.toDouble() ?: 0.0,
+                              (it["ticket_quantity"] as? Number)?.toInt() ?: 0),
+                      hostUserId =
+                          it["main_organiser"] as? String ?: "", // TODO Create User data class
+                      organiserList = getSetOfStrings(it["organisers_list"]),
+                      attendeeList = getSetOfStrings(it["attendees_list"]),
+                      category = getEventCategory(it["category"] as? String ?: "Not Specified"),
+                      fireBaseID = document.id)
+                }
+              }
+          _uiState.value =
+              _uiState.value.copy(
+                  eventList =
+                      EventList(
+                          upcomingEvents,
+                          _uiState.value.eventList.filteredEvent,
+                          _uiState.value.eventList.selectedEvent))
         }
         .addOnFailureListener { exception ->
-          Log.d("EventsOverviewViewModel", "Error getting event contact: ", exception)
+          Log.d("EventsOverviewViewModel", "Error getting upcoming events: ", exception)
         }
-
-    return contactEmail
   }
 
   companion object {
