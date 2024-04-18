@@ -54,7 +54,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
 import com.github.se.eventradar.map.EventMap
-import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.EventsOverviewViewModel
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.ui.BottomNavigationMenu
@@ -143,13 +142,24 @@ fun HomeScreen(
         }
 
     if (selectedTabIndex == 0) {
-      EventList(
-          uiState.eventList.allEvents,
-          Modifier.fillMaxWidth().constrainAs(eventList) {
-            top.linkTo(tabs.bottom, margin = 8.dp)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-          })
+      if (viewToggleBrowseIndex == 0) {
+        EventList(
+            uiState.eventList.allEvents,
+            Modifier.fillMaxWidth().constrainAs(eventList) {
+              top.linkTo(tabs.bottom, margin = 8.dp)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
+            })
+      } else {
+        EventMap(
+            uiState.eventList.allEvents,
+            navigationActions,
+            Modifier.fillMaxWidth().constrainAs(eventMap) {
+              top.linkTo(tabs.bottom, margin = 8.dp)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
+            })
+      }
     } else {
       // "Upcoming" tab content
       // TODO: Implement upcoming events
