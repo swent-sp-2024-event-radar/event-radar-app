@@ -48,38 +48,44 @@ Note:
     - Check Firestore rules for more information / details
 - Images should be stored in Firebase Storage ( firebase_storage ) to upload the image file and then you store the download url of the image inside the document in the Cloud Firestore ( cloud_firestore ).
 
-
+### Events database
 The structure of the event database is as follows:
  ```json
 {
-  "Event": {
-    "Name": "New Years Eve Party",
-    "Photo": "https://stackoverflow.com/questions/46585330/firestore-security-rules-for-public-and-private-fields",
-    "Description": "Get Ready for NYE 2025, dress classy and dance all night",
-    "Category": "Party",
-    "Start": {
-      "Date": "31.12.2024",
-      "Time": "23:00"
-    },
-    "End": {
-      "Date": "01.01.2025",
-      "Time": "06:00"
-    },
-    "Location": "Starling Hotel",
-    "Ticket": {
-      "Ticket Name": "Standard",
-      "Ticket price": 20.00,
-      "Ticket Quantity": 450
-    },
-    "Contact Email": "valerian@joytigoel.com",
-    "Co-organiser List": [
-      "xu378csh",
-      "qwglei7"
-    ] 
-    
+  "events": {
+    "event_id": {
+      "name": "New Years Eve Party",
+      "photo_url": "https://stackoverflow.com/questions/46585330/firestore-security-rules-for-public-and-private-fields",
+      "description": "Get Ready for NYE 2025, dress classy and dance all night",
+      "category": "MUSIC",
+      "start": "31/12/2024 23:00:00",
+      "end": "01/01/2025 06:00:00",
+      "location": {
+        "location_name": "Starling Hotel",
+        "location_lat": 19.4783892,
+        "location_lng": 192.198489
+      },
+      "ticket": {
+        "ticket_name": "Standard",
+        "ticket_price": 20.00,
+        "ticket_quantity": 450
+      },
+      "contact_email": "valerian@joytigoel.com",
+      "main_organiser": "xu378csh",
+      "organisers_list": [
+        "xu378csh",
+        "qwglei7"
+      ],
+      "attendees_list": [
+        "xu378csh",
+        "qwglei7",
+        "bfndn3"
+      ]
+    }
   }
 }
 ```
-/// Co-Organiser list: List of references (in Firebase).  
+Note:
+- Co-Organiser list: List of references (in Firebase).  
        
          
