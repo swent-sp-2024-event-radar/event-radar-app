@@ -5,8 +5,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventDetailsViewModel
+import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.event.EventUiState
-import com.github.se.eventradar.model.event.Ticket
 import com.github.se.eventradar.screens.EventDetailsScreen
 import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.navigation.NavigationActions
@@ -47,7 +47,7 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
               end = LocalDateTime.MAX,
               location = Location(0.0, 0.0, "base address"),
               description = "Let's debug some code together because we all enjoy kotlin !",
-              ticket = Ticket("Luck", 0.0, 7),
+              ticket = EventTicket("Luck", 0.0, 7),
               contact = "some.name@host.com",
               category = EventCategory.COMMUNITY,
           ))
@@ -86,7 +86,7 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
       categoryTitle { assertIsDisplayed() }
       categoryContent {
         assertIsDisplayed()
-        assertTextContains("COMMUNITY")
+        assertTextContains("Community")
       }
       dateTimeTitle { assertIsDisplayed() }
       dateTimeStartContent { assertIsDisplayed() }
