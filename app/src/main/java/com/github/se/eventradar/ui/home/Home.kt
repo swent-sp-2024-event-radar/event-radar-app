@@ -24,14 +24,12 @@ import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -52,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
+import com.github.se.eventradar.map.EventMap
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
@@ -59,17 +58,6 @@ import com.github.se.eventradar.model.event.Ticket
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.CameraPositionState
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
-import java.time.LocalDate
-import java.time.LocalTime
 import java.time.LocalDateTime
 
 @Composable
@@ -82,7 +70,7 @@ fun HomeScreen(navigationActions: NavigationActions) {
               "User1", // todo
               LocalDateTime.MIN,
               LocalDateTime.MAX,
-              Location(83.39, 2.992, "EPFL"),
+              Location(46.51918572819813, 6.56770796849043, "EPFL"),
               "enjoy your time on the dacefloor",
               Ticket("Standard", 0.0, 500),
               "jg@joytigoel.com",
@@ -95,7 +83,7 @@ fun HomeScreen(navigationActions: NavigationActions) {
               "User2", // todo
               LocalDateTime.now(),
               LocalDateTime.MAX,
-              Location(83.49, 56.992, "161 makepeace avenue, n666es"),
+              Location(51.56519896742657, -0.1484136269832895, "161 makepeace avenue, n666es"),
               "Forget and Enjoy",
               Ticket("regular", 0.0, 10000),
               "valerian@joytigoel.com",
@@ -122,7 +110,7 @@ fun HomeScreen(navigationActions: NavigationActions) {
   val context = LocalContext.current
 
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("homeScreen")) {
-    val (logo, tabs, eventList, bottomNav, viewToggle) = createRefs()
+    val (logo, tabs, eventList, eventMap, bottomNav, viewToggle) = createRefs()
     Row(
         modifier =
             Modifier.fillMaxWidth()
@@ -202,7 +190,7 @@ fun HomeScreen(navigationActions: NavigationActions) {
         EventMap(
             mockEvents,
             navigationActions,
-            Modifier.fillMaxWidth().constrainAs(eventList) {
+            Modifier.fillMaxSize().constrainAs(eventMap) {
               top.linkTo(tabs.bottom, margin = 8.dp)
               start.linkTo(parent.start)
               end.linkTo(parent.end)
@@ -248,46 +236,6 @@ fun HomeScreen(navigationActions: NavigationActions) {
 @Composable
 fun EventList(events: List<Event>, modifier: Modifier = Modifier) {
   LazyColumn(modifier = modifier) { items(events) { event -> EventCard(event) } }
-}
-
-@Composable
-fun EventMap(events: List<Event>, navigationActions: NavigationActions, modifier: Modifier = Modifier) {
-  val mapProperties by remember {
-    mutableStateOf(MapProperties(maxZoomPreference = 50f, minZoomPreference = 0f))
-  }
-  val mapUiSettings by remember { mutableStateOf(MapUiSettings(mapToolbarEnabled = false)) }
-  
-  // TODO: Use actual user location
-  val epflCameraPosition = LatLng(46.51890374606943, 6.566587868510539)
-  val cameraPositionState: CameraPositionState = rememberCameraPositionState {
-    position = CameraPosition.fromLatLngZoom(epflCameraPosition, 11f)
-  }
-  
-  Scaffold(
-    bottomBar = {
-      BottomNavigationMenu(
-        onTabSelected = navigationActions::navigateTo,
-        tabList = TOP_LEVEL_DESTINATIONS,
-        selectedItem = TOP_LEVEL_DESTINATIONS[1])
-    },
-    modifier = Modifier.testTag("mapScreen")) {
-    GoogleMap(
-      properties = mapProperties,
-      uiSettings = mapUiSettings,
-      cameraPositionState = cameraPositionState,
-      modifier = Modifier.fillMaxSize().padding(it).testTag("map")) {
-      for (event in events) {
-        Marker(
-          contentDescription = "Marker for ${event.name}",
-          state =
-          rememberMarkerState(
-            position = LatLng(event.location.latitude, event.location.longitude)),
-          title = event.name,
-          snippet = event.description,
-        )
-      }
-    }
-  }
 }
 
 @Composable
