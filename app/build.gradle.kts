@@ -119,6 +119,7 @@ dependencies {
     // Dagger Hilt
     implementation("com.google.dagger:hilt-android:${rootProject.extra.get("hiltVersion")}")
     kapt("com.google.dagger:hilt-android-compiler:${rootProject.extra.get("hiltVersion")}")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1-Beta")
     
     // JUnit
     testImplementation("junit:junit:4.13.2")

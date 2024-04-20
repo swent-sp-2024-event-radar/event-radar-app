@@ -1,4 +1,4 @@
-package com.github.se.eventradar.model.repository
+package com.github.se.eventradar.model.repository.event
 
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.event.Event
@@ -11,9 +11,10 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import javax.inject.Inject
 import kotlinx.coroutines.tasks.await
 
-class FirebaseEventRepository : EventRepository {
+class FirebaseEventRepository @Inject constructor() : IEventRepository {
   private val db: FirebaseFirestore = Firebase.firestore
   private val eventRef: CollectionReference = db.collection("events")
 
@@ -87,11 +88,17 @@ class FirebaseEventRepository : EventRepository {
     }
   }
 
-  override suspend fun addEvent(event: Event) {
-    eventRef.add(event).await()
+  override suspend fun addEvent(event: Event): Resource<Boolean> {
+
+    return try {
+      eventRef.add(event).await()
+      Resource.Success(true)
+    } catch (e: Exception) {
+      Resource.Failure(e)
+    }
   }
 
-  override suspend fun updateEvent(event: Event) {
+  override suspend fun updateEvent(event: Event): Resource<Boolean> {
     val eventMap =
         hashMapOf(
             "name" to event.eventName,
@@ -108,11 +115,22 @@ class FirebaseEventRepository : EventRepository {
             "organisers_list" to event.organiserList.toList(),
             "attendees_list" to event.attendeeList.toList(),
             "category" to event.category.name)
-    eventRef.document(event.fireBaseID).update(eventMap as Map<String, Any>).await()
+
+    return try {
+      eventRef.document(event.fireBaseID).update(eventMap as Map<String, Any>).await()
+      Resource.Success(true)
+    } catch (e: Exception) {
+      Resource.Failure(e)
+    }
   }
 
-  override suspend fun deleteEvent(event: Event) {
-    eventRef.document(event.fireBaseID).delete().await()
+  override suspend fun deleteEvent(event: Event): Resource<Boolean> {
+    return try {
+      eventRef.document(event.fireBaseID).delete().await()
+      Resource.Success(true)
+    } catch (e: Exception) {
+      Resource.Failure(e)
+    }
   }
 
   companion object {
