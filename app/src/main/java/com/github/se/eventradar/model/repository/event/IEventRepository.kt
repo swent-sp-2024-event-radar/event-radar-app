@@ -8,9 +8,9 @@ interface IEventRepository {
 
   suspend fun getEvent(id: String): Resource<Event?>
 
-  suspend fun addEvent(event: Event): Resource<Boolean>
+  suspend fun addEvent(event: Event): Resource<Unit>
 
-  suspend fun updateEvent(event: Event): Resource<Boolean>
+  suspend fun updateEvent(event: Event): Resource<Unit>
 
-  suspend fun deleteEvent(event: Event): Resource<Boolean>
+  suspend fun deleteEvent(event: Event): Resource<Unit>
 }
