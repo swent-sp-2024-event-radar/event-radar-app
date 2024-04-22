@@ -6,8 +6,10 @@ plugins {
 }
 
 buildscript {
+    val hiltVersion by rootProject.extra { "2.51.1" }
     dependencies {
         classpath("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:2.0.1")
+        classpath("com.google.dagger:hilt-android-gradle-plugin:$hiltVersion")
     }
 }
 
