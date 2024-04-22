@@ -143,9 +143,18 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
 
-    //QR CODE
+    //QR CODE (Zxing)
     implementation ("com.google.zxing:core:3.4.1")
+
+    implementation ("androidx.activity:activity-compose:1.9.0")
+
+    // CameraX
+    implementation ("androidx.camera:camera-camera2:1.3.3")
+    implementation ("androidx.camera:camera-lifecycle:1.3.3")
+    implementation ("androidx.camera:camera-view:1.3.3")
 }
+
+
 
 secrets {
     // Optionally specify a different file name containing your secrets.
