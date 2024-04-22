@@ -26,30 +26,52 @@ class EventsOverviewViewModel(db: FirebaseFirestore = Firebase.firestore) : View
         .get()
         .addOnSuccessListener { result ->
           val events =
-              result.documents.map { document ->
-                Event(
-                    eventName = document.data?.get("name") as String,
-                    eventPhoto = document.data?.get("photo_url") as String,
-                    start = getLocalDateTime(document.data?.get("start") as String),
-                    end = getLocalDateTime(document.data?.get("end") as String),
-                    location =
-                        getLocation(
-                            document.data?.get("location_name") as String,
-                            document.data?.get("location_lat") as Double,
-                            document.data?.get("location_lng") as Double,
-                        ),
-                    description = document.data?.get("description") as String,
-                    ticket =
-                        getEventTicket(
-                            document.data?.get("ticket_name") as String,
-                            document.data?.get("ticket_price") as Double,
-                            document.data?.get("ticket_quantity") as Int,
-                        ),
-                    contact = getEventContact(document.data?.get("main_organiser") as String),
-                    organiserList = getSetOfStrings(document.data?.get("organisers_list")),
-                    attendeeList = getSetOfStrings(document.data?.get("attendees_list")),
-                    category = getEventCategory(document.data?.get("category") as String),
-                    fireBaseID = document.id)
+              result.documents.mapNotNull { document ->
+                val eventName = document.data?.get("name") as? String
+                val eventPhoto = document.data?.get("photo_url") as? String
+                val start = (document.data?.get("start") as? String)?.let { getLocalDateTime(it) }
+                val end = (document.data?.get("end") as? String)?.let { getLocalDateTime(it) }
+                val locationName = document.data?.get("location_name") as? String
+                val locationLat = document.data?.get("location_lat") as? Double
+                val locationLng = document.data?.get("location_lng") as? Double
+                val description = document.data?.get("description") as? String
+                val ticketName = document.data?.get("ticket_name") as? String
+                val ticketPrice = document.data?.get("ticket_price") as? Double
+                val ticketQuantity = document.data?.get("ticket_quantity") as? Int
+                val mainOrganiser = document.data?.get("main_organiser") as? String
+                val organisersList = document.data?.get("organisers_list")
+                val attendeesList = document.data?.get("attendees_list")
+                val category = document.data?.get("category") as? String
+
+                if (eventName != null &&
+                    eventPhoto != null &&
+                    start != null &&
+                    end != null &&
+                    locationName != null &&
+                    locationLat != null &&
+                    locationLng != null &&
+                    description != null &&
+                    ticketName != null &&
+                    ticketPrice != null &&
+                    ticketQuantity != null &&
+                    mainOrganiser != null &&
+                    category != null) {
+                  Event(
+                      eventName = eventName,
+                      eventPhoto = eventPhoto,
+                      start = start,
+                      end = end,
+                      location = getLocation(locationName, locationLat, locationLng),
+                      description = description,
+                      ticket = getEventTicket(ticketName, ticketPrice, ticketQuantity),
+                      contact = getEventContact(mainOrganiser),
+                      organiserList = getSetOfStrings(organisersList),
+                      attendeeList = getSetOfStrings(attendeesList),
+                      category = getEventCategory(category),
+                      fireBaseID = document.id)
+                } else {
+                  null
+                }
               }
           _uiState.value =
               _uiState.value.copy(
