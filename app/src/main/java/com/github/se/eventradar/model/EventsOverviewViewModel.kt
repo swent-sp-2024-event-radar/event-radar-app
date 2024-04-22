@@ -84,56 +84,157 @@ class EventsOverviewViewModel(db: FirebaseFirestore = Firebase.firestore) : View
 
   companion object {
     fun eventFromDocument(document: DocumentSnapshot): Event? {
-      val data = document.data ?: return null
-      return Event(
-          eventName = data["name"] as? String ?: "Unknown Event",
-          eventPhoto = data["photo_url"] as? String ?: "",
-          start = getLocalDateTime(data["start"] as? String ?: "01/01/1970 00:00:00"),
-          end = getLocalDateTime(data["end"] as? String ?: "01/01/1970 00:00:00"),
+        val data = document.data
+        if (data == null) {
+            Log.w("EventsOverviewViewModel", "DocumentSnapshot data is null for id: ${document.id}")
+            return null
+        }
+        val eventName = data["name"] as? String ?: "No event name"
+        if (eventName == "No event name") {
+            Log.w("EventsOverviewViewModel", "Missing eventName for id: ${document.id}")
+        }
+        val eventPhoto = data["photo_url"] as? String ?: "No photo available"
+        if (eventPhoto == "No photo available") {
+            Log.w("EventsOverviewViewModel", "Missing event photo url for id: ${document.id}")
+        }
+        val start = data["start"] as? String ?: "01/01/1970 00:00:00"
+        val end = data["end"] as? String ?: "01/01/1970 00:00:00"
+        if (start == "01/01/1970 00:00:00" || end == "01/01/1970 00:00:00") {
+            Log.w("EventsOverviewViewModel", "Missing event time details for id: ${document.id}")
+        }
+        val locationName = data["location_name"] as? String ?: "Unknown location"
+        val locationLat = (data["location_lat"] as? Number)?.toDouble() ?: 0.0
+        val locationLng = (data["location_lng"] as? Number)?.toDouble() ?: 0.0
+        if (locationName == "Unknown location" || locationLat == 0.0 || locationLng == 0.0) {
+            Log.w("EventsOverviewViewModel", "Incomplete location details for id: ${document.id}")
+        }
+        val description = data["description"] as? String ?: "Description not available"
+        if (description == "Description not available") {
+            Log.w("EventsOverviewViewModel", "Missing description for id: ${document.id}")
+        }
+        val ticketName = data["ticket_name"] as? String ?: "No ticket name"
+        val ticketPrice = (data["ticket_price"] as? Number)?.toDouble() ?: 0.0
+        val ticketQuantity = (data["ticket_quantity"] as? Number)?.toInt() ?: 0
+        if (ticketName == "No ticket name" || ticketPrice == 0.0 || ticketQuantity == 0) {
+            Log.w("EventsOverviewViewModel", "Missing ticket details for id: ${document.id}")
+        }
+        val hostUserId = data["main_organiser"] as? String ?: "Unknown organiser"
+        if (hostUserId == "Unknown organiser") {
+            Log.w("EventsOverviewViewModel", "Missing event organizer ID for id: ${document.id}")
+        }
+        val organiserList = convertToSetOfStrings(data["organisers_list"])
+        if (organiserList.isEmpty()) {
+            Log.w("EventsOverviewViewModel", "Missing or empty organisers list for id: ${document.id}")
+        }
+        val attendeeList = convertToSetOfStrings(data["attendees_list"])
+        if (attendeeList.isEmpty()) {
+            Log.w("EventsOverviewViewModel", "Missing or empty attendees list for id: ${document.id}")
+        }
+        val category = (data["category"] as? String) ?: "None"
+        if (category == "None") {
+            Log.w("EventsOverviewViewModel", "Missing category for id: ${document.id}")
+        }
+        return Event(
+          eventName = eventName,
+          eventPhoto = eventPhoto,
+          start = getLocalDateTime(start),
+          end = getLocalDateTime(end),
           location =
               getLocation(
-                  data["location_name"] as? String ?: "Unknown Location",
-                  (data["location_lat"] as? Number)?.toDouble() ?: 0.0,
-                  (data["location_lng"] as? Number)?.toDouble() ?: 0.0),
-          description = data["description"] as? String ?: "",
+                  locationName,
+                  locationLat,
+                  locationLng),
+          description = description,
           ticket =
               getEventTicket(
-                  data["ticket_name"] as? String ?: "",
-                  (data["ticket_price"] as? Number)?.toDouble() ?: 0.0,
-                  (data["ticket_quantity"] as? Number)?.toInt() ?: 0),
-          hostUserId = data["main_organiser"] as? String ?: "",
-          organiserList = getSetOfStrings(data["organisers_list"]),
-          attendeeList = getSetOfStrings(data["attendees_list"]),
-          category = getEventCategory(data["category"] as? String ?: "Not Specified"),
+                  ticketName,
+                  ticketPrice,
+                  ticketQuantity),
+          hostUserId = hostUserId,
+          organiserList = organiserList,
+          attendeeList = attendeeList,
+          category = getEventCategory(category),
           fireBaseID = document.id)
     }
 
     fun userFromDocument(document: DocumentSnapshot): User? {
-      val data = document.data ?: return null
+        val data = document.data
+        if (data == null) {
+            Log.w("UserViewModel", "DocumentSnapshot data is null for user id: ${document.id}")
+            return null
+        }
 
-      return User(
+        val age = (data["age"] as? Number)?.toInt() ?: 0
+        if (age <= 0) {
+            Log.w("UserViewModel", "Invalid or missing age for user id: ${document.id}")
+        }
+        val email = data["email"] as? String ?: "No email provided"
+        if (email == "No email provided") {
+            Log.w("UserViewModel", "Missing email for user id: ${document.id}")
+        }
+        val firstName = data["firstName"] as? String ?: "Unknown first name"
+        if (firstName == "Unknown first name") {
+            Log.w("UserViewModel", "Missing firstName for user id: ${document.id}")
+        }
+        val lastName = data["lastName"] as? String ?: "Unknown last name"
+        if (lastName == "Unknown last name") {
+            Log.w("UserViewModel", "Missing lastName for user id: ${document.id}")
+        }
+        val phoneNumber = data["phoneNumber"] as? String ?: "No phone number"
+        if (phoneNumber == "No phone number") {
+            Log.w("UserViewModel", "Missing phoneNumber for user id: ${document.id}")
+        }
+        val accountStatus = data["accountStatus"] as? String ?: "Unknown account status"
+        if (accountStatus == "Unknown account status") {
+            Log.w("UserViewModel", "Missing accountStatus for user id: ${document.id}")
+        }
+        val eventsAttendeeList = convertToListOfStrings(data["eventsAttendeeList"])
+        if (eventsAttendeeList.isEmpty()) {
+            Log.w("UserViewModel", "Empty or invalid eventsAttendeeList for user id: ${document.id}")
+        }
+        val eventsHostList = convertToListOfStrings(data["eventsHostList"])
+        if (eventsHostList.isEmpty()) {
+            Log.w("UserViewModel", "Empty or invalid eventsHostList for user id: ${document.id}")
+        }
+        val profilePicUrl = data["profilePicUrl"] as? String ?: "No profile picture"
+        if (profilePicUrl == "No profile picture") {
+            Log.w("UserViewModel", "Missing profilePicUrl for user id: ${document.id}")
+        }
+        val qrCodeUrl = data["qrCodeUrl"] as? String ?: "No QR code"
+        if (qrCodeUrl == "No QR code") {
+            Log.w("UserViewModel", "Missing QR code URL for user id: ${document.id}")
+        }
+        val username = data["username"] as? String ?: "Unknown username"
+        if (username == "Unknown username") {
+            Log.w("UserViewModel", "Missing username for user id: ${document.id}")
+        }
+        return User(
           userId = document.id,
-          age = (data["age"] as? Number)?.toInt() ?: 0,
-          email = data["email"] as? String ?: "",
-          firstName = data["firstName"] as? String ?: "",
-          lastName = data["lastName"] as? String ?: "",
-          phoneNumber = data["phoneNumber"] as? String ?: "",
-          accountStatus = data["accountStatus"] as? String ?: "Unknown",
-          eventsAttendeeList =
-              (data["eventsAttendeeList"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
-          eventsHostList =
-              (data["eventsHostList"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
-          profilePicUrl = data["profilePicUrl"] as? String ?: "",
-          qrCodeUrl = data["qrCodeUrl"] as? String ?: "",
-          username = data["username"] as? String ?: "Unknown User")
+          age = age,
+          email = email,
+          firstName = firstName,
+          lastName = lastName,
+          phoneNumber = phoneNumber,
+          accountStatus = accountStatus,
+          eventsAttendeeList = eventsAttendeeList,
+          eventsHostList = eventsHostList,
+          profilePicUrl = profilePicUrl,
+          qrCodeUrl = qrCodeUrl,
+          username = username)
     }
 
     private fun getLocalDateTime(dateTime: String): LocalDateTime {
       val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
       return LocalDateTime.parse(dateTime, formatter)
     }
-
-    private fun getSetOfStrings(data: Any?): Set<String> {
+      private fun convertToListOfStrings(data: Any?): List<String> {
+          return when (data) {
+              is List<*> -> data.filterIsInstance<String>().toList()
+              is String -> listOf(data)
+              else -> emptyList()
+          }
+      }
+    private fun convertToSetOfStrings(data: Any?): Set<String> {
       return when (data) {
         is List<*> -> data.filterIsInstance<String>().toSet()
         is String -> setOf(data)
