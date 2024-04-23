@@ -1,7 +1,10 @@
 package com.github.se.eventradar.model.event
 
 import com.github.se.eventradar.model.Location
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.GeoPoint
 import java.time.LocalDateTime
+import java.time.ZoneId
 
 // new event struct final
 data class Event(
@@ -27,10 +30,10 @@ data class Event(
       start = LocalDateTime.parse(map["start"] as String),
       end = LocalDateTime.parse(map["end"] as String),
       location =
-          Location(
-              latitude = map["location_lat"] as Double,
+              Location(map["location_lat"] as Double,
               longitude = map["location_lng"] as Double,
-              address = map["location_name"] as String),
+              address = map["location_name"] as String
+  ),
       description = map["description"] as String,
       ticket =
           EventTicket(
@@ -49,9 +52,9 @@ data class Event(
     map["photo_url"] = eventPhoto
     map["start"] = start.toString()
     map["end"] = end.toString()
+      map["location_lat"] = location.latitude
+      map["location_lng"] = location.longitude
     map["location_name"] = location.address
-    map["location_lat"] = location.latitude
-    map["location_lng"] = location.longitude
     map["description"] = description
     map["ticket_name"] = ticket.name
     map["ticket_price"] = ticket.price
