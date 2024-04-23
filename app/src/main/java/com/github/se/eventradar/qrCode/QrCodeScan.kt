@@ -10,9 +10,8 @@ import com.google.zxing.MultiFormatReader
 import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.common.HybridBinarizer
 import java.nio.ByteBuffer
-import kotlin.jvm.internal.Ref.ByteRef
 
-class QrCodeFriendScanner(private val onQrCodeScanned: (String)-> Unit): ImageAnalysis.Analyzer {
+class QrCodeScan(private val onQrCodeScanned: (String)-> Unit): ImageAnalysis.Analyzer {
 
    //list of supported Image Formats
     private val supportedImageFormats = listOf(
