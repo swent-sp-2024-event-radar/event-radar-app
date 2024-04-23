@@ -55,6 +55,8 @@ import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.EventsOverviewViewModel
 import com.github.se.eventradar.model.event.Event
+import com.github.se.eventradar.model.repository.event.MockEventRepository
+import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
@@ -255,5 +257,9 @@ fun EventCard(event: Event) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun HomeScreenPreview() {
-  HomeScreen(EventsOverviewViewModel(), NavigationActions(rememberNavController()))
+  val mockEventRepo = MockEventRepository()
+  val mockUserRepo = MockUserRepository()
+  HomeScreen(
+      EventsOverviewViewModel(mockEventRepo, mockUserRepo),
+      NavigationActions(rememberNavController()))
 }
