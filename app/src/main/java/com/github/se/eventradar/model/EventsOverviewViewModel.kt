@@ -42,10 +42,10 @@ class EventsOverviewViewModel(db: FirebaseFirestore = Firebase.firestore) : View
                     ticket =
                         getEventTicket(
                             document.data?.get("ticket_name") as String,
-                            document.data?.get("ticket_price") as Double,
-                            document.data?.get("ticket_quantity") as Int,
+                            (document.data?.get("ticket_price") as Long).toDouble(),
+                            (document.data?.get("ticket_quantity") as Long).toInt(),
                         ),
-                    contact = getEventContact(document.data?.get("main_organiser") as String),
+                    contact = getEventContact(document.data?.get("contact") as String),
                     organiserList = getSetOfStrings(document.data?.get("organisers_list")),
                     attendeeList = getSetOfStrings(document.data?.get("attendees_list")),
                     category = getEventCategory(document.data?.get("category") as String),
@@ -85,8 +85,11 @@ class EventsOverviewViewModel(db: FirebaseFirestore = Firebase.firestore) : View
 
   companion object {
     fun getLocalDateTime(dateTime: String): LocalDateTime {
-      val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
-      return LocalDateTime.parse(dateTime, formatter)
+      // val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
+      // return LocalDateTime.parse(dateTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+      println("Parsing date-time string: '$dateTime'")
+      val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-'T'HH:mm:ss")
+      return LocalDateTime.parse(dateTime.trim(), formatter)
     }
 
     fun getSetOfStrings(data: Any?): Set<String> {
