@@ -149,4 +149,47 @@ class MockEventRepositoryUnitTest {
     assert(events is Resource.Success)
     assert((events as Resource.Success).data.size == 3)
   }
+
+  @Test
+  fun testGetEventsByIdsAllValid() = runTest {
+    val event1 = mockEvent.copy(fireBaseID = "1")
+    val event2 = mockEvent.copy(fireBaseID = "2")
+    val event3 = mockEvent.copy(fireBaseID = "3")
+
+    eventRepository.addEvent(event1)
+    eventRepository.addEvent(event2)
+    eventRepository.addEvent(event3)
+
+    val events = eventRepository.getEventsByIds(listOf("1", "2", "3"))
+
+    assert(events is Resource.Success)
+    val eventsData = (events as Resource.Success).data
+    assert(eventsData.size == 3)
+    assert(eventsData.containsAll(listOf(event1, event2, event3)))
+  }
+
+  @Test
+  fun testGetEventsByIdsWithSomeInvalid() = runTest {
+    val event1 = mockEvent.copy(fireBaseID = "1")
+    val event2 = mockEvent.copy(fireBaseID = "2")
+
+    eventRepository.addEvent(event1)
+    eventRepository.addEvent(event2)
+
+    val events = eventRepository.getEventsByIds(listOf("1", "2", "4"))
+
+    // Check that the response is a failure
+    assert(events is Resource.Failure)
+    assert((events as Resource.Failure).throwable.message == "Event with id 4 is missing")
+  }
+
+  @Test
+  fun testGetEventsByIdsAllInvalid() = runTest {
+    val events = eventRepository.getEventsByIds(listOf("100", "200"))
+
+    // Check that the response is a failure
+    assert(events is Resource.Failure)
+    assert((events as Resource.Failure).throwable.message=="Event with id 100 is missing")//Shows id of first missing event
+  }
+
 }

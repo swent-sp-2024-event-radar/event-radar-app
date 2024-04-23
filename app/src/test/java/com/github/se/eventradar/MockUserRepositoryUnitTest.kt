@@ -1,0 +1,87 @@
+package com.github.se.eventradar
+
+import com.github.se.eventradar.model.Resource
+import com.github.se.eventradar.model.User
+import com.github.se.eventradar.model.repository.user.IUserRepository
+import com.github.se.eventradar.model.repository.user.MockUserRepository
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
+import org.junit.Test
+
+
+class MockUserRepositoryUnitTest {
+    private lateinit var userRepository: IUserRepository
+
+    private val mockUser = User(
+        userId = "1",
+        age = 30,
+        email = "test@example.com",
+        firstName = "John",
+        lastName = "Doe",
+        phoneNumber = "1234567890",
+        accountStatus = "active",
+        eventsAttendeeList = listOf("event1", "event2"),
+        eventsHostList = listOf("event3"),
+        profilePicUrl = "http://example.com/pic.jpg",
+        qrCodeUrl = "http://example.com/qr.jpg",
+        username = "johndoe"
+    )
+
+    @Before
+    fun setUp() {
+        userRepository = MockUserRepository()
+    }
+
+    @Test
+    fun testGetUsersEmptyAtConstruction() = runTest {
+        val result = userRepository.getUsers()
+        assert(result is Resource.Success)
+        assert((result as Resource.Success).data.isEmpty())
+    }
+
+    @Test
+    fun testGetUserEmptyAtConstruction() = runTest {
+        val result = userRepository.getUser("1")
+        assert(result is Resource.Failure)
+        assert((result as Resource.Failure).throwable.message == "User with id 1 not found")
+    }
+
+    @Test
+    fun testAddAndGetUser() = runTest {
+        userRepository.addUser(mockUser)
+        val result = userRepository.getUser("1")
+        assert(result is Resource.Success)
+        assert(mockUser == (result as Resource.Success).data)
+    }
+
+    @Test
+    fun testUpdateUser() = runTest {
+        userRepository.addUser(mockUser)
+        val updatedUser = mockUser.copy(firstName = "Paul")
+        userRepository.updateUser(updatedUser)
+        val result = userRepository.getUser("1")
+        assert(result is Resource.Success)
+        assert("Paul" == (result as Resource.Success).data?.firstName)
+    }
+
+    @Test
+    fun testDeleteUser() = runTest {
+        userRepository.addUser(mockUser)
+        userRepository.deleteUser(mockUser)
+        val result = userRepository.getUser("1")
+        assert(result is Resource.Failure)
+        assert((result as Resource.Failure).throwable.message == "User with id 1 not found")
+    }
+
+    @Test
+    fun testAddMultipleUsers() = runTest {
+        val user1 = mockUser.copy(userId = "1")
+        val user2 = mockUser.copy(userId = "2")
+        userRepository.addUser(user1)
+        userRepository.addUser(user2)
+        val result = userRepository.getUsers()
+        assert(result is Resource.Success)
+        assert((result as Resource.Success).data.size == 2)
+        assert((result).data.containsAll(listOf(user1, user2)))
+    }
+}
