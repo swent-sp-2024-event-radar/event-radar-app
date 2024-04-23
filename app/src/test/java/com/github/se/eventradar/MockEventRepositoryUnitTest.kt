@@ -189,7 +189,8 @@ class MockEventRepositoryUnitTest {
 
     // Check that the response is a failure
     assert(events is Resource.Failure)
-    assert((events as Resource.Failure).throwable.message=="Event with id 100 is missing")//Shows id of first missing event
+    assert(
+        (events as Resource.Failure).throwable.message ==
+            "Event with id 100 is missing") // Shows id of first missing event
   }
-
 }
