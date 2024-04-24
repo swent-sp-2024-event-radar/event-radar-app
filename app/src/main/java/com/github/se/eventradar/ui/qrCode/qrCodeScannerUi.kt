@@ -10,7 +10,9 @@ import androidx.camera.core.Preview as Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -75,12 +77,13 @@ class qrCodeScannerUi(private val onQrCodeScanned: (String) -> Unit) {
               }
               previewView
             },
-            modifier = Modifier.weight(1f))
-        //                Text(
-        //                    text = code, )
+            modifier = Modifier.weight(1f).aspectRatio(1f))
 
-      }
+
+      } else { Text("Camera permission is required to use this feature.") }
+        //still inside column
     }
+
   }
 }
 
