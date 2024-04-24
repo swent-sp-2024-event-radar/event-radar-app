@@ -13,4 +13,6 @@ interface IEventRepository {
   suspend fun updateEvent(event: Event): Resource<Unit>
 
   suspend fun deleteEvent(event: Event): Resource<Unit>
+
+  suspend fun getEventsByIds(ids: List<String>): Resource<List<Event>>
 }
