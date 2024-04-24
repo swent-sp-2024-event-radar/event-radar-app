@@ -29,7 +29,6 @@ import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -74,12 +73,14 @@ import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu
+import com.github.se.eventradar.ui.component.EventList
+import com.github.se.eventradar.ui.component.ViewToggleFab
 import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.viewmodel.EventsOverviewUiState
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
-
+import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -225,7 +226,7 @@ fun HomeScreen(
     BottomNavigationMenu(
         onTabSelected = { tab -> navigationActions.navigateTo(tab) },
         tabList = TOP_LEVEL_DESTINATIONS,
-        selectedItem = TOP_LEVEL_DESTINATIONS[2],
+        selectedItem = getTopLevelDestination(R.string.homeScreen_events),
         modifier =
             Modifier.testTag("bottomNavMenu").constrainAs(bottomNav) {
               bottom.linkTo(parent.bottom)
@@ -235,20 +236,19 @@ fun HomeScreen(
 
     var viewToggleIcon =
         if (viewToggleBrowseIndex == 0) Icons.Default.Place else Icons.AutoMirrored.Filled.List
-    FloatingActionButton(
+    ViewToggleFab(
+        modifier =
+            Modifier.testTag("viewToggleFab").constrainAs(viewToggle) {
+              bottom.linkTo(bottomNav.top, margin = 16.dp)
+              start.linkTo(parent.start, margin = 16.dp)
+            },
         onClick = {
           viewToggleBrowseIndex = if (viewToggleBrowseIndex == 0) 1 else 0
           viewToggleIcon =
               if (viewToggleBrowseIndex == 0) Icons.Default.Place
               else Icons.AutoMirrored.Filled.List
         },
-        modifier =
-            Modifier.testTag("viewToggleFab").constrainAs(viewToggle) {
-              bottom.linkTo(bottomNav.top, margin = 16.dp)
-              start.linkTo(parent.start, margin = 16.dp)
-            }) {
-          Icon(imageVector = viewToggleIcon, contentDescription = null)
-        }
+        iconVector = viewToggleIcon)
   }
 }
 

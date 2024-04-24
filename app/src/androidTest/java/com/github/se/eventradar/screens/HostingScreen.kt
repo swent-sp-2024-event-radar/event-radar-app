@@ -10,11 +10,10 @@ class HostingScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
         viewBuilderAction = { hasTestTag("hostingScreen") }) {
 
   val logo: KNode = child { hasTestTag("logo") }
-  val tabs: KNode = child { hasTestTag("tabs") }
-  val myHostedEventsTab: KNode = tabs.child { hasTestTag("myHostedEventsTab") }
+  val myHostedEventsTitle: KNode = child { hasTestTag("myHostedEventsTitle") }
   val eventCard: KNode = onNode { hasTestTag("eventCard") }
   val bottomNav: KNode = child { hasTestTag("bottomNavMenu") }
   val floatingActionButtons: KNode = child { hasTestTag("floatingActionButtons") }
-  val createEventButton: KNode = floatingActionButtons.child { hasTestTag("createEventButton") }
-  val switchViewButton: KNode = floatingActionButtons.child { hasTestTag("switchViewButton") }
+  val createEventFab: KNode = floatingActionButtons.child { hasTestTag("createEventFab") }
+  val viewToggleFab: KNode = floatingActionButtons.child { hasTestTag("viewToggleFab") }
 }
