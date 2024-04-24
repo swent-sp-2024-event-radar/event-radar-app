@@ -7,9 +7,9 @@ import com.github.se.eventradar.model.event.EventTicket
 import java.time.LocalDateTime
 import org.junit.Test
 
-class EventOverviewViewmodelUnitTest {
+class EventDetailsViewmodelUnitTest {
   @Test
-  suspend fun testEventOverviewUiInitialisation() {
+  suspend fun testEventDetailsUiInitialisation() {
     EventDetailsViewModel("pSjt3r3O8TddpWxRhGK5").getEventData()
     assert(
         EventDetailsViewModel().uiState.value ==
