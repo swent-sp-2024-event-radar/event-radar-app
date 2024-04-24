@@ -28,13 +28,12 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
   fun screenDisplaysAllElementsCorrectly() = run {
     ComposeScreen.onComposeScreen<HostingScreen>(composeTestRule) {
       logo { assertIsDisplayed() }
-      tabs { assertIsDisplayed() }
-      myHostedEventsTab { assertIsDisplayed() }
+      myHostedEventsTitle { assertIsDisplayed() }
       eventCard { assertIsDisplayed() }
       bottomNav { assertIsDisplayed() }
       floatingActionButtons { assertIsDisplayed() }
-      createEventButton { assertIsDisplayed() }
-      switchViewButton { assertIsDisplayed() }
+      createEventFab { assertIsDisplayed() }
+      viewToggleFab { assertIsDisplayed() }
     }
   }
 }

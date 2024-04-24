@@ -2,27 +2,14 @@ package com.github.se.eventradar.ui.home
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults.cardColors
-import androidx.compose.material3.CardDefaults.cardElevation
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -36,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -45,7 +31,6 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,11 +39,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.EventsOverviewViewModel
-import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.ui.BottomNavigationMenu
+import com.github.se.eventradar.ui.component.EventList
+import com.github.se.eventradar.ui.component.ViewToggleFab
 import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 
 @Composable
 fun HomeScreen(
@@ -170,7 +157,7 @@ fun HomeScreen(
     BottomNavigationMenu(
         onTabSelected = { tab -> navigationActions.navigateTo(tab) },
         tabList = TOP_LEVEL_DESTINATIONS,
-        selectedItem = TOP_LEVEL_DESTINATIONS[2],
+        selectedItem = getTopLevelDestination(R.string.homeScreen_events),
         modifier =
             Modifier.testTag("bottomNavMenu").constrainAs(bottomNav) {
               bottom.linkTo(parent.bottom)
@@ -180,76 +167,20 @@ fun HomeScreen(
 
     var viewToggleIcon =
         if (viewToggleBrowseIndex == 0) Icons.Default.Place else Icons.AutoMirrored.Filled.List
-    FloatingActionButton(
+    ViewToggleFab(
+        modifier =
+            Modifier.testTag("viewToggleFab").constrainAs(viewToggle) {
+              bottom.linkTo(bottomNav.top, margin = 16.dp)
+              start.linkTo(parent.start, margin = 16.dp)
+            },
         onClick = {
           viewToggleBrowseIndex = if (viewToggleBrowseIndex == 0) 1 else 0
           viewToggleIcon =
               if (viewToggleBrowseIndex == 0) Icons.Default.Place
               else Icons.AutoMirrored.Filled.List
         },
-        modifier =
-            Modifier.testTag("viewToggleFab").constrainAs(viewToggle) {
-              bottom.linkTo(bottomNav.top, margin = 16.dp)
-              start.linkTo(parent.start, margin = 16.dp)
-            }) {
-          Icon(imageVector = viewToggleIcon, contentDescription = null)
-        }
+        iconVector = viewToggleIcon)
   }
-}
-
-@Composable
-fun EventList(events: List<Event>, modifier: Modifier = Modifier) {
-  LazyColumn(modifier = modifier) { items(events) { event -> EventCard(event) } }
-}
-
-@Composable
-fun EventCard(event: Event) {
-  // TODO: connected to event details
-  val context = LocalContext.current
-  Card(
-      modifier =
-          Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-              .height(IntrinsicSize.Min)
-              .testTag("eventCard"),
-      colors = cardColors(containerColor = MaterialTheme.colorScheme.surface),
-      elevation = cardElevation(defaultElevation = 4.dp),
-      onClick = {
-        Toast.makeText(context, "Event details not yet available", Toast.LENGTH_SHORT).show()
-      }) {
-        Row(modifier = Modifier.fillMaxSize()) {
-          Column(
-              modifier =
-                  Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 8.dp)
-                      .weight(1f),
-              verticalArrangement = Arrangement.Center) {
-                Text(
-                    text = event.eventName,
-                    style =
-                        TextStyle(
-                            fontSize = 18.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto)),
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        ))
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = event.description,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style =
-                        TextStyle(
-                            fontSize = 16.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto)),
-                            fontWeight = FontWeight.Normal,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer))
-              }
-          Image(
-              painter = painterResource(id = R.drawable.placeholder),
-              contentDescription = "Event Image",
-              contentScale = ContentScale.FillBounds,
-              modifier = Modifier.weight(0.3f).fillMaxHeight())
-        }
-      }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
