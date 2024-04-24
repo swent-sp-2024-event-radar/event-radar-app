@@ -63,4 +63,21 @@ class FirebaseEventRepository : IEventRepository {
       Resource.Failure(e)
     }
   }
+
+  override suspend fun getEventsByIds(ids: List<String>): Resource<List<Event>> {
+    return try {
+      val events = mutableListOf<Event>()
+      for (id in ids) {
+        val document = eventRef.document(id).get().await()
+        if (document.exists()) {
+          events.add(Event(document.data!!, document.id))
+        } else {
+          return Resource.Failure(Exception("Event with id $id is missing"))
+        }
+      }
+      Resource.Success(events)
+    } catch (e: Exception) {
+      Resource.Failure(e)
+    }
+  }
 }
