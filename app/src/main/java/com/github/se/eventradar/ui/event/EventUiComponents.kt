@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.github.se.eventradar.R
-import com.github.se.eventradar.model.event.EventUiState
+import com.github.se.eventradar.model.event.EventDetailsViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -50,7 +50,7 @@ fun formatDateTime(dateTime: LocalDateTime): String {
 }
 
 @Composable
-fun EventDescription(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
+fun EventDescription(modifier: Modifier, eventUiState: EventDetailsViewModel.EventUiState, style: EventComponentsStyle) {
   Column(modifier = modifier) {
     Text(
         text = stringResource(id = R.string.event_description),
@@ -66,7 +66,7 @@ fun EventDescription(modifier: Modifier, eventUiState: EventUiState, style: Even
 }
 
 @Composable
-fun EventDistance(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
+fun EventDistance(modifier: Modifier, eventUiState: EventDetailsViewModel.EventUiState, style: EventComponentsStyle) {
   Column(modifier = modifier) {
     Text(
         text = stringResource(id = R.string.event_distance),
@@ -83,7 +83,7 @@ fun EventDistance(modifier: Modifier, eventUiState: EventUiState, style: EventCo
 }
 
 @Composable
-fun EventCategory(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
+fun EventCategory(modifier: Modifier, eventUiState: EventDetailsViewModel.EventUiState, style: EventComponentsStyle) {
   Column(modifier = modifier, verticalArrangement = Arrangement.SpaceBetween) {
     Text(
         text = stringResource(id = R.string.event_categories),
@@ -99,7 +99,7 @@ fun EventCategory(modifier: Modifier, eventUiState: EventUiState, style: EventCo
 }
 
 @Composable
-fun EventDateTime(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
+fun EventDateTime(modifier: Modifier, eventUiState: EventDetailsViewModel.EventUiState, style: EventComponentsStyle) {
   Column(modifier = modifier) {
     Text(
         text = stringResource(id = R.string.event_date_and_time),
