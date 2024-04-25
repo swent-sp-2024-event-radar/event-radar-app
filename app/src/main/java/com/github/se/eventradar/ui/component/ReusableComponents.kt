@@ -37,56 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.eventradar.R
-import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
-import com.github.se.eventradar.model.event.EventCategory
-import com.github.se.eventradar.model.event.EventTicket
-import java.time.LocalDateTime
-
-fun getMockEvents(): List<Event> {
-  val mockEvents =
-      listOf(
-          Event(
-              "NYE2025",
-              "User1", // todo
-              LocalDateTime.MIN,
-              LocalDateTime.MAX,
-              Location(83.39, 2.992, "EPFL"),
-              "enjoy your time on the dacefloor",
-              EventTicket("Standard", 0.0, 500),
-              "jg@joytigoel.com",
-              mutableSetOf("2989jdgj23", "32923jkbd23"),
-              mutableSetOf("20982jwdwk", "j1ou1e]d8223"),
-              EventCategory.MUSIC,
-              "89379"),
-          Event(
-              "NYE2026",
-              "User2", // todo
-              LocalDateTime.now(),
-              LocalDateTime.MAX,
-              Location(83.49, 56.992, "161 makepeace avenue, n666es"),
-              "Forget and Enjoy",
-              EventTicket("regular", 0.0, 10000),
-              "valerian@joytigoel.com",
-              mutableSetOf("298jhk", "jwj8223"),
-              mutableSetOf("20982jhk", "j1ou1e8223"),
-              EventCategory.SPORTS,
-              "89298"),
-          Event(
-              "NYE2027",
-              "User3", // todo
-              LocalDateTime.now(),
-              LocalDateTime.MIN,
-              Location(83.39, 66.992, "161 makepeace avenue, n666es"),
-              "Join the Community",
-              EventTicket("regular", 0.0, 10000),
-              "valerian@joytigoel.com",
-              mutableSetOf("298jhk", "jwj8223"),
-              mutableSetOf("20982e2hk", "j1ou223e8223"),
-              EventCategory.COMMUNITY,
-              "89298"))
-  return mockEvents
-}
 
 @Composable
 fun ViewToggleFab(modifier: Modifier = Modifier, onClick: () -> Unit, iconVector: ImageVector) {

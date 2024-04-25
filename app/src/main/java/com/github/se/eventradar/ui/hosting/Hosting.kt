@@ -17,6 +17,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -25,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -33,19 +36,26 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.eventradar.R
+import com.github.se.eventradar.model.EventsOverviewViewModel
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.*
+import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.getTopLevelDestination
+import com.github.se.eventradar.util.toast
 
 @Composable
 fun HostingScreen(navigationActions: NavigationActions) {
-  val mockEvents = getMockEvents()
+  val viewModel: EventsOverviewViewModel = viewModel()
+  val uiState by viewModel.uiState.collectAsState()
+  LaunchedEffect(key1 = uiState.eventList) { viewModel.getEvents() }
   var viewMapOrListIndex by remember { mutableIntStateOf(0) }
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("hostingScreen")) {
-    val (logo, title, divider, eventList, bottomNav, buttons) = createRefs()
+    val (logo, title, divider, eventList, eventMap, bottomNav, buttons) = createRefs()
     Logo(
         modifier =
             Modifier.fillMaxWidth()
@@ -68,16 +78,24 @@ fun HostingScreen(navigationActions: NavigationActions) {
         modifier = Modifier.constrainAs(divider, { top.linkTo(title.bottom, margin = 10.dp) }))
     if (viewMapOrListIndex == 0) {
       EventList(
-          mockEvents,
+          uiState.eventList
+              .filteredEvent, // Functionality not yet added to filter event based on user hosting
           Modifier.fillMaxWidth().constrainAs(eventList) {
             top.linkTo(divider.bottom, margin = 8.dp)
             start.linkTo(parent.start)
             end.linkTo(parent.end)
           })
     } else {
-      // To Do (Map View)
+      EventMap(
+          uiState.eventList.filteredEvent,
+          navigationActions,
+          Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
+            top.linkTo(divider.bottom, margin = 8.dp)
+            start.linkTo(parent.start)
+            end.linkTo(parent.end)
+          })
     }
-
+    val context = LocalContext.current
     Row(
         modifier =
             Modifier.constrainAs(ref = buttons) {
@@ -89,7 +107,9 @@ fun HostingScreen(navigationActions: NavigationActions) {
                 .padding(16.dp),
         horizontalArrangement = Arrangement.Absolute.Left,
         verticalAlignment = Alignment.CenterVertically) {
-          CreateEventFab(onClick = { /*TODO*/}, modifier = Modifier.testTag("createEventFab"))
+          CreateEventFab(
+              onClick = { context.toast("Create Event still needs to be implemented") },
+              modifier = Modifier.testTag("createEventFab"))
           Spacer(modifier = Modifier.width(16.dp))
           var viewToggleIcon =
               if (viewMapOrListIndex == 0) Icons.Default.Place else Icons.AutoMirrored.Filled.List
@@ -104,9 +124,9 @@ fun HostingScreen(navigationActions: NavigationActions) {
               iconVector = viewToggleIcon)
         }
     BottomNavigationMenu(
-        onTabSelected = { tab -> navigationActions.navigateTo(tab) },
+        onTabSelected = navigationActions::navigateTo,
         tabList = TOP_LEVEL_DESTINATIONS,
-        selectedItem = getTopLevelDestination(R.string.hosting), // Don't hardcode
+        selectedItem = getTopLevelDestination(Route.MY_HOSTING),
         modifier =
             Modifier.testTag("bottomNavMenu").constrainAs(bottomNav) {
               bottom.linkTo(parent.bottom)
@@ -119,7 +139,7 @@ fun HostingScreen(navigationActions: NavigationActions) {
 @Composable
 fun Title(modifier: Modifier) {
   Text(
-      text = LocalContext.current.getString(R.string.hosted_events_title),
+      text = stringResource(R.string.hosted_events_title),
       modifier = modifier,
       style =
           TextStyle(
@@ -138,7 +158,7 @@ fun CreateEventFab(onClick: () -> Unit, modifier: Modifier = Modifier) {
   ExtendedFloatingActionButton(
       text = {
         Text(
-            text = LocalContext.current.getString(R.string.create_event_button),
+            text = stringResource(R.string.create_event_button),
             style =
                 TextStyle(
                     fontSize = 16.sp,
