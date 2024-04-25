@@ -21,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -39,6 +40,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.EventsOverviewViewModel
+import com.github.se.eventradar.model.event.HostedEventViewModel
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.*
 import com.github.se.eventradar.ui.map.EventMap
@@ -50,12 +52,11 @@ import com.github.se.eventradar.util.toast
 
 @Composable
 fun HostingScreen(
-    viewModel: EventsOverviewViewModel = viewModel(),
+    viewModel: HostedEventViewModel = viewModel(),
     navigationActions: NavigationActions
 ) {
   val uiState by viewModel.uiState.collectAsState()
   LaunchedEffect(key1 = uiState.eventList) { viewModel.getEvents() }
-  var viewMapOrListIndex by remember { mutableIntStateOf(0) }
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("hostingScreen")) {
     val (logo, title, divider, eventList, eventMap, bottomNav, buttons) = createRefs()
     Logo(
@@ -78,10 +79,9 @@ fun HostingScreen(
                     }))
     HorizontalDivider(
         modifier = Modifier.constrainAs(divider, { top.linkTo(title.bottom, margin = 10.dp) }))
-    if (viewMapOrListIndex == 0) {
+    if (uiState.viewList == true) {
       EventList(
-          uiState.eventList
-              .filteredEvent, // Functionality not yet added to filter event based on user hosting
+          uiState.eventList.allEvents,
           Modifier.fillMaxWidth().constrainAs(eventList) {
             top.linkTo(divider.bottom, margin = 8.dp)
             start.linkTo(parent.start)
@@ -89,7 +89,7 @@ fun HostingScreen(
           })
     } else {
       EventMap(
-          uiState.eventList.filteredEvent,
+          uiState.eventList.allEvents,
           navigationActions,
           Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
             top.linkTo(divider.bottom, margin = 8.dp)
@@ -113,15 +113,12 @@ fun HostingScreen(
               onClick = { context.toast("Create Event still needs to be implemented") },
               modifier = Modifier.testTag("createEventFab"))
           Spacer(modifier = Modifier.width(16.dp))
-          var viewToggleIcon =
-              if (viewMapOrListIndex == 0) Icons.Default.Place else Icons.AutoMirrored.Filled.List
+        var viewToggleIcon by remember { mutableStateOf(if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List) }
           ViewToggleFab(
               modifier = Modifier.testTag("viewToggleFab"),
               onClick = {
-                viewMapOrListIndex = if (viewMapOrListIndex == 0) 1 else 0
-                viewToggleIcon =
-                    if (viewMapOrListIndex == 0) Icons.Default.Place
-                    else Icons.AutoMirrored.Filled.List
+                uiState.viewList = !uiState.viewList
+                viewToggleIcon = if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List
               },
               iconVector = viewToggleIcon)
         }
