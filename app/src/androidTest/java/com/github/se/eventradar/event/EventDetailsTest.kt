@@ -6,6 +6,7 @@ import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.model.event.EventTicket
+import com.github.se.eventradar.model.event.EventUiState
 import com.github.se.eventradar.screens.EventDetailsScreen
 import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.navigation.NavigationActions
@@ -39,7 +40,7 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
 
   private val sampleEventStates =
       MutableStateFlow(
-        EventDetailsViewModel.EventUiState(
+        EventUiState(
           eventName = "Debugging",
           eventPhoto = "path",
           start = LocalDateTime.MIN,
