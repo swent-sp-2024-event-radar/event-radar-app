@@ -3,21 +3,21 @@ package com.github.se.eventradar.model.message
 import java.time.LocalDateTime
 
 data class Message(
-  val sender: String,
-  val content: String,
-  val dateTimeSent: LocalDateTime,
-  val isRead: Boolean,
-  val id: String,
+    val sender: String,
+    val content: String,
+    var dateTimeSent: LocalDateTime,
+    var isRead: Boolean,
+    val id: String,
 ) {
   constructor(
-    map: Map<String, Any>,
-    id: String = "",
+      map: Map<String, Any>,
+      id: String = "",
   ) : this(
-    sender = map["sender"] as String,
-    content = map["content"] as String,
-    dateTimeSent = map["date_time_sent"] as LocalDateTime,
-    isRead = map["message_read"] as Boolean,
-    id = id,
+      sender = map["sender"] as String,
+      content = map["content"] as String,
+      dateTimeSent = map["date_time_sent"] as LocalDateTime,
+      isRead = map["message_read"] as Boolean,
+      id = id,
   )
 
   fun toMap(): HashMap<String, Any> {

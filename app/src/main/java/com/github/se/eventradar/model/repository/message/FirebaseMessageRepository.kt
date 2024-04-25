@@ -8,8 +8,8 @@ import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.tasks.await
 import java.time.LocalDateTime
+import kotlinx.coroutines.tasks.await
 
 class FirebaseMessageRepository : IMessageRepository {
   private val db: FirebaseFirestore = Firebase.firestore
@@ -30,13 +30,13 @@ class FirebaseMessageRepository : IMessageRepository {
             .limit(1)
             .get()
             .await()
-    
+
     return try {
       val result = resultDocument.documents[0]
       val messageHistory = MessageHistory(result.data!!, result.id)
       Resource.Success(messageHistory)
     } catch (e: Exception) {
-      Resource.Failure(e)
+      createNewMessageHistory(user1, user2)
     }
   }
 
@@ -45,35 +45,43 @@ class FirebaseMessageRepository : IMessageRepository {
       messageHistory: MessageHistory
   ): Resource<Unit> {
     return try {
-      val newMessage = messageRef.document(messageHistory.id).collection("messages").add(message.toMap()).await()
+      val newMessage =
+          messageRef.document(messageHistory.id).collection("messages").add(message.toMap()).await()
       messageRef.document(messageHistory.id).update("latest_message_id", newMessage.id).await()
       Resource.Success(Unit)
     } catch (e: Exception) {
       Resource.Failure(e)
     }
   }
-  
+
   override suspend fun updateMessageToReadState(
-    message: Message,
-    messageHistory: MessageHistory
+      message: Message,
+      messageHistory: MessageHistory
   ): Resource<Unit> {
     return try {
-      messageRef.document(messageHistory.id).collection("messages").document(message.id).update(
-        mapOf("message_read" to message.isRead, "date_time_read" to LocalDateTime.now()) // TODO: parse as String
-      ).await()
+      messageRef
+          .document(messageHistory.id)
+          .collection("messages")
+          .document(message.id)
+          .update(mapOf("message_read" to message.isRead, "date_time_read" to LocalDateTime.now()))
+          .await()
       Resource.Success(Unit)
     } catch (e: Exception) {
       Resource.Failure(e)
     }
   }
-  
-  override suspend fun createNewMessageHistory(user1: String, user2: String): Resource<MessageHistory> {
-    val messageHistory = MessageHistory(
-        fromUser = user1,
-        toUser = user2,
-        latestMessageId = "",
-        messages = emptyList()
-    )
+
+  override suspend fun createNewMessageHistory(
+      user1: String,
+      user2: String
+  ): Resource<MessageHistory> {
+    val messageHistory =
+        MessageHistory(
+            fromUser = user1,
+            toUser = user2,
+            latestMessageId = "",
+            messages = mutableListOf(),
+        )
     return try {
       messageRef.add(messageHistory.toMap()).await()
       Resource.Success(messageHistory)

@@ -1,21 +1,21 @@
 package com.github.se.eventradar.model.message
 
 data class MessageHistory(
-  val fromUser: String,
-  val toUser: String,
-  val latestMessageId: String,
-  val messages: List<Message>,
-  val id: String = "",
+    val fromUser: String,
+    val toUser: String,
+    var latestMessageId: String,
+    val messages: MutableList<Message>,
+    val id: String = "",
 ) {
   constructor(
-    map: Map<String, Any>,
-    id: String,
+      map: Map<String, Any>,
+      id: String,
   ) : this(
-    fromUser = map["from_user"] as String,
-    toUser = map["to_user"] as String,
-    latestMessageId = map["latest_message_id"] as String,
-    messages = getMapOfMessages(map["messages"]).map { Message(it) },
-    id = id,
+      fromUser = map["from_user"] as String,
+      toUser = map["to_user"] as String,
+      latestMessageId = map["latest_message_id"] as String,
+      messages = getMapOfMessages(map["messages"]).map { Message(it) }.toMutableList(),
+      id = id,
   )
 
   fun toMap(): HashMap<String, Any> {
@@ -30,7 +30,7 @@ data class MessageHistory(
 
 private fun getMapOfMessages(map: Any?): List<Map<String, Any>> {
   return when (map) {
-    is List<*> -> map.filterIsInstance<Map<String, Any>>().toList()
+    is List<*> -> map.filterIsInstance<Map<String, Any>>().toMutableList()
     else -> emptyList()
   }
 }
