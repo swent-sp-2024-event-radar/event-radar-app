@@ -11,7 +11,8 @@ import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.common.HybridBinarizer
 import java.nio.ByteBuffer
 
-class QrCodeScan(private val onQrCodeScanned: (String) -> Unit) : ImageAnalysis.Analyzer {
+class QrCodeScanConstraints(private val onQrCodeScanned: (String) -> Unit) :
+    ImageAnalysis.Analyzer {
 
   // list of supported Image Formats
   private val supportedImageFormats =

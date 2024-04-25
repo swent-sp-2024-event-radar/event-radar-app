@@ -24,8 +24,8 @@ fun NavGraph(navController: NavHostController) {
 
     // TODO replace the Toast message with the corresponding screen function of the route
     composable(Route.SCANNER) {
-      qrCodeScannerUi(onQrCodeScanned = { context.toast(it) }).QrCodeScreen(NavigationActions(
-        rememberNavController()))
+      qrCodeScannerUi(onQrCodeScanned = { context.toast(it) })
+          .QrCodeScreen(NavigationActions(rememberNavController()))
     }
     composable(Route.MESSAGE) {
       HomeScreen(navigationActions = navActions)
