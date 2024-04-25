@@ -42,12 +42,12 @@ class NavigationActions(val navController: NavController) {
   }
 }
 
-fun getTopLevelDestination(targetTextId: Int): TopLevelDestination {
-  val foundDestination = TOP_LEVEL_DESTINATIONS.find { it.textId == targetTextId }
+fun getTopLevelDestination(targetRoute: String): TopLevelDestination {
+  val foundDestination = TOP_LEVEL_DESTINATIONS.find { it.route == targetRoute }
   if (foundDestination != null) {
     return foundDestination
   } else {
-    Log.d("Null Error", "Top level destination does not exist for R String Id: $targetTextId")
+    Log.d("Null Error", "Top level destination does not exist for R String Id: $targetRoute")
     return TOP_LEVEL_DESTINATIONS[2]
   }
 }
