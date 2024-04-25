@@ -35,8 +35,8 @@ class MockMessageRepositoryUnitTest {
 
     messageHistory = messageHistory as Resource.Success
 
-    assert(messageHistory.data.fromUser == "1")
-    assert(messageHistory.data.toUser == "2")
+    assert(messageHistory.data.user1 == "1")
+    assert(messageHistory.data.user2 == "2")
   }
 
   @Test
@@ -106,8 +106,8 @@ class MockMessageRepositoryUnitTest {
 
     messageHistory = messageHistory as Resource.Success
 
-    assert(messageHistory.data.fromUser == "1")
-    assert(messageHistory.data.toUser == "3")
+    assert(messageHistory.data.user1 == "1")
+    assert(messageHistory.data.user2 == "3")
   }
 
   @Test

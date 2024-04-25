@@ -3,7 +3,6 @@ package com.github.se.eventradar.model.repository.message
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.message.Message
 import com.github.se.eventradar.model.message.MessageHistory
-import java.time.LocalDateTime
 
 class MockMessageRepository : IMessageRepository {
   private val mockMessageHistory = mutableListOf<MessageHistory>()
@@ -12,8 +11,7 @@ class MockMessageRepository : IMessageRepository {
   override suspend fun getMessages(user1: String, user2: String): Resource<MessageHistory> {
     val messageHistory =
         mockMessageHistory.find {
-          (it.fromUser == user1 && it.toUser == user2) ||
-              (it.fromUser == user2 && it.toUser == user1)
+          (it.user1 == user1 && it.user2 == user2) || (it.user1 == user2 && it.user2 == user1)
         }
 
     return if (messageHistory != null) {
@@ -46,10 +44,7 @@ class MockMessageRepository : IMessageRepository {
             .find { it.id == messageHistory.id }
             ?.messages
             ?.find { it.id == message.id }
-            ?.let {
-              it.isRead = true
-              it.dateTimeSent = LocalDateTime.parse("2021-01-01T00:00:00")
-            }
+            ?.let { it.isRead = true }
 
     return if (updateMessage != null) {
       Resource.Success(Unit)
@@ -66,8 +61,8 @@ class MockMessageRepository : IMessageRepository {
   ): Resource<MessageHistory> {
     val messageHistory =
         MessageHistory(
-            fromUser = user1,
-            toUser = user2,
+            user1 = user1,
+            user2 = user2,
             latestMessageId = "",
             messages = mutableListOf(),
             id = "${ticker++}")

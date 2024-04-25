@@ -1,8 +1,8 @@
 package com.github.se.eventradar.model.message
 
 data class MessageHistory(
-    val fromUser: String,
-    val toUser: String,
+    val user1: String,
+    val user2: String,
     var latestMessageId: String,
     val messages: MutableList<Message>,
     val id: String = "",
@@ -11,8 +11,8 @@ data class MessageHistory(
       map: Map<String, Any>,
       id: String,
   ) : this(
-      fromUser = map["from_user"] as String,
-      toUser = map["to_user"] as String,
+      user1 = map["from_user"] as String,
+      user2 = map["to_user"] as String,
       latestMessageId = map["latest_message_id"] as String,
       messages = getMapOfMessages(map["messages"]).map { Message(it) }.toMutableList(),
       id = id,
@@ -20,8 +20,8 @@ data class MessageHistory(
 
   fun toMap(): HashMap<String, Any> {
     val map = HashMap<String, Any>()
-    map["from_user"] = fromUser
-    map["to_user"] = toUser
+    map["from_user"] = user1
+    map["to_user"] = user2
     map["latest_message_id"] = latestMessageId
     map["messages"] = messages.map { it.toMap() }
     return map
