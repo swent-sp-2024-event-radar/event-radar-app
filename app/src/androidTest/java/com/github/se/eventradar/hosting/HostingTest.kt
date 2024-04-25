@@ -9,6 +9,8 @@ import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.event.EventTicket
+import com.github.se.eventradar.model.event.HostedEventViewModel
+import com.github.se.eventradar.model.event.HostedEventsUiState
 import com.github.se.eventradar.screens.HostingScreen
 import com.github.se.eventradar.ui.hosting.HostingScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
@@ -35,11 +37,11 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
   // Relaxed mocks methods have a default implementation returning values
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
-  @RelaxedMockK lateinit var mockEventsOverviewViewModel: EventsOverviewViewModel
+  @RelaxedMockK lateinit var mockHostedEventViewModel: HostedEventViewModel
 
   private val sampleEventList =
       MutableStateFlow(
-          EventsOverviewUiState(
+          HostedEventsUiState(
               eventList =
                   EventList(
                       List(20) {
@@ -56,14 +58,15 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
                             attendeeList = setOf("Test Attendee"),
                             category = EventCategory.COMMUNITY,
                             fireBaseID = "$it")
-                      })))
+                      }))
+      )
 
   @Before
   fun testSetup() {
-    every { mockEventsOverviewViewModel.getEvents() } returns Unit
-    every { mockEventsOverviewViewModel.uiState } returns sampleEventList
+    every { mockHostedEventViewModel.getEvents() } returns Unit
+    every { mockHostedEventViewModel.uiState } returns sampleEventList
     composeTestRule.setContent {
-      HostingScreen(viewModel = mockEventsOverviewViewModel, navigationActions = mockNavActions)
+      HostingScreen(viewModel = mockHostedEventViewModel, navigationActions = mockNavActions)
     }
   }
 
