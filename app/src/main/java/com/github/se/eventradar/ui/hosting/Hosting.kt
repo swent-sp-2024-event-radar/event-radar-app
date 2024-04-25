@@ -49,8 +49,10 @@ import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 import com.github.se.eventradar.util.toast
 
 @Composable
-fun HostingScreen(navigationActions: NavigationActions) {
-  val viewModel: EventsOverviewViewModel = viewModel()
+fun HostingScreen(
+    viewModel: EventsOverviewViewModel = viewModel(),
+    navigationActions: NavigationActions
+) {
   val uiState by viewModel.uiState.collectAsState()
   LaunchedEffect(key1 = uiState.eventList) { viewModel.getEvents() }
   var viewMapOrListIndex by remember { mutableIntStateOf(0) }

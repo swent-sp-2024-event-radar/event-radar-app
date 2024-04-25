@@ -62,7 +62,9 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
   fun testSetup() {
     every { mockEventsOverviewViewModel.getEvents() } returns Unit
     every { mockEventsOverviewViewModel.uiState } returns sampleEventList
-    composeTestRule.setContent { HostingScreen(navigationActions = mockNavActions) }
+    composeTestRule.setContent {
+      HostingScreen(viewModel = mockEventsOverviewViewModel, navigationActions = mockNavActions)
+    }
   }
 
   @Test
