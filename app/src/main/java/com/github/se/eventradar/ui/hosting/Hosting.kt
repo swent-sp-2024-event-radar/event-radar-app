@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.eventradar.R
+import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.*
 import com.github.se.eventradar.ui.home.EventList
@@ -83,7 +84,7 @@ fun HostingScreen(
     if (uiState.viewList == true) {
       EventList(
           uiState.eventList.allEvents,
-          Modifier.fillMaxWidth().constrainAs(eventList) {
+         Modifier.fillMaxWidth().constrainAs(eventList) {
             top.linkTo(divider.bottom, margin = 8.dp)
             start.linkTo(parent.start)
             end.linkTo(parent.end)
@@ -91,7 +92,7 @@ fun HostingScreen(
     } else {
       EventMap(
           uiState.eventList.allEvents,
-          navigationActions,
+         navigationActions,
           Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
             top.linkTo(divider.bottom, margin = 8.dp)
             start.linkTo(parent.start)
