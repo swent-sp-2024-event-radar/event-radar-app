@@ -8,6 +8,8 @@ plugins {
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("jacoco")
     id("org.sonarqube") version "4.4.1.3373"
+    id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -114,8 +116,14 @@ dependencies {
     // Coil
     implementation("io.coil-kt:coil-compose:1.4.0")
     
-    // Coil
-    implementation("io.coil-kt:coil-compose:1.4.0")
+    // Dagger Hilt
+    implementation("com.google.dagger:hilt-android:${rootProject.extra.get("hiltVersion")}")
+    kapt("com.google.dagger:hilt-android-compiler:${rootProject.extra.get("hiltVersion")}")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1-Beta")
+    kaptTest("com.google.dagger:hilt-android-compiler:2.44")
+    testImplementation("com.google.dagger:hilt-android-testing:2.44")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
     
     // JUnit
     testImplementation("junit:junit:4.13.2")
@@ -178,6 +186,7 @@ tasks.register("jacocoTestReport", JacocoReport::class) {
         "**/*Test*.*",
         "android/**/*.*",
         "**/SignatureChecks.*",
+        "**/*Preview*.*",
     )
     val debugTree = fileTree("${project.buildDir}/tmp/kotlin-classes/debug") {
         exclude(fileFilter)
@@ -206,4 +215,8 @@ sonar {
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
     }
+}
+
+kapt {
+    correctErrorTypes = true
 }

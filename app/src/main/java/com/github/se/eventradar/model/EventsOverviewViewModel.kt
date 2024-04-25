@@ -2,99 +2,73 @@ package com.github.se.eventradar.model
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
+import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.event.EventList
-import com.github.se.eventradar.model.event.getEventCategory
-import com.github.se.eventradar.model.event.getEventTicket
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import com.github.se.eventradar.model.repository.event.IEventRepository
+import com.github.se.eventradar.model.repository.user.IUserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
-class EventsOverviewViewModel(db: FirebaseFirestore = Firebase.firestore) : ViewModel() {
+@HiltViewModel
+class EventsOverviewViewModel
+@Inject
+constructor(
+    private val eventRepository: IEventRepository,
+    private val userRepository: IUserRepository
+) : ViewModel() {
   private val _uiState = MutableStateFlow(EventsOverviewUiState())
-
   val uiState: StateFlow<EventsOverviewUiState> = _uiState
 
-  private val eventRef = db.collection("events")
-
   fun getEvents() {
-    eventRef
-        .get()
-        .addOnSuccessListener { result ->
-          val events =
-              result.documents.map { document ->
-                Event(
-                    eventName = document.data?.get("name") as String,
-                    eventPhoto = document.data?.get("photo_url") as String,
-                    start = getLocalDateTime(document.data?.get("start") as String),
-                    end = getLocalDateTime(document.data?.get("end") as String),
-                    location =
-                        getLocation(
-                            document.data?.get("location_name") as String,
-                            document.data?.get("location_lat") as Double,
-                            document.data?.get("location_lng") as Double,
-                        ),
-                    description = document.data?.get("description") as String,
-                    ticket =
-                        getEventTicket(
-                            document.data?.get("ticket_name") as String,
-                            document.data?.get("ticket_price") as Double,
-                            document.data?.get("ticket_quantity") as Int,
-                        ),
-                    contact = getEventContact(document.data?.get("main_organiser") as String),
-                    organiserList = getSetOfStrings(document.data?.get("organisers_list")),
-                    attendeeList = getSetOfStrings(document.data?.get("attendees_list")),
-                    category = getEventCategory(document.data?.get("category") as String),
-                    fireBaseID = document.id)
-              }
+    viewModelScope.launch {
+      when (val response = eventRepository.getEvents()) {
+        is Resource.Success -> {
           _uiState.value =
               _uiState.value.copy(
-                  eventList = EventList(events, events, _uiState.value.eventList.selectedEvent))
+                  eventList =
+                      EventList(
+                          response.data, response.data, _uiState.value.eventList.selectedEvent))
         }
-        .addOnFailureListener { exception ->
-          Log.d("EventsOverviewViewModel", "Error getting documents: ", exception)
-        }
+        is Resource.Failure -> Log.d("EventsOverviewViewModel", "Error getting events")
+      }
+    }
   }
 
-  private val userRef = db.collection("users")
-
-  private fun getEventContact(contactId: String): String {
-    var contactEmail = ""
-
-    userRef
-        .document(contactId)
-        .collection("private")
-        .limit(1) // Limit the query to retrieve only one document
-        .get()
-        .addOnSuccessListener { querySnapshot ->
-          for (documentSnapshot in querySnapshot.documents) {
-            contactEmail = documentSnapshot.data?.get("email") as String
-            break
+  fun getUpcomingEvents(uid: String) {
+    viewModelScope.launch {
+      when (val userResponse = userRepository.getUser(uid)) {
+        is Resource.Success -> {
+          val user = userResponse.data!!
+          val attendeeList = user.eventsAttendeeList
+          if (attendeeList.isNotEmpty()) {
+            when (val events = eventRepository.getEventsByIds(attendeeList)) {
+              is Resource.Success -> {
+                _uiState.value =
+                    _uiState.value.copy(
+                        eventList =
+                            EventList(
+                                events.data, events.data, _uiState.value.eventList.selectedEvent))
+              }
+              is Resource.Failure -> {
+                Log.d("EventsOverviewViewModel", "Error getting events for $uid")
+                _uiState.value =
+                    _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+              }
+            }
+          } else {
+            _uiState.value =
+                _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
           }
         }
-        .addOnFailureListener { exception ->
-          Log.d("EventsOverviewViewModel", "Error getting event contact: ", exception)
+        is Resource.Failure -> {
+          Log.d("EventsOverviewViewModel", "Error fetching user document")
+          _uiState.value =
+              _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
         }
-
-    return contactEmail
-  }
-
-  companion object {
-    fun getLocalDateTime(dateTime: String): LocalDateTime {
-      val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
-      return LocalDateTime.parse(dateTime, formatter)
-    }
-
-    fun getSetOfStrings(data: Any?): Set<String> {
-      return when (data) {
-        is List<*> -> data.filterIsInstance<String>().toSet()
-        is String -> setOf(data)
-        else -> emptySet()
       }
     }
   }
