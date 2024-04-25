@@ -10,32 +10,32 @@ import kotlinx.coroutines.flow.StateFlow
 
 class EventDetailsViewModel(val eventId: String? = null) : ViewModel() {
 
-  private val _uiState = MutableStateFlow(EventUiState())
-  val uiState: StateFlow<EventUiState> = _uiState
+    private val _uiState = MutableStateFlow(EventUiState())
+    val uiState: StateFlow<EventUiState> = _uiState
 
-  suspend fun getEventData() {
-    if (eventId != null) {
-      when (val event = FirebaseEventRepository().getEvent(eventId)) {
-        is Resource.Success -> {
-          _uiState.value =
-              _uiState.value.copy(
-                  eventName = event.data!!.eventName,
-                  eventPhoto = event.data.eventPhoto,
-                  start = event.data.start,
-                  end = event.data.end,
-                  location = event.data.location,
-                  description = event.data.description,
-                  ticket = event.data.ticket,
-                  contact = event.data.contact,
-                  category = event.data.category,
-              )
+    suspend fun getEventData() {
+        if (eventId != null) {
+            when (val event = FirebaseEventRepository().getEvent(eventId)) {
+                is Resource.Success -> {
+                    _uiState.value =
+                        _uiState.value.copy(
+                            eventName = event.data!!.eventName,
+                            eventPhoto = event.data.eventPhoto,
+                            start = event.data.start,
+                            end = event.data.end,
+                            location = event.data.location,
+                            description = event.data.description,
+                            ticket = event.data.ticket,
+                            contact = event.data.contact,
+                            category = event.data.category,
+                        )
+                }
+                is Resource.Failure -> {
+                    println("Failed to Fetch from Database")
+                }
+            }
         }
-        is Resource.Failure -> {
-          println("Failed to Fetch from Database")
-        }
-      }
     }
-  }
 }
 data class EventUiState(
     val eventName: String = "",
