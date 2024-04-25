@@ -27,10 +27,21 @@ class EventsOverviewViewModel(db: FirebaseFirestore = Firebase.firestore) : View
         filterEvents()
     }
 
+    fun onFilterApplyClicked(applyFilter: Boolean) {
+        _uiState.value = _uiState.value.copy(applyFilter = applyFilter)
+        filterEvents()
+    }
+
     private fun filterEvents() {
         val query = _uiState.value.searchQuery
         val filteredEvents =
             _uiState.value.eventList.allEvents.filter { it.eventName.contains(query, ignoreCase = true) }
+
+        if (_uiState.value.applyFilter) {
+            filteredEvents.filter { it.category == _uiState.value.eventList.selectedEvent?.category }
+        } else {
+            filteredEvents
+        }
 
         _uiState.value = _uiState.value.copy(
             eventList = _uiState.value.eventList.copy(filteredEvent = filteredEvents)
@@ -118,7 +129,5 @@ class EventsOverviewViewModel(db: FirebaseFirestore = Firebase.firestore) : View
 data class EventsOverviewUiState(
     val eventList: EventList = EventList(emptyList(), emptyList(), null),
     val searchQuery: String = "",
-    val radiusQuery: Int = -1, // -1 means no radius query
-    val isFreeQuery: Boolean = false,
-    val categoryQuery: Set<EventCategory> = emptySet()
+    val applyFilter: Boolean = false,
 )

@@ -69,6 +69,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
+import com.github.se.eventradar.model.EventsOverviewUiState
 import com.github.se.eventradar.model.EventsOverviewViewModel
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.eventCategoryToList
@@ -163,15 +164,11 @@ fun HomeScreen(
               }
         }
 
-      var searchQuery by remember { mutableStateOf("") }
       var showFilterPopUp by remember { mutableStateOf(false) }
 
       SearchBarAndFilter(
-          searchQuery = searchQuery,
-          onSearchQueryChange = { searchQuery = it },
-          onSearchButtonClick = {
-              // Handle search button click
-          },
+          onSearchQueryChange = { viewModel.onSearchQueryChanged(it) },
+          uiState = uiState,
           showFilterPopUp = showFilterPopUp,
           setShowFilterPopUp = { showFilterPopUp = it },
           modifier = Modifier
@@ -185,13 +182,23 @@ fun HomeScreen(
 
     if (selectedTabIndex == 0) {
       if (viewToggleBrowseIndex == 0) {
-        EventList(
-            uiState.eventList.allEvents,
-            Modifier.fillMaxWidth().constrainAs(eventList) {
-              top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-              start.linkTo(parent.start)
-              end.linkTo(parent.end)
-            })
+          if (uiState.searchQuery == "") {
+              EventList(
+                  uiState.eventList.allEvents,
+                  Modifier.fillMaxWidth().constrainAs(eventList) {
+                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                  })
+          } else {
+              EventList(
+                  uiState.eventList.filteredEvent,
+                  Modifier.fillMaxWidth().constrainAs(eventList) {
+                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                  })
+          }
       } else {
         EventMap(
             uiState.eventList.allEvents,
@@ -264,9 +271,8 @@ fun HomeScreen(
 
 @Composable
 fun SearchBarAndFilter(
-    searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
-    onSearchButtonClick: () -> Unit,
+    uiState: EventsOverviewUiState,
     showFilterPopUp: Boolean,
     setShowFilterPopUp: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -277,7 +283,7 @@ fun SearchBarAndFilter(
     ) {
         // Search bar
         TextField(
-            value = searchQuery,
+            value = uiState.searchQuery,
             onValueChange = { onSearchQueryChange(it) },
             modifier = Modifier.weight(1f),
             shape = RoundedCornerShape(32.dp),
@@ -288,13 +294,7 @@ fun SearchBarAndFilter(
             ),
             placeholder = { Text("Search event...") },
             trailingIcon = {
-                IconButton(
-                    onClick = onSearchButtonClick,
-                    modifier = Modifier
-                        .padding(horizontal = 4.dp)
-                ) {
-                    Icon(Icons.Default.Search, contentDescription = null)
-                }
+                Icon(Icons.Default.Search, contentDescription = null)
             }
         )
 
