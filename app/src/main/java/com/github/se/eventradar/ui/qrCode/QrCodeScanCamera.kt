@@ -1,4 +1,4 @@
-package com.github.se.eventradar.qrCode
+package com.github.se.eventradar.ui.qrCode
 
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.github.se.eventradar.qrCode.QrCodeScanConstraints
 
 class QrCodeScanCamera(private val onQrCodeScanned: (String) -> Unit) {
 
@@ -65,7 +66,8 @@ class QrCodeScanCamera(private val onQrCodeScanned: (String) -> Unit) {
                       .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                       .build()
               imageAnalysis.setAnalyzer(
-                  ContextCompat.getMainExecutor(context), QrCodeScanConstraints(onQrCodeScanned))
+                  ContextCompat.getMainExecutor(context), QrCodeScanConstraints(onQrCodeScanned)
+              )
               try {
                 cameraFutureProvider
                     .get()

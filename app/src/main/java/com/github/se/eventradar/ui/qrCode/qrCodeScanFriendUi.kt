@@ -35,9 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.github.se.eventradar.R
-import com.github.se.eventradar.qrCode.QrCodeScanCamera
 
-  @Composable
+@Composable
   fun QrCodeScreen(navigationActions: NavigationActions) {
       var selectedTabIndex by remember { mutableIntStateOf(0) }
       val context = LocalContext.current
@@ -50,6 +49,7 @@ import com.github.se.eventradar.qrCode.QrCodeScanCamera
           Row(
               modifier =
               Modifier
+                  .fillMaxWidth()
                   .fillMaxWidth()
                   .constrainAs(logo) {
                       top.linkTo(parent.top, margin = 32.dp)
