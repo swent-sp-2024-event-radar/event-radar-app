@@ -124,7 +124,7 @@ import com.github.se.eventradar.qrCode.QrCodeScanCamera
           BottomNavigationMenu(
               onTabSelected = { tab -> navigationActions.navigateTo(tab) },
               tabList = TOP_LEVEL_DESTINATIONS,
-              selectedItem = TOP_LEVEL_DESTINATIONS[2],
+              selectedItem = TOP_LEVEL_DESTINATIONS[0],
               modifier =
               Modifier
                   .testTag("bottomNavMenu")
