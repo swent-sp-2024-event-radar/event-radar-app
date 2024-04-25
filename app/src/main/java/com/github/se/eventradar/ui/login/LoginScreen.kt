@@ -44,6 +44,7 @@ import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun ErrorDialogBox(openErrorDialog: MutableState<Boolean>) {
@@ -77,9 +78,9 @@ fun LoginScreen(navigationActions: NavigationActions) {
       rememberLauncherForActivityResult(
           contract = FirebaseAuthUIActivityResultContract(),
           onResult = { result ->
-            if (result.resultCode == Activity.RESULT_OK)
-                navigationActions.navController.navigate(Route.HOME)
-            else openErrorDialog.value = true
+            if (result.resultCode == Activity.RESULT_OK) {
+              navigationActions.navController.navigate(Route.HOME)
+            } else openErrorDialog.value = true
           })
 
   ErrorDialogBox(openErrorDialog = openErrorDialog)

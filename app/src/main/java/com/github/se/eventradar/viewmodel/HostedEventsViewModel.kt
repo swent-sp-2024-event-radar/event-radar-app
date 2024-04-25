@@ -20,44 +20,47 @@ constructor(
     private val eventRepository: IEventRepository,
     private val userRepository: IUserRepository
 ) : ViewModel() {
-  private val _uiState = MutableStateFlow(HostedEventsUiState())
-  val uiState: StateFlow<HostedEventsUiState> = _uiState
+    private val _uiState = MutableStateFlow(HostedEventsUiState())
+    val uiState: StateFlow<HostedEventsUiState> = _uiState
 
-  fun getHostedEvents(uid: String) {
-    viewModelScope.launch {
-      when (val userResponse = userRepository.getUser(uid)) {
-        is Resource.Success -> {
-          val user = userResponse.data!!
-          val eventsHostList = user.eventsHostList
-          if (eventsHostList.isNotEmpty()) {
-            when (val events = eventRepository.getEventsByIds(eventsHostList)) {
-              is Resource.Success -> {
-                _uiState.value =
-                    _uiState.value.copy(
-                        eventList =
-                            EventList(
-                                events.data, events.data, _uiState.value.eventList.selectedEvent))
-              }
-              is Resource.Failure -> {
-                Log.d("HostedEventsViewModel", "Error getting hosted events for $uid")
-                _uiState.value =
-                    _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
-              }
+    fun getHostedEvents(uid: String) {
+        viewModelScope.launch {
+            when (val userResponse = userRepository.getUser(uid)) {
+                is Resource.Success -> {
+                    val user = userResponse.data!!
+                    val eventsHostList = user.eventsHostList
+                    if (eventsHostList.isNotEmpty()) {
+                        when (val events = eventRepository.getEventsByIds(eventsHostList)) {
+                            is Resource.Success -> {
+                                _uiState.value =
+                                    _uiState.value.copy(
+                                        eventList =
+                                        EventList(
+                                            events.data, events.data, _uiState.value.eventList.selectedEvent)
+                                    )
+                            }
+                            is Resource.Failure -> {
+                                Log.d("HostedEventsViewMode", "Error getting hosted events for $uid")
+                                _uiState.value =
+                                    _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+                            }
+                        }
+                    } else {
+                        _uiState.value =
+                            _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+                    }
+                }
+                is Resource.Failure -> {
+                    Log.d("HostedEventsViewModel", "Error fetching user document")
+                    _uiState.value =
+                        _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+                }
             }
-          } else {
-            _uiState.value =
-                _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
-          }
         }
-        is Resource.Failure -> {
-          Log.d("HostedEventsViewModel", "Error fetching user document")
-          _uiState.value =
-              _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
-        }
-      }
     }
-  }
 }
+
+
 
 data class HostedEventsUiState(
     val eventList: EventList = EventList(emptyList(), emptyList(), null),
