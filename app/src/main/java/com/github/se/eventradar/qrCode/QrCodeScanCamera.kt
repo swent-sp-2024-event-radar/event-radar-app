@@ -9,7 +9,11 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -19,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 
@@ -45,6 +50,7 @@ class QrCodeScanCamera(private val onQrCodeScanned: (String) -> Unit) {
     LaunchedEffect(key1 = true) { launcher.launch(android.Manifest.permission.CAMERA) }
     Column(modifier = Modifier.fillMaxSize()) {
       if (hasCameraPermission) {
+          Spacer(modifier = Modifier.height(80.dp))
         AndroidView( // PreviewView !E for Composable hence need ot create AndroidView
             factory = { context ->
               val previewView = PreviewView(context)
@@ -73,10 +79,11 @@ class QrCodeScanCamera(private val onQrCodeScanned: (String) -> Unit) {
               }
               previewView
             },
-            modifier = Modifier.weight(1f))
-        //                Text(
-        //                    text = code, )
+            modifier = Modifier.weight(1.5f).aspectRatio(1f).padding(horizontal = 32.dp)
+          //                Text(
 
+        //                    text = code, )
+        )
       }
     }
   }

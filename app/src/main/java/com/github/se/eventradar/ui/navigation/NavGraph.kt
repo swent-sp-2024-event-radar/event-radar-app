@@ -9,7 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.ui.home.HomeScreen
 import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.login.SignUpScreen
-import com.github.se.eventradar.ui.qrCode.qrCodeScannerUi
+import com.github.se.eventradar.ui.qrCode.QrCodeScreen
 import com.github.se.eventradar.util.toast
 
 @Composable
@@ -24,8 +24,7 @@ fun NavGraph(navController: NavHostController) {
 
     // TODO replace the Toast message with the corresponding screen function of the route
     composable(Route.SCANNER) {
-      qrCodeScannerUi(onQrCodeScanned = { context.toast(it) })
-          .QrCodeScreen(NavigationActions(rememberNavController()))
+      QrCodeScreen(navigationActions = navActions)
     }
     composable(Route.MESSAGE) {
       HomeScreen(navigationActions = navActions)
