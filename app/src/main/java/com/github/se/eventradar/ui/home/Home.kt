@@ -69,9 +69,10 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
+import com.github.se.eventradar.model.EventsOverviewUiState
 import com.github.se.eventradar.model.EventsOverviewViewModel
 import com.github.se.eventradar.model.event.Event
-import com.github.se.eventradar.model.event.eventCategoryToList
+import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
@@ -163,17 +164,14 @@ fun HomeScreen(
               }
         }
 
-      var searchQuery by remember { mutableStateOf("") }
-      var showFilterPopUp by remember { mutableStateOf(false) }
-
       SearchBarAndFilter(
-          searchQuery = searchQuery,
-          onSearchQueryChange = { searchQuery = it },
+          searchQuery = uiState.searchQuery,
+          onSearchQueryChange = { uiState.searchQuery = it },
           onSearchButtonClick = {
               // Handle search button click
           },
-          showFilterPopUp = showFilterPopUp,
-          setShowFilterPopUp = { showFilterPopUp = it },
+          showFilterPopUp = uiState.isFilterDialogOpen,
+          setShowFilterPopUp = { uiState.isFilterDialogOpen = it },
           modifier = Modifier
               .padding(horizontal = 16.dp, vertical = 8.dp)
               .constrainAs(searchAndFilter) {
@@ -209,7 +207,7 @@ fun HomeScreen(
       selectedTabIndex = 0
     }
 
-      if(showFilterPopUp) {
+      if(uiState.isFilterDialogOpen) {
           FilterPopUp(
               onRadiusChange = { radius ->
                   // Handle radius change
@@ -280,6 +278,7 @@ fun SearchBarAndFilter(
             value = searchQuery,
             onValueChange = { onSearchQueryChange(it) },
             modifier = Modifier.weight(1f),
+            maxLines = 1,
             shape = RoundedCornerShape(32.dp),
             colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.Transparent,
@@ -310,15 +309,12 @@ fun SearchBarAndFilter(
 
 @Composable
 fun FilterPopUp(
-    onRadiusChange: (Int) -> Unit,
+    onRadiusChange: (Double) -> Unit,
     onFreeSelectionChange: (Boolean) -> Unit,
-    onCategorySelectionChange: (List<String>) -> Unit,
+    onCategorySelectionChange: (List<EventCategory>) -> Unit,
     modifier: Modifier = Modifier,
+    uiState: EventsOverviewUiState = EventsOverviewUiState()
     ) {
-    var radius by remember { mutableStateOf(0) }
-    var isFree by remember { mutableStateOf(false) }
-    var selectedCategories by remember { mutableStateOf(emptyList<String>()) }
-
     Box(
         modifier = modifier
     ) {
@@ -343,8 +339,10 @@ fun FilterPopUp(
                         )
                     )
                     TextField(
-                        value = radius.toString(),
-                        onValueChange = { radius = it.toIntOrNull() ?: 0 },
+                        value = uiState.radiusInputFilter.toString(),
+                        onValueChange = { input ->
+                            uiState.radiusInputFilter = input.toDoubleOrNull() ?: uiState.radiusInputFilter
+                        },
                         modifier = Modifier
                             .width(70.dp)
                             .height(10.dp),
@@ -372,8 +370,8 @@ fun FilterPopUp(
                         )
                     )
                     Switch(
-                        checked = isFree,
-                        onCheckedChange = { isFree = it },
+                        checked = uiState.freeEventsFilter,
+                        onCheckedChange = { uiState.freeEventsFilter = it },
                     )
                 }
 
@@ -392,7 +390,7 @@ fun FilterPopUp(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start
                 ) {
-                    CategorySelection(eventCategoryToList())
+                    CategorySelection()
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -405,9 +403,10 @@ fun FilterPopUp(
                     Button(
                         onClick = {
                             // Apply filter
-                            onRadiusChange(radius)
-                            onFreeSelectionChange(isFree)
-                            onCategorySelectionChange(selectedCategories)
+                            onRadiusChange(uiState.radiusInputFilter)
+                            onFreeSelectionChange(uiState.freeEventsFilter)
+                            onCategorySelectionChange(uiState.categorySelectionFilter)
+                            onCategorySelectionChange(uiState.categorySelectionFilter)
                         }
                     ) {
                         Text("Apply")
@@ -419,12 +418,10 @@ fun FilterPopUp(
 }
 
 @Composable
-fun CategorySelection(eventCategoryList: List<String>) {
+fun CategorySelection() {
     LazyColumn {
-        items(eventCategoryList.size) { index ->
+        items(EventCategory.entries) { category ->
             var isChecked by remember { mutableStateOf(false) }
-
-            val category = eventCategoryList[index]
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
@@ -439,7 +436,7 @@ fun CategorySelection(eventCategoryList: List<String>) {
                         .padding(start = 10.dp)
                 )
                 Text(
-                    text = category.lowercase().replaceFirstChar { it.uppercase() },
+                    text = category.displayName,
                     style = TextStyle(
                         fontSize = 16.sp,
                     ),

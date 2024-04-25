@@ -3,6 +3,7 @@ package com.github.se.eventradar.model
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.eventradar.model.event.Event
+import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.event.getEventCategory
 import com.github.se.eventradar.model.event.getEventTicket
@@ -101,5 +102,9 @@ class EventsOverviewViewModel(db: FirebaseFirestore = Firebase.firestore) : View
 
 data class EventsOverviewUiState(
     val eventList: EventList = EventList(emptyList(), emptyList(), null),
-    val searchQuery: String = "",
+    var searchQuery: String = "",
+    var isFilterDialogOpen: Boolean = false,
+    var radiusInputFilter: Double = -1.0,
+    var freeEventsFilter: Boolean = false,
+    var categorySelectionFilter: List<EventCategory> = emptyList(),
 )
