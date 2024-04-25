@@ -46,6 +46,7 @@ import com.github.se.eventradar.ui.component.EventList
 import com.github.se.eventradar.ui.component.ViewToggleFab
 import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 
@@ -159,7 +160,7 @@ fun HomeScreen(
     BottomNavigationMenu(
         onTabSelected = { tab -> navigationActions.navigateTo(tab) },
         tabList = TOP_LEVEL_DESTINATIONS,
-        selectedItem = getTopLevelDestination(R.string.homeScreen_events),
+        selectedItem = getTopLevelDestination(Route.HOME),
         modifier =
             Modifier.testTag("bottomNavMenu").constrainAs(bottomNav) {
               bottom.linkTo(parent.bottom)
