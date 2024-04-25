@@ -257,9 +257,9 @@ fun EventCard(event: Event) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun HomeScreenPreview() {
-    val mockEventRepo = MockEventRepository()
-    val mockUserRepo = MockUserRepository()
-    HomeScreen(
-        EventsOverviewViewModel(mockEventRepo, mockUserRepo),
-        NavigationActions(rememberNavController()))
+  val mockEventRepo = MockEventRepository()
+  val mockUserRepo = MockUserRepository()
+  HomeScreen(
+      EventsOverviewViewModel(mockEventRepo, mockUserRepo),
+      NavigationActions(rememberNavController()))
 }
