@@ -49,6 +49,13 @@ fun EventDetails(
         viewModel.getEventData(eventId)
     }
 
+<<<<<<< HEAD
+=======
+    LaunchedEffect(Unit) {  // Using `Unit` as a key to run only once
+        viewModel.getEventData()
+    }
+
+>>>>>>> copytemp
   val eventUiState = viewModel.uiState.collectAsState().value
 
   val componentStyle =

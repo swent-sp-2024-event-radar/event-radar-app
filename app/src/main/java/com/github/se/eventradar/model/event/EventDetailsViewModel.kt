@@ -8,12 +8,12 @@ import java.time.LocalDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class EventDetailsViewModel() : ViewModel() {
+class EventDetailsViewModel(val eventId: String? = null) : ViewModel() {
 
   private val _uiState = MutableStateFlow(EventUiState())
   val uiState: StateFlow<EventUiState> = _uiState
 
-  suspend fun getEventData(eventId: String? = null) {
+  suspend fun getEventData() {
     if (eventId != null) {
       when (val event = FirebaseEventRepository().getEvent(eventId)) {
         is Resource.Success -> {
@@ -48,3 +48,4 @@ data class EventUiState(
     val contact: String = "",
     val category: EventCategory = EventCategory.MUSIC,
 )
+
