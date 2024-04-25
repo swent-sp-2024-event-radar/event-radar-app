@@ -18,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -91,8 +90,6 @@ class EventsOverviewViewModelTest {
   fun testGetEventsEmpty() = runTest {
     viewModel.getEvents()
 
-    advanceUntilIdle()
-
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
     assertNull(viewModel.uiState.value.eventList.selectedEvent)
@@ -109,7 +106,7 @@ class EventsOverviewViewModelTest {
     events.forEach { event -> eventRepository.addEvent(event) }
 
     viewModel.getEvents()
-    advanceUntilIdle()
+
     assert(viewModel.uiState.value.eventList.allEvents.isNotEmpty())
     assert(viewModel.uiState.value.eventList.allEvents.size == 3)
     assert(viewModel.uiState.value.eventList.allEvents == events)
@@ -131,7 +128,7 @@ class EventsOverviewViewModelTest {
     userRepository.addUser(mockUser)
     // MockUser is on the attendeeList for events with id "1" and "2"
     viewModel.getUpcomingEvents("user1")
-    advanceUntilIdle()
+
     assert(viewModel.uiState.value.eventList.allEvents.size == 2)
     assert(viewModel.uiState.value.eventList.allEvents == listOf(event1, event2))
     assert(viewModel.uiState.value.eventList.filteredEvents.size == 2)
@@ -148,8 +145,6 @@ class EventsOverviewViewModelTest {
     // eventRepository
     viewModel.getUpcomingEvents("user2")
 
-    advanceUntilIdle()
-
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
     assertNull(viewModel.uiState.value.eventList.selectedEvent)
@@ -165,7 +160,6 @@ class EventsOverviewViewModelTest {
     val userId = "userNotFound"
 
     viewModel.getUpcomingEvents(userId)
-    advanceUntilIdle()
 
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
@@ -180,7 +174,6 @@ class EventsOverviewViewModelTest {
         mockUser.copy(userId = "userWithEmptyList", eventsAttendeeList = emptyList())
     userRepository.addUser(userWithEmptyList)
     viewModel.getUpcomingEvents("userWithEmptyList")
-    advanceUntilIdle()
 
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())

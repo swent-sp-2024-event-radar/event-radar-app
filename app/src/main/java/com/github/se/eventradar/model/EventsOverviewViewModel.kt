@@ -41,7 +41,7 @@ constructor(
     viewModelScope.launch {
       when (val userResponse = userRepository.getUser(uid)) {
         is Resource.Success -> {
-          val user = userResponse.data ?: return@launch
+          val user = userResponse.data!!
           val attendeeList = user.eventsAttendeeList
           if (attendeeList.isNotEmpty()) {
             when (val events = eventRepository.getEventsByIds(attendeeList)) {
