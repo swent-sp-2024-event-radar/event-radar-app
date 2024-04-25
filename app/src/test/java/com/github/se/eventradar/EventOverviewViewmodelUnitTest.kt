@@ -4,6 +4,7 @@ import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.model.event.EventTicket
+import com.github.se.eventradar.model.event.EventUiState
 import java.time.LocalDateTime
 import org.junit.Test
 
@@ -13,7 +14,7 @@ class EventOverviewViewmodelUnitTest {
     EventDetailsViewModel("pSjt3r3O8TddpWxRhGK5").getEventData()
     assert(
         EventDetailsViewModel().uiState.value ==
-            EventDetailsViewModel.EventUiState(
+            EventUiState(
                 eventName = "Event Test",
                 eventPhoto = "hd3idd3bui",
                 start = LocalDateTime.parse("2024-12-31-T23:00:00"),
@@ -22,6 +23,7 @@ class EventOverviewViewmodelUnitTest {
                 description = "Come Party Hard like there is no tomorrow",
                 ticket = EventTicket("Standard", 0.0, 555),
                 contact = "jg@joytigoel.com",
-                category = EventCategory.COMMUNITY))
+                category = EventCategory.COMMUNITY)
+    )
   }
 }
