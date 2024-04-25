@@ -43,7 +43,7 @@ fun EventDetails(
     viewModel: EventDetailsViewModel = viewModel(),
     navigationActions: NavigationActions
 ) {
-
+  
   viewModel.getEventData()
   val eventUiState = viewModel.uiState.collectAsState().value
 

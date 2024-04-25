@@ -13,18 +13,6 @@ class EventDetailsViewModel(val eventId: String? = null) : ViewModel() {
   private val _uiState = MutableStateFlow(EventUiState())
   val uiState: StateFlow<EventUiState> = _uiState
 
-  data class EventUiState(
-      val eventName: String = "",
-      val eventPhoto: String = "",
-      val start: LocalDateTime = LocalDateTime.MIN,
-      val end: LocalDateTime = LocalDateTime.MAX,
-      val location: Location = Location(0.0, 0.0, ""),
-      val description: String = "",
-      val ticket: EventTicket = EventTicket("", 0.0, 0),
-      val contact: String = "",
-      val category: EventCategory = EventCategory.MUSIC,
-  )
-
   suspend fun getEventData() {
     if (eventId != null) {
       when (val event = FirebaseEventRepository().getEvent(eventId)) {
@@ -49,3 +37,15 @@ class EventDetailsViewModel(val eventId: String? = null) : ViewModel() {
     }
   }
 }
+data class EventUiState(
+    val eventName: String = "",
+    val eventPhoto: String = "",
+    val start: LocalDateTime = LocalDateTime.MIN,
+    val end: LocalDateTime = LocalDateTime.MAX,
+    val location: Location = Location(0.0, 0.0, ""),
+    val description: String = "",
+    val ticket: EventTicket = EventTicket("", 0.0, 0),
+    val contact: String = "",
+    val category: EventCategory = EventCategory.MUSIC,
+)
+
