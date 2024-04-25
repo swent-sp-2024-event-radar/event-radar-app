@@ -38,7 +38,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
-import com.github.se.eventradar.model.EventsOverviewViewModel
+import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu

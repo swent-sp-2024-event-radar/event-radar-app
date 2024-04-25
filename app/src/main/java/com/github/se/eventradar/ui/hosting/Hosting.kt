@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,8 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.eventradar.R
-import com.github.se.eventradar.model.EventsOverviewViewModel
-import com.github.se.eventradar.model.event.HostedEventViewModel
+import com.github.se.eventradar.viewmodel.HostedEventsViewModel
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.*
 import com.github.se.eventradar.ui.map.EventMap
@@ -49,14 +47,16 @@ import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 import com.github.se.eventradar.util.toast
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun HostingScreen(
-    viewModel: HostedEventViewModel = viewModel(),
+    viewModel: HostedEventsViewModel = viewModel(),
     navigationActions: NavigationActions
 ) {
   val uiState by viewModel.uiState.collectAsState()
-  LaunchedEffect(key1 = uiState.eventList) { viewModel.getEvents() }
+    val currentUser = FirebaseAuth.getInstance().currentUser?.uid
+  LaunchedEffect(key1 = uiState.eventList) { viewModel.getHostedEvents(currentUser.toString()) }
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("hostingScreen")) {
     val (logo, title, divider, eventList, eventMap, bottomNav, buttons) = createRefs()
     Logo(

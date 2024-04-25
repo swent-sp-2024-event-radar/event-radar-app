@@ -1,8 +1,9 @@
-package com.github.se.eventradar.model
+package com.github.se.eventradar.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
@@ -21,7 +22,6 @@ constructor(
 ) : ViewModel() {
   private val _uiState = MutableStateFlow(EventsOverviewUiState())
   val uiState: StateFlow<EventsOverviewUiState> = _uiState
-
   fun getEvents() {
     viewModelScope.launch {
       when (val response = eventRepository.getEvents()) {
@@ -36,7 +36,6 @@ constructor(
       }
     }
   }
-
   fun getUpcomingEvents(uid: String) {
     viewModelScope.launch {
       when (val userResponse = userRepository.getUser(uid)) {
