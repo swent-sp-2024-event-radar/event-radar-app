@@ -36,7 +36,6 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
   @RelaxedMockK lateinit var mockHostedEventsViewModel: HostedEventsViewModel
-/*
   private val sampleEventList =
       MutableStateFlow(
           HostedEventsUiState(
@@ -58,14 +57,10 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
                             fireBaseID = "$it")
                       }))
       )
-*/
   @Before
   fun testSetup() {
-      /*
-      val currentUser = FirebaseAuth.getInstance().currentUser.
-    every { mockHostedEventsViewModel.getHostedEvents() } returns Unit
+    every { mockHostedEventsViewModel.getHostedEvents(any()) } returns Unit
     every { mockHostedEventsViewModel.uiState } returns sampleEventList
-       */
     composeTestRule.setContent {
       HostingScreen(viewModel = mockHostedEventsViewModel, navigationActions = mockNavActions)
     }

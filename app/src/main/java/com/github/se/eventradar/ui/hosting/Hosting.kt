@@ -36,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.eventradar.R
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
@@ -53,7 +54,7 @@ import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun HostingScreen(
-    viewModel: HostedEventsViewModel = viewModel(),
+    viewModel: HostedEventsViewModel = hiltViewModel(),
     navigationActions: NavigationActions
 ) {
   val uiState by viewModel.uiState.collectAsState()
