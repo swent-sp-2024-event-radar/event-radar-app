@@ -1,9 +1,12 @@
 package com.github.se.eventradar
 
 import com.github.se.eventradar.model.di.FirebaseEventDatabaseModule
+import com.github.se.eventradar.model.di.FirebaseMessageDatabaseModule
 import com.github.se.eventradar.model.di.FirebaseUserDatabaseModule
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.event.MockEventRepository
+import com.github.se.eventradar.model.repository.message.IMessageRepository
+import com.github.se.eventradar.model.repository.message.MockMessageRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import dagger.Module
@@ -31,5 +34,16 @@ class MockUserDatabaseModule {
   @Singleton
   fun provideMockUserRepository(): IUserRepository {
     return MockUserRepository()
+  }
+}
+
+@Module
+@TestInstallIn(
+    components = [SingletonComponent::class], replaces = [FirebaseMessageDatabaseModule::class])
+class MockMessageDatabaseModule {
+  @Provides
+  @Singleton
+  fun provideMockMessageRepository(): IMessageRepository {
+    return MockMessageRepository()
   }
 }
