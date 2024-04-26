@@ -46,44 +46,26 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       scanQrTab.performClick()
       allowPermissionsWhileUsingApp()
 
-      try {
+
         logo.assertIsDisplayed()
-      } catch (e: AssertionError) {
-        println("Failed to find Logo: ${e.message}")
-        throw e // Re-throw to fail the test
-      }
-      try {
+
+
+
         tabs.assertIsDisplayed()
-      } catch (e: AssertionError) {
-        println("Failed to find Tabs: ${e.message}")
-        throw e // Re-throw to fail the test
-      }
-      try {
+
         myQrTab.assertIsDisplayed()
-      } catch (e: AssertionError) {
-        println("Failed to find My QR Tab: ${e.message}")
-        throw e // Re-throw to fail the test
-      }
-      try {
+
+
         scanQrTab.assertIsDisplayed()
-      } catch (e: AssertionError) {
-        println("Failed to find Scan QR Tab: ${e.message}")
-        throw e // Re-throw to fail the test
-      }
-      try {
+
+
         qrScanner.assertIsDisplayed()
-      } catch (e: AssertionError) {
-        println("Failed to find QR Scanner: ${e.message}")
-        throw e // Re-throw to fail the test
-      }
-      try {
+
+
         bottomNavMenu.assertIsDisplayed()
-      } catch (e: AssertionError) {
-        println("Failed to find Bottom Navigation Menu: ${e.message}")
-        throw e // Re-throw to fail the test
+
       }
     }
-  }
 
   @Test
   fun displaysAllComponentsCorrectly_CameraPermittedOnce(): Unit = run {
@@ -91,42 +73,17 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       scanQrTab.performClick()
       allowPermissionsOnce()
 
-      try {
-        logo.assertIsDisplayed()
-      } catch (e: AssertionError) {
-        println("Failed to find Logo: ${e.message}")
-        throw e // Re-throw to fail the test
-      }
-      try {
-        tabs.assertIsDisplayed()
-      } catch (e: AssertionError) {
-        println("Failed to find Tabs: ${e.message}")
-        throw e // Re-throw to fail the test
-      }
-      try {
-        myQrTab.assertIsDisplayed()
-      } catch (e: AssertionError) {
-        println("Failed to find My QR Tab: ${e.message}")
-        throw e // Re-throw to fail the test
-      }
-      try {
-        scanQrTab.assertIsDisplayed()
-      } catch (e: AssertionError) {
-        println("Failed to find Scan QR Tab: ${e.message}")
-        throw e // Re-throw to fail the test
-      }
-      try {
-        qrScanner.assertIsDisplayed()
-      } catch (e: AssertionError) {
-        println("Failed to find QR Scanner: ${e.message}")
-        throw e // Re-throw to fail the test
-      }
-      try {
-        bottomNavMenu.assertIsDisplayed()
-      } catch (e: AssertionError) {
-        println("Failed to find Bottom Navigation Menu: ${e.message}")
-        throw e // Re-throw to fail the test
-      }
+      logo.assertIsDisplayed()
+
+      tabs.assertIsDisplayed()
+
+      myQrTab.assertIsDisplayed()
+
+      scanQrTab.assertIsDisplayed()
+
+      qrScanner.assertIsDisplayed()
+
+      bottomNavMenu.assertIsDisplayed()
     }
   }
 
@@ -136,36 +93,15 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       scanQrTab.performClick()
       denyPermissions()
 
-      try {
-        logo.assertIsDisplayed()
-      } catch (e: AssertionError) {
-        println("Failed to find Logo: ${e.message}")
-        throw e // Re-throw to fail the test
-      }
-      try {
-        tabs.assertIsDisplayed()
-      } catch (e: AssertionError) {
-        println("Failed to find Tabs: ${e.message}")
-        throw e // Re-throw to fail the test
-      }
-      try {
-        myQrTab.assertIsDisplayed()
-      } catch (e: AssertionError) {
-        println("Failed to find My QR Tab: ${e.message}")
-        throw e // Re-throw to fail the test
-      }
-      try {
-        scanQrTab.assertIsDisplayed()
-      } catch (e: AssertionError) {
-        println("Failed to find Scan QR Tab: ${e.message}")
-        throw e // Re-throw to fail the test
-      }
-      try {
-        bottomNavMenu.assertIsDisplayed()
-      } catch (e: AssertionError) {
-        println("Failed to find Bottom Navigation Menu: ${e.message}")
-        throw e // Re-throw to fail the test
-      }
+      logo.assertIsDisplayed()
+
+      tabs.assertIsDisplayed()
+
+      myQrTab.assertIsDisplayed()
+
+      scanQrTab.assertIsDisplayed()
+
+      bottomNavMenu.assertIsDisplayed()
     }
   }
 
