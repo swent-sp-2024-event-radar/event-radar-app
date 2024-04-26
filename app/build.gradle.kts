@@ -161,7 +161,9 @@ dependencies {
     implementation ("androidx.camera:camera-lifecycle:1.3.3")
     implementation ("androidx.camera:camera-view:1.3.3")
 
-    // CameraX core library
+    // Android Test
+
+    androidTestImplementation ("androidx.test.uiautomator:uiautomator:2.2.0")
 
 }
 

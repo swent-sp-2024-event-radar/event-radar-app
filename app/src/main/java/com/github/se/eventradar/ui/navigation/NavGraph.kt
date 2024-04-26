@@ -5,7 +5,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.ui.home.HomeScreen
 import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.login.SignUpScreen
@@ -23,9 +22,7 @@ fun NavGraph(navController: NavHostController) {
     composable(Route.HOME) { HomeScreen(navigationActions = navActions) }
 
     // TODO replace the Toast message with the corresponding screen function of the route
-    composable(Route.SCANNER) {
-      QrCodeScreen(navigationActions = navActions)
-    }
+    composable(Route.SCANNER) { QrCodeScreen(navigationActions = navActions) }
     composable(Route.MESSAGE) {
       HomeScreen(navigationActions = navActions)
       context.toast("Message main screen needs to be implemented")

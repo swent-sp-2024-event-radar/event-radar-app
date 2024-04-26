@@ -1,9 +1,5 @@
 package com.github.se.eventradar.ui.qrCode
 
-import androidx.navigation.compose.rememberNavController
-import com.github.se.eventradar.ui.navigation.NavigationActions
-import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.eventradar.ui.BottomNavigationMenu
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -35,120 +31,114 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
+import com.github.se.eventradar.ui.BottomNavigationMenu
+import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 
 @Composable
-  fun QrCodeScreen(navigationActions: NavigationActions) {
-      var selectedTabIndex by remember { mutableIntStateOf(0) }
-      val context = LocalContext.current
+fun QrCodeScreen(navigationActions: NavigationActions) {
+  var selectedTabIndex by remember { mutableIntStateOf(0) }
+  val context = LocalContext.current
 
-      ConstraintLayout(modifier = Modifier
-          .fillMaxSize()
-          .testTag("qrCodeScannerScreen"),
+  ConstraintLayout(
+      modifier = Modifier.fillMaxSize().testTag("qrCodeScannerScreen"),
+  ) {
+    val (logo, tabs, bottomNav) = createRefs()
+    Row(
+        modifier =
+            Modifier.fillMaxWidth()
+                .fillMaxWidth()
+                .constrainAs(logo) {
+                  top.linkTo(parent.top, margin = 32.dp)
+                  start.linkTo(parent.start, margin = 16.dp)
+                }
+                .testTag("logo"),
+        verticalAlignment = Alignment.CenterVertically) {
+          Image(
+              painter = painterResource(id = R.drawable.event_logo),
+              contentDescription = "Event Radar Logo",
+              modifier = Modifier.size(width = 186.dp, height = 50.dp))
+        }
+    TabRow(
+        selectedTabIndex = selectedTabIndex,
+        modifier =
+            Modifier.fillMaxWidth()
+                .padding(top = 8.dp)
+                .constrainAs(tabs) {
+                  top.linkTo(logo.bottom, margin = 16.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                }
+                .testTag("tabs"),
+        contentColor = MaterialTheme.colorScheme.primary) {
+          Tab(
+              selected = selectedTabIndex == 0,
+              onClick = { selectedTabIndex = 0 },
+              modifier = Modifier.testTag("My QR Code"),
           ) {
-          val (logo, tabs, bottomNav) = createRefs()
-          Row(
-              modifier =
-              Modifier
-                  .fillMaxWidth()
-                  .fillMaxWidth()
-                  .constrainAs(logo) {
-                      top.linkTo(parent.top, margin = 32.dp)
-                      start.linkTo(parent.start, margin = 16.dp)
-                  }
-                  .testTag("logo"),
-              verticalAlignment = Alignment.CenterVertically) {
-              Image(
-                  painter = painterResource(id = R.drawable.event_logo),
-                  contentDescription = "Event Radar Logo",
-                  modifier = Modifier.size(width = 186.dp, height = 50.dp))
+            Text(
+                text = "My QR Code",
+                style =
+                    TextStyle(
+                        fontSize = 19.sp,
+                        lineHeight = 17.sp,
+                        fontFamily = FontFamily(Font(R.font.roboto)),
+                        fontWeight = FontWeight(500),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        textAlign = TextAlign.Center,
+                        letterSpacing = 0.25.sp,
+                    ),
+                modifier = Modifier.padding(bottom = 8.dp))
           }
-          TabRow(
-              selectedTabIndex = selectedTabIndex,
-              modifier =
-              Modifier
-                  .fillMaxWidth()
-                  .padding(top = 8.dp)
-                  .constrainAs(tabs) {
-                      top.linkTo(logo.bottom, margin = 16.dp)
-                      start.linkTo(parent.start)
-                      end.linkTo(parent.end)
-                  }
-                  .testTag("tabs"),
-              contentColor = MaterialTheme.colorScheme.primary) {
-
-              Tab(
-                  selected = selectedTabIndex == 0,
-                  onClick = { selectedTabIndex = 0 },
-                  modifier = Modifier.testTag("My QR Code"),
-              ) {
-                  Text(
-                      text = "My QR Code",
-                      style =
-                      TextStyle(
-                          fontSize = 19.sp,
-                          lineHeight = 17.sp,
-                          fontFamily = FontFamily(Font(R.font.roboto)),
-                          fontWeight = FontWeight(500),
-                          color = MaterialTheme.colorScheme.onPrimaryContainer,
-                          textAlign = TextAlign.Center,
-                          letterSpacing = 0.25.sp,
-                      ),
-                      modifier = Modifier.padding(bottom = 8.dp))
+          Tab(
+              selected = selectedTabIndex == 1,
+              onClick = { selectedTabIndex = 1 },
+              modifier = Modifier.testTag("Scan QR Code")) {
+                Text(
+                    text = "Scan QR Code",
+                    style =
+                        TextStyle(
+                            fontSize = 19.sp,
+                            lineHeight = 17.sp,
+                            fontFamily = FontFamily(Font(R.font.roboto)),
+                            fontWeight = FontWeight(500),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            textAlign = TextAlign.Center,
+                            letterSpacing = 0.25.sp,
+                        ),
+                    modifier = Modifier.padding(bottom = 8.dp))
               }
-              Tab(
-                  selected = selectedTabIndex == 1,
-                  onClick = { selectedTabIndex = 1 },
-                  modifier = Modifier.testTag("Scan QR Code")) {
-                  Text(
-                      text = "Scan QR Code",
-                      style =
-                      TextStyle(
-                          fontSize = 19.sp,
-                          lineHeight = 17.sp,
-                          fontFamily = FontFamily(Font(R.font.roboto)),
-                          fontWeight = FontWeight(500),
-                          color = MaterialTheme.colorScheme.onPrimaryContainer,
-                          textAlign = TextAlign.Center,
-                          letterSpacing = 0.25.sp,
-                      ),
-                      modifier = Modifier.padding(bottom = 8.dp))
-              }
-          }
+        }
 
-          if (selectedTabIndex == 0) {
-                  Toast.makeText(context, "My Qr Code not yet available", Toast.LENGTH_SHORT).show()
-          } else {
-              Column (modifier = Modifier.testTag("QrScanner")){
-                  QrCodeScanCamera(dummyQrCodeScanned).QrCodeScanner()
-              }
-
-          }
-          BottomNavigationMenu(
-              onTabSelected = { tab -> navigationActions.navigateTo(tab) },
-              tabList = TOP_LEVEL_DESTINATIONS,
-              selectedItem = TOP_LEVEL_DESTINATIONS[0],
-              modifier =
-              Modifier
-                  .testTag("bottomNavMenu")
-                  .constrainAs(bottomNav) {
-                      bottom.linkTo(parent.bottom)
-                      start.linkTo(parent.start)
-                      end.linkTo(parent.end)
-                  })
-
+    if (selectedTabIndex == 0) {
+      Toast.makeText(context, "My Qr Code not yet available", Toast.LENGTH_SHORT).show()
+    } else {
+      Column(modifier = Modifier.testTag("QrScanner")) {
+        QrCodeScanCamera(dummyQrCodeScanned).QrCodeScanner()
       }
+    }
+    BottomNavigationMenu(
+        onTabSelected = { tab -> navigationActions.navigateTo(tab) },
+        tabList = TOP_LEVEL_DESTINATIONS,
+        selectedItem = TOP_LEVEL_DESTINATIONS[0],
+        modifier =
+            Modifier.testTag("bottomNavMenu").constrainAs(bottomNav) {
+              bottom.linkTo(parent.bottom)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
+            })
   }
-    private val dummyQrCodeScanned: (String) -> Unit = { qrCode ->
-        Log.d("QRCodeScanner", "QR Code Scanned: $qrCode")
-        // You can perform any additional logic here for testing
-    }
-    @androidx.compose.ui.tooling.preview.Preview
-    @Composable
-    fun QrcodeScanTest() {
-        QrCodeScreen(NavigationActions(rememberNavController()))
-    }
+}
 
+private val dummyQrCodeScanned: (String) -> Unit = { qrCode ->
+  Log.d("QRCodeScanner", "QR Code Scanned: $qrCode")
+  // You can perform any additional logic here for testing
+}
 
-
-
+@androidx.compose.ui.tooling.preview.Preview
+@Composable
+fun QrcodeScanTest() {
+  QrCodeScreen(NavigationActions(rememberNavController()))
+}

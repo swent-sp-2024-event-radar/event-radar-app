@@ -51,7 +51,7 @@ class QrCodeScanCamera(private val onQrCodeScanned: (String) -> Unit) {
     LaunchedEffect(key1 = true) { launcher.launch(android.Manifest.permission.CAMERA) }
     Column(modifier = Modifier.fillMaxSize()) {
       if (hasCameraPermission) {
-          Spacer(modifier = Modifier.height(80.dp))
+        Spacer(modifier = Modifier.height(80.dp))
         AndroidView( // PreviewView !E for Composable hence need ot create AndroidView
             factory = { context ->
               val previewView = PreviewView(context)
@@ -66,8 +66,7 @@ class QrCodeScanCamera(private val onQrCodeScanned: (String) -> Unit) {
                       .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                       .build()
               imageAnalysis.setAnalyzer(
-                  ContextCompat.getMainExecutor(context), QrCodeScanConstraints(onQrCodeScanned)
-              )
+                  ContextCompat.getMainExecutor(context), QrCodeScanConstraints(onQrCodeScanned))
               try {
                 cameraFutureProvider
                     .get()
@@ -82,10 +81,10 @@ class QrCodeScanCamera(private val onQrCodeScanned: (String) -> Unit) {
               previewView
             },
             modifier = Modifier.weight(1.5f).aspectRatio(1f).padding(horizontal = 32.dp)
-          //                Text(
+            //                Text(
 
-        //                    text = code, )
-        )
+            //                    text = code, )
+            )
       }
     }
   }
