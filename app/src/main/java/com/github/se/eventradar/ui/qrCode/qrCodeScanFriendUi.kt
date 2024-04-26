@@ -44,7 +44,7 @@ import com.github.se.eventradar.R
 
       ConstraintLayout(modifier = Modifier
           .fillMaxSize()
-          .testTag("homeScreen"),
+          .testTag("qrCodeScannerScreen"),
           ) {
           val (logo, tabs, bottomNav) = createRefs()
           Row(

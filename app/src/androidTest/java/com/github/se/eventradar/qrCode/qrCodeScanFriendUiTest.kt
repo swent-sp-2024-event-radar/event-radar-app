@@ -39,6 +39,8 @@ class QrCodeScanFriendUiTest: TestCase(kaspressoBuilder = Kaspresso.Builder.with
     fun qrCodeScanFriendUi_displaysAllComponentsCorrectly(): Unit =
         run {
             onComposeScreen<QrCodeScanFriendUiScreen>(composeTestRule) {
+                scanQrTab.performClick()
+
                 try {
                     logo.assertIsDisplayed()
                 } catch (e: AssertionError) {
