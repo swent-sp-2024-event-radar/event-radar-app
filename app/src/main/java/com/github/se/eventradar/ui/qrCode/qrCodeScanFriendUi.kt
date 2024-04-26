@@ -7,6 +7,7 @@ import com.github.se.eventradar.ui.BottomNavigationMenu
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,7 +46,7 @@ import com.github.se.eventradar.R
           .fillMaxSize()
           .testTag("homeScreen"),
           ) {
-          val (logo, tabs, qrScanner, bottomNav) = createRefs()
+          val (logo, tabs, bottomNav) = createRefs()
           Row(
               modifier =
               Modifier
@@ -118,8 +119,10 @@ import com.github.se.eventradar.R
           if (selectedTabIndex == 0) {
                   Toast.makeText(context, "My Qr Code not yet available", Toast.LENGTH_SHORT).show()
           } else {
-              
-              QrCodeScanCamera(dummyQrCodeScanned).QrCodeScanner()
+              Column (modifier = Modifier.testTag("QrScanner")){
+                  QrCodeScanCamera(dummyQrCodeScanned).QrCodeScanner()
+              }
+
           }
           BottomNavigationMenu(
               onTabSelected = { tab -> navigationActions.navigateTo(tab) },
