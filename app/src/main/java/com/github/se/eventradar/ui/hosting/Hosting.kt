@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,9 +36,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.eventradar.R
-import com.github.se.eventradar.viewmodel.HostedEventsViewModel
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.*
 import com.github.se.eventradar.ui.map.EventMap
@@ -48,15 +47,16 @@ import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 import com.github.se.eventradar.util.toast
+import com.github.se.eventradar.viewmodel.HostedEventsViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun HostingScreen(
-    viewModel: HostedEventsViewModel = viewModel(),
+    viewModel: HostedEventsViewModel = hiltViewModel(),
     navigationActions: NavigationActions
 ) {
   val uiState by viewModel.uiState.collectAsState()
-    val currentUser = FirebaseAuth.getInstance().currentUser?.uid
+  val currentUser = FirebaseAuth.getInstance().currentUser?.uid
   LaunchedEffect(key1 = uiState.eventList) { viewModel.getHostedEvents(currentUser.toString()) }
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("hostingScreen")) {
     val (logo, title, divider, eventList, eventMap, bottomNav, buttons) = createRefs()
@@ -114,12 +114,16 @@ fun HostingScreen(
               onClick = { context.toast("Create Event still needs to be implemented") },
               modifier = Modifier.testTag("createEventFab"))
           Spacer(modifier = Modifier.width(16.dp))
-        var viewToggleIcon by remember { mutableStateOf(if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List) }
+          var viewToggleIcon by remember {
+            mutableStateOf(
+                if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List)
+          }
           ViewToggleFab(
               modifier = Modifier.testTag("viewToggleFab"),
               onClick = {
                 uiState.viewList = !uiState.viewList
-                viewToggleIcon = if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List
+                viewToggleIcon =
+                    if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List
               },
               iconVector = viewToggleIcon)
         }

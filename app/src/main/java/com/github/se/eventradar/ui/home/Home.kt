@@ -35,10 +35,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
-import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu
@@ -49,10 +49,11 @@ import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.getTopLevelDestination
+import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 
 @Composable
 fun HomeScreen(
-    viewModel: EventsOverviewViewModel = viewModel(),
+    viewModel: EventsOverviewViewModel = hiltViewModel(),
     navigationActions: NavigationActions
 ) {
   val uiState by viewModel.uiState.collectAsState()

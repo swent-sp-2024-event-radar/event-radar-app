@@ -22,6 +22,7 @@ constructor(
 ) : ViewModel() {
   private val _uiState = MutableStateFlow(EventsOverviewUiState())
   val uiState: StateFlow<EventsOverviewUiState> = _uiState
+
   fun getEvents() {
     viewModelScope.launch {
       when (val response = eventRepository.getEvents()) {
@@ -36,6 +37,7 @@ constructor(
       }
     }
   }
+
   fun getUpcomingEvents(uid: String) {
     viewModelScope.launch {
       when (val userResponse = userRepository.getUser(uid)) {

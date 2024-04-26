@@ -2,16 +2,25 @@ package com.github.se.eventradar.hosting
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.eventradar.ui.hosting.HostingScreen
+import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.event.Event
+import com.github.se.eventradar.model.event.EventCategory
+import com.github.se.eventradar.model.event.EventList
+import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.screens.HostingScreen
+import com.github.se.eventradar.ui.hosting.HostingScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.viewmodel.HostedEventsUiState
 import com.github.se.eventradar.viewmodel.HostedEventsViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
+import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
+import java.time.LocalDateTime
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -27,11 +36,6 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var mockHostedEventsViewModel: HostedEventsViewModel
 
-/*
-=======
-  @RelaxedMockK lateinit var mockHostedEventViewModel: HostedEventViewModel
-
->>>>>>> bd6cacbd66310c85e1e1dfe01ce9fedb6afb9e09
   private val sampleEventList =
       MutableStateFlow(
           HostedEventsUiState(
@@ -51,17 +55,12 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
                             attendeeList = setOf("Test Attendee"),
                             category = EventCategory.COMMUNITY,
                             fireBaseID = "$it")
-                      }))
-      )
+                      })))
 
-*/
   @Before
   fun testSetup() {
-      /*
-      val currentUser = FirebaseAuth.getInstance().currentUser.
-    every { mockHostedEventsViewModel.getHostedEvents() } returns Unit
+    every { mockHostedEventsViewModel.getHostedEvents(any()) } returns Unit
     every { mockHostedEventsViewModel.uiState } returns sampleEventList
-       */
     composeTestRule.setContent {
       HostingScreen(viewModel = mockHostedEventsViewModel, navigationActions = mockNavActions)
     }
