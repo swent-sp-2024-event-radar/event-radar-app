@@ -8,9 +8,9 @@ data class User(
     val lastName: String,
     val phoneNumber: String,
     val accountStatus: String,
-    val eventsAttendeeList: Set<String>,
-    val eventsHostList: Set<String>,
-    val friendList: Set<String>,
+    val eventsAttendeeList: MutableSet<String>,
+    val eventsHostList: MutableSet<String>,
+    val friendList: MutableSet<String>,
     val profilePicUrl: String,
     val qrCodeUrl: String,
     val username: String,
@@ -51,10 +51,10 @@ data class User(
   }
 }
 
-private fun convertToListOfStrings(data: Any?): Set<String> {
+private fun convertToListOfStrings(data: Any?): MutableSet<String> {
   return when (data) {
-    is List<*> -> data.filterIsInstance<String>().toSet()
-    is String -> setOf(data)
-    else -> emptySet()
+    is List<*> -> data.filterIsInstance<String>().toMutableSet()
+    is String -> mutableSetOf(data)
+    else -> mutableSetOf()
   }
 }
