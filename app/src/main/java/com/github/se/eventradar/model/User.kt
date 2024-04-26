@@ -8,8 +8,9 @@ data class User(
     val lastName: String,
     val phoneNumber: String,
     val accountStatus: String,
-    val eventsAttendeeList: List<String>,
-    val eventsHostList: List<String>,
+    val eventsAttendeeList: Set<String>,
+    val eventsHostList: Set<String>,
+    val friendList: Set<String>,
     val profilePicUrl: String,
     val qrCodeUrl: String,
     val username: String,
@@ -27,6 +28,7 @@ data class User(
       accountStatus = map["accountStatus"] as String,
       eventsAttendeeList = convertToListOfStrings(map["eventsAttendeeList"]),
       eventsHostList = convertToListOfStrings(map["eventsHostList"]),
+      friendList = convertToListOfStrings(map["friendList"]),
       profilePicUrl = map["profilePicUrl"] as String,
       qrCodeUrl = map["qrCodeUrl"] as String,
       username = map["username"] as String)
@@ -49,10 +51,10 @@ data class User(
   }
 }
 
-private fun convertToListOfStrings(data: Any?): List<String> {
+private fun convertToListOfStrings(data: Any?): Set<String> {
   return when (data) {
-    is List<*> -> data.filterIsInstance<String>().toList()
-    is String -> listOf(data)
-    else -> emptyList()
+    is List<*> -> data.filterIsInstance<String>().toSet()
+    is String -> setOf(data)
+    else -> emptySet()
   }
 }
