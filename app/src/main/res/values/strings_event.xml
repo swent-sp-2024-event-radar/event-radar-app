@@ -7,7 +7,6 @@
     <string name="event_dt_start">Start</string>
     <string name="event_dt_end">End</string>
     <string name="event_categories">Categories</string>
-
     <string name="event_category_music">Music</string>
     <string name="event_category_sport">Sports</string>
     <string name="event_category_conference">Conference</string>
