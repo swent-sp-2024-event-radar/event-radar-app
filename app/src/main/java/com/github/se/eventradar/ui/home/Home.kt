@@ -50,7 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.EventsOverviewViewModel
@@ -64,7 +64,7 @@ import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 
 @Composable
 fun HomeScreen(
-    viewModel: EventsOverviewViewModel = viewModel(),
+    viewModel: EventsOverviewViewModel = hiltViewModel(),
     navigationActions: NavigationActions
 ) {
   val uiState by viewModel.uiState.collectAsState()
