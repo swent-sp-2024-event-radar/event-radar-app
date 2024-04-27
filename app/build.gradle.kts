@@ -142,6 +142,10 @@ dependencies {
     androidTestImplementation("io.mockk:mockk:1.13.10")
     androidTestImplementation("io.mockk:mockk-android:1.13.10")
     androidTestImplementation("io.mockk:mockk-agent:1.13.10")
+    androidTestImplementation ("androidx.test:runner:1.5.2")
+    androidTestImplementation ("androidx.test:rules:1.5.0")
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation ("androidx.test.espresso:espresso-intents:3.5.1")
 
     //Robolectric
     testImplementation("org.robolectric:robolectric:4.11.1")
