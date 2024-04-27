@@ -14,6 +14,25 @@ class FirebaseMessageRepository : IMessageRepository {
   private val db: FirebaseFirestore = Firebase.firestore
   private val messageRef: CollectionReference = db.collection("messages")
 
+  override suspend fun getMessages(uid: String): Resource<List<MessageHistory>> {
+    return try {
+      val resultDocument =
+          messageRef
+              .where(
+                  Filter.or(
+                      Filter.arrayContains("from_user", uid), Filter.arrayContains("to_user", uid)))
+              .get()
+              .await()
+      if (resultDocument == null || resultDocument.isEmpty) {
+        return Resource.Success(emptyList())
+      }
+      val messageHistories = resultDocument.documents.map { MessageHistory(it.data!!, it.id) }
+      Resource.Success(messageHistories)
+    } catch (e: Exception) {
+      Resource.Failure(e)
+    }
+  }
+
   override suspend fun getMessages(user1: String, user2: String): Resource<MessageHistory> {
     // From and to user are interchangeable
     val resultDocument =

@@ -8,6 +8,11 @@ class MockMessageRepository : IMessageRepository {
   private val mockMessageHistory = mutableListOf<MessageHistory>()
   private var ticker = 0
 
+  override suspend fun getMessages(uid: String): Resource<List<MessageHistory>> {
+    val messageHistories = mockMessageHistory.filter { it.user1 == uid || it.user2 == uid }
+    return Resource.Success(messageHistories)
+  }
+
   override suspend fun getMessages(user1: String, user2: String): Resource<MessageHistory> {
     val messageHistory =
         mockMessageHistory.find {
