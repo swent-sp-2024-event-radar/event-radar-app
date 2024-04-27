@@ -12,8 +12,8 @@ data class Event(
     var description: String,
     var ticket: EventTicket,
     var contact: String,
-    var organiserList: Set<String>,
-    var attendeeList: Set<String>,
+    var organiserList: MutableSet<String>,
+    var attendeeList: MutableSet<String>,
     var category: EventCategory,
     var fireBaseID: String
 ) {
@@ -63,10 +63,10 @@ data class Event(
   }
 }
 
-private fun getSetOfStrings(data: Any?): Set<String> {
+private fun getSetOfStrings(data: Any?): MutableSet<String> {
   return when (data) {
-    is List<*> -> data.filterIsInstance<String>().toSet()
-    is String -> setOf(data)
-    else -> emptySet()
+    is List<*> -> data.filterIsInstance<String>().toMutableSet()
+    is String -> mutableSetOf(data)
+    else -> mutableSetOf()
   }
 }

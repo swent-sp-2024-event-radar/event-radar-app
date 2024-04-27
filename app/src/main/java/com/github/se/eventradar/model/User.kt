@@ -26,9 +26,9 @@ data class User(
       lastName = map["lastName"] as String,
       phoneNumber = map["phoneNumber"] as String,
       accountStatus = map["accountStatus"] as String,
-      eventsAttendeeList = convertToListOfStrings(map["eventsAttendeeList"]),
-      eventsHostList = convertToListOfStrings(map["eventsHostList"]),
-      friendList = convertToListOfStrings(map["friendList"]),
+      eventsAttendeeList = convertToSetOfStrings(map["eventsAttendeeList"]),
+      eventsHostList = convertToSetOfStrings(map["eventsHostList"]),
+      friendList = convertToSetOfStrings(map["friendList"]),
       profilePicUrl = map["profilePicUrl"] as String,
       qrCodeUrl = map["qrCodeUrl"] as String,
       username = map["username"] as String)
@@ -44,6 +44,7 @@ data class User(
     map["accountStatus"] = accountStatus
     map["eventsAttendeeList"] = eventsAttendeeList
     map["eventsHostList"] = eventsHostList
+    map["friendList"] = friendList
     map["profilePicUrl"] = profilePicUrl
     map["qrCodeUrl"] = qrCodeUrl
     map["username"] = username
@@ -51,7 +52,7 @@ data class User(
   }
 }
 
-private fun convertToListOfStrings(data: Any?): MutableSet<String> {
+private fun convertToSetOfStrings(data: Any?): MutableSet<String> {
   return when (data) {
     is List<*> -> data.filterIsInstance<String>().toMutableSet()
     is String -> mutableSetOf(data)
