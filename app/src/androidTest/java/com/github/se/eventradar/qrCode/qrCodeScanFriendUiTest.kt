@@ -18,6 +18,7 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen.Companion.onComposeScreen
 import io.mockk.impl.annotations.RelaxedMockK
 import android.Manifest
+import android.util.Log
 import io.mockk.junit4.MockKRule
 import org.junit.Before
 import org.junit.Rule
@@ -42,10 +43,15 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
 
   private lateinit var mDevice: UiDevice
 
+  private val dummyQrCodeScanned: (String) -> Unit = { qrCode ->
+    Log.d("QRCodeScanner", "QR Code Scanned: $qrCode")
+    // You can perform any additional logic here for testing
+  }
+
   @Before
   fun testSetup() {
     //        MockKAnnotations.init(this)
-    composeTestRule.setContent { QrCodeScreen(mockNavActions) }
+    composeTestRule.setContent { QrCodeScreen(mockNavActions, dummyQrCodeScanned) }
     mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
   }
 

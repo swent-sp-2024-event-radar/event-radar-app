@@ -42,6 +42,7 @@ fun QrCodeScreen(navigationActions: NavigationActions) {
   var selectedTabIndex by remember { mutableIntStateOf(0) }
   val context = LocalContext.current
 
+
   ConstraintLayout(
       modifier = Modifier.fillMaxSize().testTag("qrCodeScannerScreen"),
   ) {
@@ -116,7 +117,7 @@ fun QrCodeScreen(navigationActions: NavigationActions) {
       Toast.makeText(context, "My Qr Code not yet available", Toast.LENGTH_SHORT).show()
     } else {
       Column(modifier = Modifier.testTag("QrScanner")) {
-        QrCodeScanCamera(dummyQrCodeScanned).QrCodeScanner()
+        QrCodeScanCamera().QrCodeScanner(0)
       }
     }
     BottomNavigationMenu(
