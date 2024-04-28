@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
+import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
@@ -76,9 +77,13 @@ constructor(
 
 data class EventsOverviewUiState(
     val eventList: EventList = EventList(emptyList(), emptyList(), null),
+    var searchQuery: String = "",
+    var isFilterDialogOpen: Boolean = false,
+    var radiusInputFilter: Double = -1.0,
+    var freeEventsFilter: Boolean = false,
+    var categorySelectionFilter: List<EventCategory> = emptyList(),
     var viewList: Boolean = true,
     var tab: Tab = Tab.BROWSE,
-    val searchQuery: String = "",
 )
 
 enum class Tab {
