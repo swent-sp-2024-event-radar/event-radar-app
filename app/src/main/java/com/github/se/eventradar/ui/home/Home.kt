@@ -208,8 +208,8 @@ fun HomeScreen(
       Toast.makeText(context, "Upcoming events not yet available", Toast.LENGTH_SHORT).show()
       selectedTabIndex = 0
     }
-
-      if(uiState.isFilterDialogOpen) {
+      // Note for now, the filter dialog is always open to verify the UI
+      if(!uiState.isFilterDialogOpen) {
           FilterPopUp(
               onRadiusChange = { radius ->
                   // Handle radius change
@@ -278,6 +278,7 @@ fun SearchBarAndFilter(
         // Search bar
         TextField(
             value = searchQuery,
+            // function onSearchQueryChange() needs to be created in the VM
             onValueChange = { onSearchQueryChange(it) },
             modifier = Modifier.weight(1f),
             maxLines = 1,
@@ -301,6 +302,7 @@ fun SearchBarAndFilter(
 
         // Filter button
         Button(
+            // function setShowFilterPopUp() needs to be created in the VM
             onClick = { setShowFilterPopUp(!showFilterPopUp) },
             modifier = Modifier.padding(start = 8.dp)
         ) {
