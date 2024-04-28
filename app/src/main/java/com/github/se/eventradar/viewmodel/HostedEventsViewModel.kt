@@ -15,38 +15,23 @@ import kotlinx.coroutines.launch
 
 //new branch
 @HiltViewModel
-class EventsOverviewViewModel
+class HostedEventsViewModel
 @Inject
 constructor(
     private val eventRepository: IEventRepository,
     private val userRepository: IUserRepository
 ) : ViewModel() {
-  private val _uiState = MutableStateFlow(EventsOverviewUiState())
-  val uiState: StateFlow<EventsOverviewUiState> = _uiState
+  private val _uiState = MutableStateFlow(HostedEventsUiState())
+  val uiState: StateFlow<HostedEventsUiState> = _uiState
 
-  fun getEvents() {
-    viewModelScope.launch {
-      when (val response = eventRepository.getEvents()) {
-        is Resource.Success -> {
-          _uiState.value =
-              _uiState.value.copy(
-                  eventList =
-                      EventList(
-                          response.data, response.data, _uiState.value.eventList.selectedEvent))
-        }
-        is Resource.Failure -> Log.d("EventsOverviewViewModel", "Error getting events")
-      }
-    }
-  }
-
-  fun getUpcomingEvents(uid: String) {
+  fun getHostedEvents(uid: String) {
     viewModelScope.launch {
       when (val userResponse = userRepository.getUser(uid)) {
         is Resource.Success -> {
           val user = userResponse.data!!
-          val attendeeList = user.eventsAttendeeList
-          if (attendeeList.isNotEmpty()) {
-            when (val events = eventRepository.getEventsByIds(attendeeList)) {
+          val eventsHostList = user.eventsHostList
+          if (eventsHostList.isNotEmpty()) {
+            when (val events = eventRepository.getEventsByIds(eventsHostList)) {
               is Resource.Success -> {
                 _uiState.value =
                     _uiState.value.copy(
@@ -55,7 +40,7 @@ constructor(
                                 events.data, events.data, _uiState.value.eventList.selectedEvent))
               }
               is Resource.Failure -> {
-                Log.d("EventsOverviewViewModel", "Error getting events for $uid")
+                Log.d("HostedEventsViewModel", "Error getting hosted events for $uid")
                 _uiState.value =
                     _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
               }
@@ -66,7 +51,7 @@ constructor(
           }
         }
         is Resource.Failure -> {
-          Log.d("EventsOverviewViewModel", "Error fetching user document")
+          Log.d("HostedEventsViewModel", "Error fetching user document")
           _uiState.value =
               _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
         }
@@ -75,7 +60,8 @@ constructor(
   }
 }
 
-data class EventsOverviewUiState(
+data class HostedEventsUiState(
     val eventList: EventList = EventList(emptyList(), emptyList(), null),
+    var viewType: ViewType = ViewType.LIST,
     val searchQuery: String = "",
 )
