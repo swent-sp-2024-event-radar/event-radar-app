@@ -44,7 +44,7 @@ constructor(
         is Resource.Success -> {
           val user = userResponse.data!!
           val attendeeList = user.eventsAttendeeList
-          if (attendeeList.isNotEmpty()) {
+          if (attendeeList.isNotEmpty()) { //will it ever be that
             when (val events = eventRepository.getEventsByIds(attendeeList)) {
               is Resource.Success -> {
                 _uiState.value =
@@ -76,7 +76,7 @@ constructor(
 
 data class EventsOverviewUiState(
     val eventList: EventList = EventList(emptyList(), emptyList(), null),
-    var viewType: ViewType = ViewType.LIST,
+    var viewList: Boolean = true,
     var tab: Tab = Tab.BROWSE,
     val searchQuery: String = "",
 )

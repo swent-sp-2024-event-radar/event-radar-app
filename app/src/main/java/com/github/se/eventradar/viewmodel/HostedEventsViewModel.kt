@@ -61,6 +61,6 @@ constructor(
 
 data class HostedEventsUiState(
     val eventList: EventList = EventList(emptyList(), emptyList(), null),
-    var viewType: ViewType = ViewType.LIST,
+    var viewList: Boolean = true,
     val searchQuery: String = "",
 )
