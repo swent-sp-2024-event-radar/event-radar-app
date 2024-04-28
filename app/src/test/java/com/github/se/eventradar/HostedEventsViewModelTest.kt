@@ -30,7 +30,6 @@ import org.junit.Test
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
-//new branch
 @ExperimentalCoroutinesApi
 class HostedEventsViewModelTest {
   private lateinit var viewModel: HostedEventsViewModel

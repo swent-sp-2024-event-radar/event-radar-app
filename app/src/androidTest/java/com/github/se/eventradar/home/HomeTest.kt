@@ -2,8 +2,6 @@ package com.github.se.eventradar.home
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.eventradar.viewmodel.EventsOverviewUiState
-import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
@@ -12,6 +10,8 @@ import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.screens.HomeScreen
 import com.github.se.eventradar.ui.home.HomeScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.viewmodel.EventsOverviewUiState
+import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -60,8 +60,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
                             attendeeList = setOf("Test Attendee"),
                             category = EventCategory.COMMUNITY,
                             fireBaseID = "$it")
-                      }))
-      )
+                      })))
 
   @Before
   fun testSetup() {
