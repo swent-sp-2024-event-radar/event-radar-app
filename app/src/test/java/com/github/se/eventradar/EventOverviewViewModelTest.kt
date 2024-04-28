@@ -9,6 +9,7 @@ import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
+import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockkStatic

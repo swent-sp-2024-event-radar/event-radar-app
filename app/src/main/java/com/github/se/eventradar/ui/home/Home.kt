@@ -53,7 +53,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
-import com.github.se.eventradar.model.EventsOverviewViewModel
+import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
