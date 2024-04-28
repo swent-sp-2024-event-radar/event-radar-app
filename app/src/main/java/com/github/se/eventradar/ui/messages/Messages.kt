@@ -63,7 +63,7 @@ fun MessagesScreen(
     navigationActions: NavigationActions
 ) {
   val uiState by viewModel.uiState.collectAsState()
-
+  val context = LocalContext.current // only needed while the chat feature is not implemented
   viewModel.getMessages(userId)
 
   MessagesScreenUi(
@@ -71,7 +71,7 @@ fun MessagesScreen(
       uiState = uiState,
       onSelectedTabIndexChange = viewModel::onSelectedTabIndexChange,
       onSearchQueryChange = viewModel::onSearchQueryChange,
-      onChatClicked = { navigationActions.navController.navigate("message/${it.id}") },
+      onChatClicked = { Toast.makeText(context, "Chat feature is not yet implemented", Toast.LENGTH_SHORT).show()},
       onTabSelected = navigationActions::navigateTo,
       getUser = viewModel::getUser)
 }
@@ -263,7 +263,20 @@ fun PreviewMessagesScreen() {
                                       isRead = false,
                                       id = "1")),
                           latestMessageId = "1",
-                      ))),
+                      ),
+            MessageHistory(
+              user1 = "1",
+              user2 = "3",
+              messages =
+              mutableListOf(
+                Message(
+                  sender = "3",
+                  content = "Hello Hello Hello Hello Hello",
+                  dateTimeSent = LocalDateTime.parse("2024-04-27T12:00:00"),
+                  isRead = true,
+                  id = "1")),
+              latestMessageId = "1",
+            ))),
       onSelectedTabIndexChange = {},
       onSearchQueryChange = {},
       onChatClicked = {},

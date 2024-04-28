@@ -55,8 +55,7 @@ class MessagesViewModel @Inject constructor(
   private suspend fun getUserAsync(userId: String): User? {
     return when (val response = userRepository.getUser(userId)) {
       is Resource.Success -> {
-        val user = response.data!!
-        return user
+        return response.data!!
       }
       is Resource.Failure -> {
         Log.d("MessagesViewModel", "Error getting user: ${response.throwable.message}")

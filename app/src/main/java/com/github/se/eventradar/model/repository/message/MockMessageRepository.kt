@@ -9,7 +9,7 @@ class MockMessageRepository : IMessageRepository {
   private var ticker = 0
 
   override suspend fun getMessages(uid: String): Resource<List<MessageHistory>> {
-    val messageHistories = mockMessageHistory.filter { it.user1 == uid || it.user2 == uid }
+    val messageHistories = mockMessageHistory.filter { it.user1 == uid || it.user2 == uid }.sortedBy { it.messages.last { message -> message.id == it.latestMessageId }.dateTimeSent }
     return Resource.Success(messageHistories)
   }
 

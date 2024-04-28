@@ -21,6 +21,7 @@ class FirebaseMessageRepository : IMessageRepository {
               .where(
                   Filter.or(
                       Filter.arrayContains("from_user", uid), Filter.arrayContains("to_user", uid)))
+              .orderBy("messages/date_time_sent")
               .get()
               .await()
       if (resultDocument == null || resultDocument.isEmpty) {
