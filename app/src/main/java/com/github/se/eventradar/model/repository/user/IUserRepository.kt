@@ -10,7 +10,12 @@ interface IUserRepository {
 
   suspend fun addUser(user: User): Resource<Unit>
 
+  // add user using a map
+  suspend fun addUser(map: Map<String, Any?>, documentId: String): Resource<Unit>
+
   suspend fun updateUser(user: User): Resource<Unit>
 
   suspend fun deleteUser(user: User): Resource<Unit>
+
+  suspend fun isUserLoggedIn(userId: String): Resource<Unit>
 }

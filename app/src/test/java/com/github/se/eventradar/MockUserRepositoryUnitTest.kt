@@ -14,7 +14,7 @@ class MockUserRepositoryUnitTest {
   private val mockUser =
       User(
           userId = "1",
-          age = 30,
+          birthDate = "01/01/2000",
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",
@@ -51,6 +51,18 @@ class MockUserRepositoryUnitTest {
     val result = userRepository.getUser("1")
     assert(result is Resource.Success)
     assert(mockUser == (result as Resource.Success).data)
+  }
+
+  @Test
+  fun testAddUserWithMap() = runTest {
+    val userMap = mockUser.toMap()
+
+    val result = userRepository.addUser(userMap, "1")
+    assert(result is Resource.Success)
+
+    val getUserResult = userRepository.getUser("1")
+    assert(getUserResult is Resource.Success)
+    assert(mockUser == (getUserResult as Resource.Success).data)
   }
 
   @Test

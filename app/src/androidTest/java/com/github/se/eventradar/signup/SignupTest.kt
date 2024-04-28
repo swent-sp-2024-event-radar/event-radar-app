@@ -1,163 +1,129 @@
 package com.github.se.eventradar.signup
 
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import android.content.Intent
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
+import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
+import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.screens.SignupScreen
-import com.github.se.eventradar.ui.MainActivity
+import com.github.se.eventradar.ui.login.LoginViewModel
+import com.github.se.eventradar.ui.login.SignUpScreen
+import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import dagger.hilt.android.testing.HiltAndroidTest
 import io.github.kakaocup.compose.node.element.ComposeScreen
+import io.mockk.confirmVerified
+import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.junit4.MockKRule
+import io.mockk.verify
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
+@HiltAndroidTest
+// @Config(application = HiltTestApplication::class)
 class SignupTest : TestCase() {
-  @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
+  @get:Rule val composeTestRule = createComposeRule()
 
-  // The IntentsTestRule simply calls Intents.init() before the @Test block
-  // and Intents.release() after the @Test block is completed. IntentsTestRule
-  // is deprecated, but it was MUCH faster than using IntentsRule in our tests
-  // @get:Rule val intentsTestRule = IntentsTestRule(MainActivity::class.java)
+  // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
+  @get:Rule val mockkRule = MockKRule(this)
 
-  /** This test checks that the logo is correctly displayed on the screen */
+  // Relaxed mocks methods have a default implementation returning values
+  @RelaxedMockK lateinit var mockNavActions: NavigationActions
+
+  private var mockUserRepository: MockUserRepository = MockUserRepository()
+
+  @Before
+  fun setUp() {
+    // Launch the Signup screen
+    composeTestRule.setContent { SignUpScreen(LoginViewModel(mockUserRepository), mockNavActions) }
+  }
+
   @Test
-  fun logoIsCorrectlyDisplayed() {
+  fun allElementsAreCorrectlyDisplayed() = run {
     ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
       // Test the UI elements
       eventRadarLogo { assertIsDisplayed() }
+      profilePicture { assertIsDisplayed() }
+      usernameTextField { assertIsDisplayed() }
+      nameTextField { assertIsDisplayed() }
+      surnameTextField { assertIsDisplayed() }
+      phoneTextField { assertIsDisplayed() }
+      birthDateTextField { assertIsDisplayed() }
+      signUpButton {
+        assertIsDisplayed()
+        assertHasClickAction()
+      }
     }
   }
 
-  /*
-    /** This test checks that the profile picture is correctly displayed */
-    @Test
-    fun profilePictureIsCorrectlyDisplayed() {
-      ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
-        // Test the UI elements
-        profilePicture { assertIsDisplayed() }
-      }
-    }
-
-    /** This test checks that the username text field is correctly displayed */
-    @Test
-    fun usernameTextFieldIsCorrectlyDisplayed() {
-      ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
-        // Test the UI elements
-        usernameTextField { assertIsDisplayed() }
-      }
-    }
-
-    /** This test checks that the name text field is correctly displayed */
-    @Test
-    fun nameTextFieldIsCorrectlyDisplayed() {
-      ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
-        // Test the UI elements
-        nameTextField { assertIsDisplayed() }
-      }
-    }
-
-    /** This test checks that the surname text field is correctly displayed */
-    @Test
-    fun surnameTextFieldIsCorrectlyDisplayed() {
-      ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
-        // Test the UI elements
-        surnameTextField { assertIsDisplayed() }
-      }
-    }
-
-    /** This test checks that the phone text field is correctly displayed */
-    @Test
-    fun phoneTextFieldIsCorrectlyDisplayed() {
-      ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
-        // Test the UI elements
-        phoneTextField { assertIsDisplayed() }
-      }
-    }
-
-    /** This test checks that the birth date text field is correctly displayed */
-    @Test
-    fun birthDateTextFieldIsCorrectlyDisplayed() {
-      ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
-        // Test the UI elements
-        birthDateTextField { assertIsDisplayed() }
-      }
-    }
-
-    /** This test checks that the sign up button is correctly displayed */
-    @Test
-    fun signUpButtonIsCorrectlyDisplayed() {
-      ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
-        // Test the UI elements
-        signUpButton {
+  /** This test checks that the google authentication works correctly */
+  @Test
+  fun googleSignInReturnsValidActivityResult() = run {
+    Intents.init()
+    ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
+      step("fill in all fields") {
+        usernameTextField {
           assertIsDisplayed()
-          assertHasClickAction()
+          performTextInput("test")
+        }
+        nameTextField {
+          assertIsDisplayed()
+          performTextInput("test")
+        }
+        surnameTextField {
+          assertIsDisplayed()
+          performTextInput("test")
+        }
+        phoneTextField {
+          assertIsDisplayed()
+          performTextInput("123456789")
+        }
+        birthDateTextField {
+          assertIsDisplayed()
+          performTextInput("01/01/2000")
         }
       }
-    }
 
-    /** This test checks that the google authentication works correctly */
-    @Test
-    fun googleSignInReturnsValidActivityResult() {
-      Intents.init()
-      ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
+      step("click on sign up button") {
         signUpButton {
           assertIsDisplayed()
           performClick()
         }
-
-        // assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)
-        intended(toPackage("com.google.android.gms"))
       }
-      Intents.release()
+
+      // assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)
+      intended(toPackage("com.google.android.gms"))
     }
+    Intents.release()
   }
 
-  //    @Test
-  //    fun signInFailureShowsErrorDialog() {
-  ////        // Mock the result of the sign-in operation to simulate failure
-  ////        val mockLauncher = mockk<ActivityResultLauncher<Intent>>()
-  ////        val mockResult = ActivityResult(Activity.RESULT_CANCELED, null)
-  ////        every { mockLauncher.launch(any()) } answers { mockResult }
-  //
-  //        composeTestRule.setContent {
-  //            // ActivityResultRegistry is responsible for handling the
-  //            // contracts and launching the activity
-  //            val registryOwner = object : ActivityResultRegistryOwner {
-  //
-  //                override val activityResultRegistry = object : ActivityResultRegistry() {
-  //                    override fun <I : Any?, O : Any?> onLaunch(
-  //                        requestCode: Int,
-  //                        contract: ActivityResultContract<I, O>,
-  //                        input: I,
-  //                        options: ActivityOptionsCompat?
-  //                    ) {
-  //                        // don't launch an activity, just respond with the test Uri
-  //                        val intent = Intent()
-  //                        this.dispatchResult(requestCode, Activity.RESULT_CANCELED, intent)
-  //                    }
-  //                }
-  //            }
-  //
-  //            var launcher : ActivityResultLauncher<Intent>? = null
-  //            composeTestRule.setContent {
-  //                CompositionLocalProvider(LocalActivityResultRegistryOwner provides registryOwner)
-  // {
-  //                    SignUpScreen()
-  //                }
-  //            }
-  //
-  //            // Verify that the error dialog is displayed
-  //            ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
-  //                signupErrorDisplayText {
-  //                    assertIsDisplayed()
-  //                    assertTextEquals("Sign in Failed. Please try again.")
-  //                }
-  //
-  //                signupErrorTitle {
-  //                    assertIsDisplayed()
-  //                    assertTextEquals("Sign in Failed")
-  //                }
-  //            }
+  @Test
+  fun profilePicClickOpensGallery() = run {
+    Intents.init()
+    ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
+      profilePicture {
+        assertIsDisplayed()
+        performClick()
+      }
 
-     */
+      intended(hasAction(Intent.ACTION_GET_CONTENT))
+    }
+    Intents.release()
+  }
+
+  @Test
+  fun notAbleToSignInIfNotAllFieldsEntered() {
+    ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
+      signUpButton {
+        assertIsDisplayed()
+        performClick()
+      }
+
+      verify(exactly = 0) { mockNavActions.navigateTo(any()) }
+      confirmVerified(mockNavActions)
+    }
+  }
 }

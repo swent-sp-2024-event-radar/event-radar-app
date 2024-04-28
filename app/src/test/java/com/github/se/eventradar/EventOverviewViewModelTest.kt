@@ -1,7 +1,9 @@
 package com.github.se.eventradar
 
 import android.util.Log
-import com.github.se.eventradar.model.*
+import com.github.se.eventradar.model.EventsOverviewViewModel
+import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventTicket
@@ -21,7 +23,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.junit.Assert.*
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -67,7 +69,7 @@ class EventsOverviewViewModelTest {
   private val mockUser =
       User(
           userId = "user1",
-          age = 30,
+          birthDate = "01/01/2000",
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",

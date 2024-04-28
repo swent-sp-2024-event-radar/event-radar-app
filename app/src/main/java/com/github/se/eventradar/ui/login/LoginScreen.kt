@@ -39,11 +39,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun ErrorDialogBox(openErrorDialog: MutableState<Boolean>) {
@@ -69,7 +71,7 @@ fun ErrorDialogBox(openErrorDialog: MutableState<Boolean>) {
 }
 
 @Composable
-fun LoginScreen(navigationActions: NavigationActions) {
+fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), navigationActions: NavigationActions) {
 
   val openErrorDialog = remember { mutableStateOf(false) }
 
@@ -77,12 +79,21 @@ fun LoginScreen(navigationActions: NavigationActions) {
       rememberLauncherForActivityResult(
           contract = FirebaseAuthUIActivityResultContract(),
           onResult = { result ->
-            if (result.resultCode == Activity.RESULT_OK)
-                navigationActions.navController.navigate(Route.HOME)
-            else openErrorDialog.value = true
+            if (result.resultCode == Activity.RESULT_OK) {
+              val currentUser = FirebaseAuth.getInstance().currentUser
+              if (currentUser != null) {
+                if (viewModel.isUserLoggedIn(currentUser.uid)) {
+                  navigationActions.navController.navigate(Route.HOME)
+                } else {
+                  navigationActions.navController.navigate(Route.SIGNUP)
+                }
+              } else {
+                openErrorDialog.value = true
+              }
+            } else openErrorDialog.value = true
           })
 
-  ErrorDialogBox(openErrorDialog = openErrorDialog)
+  ErrorDialogBox(openErrorDialog)
 
   val providers =
       arrayListOf(

@@ -34,8 +34,8 @@ data class Event(
       ticket =
           EventTicket(
               name = map["ticket_name"] as String,
-              price = map["ticket_price"] as Double,
-              capacity = map["ticket_quantity"] as Int),
+              price = (map["ticket_price"] as Long).toDouble(),
+              capacity = (map["ticket_quantity"] as Long).toInt()),
       contact = map["contact"] as String,
       organiserList = getSetOfStrings(map["organisers_list"]),
       attendeeList = getSetOfStrings(map["attendees_list"]),
