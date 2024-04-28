@@ -76,5 +76,12 @@ constructor(
 
 data class EventsOverviewUiState(
     val eventList: EventList = EventList(emptyList(), emptyList(), null),
+    var viewType: ViewType = ViewType.LIST,
+    var tab: Tab = Tab.BROWSE,
     val searchQuery: String = "",
 )
+
+enum class Tab {
+    BROWSE,
+    UPCOMING_EVENTS
+}
