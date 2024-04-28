@@ -23,7 +23,6 @@ import org.junit.Rule
 import org.junit.Test
 
 @HiltAndroidTest
-// @Config(application = HiltTestApplication::class)
 class SignupTest : TestCase() {
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -45,14 +44,36 @@ class SignupTest : TestCase() {
   fun allElementsAreCorrectlyDisplayed() = run {
     ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
       // Test the UI elements
-      eventRadarLogo { assertIsDisplayed() }
-      profilePicture { assertIsDisplayed() }
-      usernameTextField { assertIsDisplayed() }
-      nameTextField { assertIsDisplayed() }
-      surnameTextField { assertIsDisplayed() }
-      phoneTextField { assertIsDisplayed() }
-      birthDateTextField { assertIsDisplayed() }
+      eventRadarLogo {
+        performScrollTo()
+        assertIsDisplayed()
+      }
+      profilePicture {
+        performScrollTo()
+        assertIsDisplayed()
+      }
+      usernameTextField {
+        performScrollTo()
+        assertIsDisplayed()
+      }
+      nameTextField {
+        performScrollTo()
+        assertIsDisplayed()
+      }
+      surnameTextField {
+        performScrollTo()
+        assertIsDisplayed()
+      }
+      phoneTextField {
+        performScrollTo()
+        assertIsDisplayed()
+      }
+      birthDateTextField {
+        performScrollTo()
+        assertIsDisplayed()
+      }
       signUpButton {
+        performScrollTo()
         assertIsDisplayed()
         assertHasClickAction()
       }
@@ -66,22 +87,27 @@ class SignupTest : TestCase() {
     ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
       step("fill in all fields") {
         usernameTextField {
+          performScrollTo()
           assertIsDisplayed()
           performTextInput("test")
         }
         nameTextField {
+          performScrollTo()
           assertIsDisplayed()
           performTextInput("test")
         }
         surnameTextField {
+          performScrollTo()
           assertIsDisplayed()
           performTextInput("test")
         }
         phoneTextField {
+          performScrollTo()
           assertIsDisplayed()
           performTextInput("123456789")
         }
         birthDateTextField {
+          performScrollTo()
           assertIsDisplayed()
           performTextInput("01/01/2000")
         }
@@ -89,6 +115,7 @@ class SignupTest : TestCase() {
 
       step("click on sign up button") {
         signUpButton {
+          performScrollTo()
           assertIsDisplayed()
           performClick()
         }
@@ -118,6 +145,7 @@ class SignupTest : TestCase() {
   fun notAbleToSignInIfNotAllFieldsEntered() {
     ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
       signUpButton {
+        performScrollTo()
         assertIsDisplayed()
         performClick()
       }
