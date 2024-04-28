@@ -50,6 +50,7 @@ import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 import com.github.se.eventradar.util.toast
 import com.github.se.eventradar.viewmodel.HostedEventsViewModel
+import com.github.se.eventradar.viewmodel.ViewType
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -58,8 +59,11 @@ fun HostingScreen(
     navigationActions: NavigationActions
 ) {
   val uiState by viewModel.uiState.collectAsState()
-  val currentUser = FirebaseAuth.getInstance().currentUser?.uid
-  LaunchedEffect(key1 = uiState.eventList) { viewModel.getHostedEvents(currentUser.toString()) }
+    var viewToggleIcon by remember {
+        mutableStateOf(
+            if (uiState.viewType == ViewType.LIST) Icons.Default.Place else Icons.AutoMirrored.Filled.List)
+    }
+  LaunchedEffect(key1 = uiState.eventList) { viewModel.getHostedEvents() }
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("hostingScreen")) {
     val (logo, title, divider, eventList, eventMap, bottomNav, buttons) = createRefs()
     Logo(
@@ -82,7 +86,7 @@ fun HostingScreen(
                     }))
     HorizontalDivider(
         modifier = Modifier.constrainAs(divider, { top.linkTo(title.bottom, margin = 10.dp) }))
-    if (uiState.viewList == true) {
+    if (uiState.viewType == ViewType.LIST) {
       EventList(
           uiState.eventList.allEvents,
          Modifier.fillMaxWidth().constrainAs(eventList) {
@@ -116,16 +120,15 @@ fun HostingScreen(
               onClick = { context.toast("Create Event still needs to be implemented") },
               modifier = Modifier.testTag("createEventFab"))
           Spacer(modifier = Modifier.width(16.dp))
-          var viewToggleIcon by remember {
-            mutableStateOf(
-                if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List)
-          }
           ViewToggleFab(
               modifier = Modifier.testTag("viewToggleFab"),
               onClick = {
-                uiState.viewList = !uiState.viewList
-                viewToggleIcon =
-                    if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List
+                  if (uiState.viewType == ViewType.LIST){
+                      uiState.viewType = ViewType.MAP
+                  } else {
+                      uiState.viewType = ViewType.LIST
+                  }
+                  viewToggleIcon = if (uiState.viewType == ViewType.LIST) Icons.Default.Place else Icons.AutoMirrored.Filled.List
               },
               iconVector = viewToggleIcon)
         }

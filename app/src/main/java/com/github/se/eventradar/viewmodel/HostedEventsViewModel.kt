@@ -7,6 +7,7 @@ import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,9 +23,15 @@ constructor(
 ) : ViewModel() {
   private val _uiState = MutableStateFlow(HostedEventsUiState())
   val uiState: StateFlow<HostedEventsUiState> = _uiState
-
-  fun getHostedEvents(uid: String) {
+  fun getHostedEvents() {
+      val currentUser = FirebaseAuth.getInstance().currentUser
+      val uid = if (currentUser != null) {
+          currentUser.uid
+      } else {
+          throw IllegalStateException("User is not authenticated")
+      }
     viewModelScope.launch {
+
       when (val userResponse = userRepository.getUser(uid)) {
         is Resource.Success -> {
           val user = userResponse.data!!

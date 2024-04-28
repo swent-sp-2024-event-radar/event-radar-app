@@ -88,5 +88,5 @@ data class EventsOverviewUiState(
 
 enum class Tab {
   BROWSE,
-  UPCOMING_EVENTS
+  UPCOMING_EVENTS,
 }
