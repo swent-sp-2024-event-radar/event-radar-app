@@ -69,8 +69,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
-import com.github.se.eventradar.model.EventsOverviewUiState
-import com.github.se.eventradar.model.EventsOverviewViewModel
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.repository.event.MockEventRepository
@@ -79,6 +77,8 @@ import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.eventradar.viewmodel.EventsOverviewUiState
+import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
