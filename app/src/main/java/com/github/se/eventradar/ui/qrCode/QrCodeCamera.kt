@@ -29,7 +29,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.github.se.eventradar.qrCode.QrCodeAnalyser
 
-class QrCodeScanCamera() {
+class QrCodeCamera() {
 
     @Composable
      fun QrCodeScanner(friendOrTicket: Int) {
