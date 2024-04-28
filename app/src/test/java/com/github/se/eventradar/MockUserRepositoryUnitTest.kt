@@ -95,4 +95,17 @@ class MockUserRepositoryUnitTest {
     assert((result as Resource.Success).data.size == 2)
     assert((result).data.containsAll(listOf(user1, user2)))
   }
+
+  @Test
+  fun testIsUserLoggedIn() = runTest {
+    userRepository.addUser(mockUser)
+    val result = userRepository.isUserLoggedIn("1")
+    assert(result is Resource.Success)
+  }
+
+  @Test
+  fun testIsUserLoggedInFalseCase() = runTest {
+    val result = userRepository.isUserLoggedIn("2")
+    assert(result is Resource.Failure)
+  }
 }
