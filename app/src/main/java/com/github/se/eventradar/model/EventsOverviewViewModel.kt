@@ -2,8 +2,8 @@ package com.github.se.eventradar.model
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.github.se.eventradar.model.event.EventCategory
 import androidx.lifecycle.viewModelScope
+import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
