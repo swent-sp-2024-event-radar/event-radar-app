@@ -23,16 +23,9 @@ constructor(
 ) : ViewModel() {
   private val _uiState = MutableStateFlow(HostedEventsUiState())
   val uiState: StateFlow<HostedEventsUiState> = _uiState
-  fun getHostedEvents() {
-      val currentUser = FirebaseAuth.getInstance().currentUser
-      val uid = if (currentUser != null) {
-          currentUser.uid
-      } else {
-          throw IllegalStateException("User is not authenticated")
-      }
-    viewModelScope.launch {
-
-      when (val userResponse = userRepository.getUser(uid)) {
+    fun getHostedEvents(uid: String) {
+        viewModelScope.launch {
+            when (val userResponse = userRepository.getUser(uid)) {
         is Resource.Success -> {
           val user = userResponse.data!!
           val eventsHostList = user.eventsHostList

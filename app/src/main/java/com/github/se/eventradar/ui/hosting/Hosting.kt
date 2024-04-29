@@ -53,6 +53,7 @@ import com.github.se.eventradar.viewmodel.HostedEventsViewModel
 
 @Composable
 fun HostingScreen(
+    uid: String,
     viewModel: HostedEventsViewModel = hiltViewModel(),
     navigationActions: NavigationActions
 ) {
@@ -61,7 +62,7 @@ fun HostingScreen(
         mutableStateOf(
             if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List)
     }
-  LaunchedEffect(key1 = uiState.eventList) { viewModel.getHostedEvents() }
+  LaunchedEffect(key1 = uiState.eventList) { viewModel.getHostedEvents(uid) }
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("hostingScreen")) {
     val (logo, title, divider, eventList, eventMap, bottomNav, buttons) = createRefs()
     Logo(

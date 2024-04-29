@@ -3,6 +3,7 @@ package com.github.se.eventradar.hosting
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventList
@@ -12,7 +13,6 @@ import com.github.se.eventradar.screens.HostingScreen
 import com.github.se.eventradar.ui.hosting.HostingScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.viewmodel.HostedEventsViewModel
-import com.google.firebase.auth.FirebaseAuth
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -36,6 +36,7 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
   @RelaxedMockK lateinit var mockHostedEventsViewModel: HostedEventsViewModel
+
   private val sampleEventList =
       MutableStateFlow(
           HostedEventsUiState(
@@ -57,12 +58,26 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
                             fireBaseID = "$it")
                       }))
       )
+    private val mockUser =
+        User(
+            userId = "userid1",
+            age = 30,
+            email = "test@example.com",
+            firstName = "John",
+            lastName = "Doe",
+            phoneNumber = "1234567890",
+            accountStatus = "active",
+            eventsAttendeeList = listOf("userId1", "userId2"),
+            eventsHostList = listOf(),
+            profilePicUrl = "http://example.com/pic.jpg",
+            qrCodeUrl = "http://example.com/qr.jpg",
+            username = "john_doe")
   @Before
   fun testSetup() {
     every { mockHostedEventsViewModel.getHostedEvents(any()) } returns Unit
     every { mockHostedEventsViewModel.uiState } returns sampleEventList
     composeTestRule.setContent {
-      HostingScreen(viewModel = mockHostedEventsViewModel, navigationActions = mockNavActions)
+      HostingScreen(uid = mockUser.userId, viewModel = mockHostedEventsViewModel, navigationActions = mockNavActions)
     }
   }
 
