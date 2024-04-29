@@ -49,7 +49,7 @@ class MockUserRepository : IUserRepository {
     }
   }
 
-  override suspend fun isUserLoggedIn(userId: String): Resource<Unit> {
+  override suspend fun doesUserExist(userId: String): Resource<Unit> {
     return if (mockUsers.none { userId == it.userId })
         Resource.Failure(Exception("User not logged in"))
     else Resource.Success(Unit)

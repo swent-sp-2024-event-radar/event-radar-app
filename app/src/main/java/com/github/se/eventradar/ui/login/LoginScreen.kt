@@ -95,7 +95,7 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), navigationActions: 
             if (result.resultCode == Activity.RESULT_OK) {
               val currentUser = FirebaseAuth.getInstance().currentUser
               if (currentUser != null) {
-                if (viewModel.isUserLoggedIn(currentUser.uid)) {
+                if (viewModel.doesUserExist(currentUser.uid)) {
                   navigationActions.navController.navigate(Route.HOME)
                 } else {
                   navigationActions.navController.navigate(Route.SIGNUP)

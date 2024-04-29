@@ -12,6 +12,7 @@ class LoginScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   // Structural elements of the UI of the Signup screen
   val eventRadarLogo: KNode = onNode { hasTestTag("eventRadarLogo") }
   val loginButton: KNode = onNode { hasTestTag("loginButton") }
+  val signUpButton: KNode = onNode { hasTestTag("signUpButton") }
   val errorDialog: KNode = onNode { hasTestTag("loginErrorDialog") }
   val errorDialogText: KNode = onNode { hasTestTag("loginErrorDisplayText") }
   val errorDialogButton: KNode = onNode { hasTestTag("errorDialogConfirmButton") }

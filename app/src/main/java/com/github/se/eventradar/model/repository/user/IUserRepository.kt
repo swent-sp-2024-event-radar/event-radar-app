@@ -17,5 +17,5 @@ interface IUserRepository {
 
   suspend fun deleteUser(user: User): Resource<Unit>
 
-  suspend fun isUserLoggedIn(userId: String): Resource<Unit>
+  suspend fun doesUserExist(userId: String): Resource<Unit>
 }

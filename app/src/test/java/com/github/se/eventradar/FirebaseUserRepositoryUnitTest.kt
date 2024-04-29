@@ -362,7 +362,7 @@ class FirebaseUserRepositoryUnitTest {
     every { userRef.document(uid).get() } returns mockTask(mockDocumentSnapshot)
     every { mockDocumentSnapshot.exists() } returns true
 
-    val result = firebaseUserRepository.isUserLoggedIn(uid)
+    val result = firebaseUserRepository.doesUserExist(uid)
 
     assert(result is Resource.Success)
   }
@@ -372,7 +372,7 @@ class FirebaseUserRepositoryUnitTest {
     every { userRef.document(uid).get() } returns mockTask(mockDocumentSnapshot)
     every { mockDocumentSnapshot.exists() } returns false
 
-    val result = firebaseUserRepository.isUserLoggedIn(uid)
+    val result = firebaseUserRepository.doesUserExist(uid)
 
     assert(result is Resource.Failure)
     assert((result as Resource.Failure).throwable.message == "User not found")
@@ -383,7 +383,7 @@ class FirebaseUserRepositoryUnitTest {
     val message = "Exception"
     every { userRef.document(uid).get() } returns mockTask(mockDocumentSnapshot, Exception(message))
 
-    val result = firebaseUserRepository.isUserLoggedIn(uid)
+    val result = firebaseUserRepository.doesUserExist(uid)
 
     assert(result is Resource.Failure)
     assert((result as Resource.Failure).throwable.message == message)

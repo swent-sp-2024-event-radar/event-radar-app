@@ -66,7 +66,7 @@ class LoginFailureTest : TestCase() {
   }
 
   @Test
-  fun dialogErrorBoxOpensWhenSignUpFails() = run {
+  fun dialogErrorBoxOpensWhenLoginFails() = run {
     ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
       step("Click on the Sign Up button") {
         loginButton {

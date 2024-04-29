@@ -99,13 +99,13 @@ class MockUserRepositoryUnitTest {
   @Test
   fun testIsUserLoggedIn() = runTest {
     userRepository.addUser(mockUser)
-    val result = userRepository.isUserLoggedIn("1")
+    val result = userRepository.doesUserExist("1")
     assert(result is Resource.Success)
   }
 
   @Test
   fun testIsUserLoggedInFalseCase() = runTest {
-    val result = userRepository.isUserLoggedIn("2")
+    val result = userRepository.doesUserExist("2")
     assert(result is Resource.Failure)
   }
 }

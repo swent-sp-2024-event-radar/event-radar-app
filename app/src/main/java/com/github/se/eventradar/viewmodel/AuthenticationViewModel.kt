@@ -70,16 +70,16 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
     }
   }
 
-  fun isUserLoggedIn(userId: String): Boolean {
-    var isUserLoggedIn: Boolean
+  fun doesUserExist(userId: String): Boolean {
+    var userExists: Boolean
 
-    runBlocking { isUserLoggedIn = isUserLoggedInAsync(userId) }
+    runBlocking { userExists = doesUserExistAsync(userId) }
 
-    return isUserLoggedIn
+    return userExists
   }
 
-  private suspend fun isUserLoggedInAsync(userId: String): Boolean {
-    return when (val result = userRepository.isUserLoggedIn(userId)) {
+  private suspend fun doesUserExistAsync(userId: String): Boolean {
+    return when (val result = userRepository.doesUserExist(userId)) {
       is Resource.Success -> {
         true
       }

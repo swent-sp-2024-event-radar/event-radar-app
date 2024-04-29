@@ -174,7 +174,7 @@ class LoginViewModelTest {
   @Test
   fun testIsUserLoggedIn() = runTest {
     userRepository.addUser(mockUser)
-    val result = viewModel.isUserLoggedIn("1")
+    val result = viewModel.doesUserExist("1")
     assert(result)
   }
 
@@ -183,7 +183,7 @@ class LoginViewModelTest {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
 
-    val result = viewModel.isUserLoggedIn("2")
+    val result = viewModel.doesUserExist("2")
     assert(!result)
   }
 }
