@@ -27,7 +27,7 @@ data class Event(
       end = LocalDateTime.parse(map["end"] as String),
       location =
           Location(
-              latitude = map["location_lat"] as Double,
+              map["location_lat"] as Double,
               longitude = map["location_lng"] as Double,
               address = map["location_name"] as String),
       description = map["description"] as String,
@@ -48,9 +48,9 @@ data class Event(
     map["photo_url"] = eventPhoto
     map["start"] = start.toString()
     map["end"] = end.toString()
-    map["location_name"] = location.address
     map["location_lat"] = location.latitude
     map["location_lng"] = location.longitude
+    map["location_name"] = location.address
     map["description"] = description
     map["ticket_name"] = ticket.name
     map["ticket_price"] = ticket.price

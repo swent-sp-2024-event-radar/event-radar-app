@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,129 +45,132 @@ fun EventDetails(
     navigationActions: NavigationActions
 ) {
 
-  viewModel.getEventData()
-  val eventUiState = viewModel.uiState.collectAsState().value
+    LaunchedEffect(Unit) {  // Using `Unit` as a key to run only once
+        viewModel.getEventData()
+    }
 
-  val componentStyle =
-      EventComponentsStyle(
-          MaterialTheme.colorScheme.onSurface,
-          MaterialTheme.colorScheme.onSurfaceVariant,
-          MaterialTheme.colorScheme.onSurface,
-      )
+    val eventUiState = viewModel.uiState.collectAsState().value
 
-  Scaffold(
-      modifier = Modifier.testTag("EventDetailsScreen"),
-      topBar = {},
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelected = { tab -> navigationActions.navigateTo(tab) },
-            tabList = TOP_LEVEL_DESTINATIONS,
-            selectedItem = TOP_LEVEL_DESTINATIONS[2],
-            modifier = Modifier.testTag("bottomNavMenu"))
-      },
-      floatingActionButton = {
-        // register button
-        FloatingActionButton(
-            onClick = { /*TODO*/},
-            modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("ticketButton"),
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-        ) {
-          Icon(
-              painter = painterResource(id = R.drawable.ticket),
-              contentDescription = "register to event button",
-              modifier = Modifier.size(32.dp),
-              tint = MaterialTheme.colorScheme.primary,
-          )
-        }
-      }) { innerPadding ->
+    val componentStyle =
+        EventComponentsStyle(
+            MaterialTheme.colorScheme.onSurface,
+            MaterialTheme.colorScheme.onSurfaceVariant,
+            MaterialTheme.colorScheme.onSurface,
+        )
+
+    Scaffold(
+        modifier = Modifier.testTag("EventDetailsScreen"),
+        topBar = {},
+        bottomBar = {
+            BottomNavigationMenu(
+                onTabSelected = { tab -> navigationActions.navigateTo(tab) },
+                tabList = TOP_LEVEL_DESTINATIONS,
+                selectedItem = TOP_LEVEL_DESTINATIONS[2],
+                modifier = Modifier.testTag("bottomNavMenu"))
+        },
+        floatingActionButton = {
+            // register button
+            FloatingActionButton(
+                onClick = { /*TODO*/},
+                modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("ticketButton"),
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ticket),
+                    contentDescription = "register to event button",
+                    modifier = Modifier.size(32.dp),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            }
+        }) { innerPadding ->
         ConstraintLayout(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-          val (image, backButton, title, description, distance, date, category, time) = createRefs()
-          val imagePainter: Painter = rememberImagePainter(eventUiState.eventPhoto)
-          Image(
-              painter = imagePainter,
-              contentDescription = "Event banner image",
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .height(imageHeight)
-                      .constrainAs(image) {
+            val (image, backButton, title, description, distance, date, category, time) = createRefs()
+            val imagePainter: Painter = rememberImagePainter(eventUiState.eventPhoto)
+            Image(
+                painter = imagePainter,
+                contentDescription = "Event banner image",
+                modifier =
+                Modifier.fillMaxWidth()
+                    .height(imageHeight)
+                    .constrainAs(image) {
                         top.linkTo(parent.top, margin = 0.dp)
                         start.linkTo(parent.start, margin = 0.dp)
-                      }
-                      .testTag("eventImage"),
-              contentScale = ContentScale.FillWidth)
+                    }
+                    .testTag("eventImage"),
+                contentScale = ContentScale.FillWidth)
 
-          // Go back button
-          Button(
-              onClick = { navigationActions.goBack() },
-              modifier =
-                  Modifier.wrapContentSize()
-                      .constrainAs(backButton) {
+            // Go back button
+            Button(
+                onClick = { navigationActions.goBack() },
+                modifier =
+                Modifier.wrapContentSize()
+                    .constrainAs(backButton) {
                         top.linkTo(image.bottom, margin = 8.dp)
                         start.linkTo(image.start, margin = 4.dp)
-                      }
-                      .testTag("goBackButton"),
-              colors =
-                  ButtonDefaults.buttonColors(
-                      contentColor = Color.Transparent,
-                      containerColor = Color.Transparent,
-                  ),
-          ) {
-            Icon(
-                painter = painterResource(id = R.drawable.back_arrow),
-                contentDescription = "Back navigation arrow",
-                tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.width(24.dp).height(24.dp).align(Alignment.CenterVertically))
-          }
+                    }
+                    .testTag("goBackButton"),
+                colors =
+                ButtonDefaults.buttonColors(
+                    contentColor = Color.Transparent,
+                    containerColor = Color.Transparent,
+                ),
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.back_arrow),
+                    contentDescription = "Back navigation arrow",
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.width(24.dp).height(24.dp).align(Alignment.CenterVertically))
+            }
 
-          Text(
-              text = eventUiState.eventName,
-              style = componentStyle.titleStyle,
-              modifier =
-                  Modifier.constrainAs(title) {
-                        top.linkTo(image.bottom, margin = 32.dp)
-                        start.linkTo(image.start)
-                        end.linkTo(image.end)
-                      }
-                      .testTag("eventTitle"),
-              color = MaterialTheme.colorScheme.onSurface)
+            Text(
+                text = eventUiState.eventName,
+                style = componentStyle.titleStyle,
+                modifier =
+                Modifier.constrainAs(title) {
+                    top.linkTo(image.bottom, margin = 32.dp)
+                    start.linkTo(image.start)
+                    end.linkTo(image.end)
+                }
+                    .testTag("eventTitle"),
+                color = MaterialTheme.colorScheme.onSurface)
 
-          EventDescription(
-              modifier =
-                  Modifier
-                      // .padding(start = widthPadding, end = widthPadding)
-                      .constrainAs(description) {
+            EventDescription(
+                modifier =
+                Modifier
+                    // .padding(start = widthPadding, end = widthPadding)
+                    .constrainAs(description) {
                         top.linkTo(title.bottom, margin = 32.dp)
                         start.linkTo(parent.start, margin = widthPadding)
-                      },
-              eventUiState,
-              componentStyle)
+                    },
+                eventUiState,
+                componentStyle)
 
-          EventDistance(
-              modifier =
-                  Modifier.constrainAs(distance) {
+            EventDistance(
+                modifier =
+                Modifier.constrainAs(distance) {
                     top.linkTo(description.bottom, margin = 32.dp)
                     start.linkTo(parent.start, margin = widthPadding)
-                  },
-              eventUiState,
-              componentStyle)
+                },
+                eventUiState,
+                componentStyle)
 
-          EventDateTime(
-              modifier =
-                  Modifier.constrainAs(time) {
+            EventDateTime(
+                modifier =
+                Modifier.constrainAs(time) {
                     top.linkTo(distance.bottom, margin = 32.dp)
                     start.linkTo(parent.start, margin = widthPadding)
-                  },
-              eventUiState,
-              componentStyle)
+                },
+                eventUiState,
+                componentStyle)
 
-          EventCategory(
-              modifier =
-                  Modifier.constrainAs(category) {
+            EventCategory(
+                modifier =
+                Modifier.constrainAs(category) {
                     top.linkTo(time.bottom, margin = 32.dp)
                     start.linkTo(parent.start, margin = widthPadding)
-                  },
-              eventUiState,
-              componentStyle)
+                },
+                eventUiState,
+                componentStyle)
         }
-      }
+    }
 }
