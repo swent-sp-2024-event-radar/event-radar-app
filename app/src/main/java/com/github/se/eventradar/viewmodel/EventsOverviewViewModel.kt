@@ -8,7 +8,6 @@ import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
-import com.google.android.play.core.assetpacks.db
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,32 +23,34 @@ constructor(
 ) : ViewModel() {
   private val _uiState = MutableStateFlow(EventsOverviewUiState())
   val uiState: StateFlow<EventsOverviewUiState> = _uiState
-    
-    fun onSearchQueryChanged(query: String) {
-        _uiState.value = _uiState.value.copy(searchQuery = query)
-        filterEvents()
-    }
 
-    fun onFilterApplyClicked(applyFilter: Boolean) {
-        _uiState.value = _uiState.value.copy(isFilterDialogOpen = applyFilter)
-        filterEvents()
-    }
+  fun onSearchQueryChanged(query: String) {
+    _uiState.value = _uiState.value.copy(searchQuery = query)
+    filterEvents()
+  }
 
-    private fun filterEvents() {
-        val query = _uiState.value.searchQuery
-        val filteredEvents =
-            _uiState.value.eventList.allEvents.filter { it.eventName.contains(query, ignoreCase = true) }
+  fun onFilterApplyClicked(applyFilter: Boolean) {
+    _uiState.value = _uiState.value.copy(isFilterDialogOpen = applyFilter)
+    filterEvents()
+  }
 
-        if (_uiState.value.isFilterDialogOpen) {
-            filteredEvents.filter { it.category == _uiState.value.eventList.selectedEvent?.category }
-        } else {
-            filteredEvents
+  private fun filterEvents() {
+    val query = _uiState.value.searchQuery
+    val filteredEvents =
+        _uiState.value.eventList.allEvents.filter {
+          it.eventName.contains(query, ignoreCase = true)
         }
 
-        _uiState.value = _uiState.value.copy(
-            eventList = _uiState.value.eventList.copy(filteredEvents = filteredEvents)
-        )
+    if (_uiState.value.isFilterDialogOpen) {
+      filteredEvents.filter { it.category == _uiState.value.eventList.selectedEvent?.category }
+    } else {
+      filteredEvents
     }
+
+    _uiState.value =
+        _uiState.value.copy(
+            eventList = _uiState.value.eventList.copy(filteredEvents = filteredEvents))
+  }
 
   fun getEvents() {
     viewModelScope.launch {

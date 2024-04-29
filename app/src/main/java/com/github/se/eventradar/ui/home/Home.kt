@@ -31,7 +31,6 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
@@ -163,39 +162,37 @@ fun HomeScreen(
               }
         }
 
-      SearchBarAndFilter(
-          onSearchQueryChange = { uiState.searchQuery = it },
-          uiState = uiState,
-          showFilterPopUp = uiState.isFilterDialogOpen,
-          setShowFilterPopUp = { uiState.isFilterDialogOpen = it },
-          modifier = Modifier
-              .padding(horizontal = 16.dp, vertical = 8.dp)
-              .constrainAs(searchAndFilter) {
-                  top.linkTo(tabs.bottom, margin = 8.dp)
-                  start.linkTo(parent.start)
-                  end.linkTo(parent.end)
-              }
-      )
+    SearchBarAndFilter(
+        onSearchQueryChange = { viewModel.onSearchQueryChanged(it) },
+        uiState = uiState,
+        showFilterPopUp = uiState.isFilterDialogOpen,
+        setShowFilterPopUp = { uiState.isFilterDialogOpen = it },
+        modifier =
+            Modifier.padding(horizontal = 16.dp, vertical = 8.dp).constrainAs(searchAndFilter) {
+              top.linkTo(tabs.bottom, margin = 8.dp)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
+            })
 
     if (selectedTabIndex == 0) {
       if (viewToggleBrowseIndex == 0) {
-          if (uiState.searchQuery == "") {
-              EventList(
-                  uiState.eventList.allEvents,
-                  Modifier.fillMaxWidth().constrainAs(eventList) {
-                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                      start.linkTo(parent.start)
-                      end.linkTo(parent.end)
-                  })
-          } else {
-              EventList(
-                  uiState.eventList.filteredEvents,
-                  Modifier.fillMaxWidth().constrainAs(eventList) {
-                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                      start.linkTo(parent.start)
-                      end.linkTo(parent.end)
-                  })
-          }
+        if (uiState.searchQuery == "") {
+          EventList(
+              uiState.eventList.allEvents,
+              Modifier.fillMaxWidth().constrainAs(eventList) {
+                top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+              })
+        } else {
+          EventList(
+              uiState.eventList.filteredEvents,
+              Modifier.fillMaxWidth().constrainAs(eventList) {
+                top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+              })
+        }
       } else {
         EventMap(
             uiState.eventList.allEvents,
@@ -269,28 +266,21 @@ fun SearchBarAndFilter(
     setShowFilterPopUp: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-    ) {
-        // Search bar
-        TextField(
-            value = uiState.searchQuery,
-            // function onSearchQueryChange() needs to be created in the VM
-            onValueChange = { onSearchQueryChange(it) },
-            modifier = Modifier.weight(1f),
-            maxLines = 1,
-            shape = RoundedCornerShape(32.dp),
-            colors = TextFieldDefaults.colors(
+  Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
+    // Search bar
+    TextField(
+        value = uiState.searchQuery,
+        onValueChange = { onSearchQueryChange(it) },
+        modifier = Modifier.weight(1f),
+        maxLines = 1,
+        shape = RoundedCornerShape(32.dp),
+        colors =
+            TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent
-            ),
-            placeholder = { Text("Search event...") },
-            trailingIcon = {
-                Icon(Icons.Default.Search, contentDescription = null)
-            }
-        )
+                disabledIndicatorColor = Color.Transparent),
+        placeholder = { Text("Search event...") },
+        trailingIcon = { Icon(Icons.Default.Search, contentDescription = null) })
 
     // Filter button
     Button(
