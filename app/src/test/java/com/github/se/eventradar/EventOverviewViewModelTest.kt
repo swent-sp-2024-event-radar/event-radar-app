@@ -14,8 +14,8 @@ import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockkStatic
+import io.mockk.unmockkAll
 import io.mockk.verify
-import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestDispatcher
@@ -29,6 +29,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
+import java.time.LocalDateTime
 
 @ExperimentalCoroutinesApi
 class EventsOverviewViewModelTest {
@@ -153,6 +154,7 @@ class EventsOverviewViewModelTest {
 
     verify { Log.d("EventsOverviewViewModel", "Error getting events for user2") }
     confirmVerified()
+    unmockkAll()
   }
 
   @Test
@@ -168,6 +170,7 @@ class EventsOverviewViewModelTest {
     assertNull(viewModel.uiState.value.eventList.selectedEvent)
     verify { Log.d("EventsOverviewViewModel", "Error fetching user document") }
     confirmVerified()
+    unmockkAll()
   }
 
   @Test

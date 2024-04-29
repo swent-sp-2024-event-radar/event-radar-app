@@ -12,7 +12,9 @@ import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
 import io.mockk.slot
+import io.mockk.unmockkAll
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
@@ -55,6 +57,11 @@ class FirebaseUserRepositoryUnitTest {
     every { mockDb.collection("users") } returns userRef
 
     firebaseUserRepository = FirebaseUserRepository(db = mockDb)
+  }
+  
+  @After
+  fun tearDown() {
+    unmockkAll()
   }
 
   @Test

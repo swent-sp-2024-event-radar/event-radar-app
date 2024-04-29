@@ -11,10 +11,10 @@ import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.viewmodel.HostedEventsViewModel
+import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.verify
-import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestDispatcher
@@ -28,6 +28,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
+import java.time.LocalDateTime
 
 @ExperimentalCoroutinesApi
 class HostedEventsViewModelTest {
@@ -139,6 +140,7 @@ class HostedEventsViewModelTest {
       Log.d(
           "HostedEventsViewModel", "Error getting hosted events for ${userWithHostedEvent.userId}")
     }
+    confirmVerified()
   }
 
   @Test
@@ -151,5 +153,6 @@ class HostedEventsViewModelTest {
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
     Assert.assertNull(viewModel.uiState.value.eventList.selectedEvent)
     verify { Log.d("HostedEventsViewModel", "Error fetching user document") }
+    confirmVerified()
   }
 }

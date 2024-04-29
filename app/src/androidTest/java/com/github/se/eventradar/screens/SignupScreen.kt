@@ -22,7 +22,8 @@ class SignupScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   private val birthdate: KNode = onNode { hasTestTag("signUpBirthDateField") }
   val birthDateTextField: KNode = birthdate.child { hasTestTag("signUpBirthDateTextField") }
   val signUpButton: KNode = onNode { hasTestTag("signUpLoginButton") }
-  val profilePicture: KNode = onNode { hasTestTag("signUpProfilePicture") }
+  val profileSelectedPicture: KNode = onNode { hasTestTag("signUpProfilePicture") }
+  val profilePicture: KNode = onNode { hasTestTag("signUpProfilePicturePlaceholder") }
   val errorDialog: KNode = onNode { hasTestTag("signUpErrorDialog") }
   val errorDialogText: KNode = onNode { hasTestTag("loginErrorDisplayText") }
   val errorDialogButton: KNode = onNode { hasTestTag("errorDialogConfirmButton") }

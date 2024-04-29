@@ -144,7 +144,7 @@ fun SignUpScreen(
                 modifier =
                     Modifier.size(150.dp) // Adjust size as needed
                         .clip(CircleShape)
-                        .testTag("signUpProfilePicture")
+                        .testTag("signUpProfilePicturePlaceholder")
                         .clickable {
                           imagePickerLauncher.launch("image/*")
                         } // Launch the image picker when the placeholder is clicked

@@ -14,6 +14,8 @@ import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import io.mockk.unmockkAll
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +24,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -32,7 +35,7 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
-class LoginViewModelTest {
+class AuthenticationViewModelTest {
 
   @RelaxedMockK lateinit var viewModel: LoginViewModel
   @RelaxedMockK lateinit var user: FirebaseUser
@@ -84,6 +87,11 @@ class LoginViewModelTest {
 
     every { user.uid } returns "1"
     every { user.email } returns "test@test.com"
+  }
+  
+  @After
+  fun tearDown() {
+    unmockkAll()
   }
 
   @Test
@@ -169,6 +177,19 @@ class LoginViewModelTest {
     assert(result)
 
     assert(userRepository.getUser("1") is Resource.Success)
+  }
+
+  @Test
+  fun testAddUserFalseCase() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+    
+    val result = viewModel.addUser(mockUiState, null)
+    assert(!result)
+    
+    verify { Log.d("LoginScreenViewModel", "User not logged in") }
+    
+    unmockkAll()
   }
 
   @Test
