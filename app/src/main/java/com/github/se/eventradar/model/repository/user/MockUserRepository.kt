@@ -25,6 +25,11 @@ class MockUserRepository : IUserRepository {
     return Resource.Success(Unit)
   }
 
+  override suspend fun addUser(map: Map<String, Any?>, documentId: String): Resource<Unit> {
+    val user = User(map, documentId)
+    return addUser(user)
+  }
+
   override suspend fun updateUser(user: User): Resource<Unit> {
     val index = mockUsers.indexOfFirst { it.userId == user.userId }
 
@@ -42,5 +47,11 @@ class MockUserRepository : IUserRepository {
     } else {
       Resource.Failure(Exception("User with id ${user.userId} not found"))
     }
+  }
+
+  override suspend fun doesUserExist(userId: String): Resource<Unit> {
+    return if (mockUsers.none { userId == it.userId })
+        Resource.Failure(Exception("User not logged in"))
+    else Resource.Success(Unit)
   }
 }

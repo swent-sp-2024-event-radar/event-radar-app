@@ -39,18 +39,26 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
+import com.github.se.eventradar.viewmodel.LoginViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun ErrorDialogBox(openErrorDialog: MutableState<Boolean>) {
+fun ErrorDialogBox(openErrorDialog: MutableState<Boolean>, modifier: Modifier = Modifier) {
   val display by openErrorDialog
   if (display) {
     AlertDialog(
-        icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Account Icon") },
+        icon = {
+          Icon(
+              Icons.Default.AccountCircle,
+              contentDescription = "Account Icon",
+              modifier = Modifier.testTag("errorDialogIcon"))
+        },
         text = {
           Text(
               text = "Sign in Failed. Please try again.",
@@ -64,12 +72,19 @@ fun ErrorDialogBox(openErrorDialog: MutableState<Boolean>) {
           )
         },
         onDismissRequest = { openErrorDialog.value = false },
-        confirmButton = { TextButton(onClick = { openErrorDialog.value = false }) { Text("Ok") } })
+        confirmButton = {
+          TextButton(
+              onClick = { openErrorDialog.value = false },
+              modifier = Modifier.testTag("errorDialogConfirmButton")) {
+                Text("Ok")
+              }
+        },
+        modifier = modifier)
   }
 }
 
 @Composable
-fun LoginScreen(navigationActions: NavigationActions) {
+fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), navigationActions: NavigationActions) {
 
   val openErrorDialog = remember { mutableStateOf(false) }
 
@@ -77,12 +92,21 @@ fun LoginScreen(navigationActions: NavigationActions) {
       rememberLauncherForActivityResult(
           contract = FirebaseAuthUIActivityResultContract(),
           onResult = { result ->
-            if (result.resultCode == Activity.RESULT_OK)
-                navigationActions.navController.navigate(Route.HOME)
-            else openErrorDialog.value = true
+            if (result.resultCode == Activity.RESULT_OK) {
+              val currentUser = FirebaseAuth.getInstance().currentUser
+              if (currentUser != null) {
+                if (viewModel.doesUserExist(currentUser.uid)) {
+                  navigationActions.navController.navigate(Route.HOME)
+                } else {
+                  navigationActions.navController.navigate(Route.SIGNUP)
+                }
+              } else {
+                openErrorDialog.value = true
+              }
+            } else openErrorDialog.value = true
           })
 
-  ErrorDialogBox(openErrorDialog = openErrorDialog)
+  ErrorDialogBox(openErrorDialog, modifier = Modifier.testTag("loginErrorDialog"))
 
   val providers =
       arrayListOf(

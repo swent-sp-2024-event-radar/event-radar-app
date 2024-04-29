@@ -24,6 +24,7 @@ class EventDetailsViewModel(
   fun getEventData(eventId: String): Unit {
 
     // Fetch the specific document from Firebase
+    // TODO: refactor this to use the appropriate database structure
     db.collection("EVENT")
         .document(eventId)
         .get()
