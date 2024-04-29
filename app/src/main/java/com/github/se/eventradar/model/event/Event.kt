@@ -64,9 +64,9 @@ data class Event(
 }
 
 private fun getSetOfStrings(data: Any?): Set<String> {
-    return when (data) {
-        is List<*> -> data.filterIsInstance<String>().toSet()
-        is String -> setOf(data)
-        else -> emptySet()
-    }
+  return when (data) {
+    is List<*> -> data.filterIsInstance<String>().toSet()
+    is String -> setOf(data)
+    else -> emptySet()
+  }
 }
