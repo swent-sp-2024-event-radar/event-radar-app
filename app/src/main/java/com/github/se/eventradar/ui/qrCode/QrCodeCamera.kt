@@ -26,20 +26,17 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
-import com.github.se.eventradar.model.qrCode.QrCodeAnalyser
-
-import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
 
 
-class QrCodeCamera() {
+
+class QrCodeCamera {
 
     @Composable
-     fun QrCodeScanner(navigationActions: NavigationActions, friendOrTicket: Int) {
+     fun QrCodeScanner() {
 
         val context = LocalContext.current
         val lifeCycleOwner = LocalLifecycleOwner.current
-        val currentCoroutineScope = lifeCycleOwner.lifecycleScope
         val cameraFutureProvider = remember { ProcessCameraProvider.getInstance(context) }
 
         var hasCameraPermission by remember {
@@ -73,7 +70,7 @@ class QrCodeCamera() {
                                 .build()
                         imageAnalysis.setAnalyzer(
                             ContextCompat.getMainExecutor(context),
-                            QrCodeAnalyser(navigationActions, currentCoroutineScope, friendOrTicket)
+                            QrCodeAnalyser()
 
                         )
                         try {

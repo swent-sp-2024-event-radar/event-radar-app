@@ -1,6 +1,5 @@
 package com.github.se.eventradar.ui.qrCode
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -14,6 +13,8 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -31,14 +32,35 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.eventradar.ui.navigation.TopLevelDestination
+import com.github.se.eventradar.viewmodel.qrCode.NavigationEvent
+import com.github.se.eventradar.viewmodel.qrCode.QrCodeFriendViewModel
 
 @Composable
-fun QrCodeScreen(navigationActions: NavigationActions) {
+fun QrCodeScreen(viewModel: QrCodeFriendViewModel,  navigationActions: NavigationActions) {
+    val navigateState by viewModel.navigationEvent.collectAsState()
+
+    // React to changes in navigation state
+    LaunchedEffect(navigateState) {
+        when (navigateState) {
+            NavigationEvent.NavigateToNextScreen -> {
+                navigationActions.navigateTo( TopLevelDestination( //TODO
+                    route = Route.MESSAGE,
+                    icon = R.drawable.chat_bubble,
+                    textId = R.string.message_chats,
+                )
+                )// Adjust according to your actual navigation logic
+                viewModel.resetNavigationEvent() // Reset the navigation event in the ViewModel to prevent repeated navigations
+            }
+            else -> Unit // Do nothing if the state is None or any other non-navigational state
+        }
+    }
+
   var selectedTabIndex by remember { mutableIntStateOf(0) }
   val context = LocalContext.current
 
@@ -117,7 +139,7 @@ fun QrCodeScreen(navigationActions: NavigationActions) {
       Toast.makeText(context, "My Qr Code not yet available", Toast.LENGTH_SHORT).show()
     } else {
       Column(modifier = Modifier.testTag("QrScanner")) {
-        QrCodeCamera().QrCodeScanner(navigationActions, 0)
+        QrCodeCamera().QrCodeScanner()
       }
     }
     BottomNavigationMenu(
@@ -133,13 +155,13 @@ fun QrCodeScreen(navigationActions: NavigationActions) {
   }
 }
 
-private val dummyQrCodeScanned: (String) -> Unit = { qrCode ->
-  Log.d("QRCodeScanner", "QR Code Scanned: $qrCode")
-  // You can perform any additional logic here for testing
-}
+//private val dummyQrCodeScanned: (String) -> Unit = { qrCode ->
+//  Log.d("QRCodeScanner", "QR Code Scanned: $qrCode")
+//  // You can perform any additional logic here for testing
+//}
 
-@androidx.compose.ui.tooling.preview.Preview
-@Composable
-fun QrcodeScanTest() {
-  QrCodeScreen(NavigationActions(rememberNavController()))
-}
+//@androidx.compose.ui.tooling.preview.Preview
+//@Composable
+//fun QrcodeScanTest() {
+//  QrCodeScreen(viewNavigationActions(rememberNavController()))
+//}
