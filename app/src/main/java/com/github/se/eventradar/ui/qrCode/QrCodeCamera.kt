@@ -29,10 +29,13 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.github.se.eventradar.model.qrCode.QrCodeAnalyser
 
+import com.github.se.eventradar.ui.navigation.NavigationActions
+
+
 class QrCodeCamera() {
 
     @Composable
-     fun QrCodeScanner(friendOrTicket: Int) {
+     fun QrCodeScanner(navigationActions: NavigationActions, friendOrTicket: Int) {
 
         val context = LocalContext.current
         val lifeCycleOwner = LocalLifecycleOwner.current
@@ -70,7 +73,7 @@ class QrCodeCamera() {
                                 .build()
                         imageAnalysis.setAnalyzer(
                             ContextCompat.getMainExecutor(context),
-                            QrCodeAnalyser(currentCoroutineScope, friendOrTicket)
+                            QrCodeAnalyser(navigationActions, currentCoroutineScope, friendOrTicket)
 
                         )
                         try {

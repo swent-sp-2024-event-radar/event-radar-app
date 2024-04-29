@@ -5,6 +5,7 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.repository.user.FirebaseUserRepository
+import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.BinaryBitmap
 import com.google.zxing.DecodeHintType
@@ -15,11 +16,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.nio.ByteBuffer
 
-class QrCodeAnalyser(private val activityScope: CoroutineScope, private val friendOrTicket: Int) : ImageAnalysis.Analyzer {
+class QrCodeAnalyser(private val navigationActions: NavigationActions, private val activityScope: CoroutineScope, private val friendOrTicket: Int) : ImageAnalysis.Analyzer {
 
   // list of supported Image Formats
   private val supportedImageFormats =
       listOf(ImageFormat.YUV_420_888, ImageFormat.YUV_422_888, ImageFormat.YUV_444_888)
+
+
 
   override fun analyze(image: ImageProxy) {
 
@@ -46,21 +49,39 @@ class QrCodeAnalyser(private val activityScope: CoroutineScope, private val frie
 
         if (friendOrTicket == 0) { // SCAN FRIEND
             activityScope.launch {
+                val myUID = FirebaseUserRepository().getUser("mockId")
+                    .toString() //TODO CHANGE TO GET MYCURRENT
+                //add myself to new Friend's friendList
                 when (val newUserFriend = FirebaseUserRepository().getUser(result.text)) {
-                    is Resource.Success ->
-                        if (newUserFriend.data!!.friendList.contains(myUID)) {
-                            //Navigate to message screen
-                        } else {
+                    is Resource.Success -> {
+                        if (!newUserFriend.data!!.friendList.contains(myUID)) {
                             newUserFriend.data.friendList.add(myUID)
                             FirebaseUserRepository().updateUser(newUserFriend.data)
                         }
+                        // navigationActions.navigateTo() //
+                    }
+
+                    is Resource.Failure -> {
+                        println("Failed to Fetch from Database")
+                    }
+                }
+                //add new Friend's UId to my friendList
+                when (val myUser = FirebaseUserRepository().getUser(result.text)) {
+                    is Resource.Success -> {
+                        if (!myUser.data!!.friendList.contains(myUID)) {
+                            myUser.data.friendList.add(result.text)
+                            FirebaseUserRepository().updateUser(myUser.data)
+                        }
+                        // navigationActions.navigateTo() //
+                    }
 
                     is Resource.Failure -> {
                         println("Failed to Fetch from Database")
                     }
                 }
             }
-        } 
+        }
+
 
       } catch (e: Exception) {
         e.printStackTrace()

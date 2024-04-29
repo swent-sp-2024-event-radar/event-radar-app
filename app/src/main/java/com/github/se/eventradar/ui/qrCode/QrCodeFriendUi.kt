@@ -117,7 +117,7 @@ fun QrCodeScreen(navigationActions: NavigationActions) {
       Toast.makeText(context, "My Qr Code not yet available", Toast.LENGTH_SHORT).show()
     } else {
       Column(modifier = Modifier.testTag("QrScanner")) {
-        QrCodeCamera().QrCodeScanner(0)
+        QrCodeCamera().QrCodeScanner(navigationActions, 0)
       }
     }
     BottomNavigationMenu(
