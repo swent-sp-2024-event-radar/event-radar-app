@@ -45,7 +45,7 @@ constructor(
       when (val userResponse = userRepository.getUser(uid)) {
         is Resource.Success -> {
           val user = userResponse.data!!
-          val attendeeList = user.eventsAttendeeList
+          val attendeeList = user.eventsAttendeeSet
           if (attendeeList.isNotEmpty()) { // will it ever be that
             when (val events = eventRepository.getEventsByIds(attendeeList)) {
               is Resource.Success -> {
