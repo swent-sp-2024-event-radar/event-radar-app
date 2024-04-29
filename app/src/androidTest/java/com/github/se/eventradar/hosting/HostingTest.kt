@@ -8,18 +8,20 @@ import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.event.EventTicket
-import com.github.se.eventradar.viewmodel.HostedEventsUiState
 import com.github.se.eventradar.screens.HostingScreen
 import com.github.se.eventradar.ui.hosting.HostingScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.viewmodel.HostedEventsUiState
 import com.github.se.eventradar.viewmodel.HostedEventsViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
+import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
+import io.mockk.verify
 import java.time.LocalDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
@@ -56,28 +58,31 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
                             attendeeList = setOf("Test Attendee"),
                             category = EventCategory.COMMUNITY,
                             fireBaseID = "$it")
-                      }))
-      )
-    private val mockUser =
-        User(
-            userId = "userid1",
-            age = 30,
-            email = "test@example.com",
-            firstName = "John",
-            lastName = "Doe",
-            phoneNumber = "1234567890",
-            accountStatus = "active",
-            eventsAttendeeList = listOf("userId1", "userId2"),
-            eventsHostList = listOf(),
-            profilePicUrl = "http://example.com/pic.jpg",
-            qrCodeUrl = "http://example.com/qr.jpg",
-            username = "john_doe")
+                      })))
+  private val mockUser =
+      User(
+          userId = "userid1",
+          age = 30,
+          email = "test@example.com",
+          firstName = "John",
+          lastName = "Doe",
+          phoneNumber = "1234567890",
+          accountStatus = "active",
+          eventsAttendeeList = listOf("userId1", "userId2"),
+          eventsHostList = listOf(),
+          profilePicUrl = "http://example.com/pic.jpg",
+          qrCodeUrl = "http://example.com/qr.jpg",
+          username = "john_doe")
+
   @Before
   fun testSetup() {
     every { mockHostedEventsViewModel.getHostedEvents(any()) } returns Unit
     every { mockHostedEventsViewModel.uiState } returns sampleEventList
     composeTestRule.setContent {
-      HostingScreen(uid = mockUser.userId, viewModel = mockHostedEventsViewModel, navigationActions = mockNavActions)
+      HostingScreen(
+          uid = mockUser.userId,
+          viewModel = mockHostedEventsViewModel,
+          navigationActions = mockNavActions)
     }
   }
 
@@ -117,6 +122,15 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
         map { assertDoesNotExist() }
         eventCard { assertIsDisplayed() }
       }
+    }
+  }
+
+  @Test
+  fun getHostedEventsIsCalledOnLaunch() = run {
+    ComposeScreen.onComposeScreen<HostingScreen>(composeTestRule) {
+      verify(exactly = 1) { mockHostedEventsViewModel.getHostedEvents(any()) }
+      verify(exactly = 1) { mockHostedEventsViewModel.uiState }
+      confirmVerified(mockHostedEventsViewModel)
     }
   }
 }

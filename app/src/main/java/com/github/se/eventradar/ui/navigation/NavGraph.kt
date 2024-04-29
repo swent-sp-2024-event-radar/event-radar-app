@@ -37,11 +37,13 @@ fun NavGraph(navController: NavHostController) {
     }
     composable(Route.MY_HOSTING) {
       val currentUser = FirebaseAuth.getInstance().currentUser
-      val uid = if (currentUser != null) {
-        currentUser.uid
-      } else {
-        throw IllegalStateException("User is not authenticated")
-      }
-      HostingScreen(uid = uid, navigationActions = navActions) }
+      val uid =
+          if (currentUser != null) {
+            currentUser.uid
+          } else {
+            throw IllegalStateException("User is not authenticated")
+          }
+      HostingScreen(uid = uid, navigationActions = navActions)
+    }
   }
 }

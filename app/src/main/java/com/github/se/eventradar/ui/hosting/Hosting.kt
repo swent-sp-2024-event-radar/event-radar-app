@@ -39,7 +39,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.eventradar.R
-import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.*
 import com.github.se.eventradar.ui.home.EventList
@@ -57,11 +56,11 @@ fun HostingScreen(
     viewModel: HostedEventsViewModel = hiltViewModel(),
     navigationActions: NavigationActions
 ) {
+    //Ui States handled by viewModel
   val uiState by viewModel.uiState.collectAsState()
-    var viewToggleIcon by remember {
-        mutableStateOf(
-            if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List)
-    }
+  var viewToggleIcon by remember {
+    mutableStateOf(if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List)
+  }
   LaunchedEffect(key1 = uiState.eventList) { viewModel.getHostedEvents(uid) }
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("hostingScreen")) {
     val (logo, title, divider, eventList, eventMap, bottomNav, buttons) = createRefs()
@@ -88,7 +87,7 @@ fun HostingScreen(
     if (uiState.viewList) {
       EventList(
           uiState.eventList.allEvents,
-         Modifier.fillMaxWidth().constrainAs(eventList) {
+          Modifier.fillMaxWidth().constrainAs(eventList) {
             top.linkTo(divider.bottom, margin = 8.dp)
             start.linkTo(parent.start)
             end.linkTo(parent.end)
@@ -96,7 +95,7 @@ fun HostingScreen(
     } else {
       EventMap(
           uiState.eventList.allEvents,
-         navigationActions,
+          navigationActions,
           Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
             top.linkTo(divider.bottom, margin = 8.dp)
             start.linkTo(parent.start)
@@ -122,8 +121,9 @@ fun HostingScreen(
           ViewToggleFab(
               modifier = Modifier.testTag("viewToggleFab"),
               onClick = {
-                  uiState.viewList = !uiState.viewList
-                  viewToggleIcon = if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List
+                uiState.viewList = !uiState.viewList
+                viewToggleIcon =
+                    if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List
               },
               iconVector = viewToggleIcon)
         }

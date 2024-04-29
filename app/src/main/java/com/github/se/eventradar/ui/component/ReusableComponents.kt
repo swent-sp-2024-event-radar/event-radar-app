@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.event.Event
+
 @Composable
 fun ViewToggleFab(modifier: Modifier = Modifier, onClick: () -> Unit, iconVector: ImageVector) {
   FloatingActionButton(onClick = { onClick() }, modifier = modifier) {

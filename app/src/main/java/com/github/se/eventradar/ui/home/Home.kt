@@ -78,25 +78,23 @@ import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 import com.github.se.eventradar.viewmodel.EventsOverviewUiState
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
-import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 import com.github.se.eventradar.viewmodel.Tab
+
 @Composable
 fun HomeScreen(
     viewModel: EventsOverviewViewModel = hiltViewModel(),
     navigationActions: NavigationActions
 ) {
 
-    //i think more easily readable code is uiState.tab == UpcomingEvents,
+  //Ui States handled by viewModel
   val uiState by viewModel.uiState.collectAsState()
-    var selectedTabIndex by remember { mutableIntStateOf (
-        if (uiState.tab == Tab.BROWSE) 0 else 1)
-    }
-    var viewToggleIcon by remember {
-        mutableStateOf(
-            if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List)
-    }
+  var selectedTabIndex by remember { mutableIntStateOf(if (uiState.tab == Tab.BROWSE) 0 else 1) }
+  var viewToggleIcon by remember {
+    mutableStateOf(if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List)
+  }
   LaunchedEffect(key1 = uiState.eventList) { viewModel.getEvents() }
   val context = LocalContext.current
 
@@ -132,9 +130,10 @@ fun HomeScreen(
         contentColor = MaterialTheme.colorScheme.primary) {
           Tab(
               selected = selectedTabIndex == 0,
-              onClick = { uiState.tab = Tab.BROWSE
-                        selectedTabIndex = if (uiState.tab == Tab.BROWSE) 0 else 1
-                        },
+              onClick = {
+                uiState.tab = Tab.BROWSE
+                selectedTabIndex = if (uiState.tab == Tab.BROWSE) 0 else 1
+              },
               modifier = Modifier.testTag("browseTab"),
           ) {
             Text(
@@ -153,8 +152,10 @@ fun HomeScreen(
           }
           Tab(
               selected = selectedTabIndex == 1,
-              onClick = { uiState.tab = Tab.UPCOMING_EVENTS
-                        selectedTabIndex = if (uiState.tab == Tab.BROWSE) 0 else 1},
+              onClick = {
+                uiState.tab = Tab.UPCOMING_EVENTS
+                selectedTabIndex = if (uiState.tab == Tab.BROWSE) 0 else 1
+              },
               modifier = Modifier.testTag("upcomingTab")) {
                 Text(
                     text = "Upcoming",
@@ -187,32 +188,31 @@ fun HomeScreen(
               end.linkTo(parent.end)
             })
 
-
-    if (selectedTabIndex == 0) { //problem is the icon
-        if (uiState.viewList) {
-            EventList(
-                uiState.eventList.allEvents,
-                Modifier.fillMaxWidth().constrainAs(eventList) {
-                    top.linkTo(tabs.bottom, margin = 8.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                })
-        } else {
-            EventMap(
-                uiState.eventList.allEvents,
-                navigationActions,
-                Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
-                    top.linkTo(tabs.bottom, margin = 8.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                })
-        }
+    if (selectedTabIndex == 0) {
+      if (uiState.viewList) {
+        EventList(
+            uiState.eventList.allEvents,
+            Modifier.fillMaxWidth().constrainAs(eventList) {
+              top.linkTo(tabs.bottom, margin = 8.dp)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
+            })
+      } else {
+        EventMap(
+            uiState.eventList.allEvents,
+            navigationActions,
+            Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
+              top.linkTo(tabs.bottom, margin = 8.dp)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
+            })
+      }
     } else {
       // "Upcoming" tab content
       // TODO: Implement upcoming events
       Toast.makeText(context, "Upcoming events not yet available", Toast.LENGTH_SHORT).show()
       uiState.tab = Tab.BROWSE
-        selectedTabIndex = if (uiState.tab == Tab.BROWSE) 0 else 1
+      selectedTabIndex = if (uiState.tab == Tab.BROWSE) 0 else 1
     }
     // Note for now, the filter dialog is always open to verify the UI
     if (!uiState.isFilterDialogOpen) {
@@ -243,16 +243,18 @@ fun HomeScreen(
               start.linkTo(parent.start)
               end.linkTo(parent.end)
             })
-      ViewToggleFab(
-          modifier = Modifier.padding(16.dp).testTag("viewToggleFab").constrainAs(viewToggle){
+    ViewToggleFab(
+        modifier =
+            Modifier.padding(16.dp).testTag("viewToggleFab").constrainAs(viewToggle) {
               bottom.linkTo(bottomNav.top)
               absoluteRight.linkTo(parent.absoluteRight)
-          },
-          onClick = {
-              uiState.viewList = !uiState.viewList
-              viewToggleIcon = if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List
-          },
-          iconVector = viewToggleIcon)
+            },
+        onClick = {
+          uiState.viewList = !uiState.viewList
+          viewToggleIcon =
+              if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List
+        },
+        iconVector = viewToggleIcon)
   }
 }
 

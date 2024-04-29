@@ -77,9 +77,9 @@ fun LoginScreen(navigationActions: NavigationActions) {
       rememberLauncherForActivityResult(
           contract = FirebaseAuthUIActivityResultContract(),
           onResult = { result ->
-              if (result.resultCode == Activity.RESULT_OK)
-                  navigationActions.navController.navigate(Route.HOME)
-              else openErrorDialog.value = true
+            if (result.resultCode == Activity.RESULT_OK)
+                navigationActions.navController.navigate(Route.HOME)
+            else openErrorDialog.value = true
           })
 
   ErrorDialogBox(openErrorDialog = openErrorDialog)
