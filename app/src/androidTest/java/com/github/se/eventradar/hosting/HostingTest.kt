@@ -3,7 +3,6 @@ package com.github.se.eventradar.hosting
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.model.Location
-import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventList
@@ -54,25 +53,11 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
                             description = "Test Description",
                             ticket = EventTicket("Test Ticket", 0.0, 1),
                             contact = "Test Contact Email",
-                            organiserList = setOf("Test Organiser"),
+                            organiserList = setOf("testuserId1"),
                             attendeeList = setOf("Test Attendee"),
                             category = EventCategory.COMMUNITY,
                             fireBaseID = "$it")
                       })))
-  private val mockUser =
-      User(
-          userId = "userid1",
-          age = 30,
-          email = "test@example.com",
-          firstName = "John",
-          lastName = "Doe",
-          phoneNumber = "1234567890",
-          accountStatus = "active",
-          eventsAttendeeList = listOf("userId1", "userId2"),
-          eventsHostList = listOf(),
-          profilePicUrl = "http://example.com/pic.jpg",
-          qrCodeUrl = "http://example.com/qr.jpg",
-          username = "john_doe")
 
   @Before
   fun testSetup() {
@@ -80,7 +65,7 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
     every { mockHostedEventsViewModel.uiState } returns sampleEventList
     composeTestRule.setContent {
       HostingScreen(
-          uid = mockUser.userId,
+          uid = "testuserId1",
           viewModel = mockHostedEventsViewModel,
           navigationActions = mockNavActions)
     }
