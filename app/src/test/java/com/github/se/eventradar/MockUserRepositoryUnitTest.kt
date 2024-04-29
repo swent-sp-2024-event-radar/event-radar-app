@@ -22,6 +22,7 @@ class MockUserRepositoryUnitTest {
           accountStatus = "active",
           eventsAttendeeList = listOf("event1", "event2"),
           eventsHostList = listOf("event3"),
+        friendsSet = mutableSetOf(),
           profilePicUrl = "http://example.com/pic.jpg",
           qrCodeUrl = "http://example.com/qr.jpg",
           username = "johndoe")

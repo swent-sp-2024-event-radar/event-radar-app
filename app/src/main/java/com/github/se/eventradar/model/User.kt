@@ -10,6 +10,7 @@ data class User(
     val accountStatus: String,
     val eventsAttendeeList: List<String>,
     val eventsHostList: List<String>,
+    val friendsSet: MutableSet<String>,
     val profilePicUrl: String,
     val qrCodeUrl: String,
     val username: String,
@@ -27,6 +28,7 @@ data class User(
       accountStatus = map["accountStatus"] as String,
       eventsAttendeeList = convertToListOfStrings(map["eventsAttendeeList"]),
       eventsHostList = convertToListOfStrings(map["eventsHostList"]),
+      friendsSet = convertToMutableSetOfStrings(map["friendsList"]),
       profilePicUrl = map["profilePicUrl"] as String,
       qrCodeUrl = map["qrCodeUrl"] as String,
       username = map["username"] as String)
@@ -55,3 +57,11 @@ private fun convertToListOfStrings(data: Any?): List<String> {
     else -> emptyList()
   }
 }
+private fun convertToMutableSetOfStrings(data: Any?): MutableSet<String> {
+    return when (data) {
+        is List<*> -> data.filterIsInstance<String>().toMutableSet()
+        is String -> mutableSetOf(data)
+        else -> mutableSetOf()
+    }
+}
+
