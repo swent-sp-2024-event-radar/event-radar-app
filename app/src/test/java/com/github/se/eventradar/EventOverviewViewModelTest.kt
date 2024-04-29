@@ -1,7 +1,6 @@
 package com.github.se.eventradar
 
 import android.util.Log
-import com.github.se.eventradar.model.EventsOverviewViewModel
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event

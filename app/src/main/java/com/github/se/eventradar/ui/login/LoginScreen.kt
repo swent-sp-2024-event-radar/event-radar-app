@@ -45,6 +45,7 @@ import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
+import com.github.se.eventradar.viewmodel.LoginViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable

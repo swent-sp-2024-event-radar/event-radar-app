@@ -1,4 +1,4 @@
-package com.github.se.eventradar.ui.login
+package com.github.se.eventradar.viewmodel
 
 import android.net.Uri
 import android.util.Log

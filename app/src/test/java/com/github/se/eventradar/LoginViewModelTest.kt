@@ -6,9 +6,9 @@ import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
-import com.github.se.eventradar.ui.login.CountryCode
-import com.github.se.eventradar.ui.login.LoginUiState
-import com.github.se.eventradar.ui.login.LoginViewModel
+import com.github.se.eventradar.viewmodel.CountryCode
+import com.github.se.eventradar.viewmodel.LoginUiState
+import com.github.se.eventradar.viewmodel.LoginViewModel
 import com.google.firebase.auth.FirebaseUser
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
