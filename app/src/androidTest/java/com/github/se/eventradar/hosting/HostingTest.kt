@@ -53,7 +53,7 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
                             description = "Test Description",
                             ticket = EventTicket("Test Ticket", 0.0, 1),
                             contact = "Test Contact Email",
-                            organiserList = setOf("testuserId1"),
+                            organiserList = setOf("Test Organiser"),
                             attendeeList = setOf("Test Attendee"),
                             category = EventCategory.COMMUNITY,
                             fireBaseID = "$it")
@@ -65,7 +65,7 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
     every { mockHostedEventsViewModel.uiState } returns sampleEventList
     composeTestRule.setContent {
       HostingScreen(
-          uid = "testuserId1",
+          uid = "Test Organiser",
           viewModel = mockHostedEventsViewModel,
           navigationActions = mockNavActions)
     }
