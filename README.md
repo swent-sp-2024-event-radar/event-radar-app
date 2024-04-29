@@ -21,7 +21,7 @@ The structure of the user database is as follows:
     "user_id": {
       "private": {
         "private_id": {
-          "age": 22,
+          "birthdate": "31/12/1999",
           "email": "christineha127@gmail.com",
           "firstName": "Christine",
           "lastName": "Ha",
