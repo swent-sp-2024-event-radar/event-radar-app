@@ -49,11 +49,16 @@ import com.github.se.eventradar.viewmodel.LoginViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun ErrorDialogBox(openErrorDialog: MutableState<Boolean>) {
+fun ErrorDialogBox(openErrorDialog: MutableState<Boolean>, modifier: Modifier = Modifier) {
   val display by openErrorDialog
   if (display) {
     AlertDialog(
-        icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Account Icon") },
+        icon = {
+          Icon(
+              Icons.Default.AccountCircle,
+              contentDescription = "Account Icon",
+              modifier = Modifier.testTag("errorDialogIcon"))
+        },
         text = {
           Text(
               text = "Sign in Failed. Please try again.",
@@ -67,7 +72,14 @@ fun ErrorDialogBox(openErrorDialog: MutableState<Boolean>) {
           )
         },
         onDismissRequest = { openErrorDialog.value = false },
-        confirmButton = { TextButton(onClick = { openErrorDialog.value = false }) { Text("Ok") } })
+        confirmButton = {
+          TextButton(
+              onClick = { openErrorDialog.value = false },
+              modifier = Modifier.testTag("errorDialogConfirmButton")) {
+                Text("Ok")
+              }
+        },
+        modifier = modifier)
   }
 }
 
@@ -94,7 +106,7 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), navigationActions: 
             } else openErrorDialog.value = true
           })
 
-  ErrorDialogBox(openErrorDialog)
+  ErrorDialogBox(openErrorDialog, modifier = Modifier.testTag("loginErrorDialog"))
 
   val providers =
       arrayListOf(

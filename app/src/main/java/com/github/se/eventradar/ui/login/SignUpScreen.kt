@@ -25,7 +25,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -63,7 +62,6 @@ import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.viewmodel.CountryCode
 import com.github.se.eventradar.viewmodel.LoginViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
     viewModel: LoginViewModel = hiltViewModel(),
@@ -85,7 +83,7 @@ fun SignUpScreen(
             }
           })
 
-  ErrorDialogBox(openErrorDialog)
+  ErrorDialogBox(openErrorDialog, modifier = Modifier.testTag("signUpErrorDialog"))
 
   val imagePickerLauncher =
       rememberLauncherForActivityResult(
