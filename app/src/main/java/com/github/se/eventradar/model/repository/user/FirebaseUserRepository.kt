@@ -154,8 +154,8 @@ private fun getMaps(user: User): Pair<Map<String, Any?>, Map<String, Any?>> {
           "qrCodeUrl" to user.qrCodeUrl,
           "username" to user.username,
           "accountStatus" to user.accountStatus,
-          "eventsAttendeeList" to user.eventsAttendeeSet,
-          "eventsHostList" to user.eventsHostSet,
+          "eventsAttendeeList" to user.eventsAttendeeList,
+          "eventsHostList" to user.eventsHostList,
       )
 
   return Pair(publicMap, privateMap)
