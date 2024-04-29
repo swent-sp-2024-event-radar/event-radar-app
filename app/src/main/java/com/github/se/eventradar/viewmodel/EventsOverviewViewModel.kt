@@ -1,9 +1,10 @@
-package com.github.se.eventradar.model
+package com.github.se.eventradar.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.github.se.eventradar.model.event.EventCategory
 import androidx.lifecycle.viewModelScope
+import com.github.se.eventradar.model.Resource
+import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
@@ -23,16 +24,14 @@ constructor(
 ) : ViewModel() {
   private val _uiState = MutableStateFlow(EventsOverviewUiState())
   val uiState: StateFlow<EventsOverviewUiState> = _uiState
-
-  private val eventRef = db.collection("events")
-
+    
     fun onSearchQueryChanged(query: String) {
         _uiState.value = _uiState.value.copy(searchQuery = query)
         filterEvents()
     }
 
     fun onFilterApplyClicked(applyFilter: Boolean) {
-        _uiState.value = _uiState.value.copy(applyFilter = applyFilter)
+        _uiState.value = _uiState.value.copy(isFilterDialogOpen = applyFilter)
         filterEvents()
     }
 
@@ -41,14 +40,14 @@ constructor(
         val filteredEvents =
             _uiState.value.eventList.allEvents.filter { it.eventName.contains(query, ignoreCase = true) }
 
-        if (_uiState.value.applyFilter) {
+        if (_uiState.value.isFilterDialogOpen) {
             filteredEvents.filter { it.category == _uiState.value.eventList.selectedEvent?.category }
         } else {
             filteredEvents
         }
 
         _uiState.value = _uiState.value.copy(
-            eventList = _uiState.value.eventList.copy(filteredEvent = filteredEvents)
+            eventList = _uiState.value.eventList.copy(filteredEvents = filteredEvents)
         )
     }
 
@@ -73,7 +72,7 @@ constructor(
         is Resource.Success -> {
           val user = userResponse.data!!
           val attendeeList = user.eventsAttendeeList
-          if (attendeeList.isNotEmpty()) {
+          if (attendeeList.isNotEmpty()) { // will it ever be that
             when (val events = eventRepository.getEventsByIds(attendeeList)) {
               is Resource.Success -> {
                 _uiState.value =
@@ -110,4 +109,11 @@ data class EventsOverviewUiState(
     var radiusInputFilter: Double = -1.0,
     var freeEventsFilter: Boolean = false,
     var categorySelectionFilter: List<EventCategory> = emptyList(),
+    var viewList: Boolean = true,
+    var tab: Tab = Tab.BROWSE,
 )
+
+enum class Tab {
+  BROWSE,
+  UPCOMING_EVENTS
+}

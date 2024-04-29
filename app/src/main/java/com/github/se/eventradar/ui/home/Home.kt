@@ -2,7 +2,6 @@ package com.github.se.eventradar.ui.home
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,14 +12,16 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -28,11 +29,9 @@ import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
@@ -60,6 +59,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -69,8 +69,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
-import com.github.se.eventradar.model.EventsOverviewUiState
-import com.github.se.eventradar.model.EventsOverviewViewModel
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.repository.event.MockEventRepository
@@ -79,6 +77,8 @@ import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.eventradar.viewmodel.EventsOverviewUiState
+import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,19 +94,17 @@ fun HomeScreen(
   var viewToggleBrowseIndex by remember { mutableIntStateOf(0) }
   val context = LocalContext.current
 
-  ConstraintLayout(modifier = Modifier
-      .fillMaxSize()
-      .testTag("homeScreen")) {
-    val (logo, tabs, searchAndFilter, filterPopUp, eventList, eventMap, bottomNav, viewToggle) = createRefs()
+  ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("homeScreen")) {
+    val (logo, tabs, searchAndFilter, filterPopUp, eventList, eventMap, bottomNav, viewToggle) =
+        createRefs()
     Row(
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .constrainAs(logo) {
-                top.linkTo(parent.top, margin = 32.dp)
-                start.linkTo(parent.start, margin = 16.dp)
-            }
-            .testTag("logo"),
+            Modifier.fillMaxWidth()
+                .constrainAs(logo) {
+                  top.linkTo(parent.top, margin = 32.dp)
+                  start.linkTo(parent.start, margin = 16.dp)
+                }
+                .testTag("logo"),
         verticalAlignment = Alignment.CenterVertically) {
           Image(
               painter = painterResource(id = R.drawable.event_logo),
@@ -117,15 +115,14 @@ fun HomeScreen(
     TabRow(
         selectedTabIndex = selectedTabIndex,
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp)
-            .constrainAs(tabs) {
-                top.linkTo(logo.bottom, margin = 16.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }
-            .testTag("tabs"),
+            Modifier.fillMaxWidth()
+                .padding(top = 8.dp)
+                .constrainAs(tabs) {
+                  top.linkTo(logo.bottom, margin = 16.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                }
+                .testTag("tabs"),
         contentColor = MaterialTheme.colorScheme.primary) {
           Tab(
               selected = selectedTabIndex == 0,
@@ -166,13 +163,9 @@ fun HomeScreen(
               }
         }
 
-
       SearchBarAndFilter(
-          searchQuery = uiState.searchQuery,
           onSearchQueryChange = { uiState.searchQuery = it },
-          onSearchButtonClick = {
-              // Handle search button click
-          },
+          uiState = uiState,
           showFilterPopUp = uiState.isFilterDialogOpen,
           setShowFilterPopUp = { uiState.isFilterDialogOpen = it },
           modifier = Modifier
@@ -196,7 +189,7 @@ fun HomeScreen(
                   })
           } else {
               EventList(
-                  uiState.eventList.filteredEvent,
+                  uiState.eventList.filteredEvents,
                   Modifier.fillMaxWidth().constrainAs(eventList) {
                       top.linkTo(searchAndFilter.bottom, margin = 8.dp)
                       start.linkTo(parent.start)
@@ -219,39 +212,34 @@ fun HomeScreen(
       Toast.makeText(context, "Upcoming events not yet available", Toast.LENGTH_SHORT).show()
       selectedTabIndex = 0
     }
-      // Note for now, the filter dialog is always open to verify the UI
-      if(!uiState.isFilterDialogOpen) {
-          FilterPopUp(
-              onRadiusChange = { radius ->
-                  // Handle radius change
-              },
-              onFreeSelectionChange = { isFree ->
-                  // Handle free selection change
-              },
-              onCategorySelectionChange = { selectedCategories ->
-                  // Handle category selection change
-              },
-              modifier = Modifier
-                  .height(320.dp)
-                  .width(230.dp)
-                  .constrainAs(filterPopUp) {
-                      top.linkTo(searchAndFilter.bottom)
-                      end.linkTo(parent.end)
-                  }
-          )
-      }
+    // Note for now, the filter dialog is always open to verify the UI
+    if (!uiState.isFilterDialogOpen) {
+      FilterPopUp(
+          onRadiusChange = { radius ->
+            // Handle radius change
+          },
+          onFreeSelectionChange = { isFree ->
+            // Handle free selection change
+          },
+          onCategorySelectionChange = { selectedCategories ->
+            // Handle category selection change
+          },
+          modifier =
+              Modifier.height(320.dp).width(230.dp).constrainAs(filterPopUp) {
+                top.linkTo(searchAndFilter.bottom)
+                end.linkTo(parent.end)
+              })
+    }
 
     BottomNavigationMenu(
         onTabSelected = { tab -> navigationActions.navigateTo(tab) },
         tabList = TOP_LEVEL_DESTINATIONS,
         selectedItem = TOP_LEVEL_DESTINATIONS[2],
         modifier =
-        Modifier
-            .testTag("bottomNavMenu")
-            .constrainAs(bottomNav) {
-                bottom.linkTo(parent.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
+            Modifier.testTag("bottomNavMenu").constrainAs(bottomNav) {
+              bottom.linkTo(parent.bottom)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
             })
 
     var viewToggleIcon =
@@ -304,15 +292,14 @@ fun SearchBarAndFilter(
             }
         )
 
-        // Filter button
-        Button(
-            // function setShowFilterPopUp() needs to be created in the VM
-            onClick = { setShowFilterPopUp(!showFilterPopUp) },
-            modifier = Modifier.padding(start = 8.dp)
-        ) {
-            Text("Filter")
+    // Filter button
+    Button(
+        // function setShowFilterPopUp() needs to be created in the VM
+        onClick = { setShowFilterPopUp(!showFilterPopUp) },
+        modifier = Modifier.padding(start = 8.dp)) {
+          Text("Filter")
         }
-    }
+  }
 }
 
 @Composable
@@ -322,137 +309,119 @@ fun FilterPopUp(
     onCategorySelectionChange: (List<EventCategory>) -> Unit,
     modifier: Modifier = Modifier,
     uiState: EventsOverviewUiState = EventsOverviewUiState()
+) {
+  Box(modifier = modifier) {
+    Card(
+        modifier = Modifier.padding(12.dp),
+        elevation = cardElevation(defaultElevation = 4.dp),
     ) {
-    Box(
-        modifier = modifier
-    ) {
-        Card(
-            modifier = Modifier.padding(12.dp),
-            elevation = cardElevation(defaultElevation = 4.dp),
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(12.dp)
-            ) {
-                // Text input for radius
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Text(
-                        text = "Radius: ",
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                        )
-                    )
-                    TextField(
-                        value = uiState.radiusInputFilter.toString(),
-                        onValueChange = { input ->
-                            uiState.radiusInputFilter = input.toDoubleOrNull() ?: uiState.radiusInputFilter
-                        },
-                        modifier = Modifier
-                            .width(70.dp)
-                            .height(10.dp),
-                    )
-                    Text(
-                        text = " km",
-                        modifier = Modifier.weight(1f),
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                        )
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Slider for free selection
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Text(
-                        text = "Free:  ",
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                        )
-                    )
-                    Switch(
-                        checked = uiState.freeEventsFilter,
-                        onCheckedChange = { uiState.freeEventsFilter = it },
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // Buttons for category selection
-                Text(
-                    text = "Category: ",
-                    modifier = Modifier.weight(1f),
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                    )
-                )
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    CategorySelection()
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // Button to apply filter
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Button(
-                        onClick = {
-                            // Apply filter
-                            onRadiusChange(uiState.radiusInputFilter)
-                            onFreeSelectionChange(uiState.freeEventsFilter)
-                            onCategorySelectionChange(uiState.categorySelectionFilter)
-                            onCategorySelectionChange(uiState.categorySelectionFilter)
-                        }
-                    ) {
-                        Text("Apply")
-                    }
-                }
+      Column(modifier = Modifier.fillMaxSize().padding(12.dp)) {
+        // Text input for radius
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start) {
+              Text(
+                  text = "Radius: ",
+                  style =
+                      TextStyle(
+                          fontSize = 16.sp,
+                      ))
+              TextField(
+                  value = uiState.radiusInputFilter.toString(),
+                  onValueChange = { input ->
+                    uiState.radiusInputFilter = input.toDoubleOrNull() ?: uiState.radiusInputFilter
+                  },
+                  keyboardOptions =
+                      KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                  modifier = Modifier.width(70.dp).height(10.dp),
+              )
+              Text(
+                  text = " km",
+                  modifier = Modifier.weight(1f),
+                  style =
+                      TextStyle(
+                          fontSize = 16.sp,
+                      ))
             }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Slider for free selection
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start) {
+              Text(
+                  text = "Free:  ",
+                  style =
+                      TextStyle(
+                          fontSize = 16.sp,
+                      ))
+              Switch(
+                  checked = uiState.freeEventsFilter,
+                  onCheckedChange = { uiState.freeEventsFilter = it },
+              )
+            }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        // Buttons for category selection
+        Text(
+            text = "Category: ",
+            modifier = Modifier.weight(1f),
+            style =
+                TextStyle(
+                    fontSize = 16.sp,
+                ))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start) {
+              CategorySelection()
+            }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        // Button to apply filter
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+          Button(
+              onClick = {
+                // Apply filter
+                onRadiusChange(uiState.radiusInputFilter)
+                onFreeSelectionChange(uiState.freeEventsFilter)
+                onCategorySelectionChange(uiState.categorySelectionFilter)
+                onCategorySelectionChange(uiState.categorySelectionFilter)
+              }) {
+                Text("Apply")
+              }
         }
+      }
     }
+  }
 }
 
 @Composable
 fun CategorySelection() {
-    LazyColumn {
-        items(EventCategory.entries) { category ->
-            var isChecked by remember { mutableStateOf(false) }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier.padding(vertical = 0.dp)
-            ) {
-                Checkbox(
-                    checked = isChecked,
-                    onCheckedChange = { isChecked = it },
-                    modifier = Modifier
-                        .scale(0.6f)
-                        .size(10.dp)
-                        .padding(start = 10.dp)
-                )
-                Text(
-                    text = category.displayName,
-                    style = TextStyle(
+  LazyColumn {
+    items(EventCategory.entries) { category ->
+      var isChecked by remember { mutableStateOf(false) }
+      Row(
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.Start,
+          modifier = Modifier.padding(vertical = 0.dp)) {
+            Checkbox(
+                checked = isChecked,
+                onCheckedChange = { isChecked = it },
+                modifier = Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp))
+            Text(
+                text = category.displayName,
+                style =
+                    TextStyle(
                         fontSize = 16.sp,
                     ),
-                    modifier = Modifier.padding(start = 16.dp)
-                )
-            }
-        }
+                modifier = Modifier.padding(start = 16.dp))
+          }
     }
+  }
 }
 
 @Composable
@@ -466,10 +435,9 @@ fun EventCard(event: Event) {
   val context = LocalContext.current
   Card(
       modifier =
-      Modifier
-          .padding(horizontal = 16.dp, vertical = 8.dp)
-          .height(IntrinsicSize.Min)
-          .testTag("eventCard"),
+          Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+              .height(IntrinsicSize.Min)
+              .testTag("eventCard"),
       colors = cardColors(containerColor = MaterialTheme.colorScheme.surface),
       elevation = cardElevation(defaultElevation = 4.dp),
       onClick = {
@@ -478,9 +446,8 @@ fun EventCard(event: Event) {
         Row(modifier = Modifier.fillMaxSize()) {
           Column(
               modifier =
-              Modifier
-                  .padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 8.dp)
-                  .weight(1f),
+                  Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 8.dp)
+                      .weight(1f),
               verticalArrangement = Arrangement.Center) {
                 Text(
                     text = event.eventName,
@@ -507,9 +474,7 @@ fun EventCard(event: Event) {
               painter = painterResource(id = R.drawable.placeholder),
               contentDescription = "Event Image",
               contentScale = ContentScale.FillBounds,
-              modifier = Modifier
-                  .weight(0.3f)
-                  .fillMaxHeight())
+              modifier = Modifier.weight(0.3f).fillMaxHeight())
         }
       }
 }

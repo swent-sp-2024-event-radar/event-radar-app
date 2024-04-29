@@ -8,11 +8,3 @@ enum class EventCategory(val displayName: String) {
   COMMUNITY("Community"),
   SOCIAL("Social"),
 }
-
-fun getEventCategory(categoryString: String): EventCategory {
-  return try {
-    enumValueOf<EventCategory>(categoryString.uppercase())
-  } catch (e: IllegalArgumentException) {
-    EventCategory.SOCIAL // Default to SOCIAL if categoryString is not valid
-  }
-}
