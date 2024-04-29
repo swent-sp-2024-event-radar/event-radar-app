@@ -1,8 +1,10 @@
-package com.github.se.eventradar.model
+package com.github.se.eventradar.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.se.eventradar.model.Resource
+import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
@@ -44,7 +46,7 @@ constructor(
         is Resource.Success -> {
           val user = userResponse.data!!
           val attendeeList = user.eventsAttendeeList
-          if (attendeeList.isNotEmpty()) {
+          if (attendeeList.isNotEmpty()) { // will it ever be that
             when (val events = eventRepository.getEventsByIds(attendeeList)) {
               is Resource.Success -> {
                 _uiState.value =
@@ -76,5 +78,16 @@ constructor(
 
 data class EventsOverviewUiState(
     val eventList: EventList = EventList(emptyList(), emptyList(), null),
-    val searchQuery: String = "",
+    var searchQuery: String = "",
+    var isFilterDialogOpen: Boolean = false,
+    var radiusInputFilter: Double = -1.0,
+    var freeEventsFilter: Boolean = false,
+    var categorySelectionFilter: List<EventCategory> = emptyList(),
+    var viewList: Boolean = true,
+    var tab: Tab = Tab.BROWSE,
 )
+
+enum class Tab {
+  BROWSE,
+  UPCOMING_EVENTS
+}

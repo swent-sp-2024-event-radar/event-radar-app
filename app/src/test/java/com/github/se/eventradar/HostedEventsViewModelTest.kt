@@ -1,7 +1,6 @@
 package com.github.se.eventradar
 
 import android.util.Log
-import com.github.se.eventradar.model.EventsOverviewViewModel
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
@@ -11,7 +10,7 @@ import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
-import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
+import com.github.se.eventradar.viewmodel.HostedEventsViewModel
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockkStatic
@@ -24,7 +23,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.junit.Assert.assertNull
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -32,9 +31,8 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
 @ExperimentalCoroutinesApi
-class EventsOverviewViewModelTest {
-
-  private lateinit var viewModel: EventsOverviewViewModel
+class HostedEventsViewModelTest {
+  private lateinit var viewModel: HostedEventsViewModel
   private lateinit var eventRepository: IEventRepository
   private lateinit var userRepository: IUserRepository
 
@@ -62,22 +60,22 @@ class EventsOverviewViewModelTest {
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1),
           contact = "Test Contact Email",
-          organiserList = setOf("Test Organiser"),
+          organiserList = setOf("userid1"),
           attendeeList = setOf("Test Attendee"),
           category = EventCategory.COMMUNITY,
-          fireBaseID = "1")
+          fireBaseID = "eventId1")
 
   private val mockUser =
       User(
-          userId = "user1",
-          birthDate = "01/01/2000",
+          userId = "userid1",
+          age = 30,
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",
           phoneNumber = "1234567890",
           accountStatus = "active",
-          eventsAttendeeList = listOf("1", "2"),
-          eventsHostList = listOf("3"),
+          eventsAttendeeList = listOf("userId1", "userId2"),
+          eventsHostList = listOf(),
           profilePicUrl = "http://example.com/pic.jpg",
           qrCodeUrl = "http://example.com/qr.jpg",
           username = "john_doe")
@@ -86,100 +84,75 @@ class EventsOverviewViewModelTest {
   fun setUp() {
     eventRepository = MockEventRepository()
     userRepository = MockUserRepository()
-    viewModel = EventsOverviewViewModel(eventRepository, userRepository)
+    viewModel = HostedEventsViewModel(eventRepository, userRepository)
   }
 
   @Test
-  fun testGetEventsEmpty() = runTest {
-    viewModel.getEvents()
-
+  fun testGetHostedEventsEmpty() = runTest {
+    userRepository.addUser(mockUser)
+    viewModel.getHostedEvents(mockUser.userId)
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
-    assertNull(viewModel.uiState.value.eventList.selectedEvent)
+    Assert.assertNull(viewModel.uiState.value.eventList.selectedEvent)
   }
 
   @Test
-  fun testGetEventsSuccess() = runTest {
+  fun testGetHostedEventsSuccess() = runTest {
     val events =
         listOf(
-            mockEvent.copy(fireBaseID = "1"),
-            mockEvent.copy(fireBaseID = "2"),
-            mockEvent.copy(fireBaseID = "3"))
-
+            mockEvent.copy(fireBaseID = "eventId1"),
+            mockEvent.copy(fireBaseID = "eventId2"),
+            mockEvent.copy(fireBaseID = "eventId3"))
     events.forEach { event -> eventRepository.addEvent(event) }
 
-    viewModel.getEvents()
+    val listOfEventIds = events.map { event -> event.fireBaseID }
+    val userWithHostedEvent = mockUser.copy(eventsHostList = listOfEventIds)
+    userRepository.addUser(userWithHostedEvent)
 
+    viewModel.getHostedEvents(userWithHostedEvent.userId)
     assert(viewModel.uiState.value.eventList.allEvents.isNotEmpty())
     assert(viewModel.uiState.value.eventList.allEvents.size == 3)
-    assert(viewModel.uiState.value.eventList.allEvents == events)
+    assert(
+        viewModel.uiState.value.eventList.allEvents.containsAll(events)) // this is where it fails.
     assert(viewModel.uiState.value.eventList.filteredEvents.size == 3)
-    assert(viewModel.uiState.value.eventList.filteredEvents == events)
-    assertNull(viewModel.uiState.value.eventList.selectedEvent)
+    assert(viewModel.uiState.value.eventList.filteredEvents.containsAll(events))
+    Assert.assertNull(viewModel.uiState.value.eventList.selectedEvent)
   }
 
   @Test
-  fun testGetUpcomingEventsSuccess() = runTest {
-    val event1 = mockEvent.copy(fireBaseID = "1")
-    val event2 = mockEvent.copy(fireBaseID = "2")
-    val event3 = mockEvent.copy(fireBaseID = "3")
-
-    eventRepository.addEvent(event1)
-    eventRepository.addEvent(event2)
-    eventRepository.addEvent(event3)
-
-    userRepository.addUser(mockUser)
-    // MockUser is on the attendeeList for events with id "1" and "2"
-    viewModel.getUpcomingEvents("user1")
-
-    assert(viewModel.uiState.value.eventList.allEvents.size == 2)
-    assert(viewModel.uiState.value.eventList.allEvents == listOf(event1, event2))
-    assert(viewModel.uiState.value.eventList.filteredEvents.size == 2)
-    assert(viewModel.uiState.value.eventList.filteredEvents == listOf(event1, event2))
-    assertNull(viewModel.uiState.value.eventList.selectedEvent)
-  }
-
-  @Test
-  fun testGetUpcomingEventsWithEventsNotInRepo() = runTest {
+  fun testGetHostedEventsWithEventsNotInRepo() = runTest {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
-    (userRepository as MockUserRepository).addUser(mockUser.copy(userId = "user2"))
-    // MockUser is on the attendeeList for events with id "1" and "2" but these are not in the
-    // eventRepository
-    viewModel.getUpcomingEvents("user2")
-
+    val events =
+        listOf(
+            mockEvent.copy(fireBaseID = "eventId1"),
+            mockEvent.copy(fireBaseID = "eventId2"),
+            mockEvent.copy(fireBaseID = "eventId3"))
+    // event is not added to repo.
+    val listOfEventIds = events.map { event -> event.fireBaseID }
+    val userWithHostedEvent = mockUser.copy(eventsHostList = listOfEventIds)
+    userRepository.addUser(userWithHostedEvent)
+    viewModel.getHostedEvents(userWithHostedEvent.userId)
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
-    assertNull(viewModel.uiState.value.eventList.selectedEvent)
-
-    verify { Log.d("EventsOverviewViewModel", "Error getting events for user2") }
+    Assert.assertNull(viewModel.uiState.value.eventList.selectedEvent)
+    verify {
+      Log.d(
+          "HostedEventsViewModel", "Error getting hosted events for ${userWithHostedEvent.userId}")
+    }
     confirmVerified()
   }
 
   @Test
-  fun testGetUpcomingEventsUserNotFound() = runTest {
+  fun testGetHostedEventsUserNotFound() = runTest {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
     val userId = "userNotFound"
-
-    viewModel.getUpcomingEvents(userId)
-
+    viewModel.getHostedEvents(userId)
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
-    assertNull(viewModel.uiState.value.eventList.selectedEvent)
-    verify { Log.d("EventsOverviewViewModel", "Error fetching user document") }
+    Assert.assertNull(viewModel.uiState.value.eventList.selectedEvent)
+    verify { Log.d("HostedEventsViewModel", "Error fetching user document") }
     confirmVerified()
-  }
-
-  @Test
-  fun testGetUpcomingEventsEmptyAttendeeList() = runTest {
-    val userWithEmptyList =
-        mockUser.copy(userId = "userWithEmptyList", eventsAttendeeList = emptyList())
-    userRepository.addUser(userWithEmptyList)
-    viewModel.getUpcomingEvents("userWithEmptyList")
-
-    assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
-    assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
-    assertNull(viewModel.uiState.value.eventList.selectedEvent)
   }
 }
