@@ -88,7 +88,7 @@ class AuthenticationViewModelTest {
     every { user.uid } returns "1"
     every { user.email } returns "test@test.com"
   }
-  
+
   @After
   fun tearDown() {
     unmockkAll()
@@ -183,12 +183,12 @@ class AuthenticationViewModelTest {
   fun testAddUserFalseCase() = runTest {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
-    
+
     val result = viewModel.addUser(mockUiState, null)
     assert(!result)
-    
+
     verify { Log.d("LoginScreenViewModel", "User not logged in") }
-    
+
     unmockkAll()
   }
 

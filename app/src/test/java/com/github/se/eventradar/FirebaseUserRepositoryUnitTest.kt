@@ -58,7 +58,7 @@ class FirebaseUserRepositoryUnitTest {
 
     firebaseUserRepository = FirebaseUserRepository(db = mockDb)
   }
-  
+
   @After
   fun tearDown() {
     unmockkAll()
