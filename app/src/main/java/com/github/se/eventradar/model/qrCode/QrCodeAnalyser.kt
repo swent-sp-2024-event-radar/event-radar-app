@@ -1,4 +1,4 @@
-package com.github.se.eventradar.qrCode
+package com.github.se.eventradar.model.qrCode
 
 import android.graphics.ImageFormat
 import androidx.camera.core.ImageAnalysis
@@ -60,24 +60,7 @@ class QrCodeAnalyser(private val activityScope: CoroutineScope, private val frie
                     }
                 }
             }
-        } else { //SCAN TICKET
-            activityScope.launch {
-                when (val newUserFriend = FirebaseUserRepository().getUser(scannedUID)) {
-                    is Resource.Success ->
-                        if (newUserFriend.data!!.friendList.contains()) {
-                            //Navigate to message screen
-                        } else {
-                            newUserFriend.data.friendList.add(myUID)
-                            FirebaseUserRepository().updateUser(newUserFriend.data)
-                        }
-
-                    is Resource.Failure -> {
-                        println("Failed to Fetch from Database")
-                    }
-                }
-            }
-
-        }
+        } 
 
       } catch (e: Exception) {
         e.printStackTrace()
