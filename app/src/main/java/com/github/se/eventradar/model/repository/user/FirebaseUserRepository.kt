@@ -8,14 +8,18 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
-class FirebaseUserRepository : IUserRepository {
-  private val db: FirebaseFirestore = Firebase.firestore
+class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUserRepository {
   private val userRef: CollectionReference = db.collection("users")
 
-  override suspend fun getUsers(): Resource<List<User>> {
-    val resultDocument = userRef.get().await()
+  private val birthdateString = "private/birthDate"
+  private val emailString = "private/email"
+  private val firstNameString = "private/firstName"
+  private val lastNameString = "private/lastName"
+  private val phoneNumberString = "private/phoneNumber"
 
+  override suspend fun getUsers(): Resource<List<User>> {
     return try {
+      val resultDocument = userRef.get().await()
       val users =
           resultDocument.documents.map { document ->
             val userMap = document.data!!
@@ -26,11 +30,11 @@ class FirebaseUserRepository : IUserRepository {
                     .document("private")
                     .get()
                     .await()
-            userMap["private/birthDate"] = privateResult["birthDate"] as String
-            userMap["private/email"] = privateResult["email"] as String
-            userMap["private/firstName"] = privateResult["firstName"] as String
-            userMap["private/lastName"] = privateResult["lastName"] as String
-            userMap["private/phoneNumber"] = privateResult["phoneNumber"] as String
+            userMap[birthdateString] = privateResult["birthDate"] as String
+            userMap[emailString] = privateResult["email"] as String
+            userMap[firstNameString] = privateResult["firstName"] as String
+            userMap[lastNameString] = privateResult["lastName"] as String
+            userMap[phoneNumberString] = privateResult["phoneNumber"] as String
             User(userMap, document.id)
           }
       Resource.Success(users)
@@ -40,9 +44,8 @@ class FirebaseUserRepository : IUserRepository {
   }
 
   override suspend fun getUser(uid: String): Resource<User?> {
-    val resultDocument = userRef.document(uid).get().await()
-
     return try {
+      val resultDocument = userRef.document(uid).get().await()
       val userMap = resultDocument.data!!
       val privateResult =
           userRef
@@ -51,11 +54,12 @@ class FirebaseUserRepository : IUserRepository {
               .document("private")
               .get()
               .await()
-      userMap["private/birthDate"] = privateResult["birthDate"] as String
-      userMap["private/email"] = privateResult["email"] as String
-      userMap["private/firstName"] = privateResult["firstName"] as String
-      userMap["private/lastName"] = privateResult["lastName"] as String
-      userMap["private/phoneNumber"] = privateResult["phoneNumber"] as String
+      userMap[birthdateString] = privateResult["birthDate"] as String
+      userMap[emailString] = privateResult["email"] as String
+      userMap[firstNameString] = privateResult["firstName"] as String
+      userMap[lastNameString] = privateResult["lastName"] as String
+      userMap[phoneNumberString] = privateResult["phoneNumber"] as String
+
       val user = User(userMap, resultDocument.id)
       Resource.Success(user)
     } catch (e: Exception) {
@@ -123,32 +127,15 @@ class FirebaseUserRepository : IUserRepository {
   }
 
   override suspend fun updateUser(user: User): Resource<Unit> {
-    val privateMap =
-        mutableMapOf(
-            "firstName" to user.firstName,
-            "lastName" to user.lastName,
-            "phoneNumber" to user.phoneNumber,
-            "birthDate" to user.birthDate,
-            "email" to user.email,
-        )
-
-    val publicMap =
-        mutableMapOf(
-            "profilePicUrl" to user.profilePicUrl,
-            "qrCodeUrl" to user.qrCodeUrl,
-            "username" to user.username,
-            "accountStatus" to user.accountStatus,
-            "eventsAttendeeList" to user.eventsAttendeeList,
-            "eventsHostList" to user.eventsHostList,
-        )
+    val maps: Pair<Map<String, Any?>, Map<String, Any?>> = getMaps(user)
 
     return try {
-      userRef.document(user.userId).update(publicMap as Map<String, Any>).await()
+      userRef.document(user.userId).update(maps.first).await()
       userRef
           .document(user.userId)
           .collection("private")
           .document("private")
-          .update(privateMap as Map<String, Any>)
+          .update(maps.second)
           .await()
       Resource.Success(Unit)
     } catch (e: Exception) {
@@ -177,4 +164,27 @@ class FirebaseUserRepository : IUserRepository {
       Resource.Failure(e)
     }
   }
+}
+
+private fun getMaps(user: User): Pair<Map<String, Any?>, Map<String, Any?>> {
+  val privateMap =
+      mutableMapOf(
+          "firstName" to user.firstName,
+          "lastName" to user.lastName,
+          "phoneNumber" to user.phoneNumber,
+          "birthDate" to user.birthDate,
+          "email" to user.email,
+      )
+
+  val publicMap =
+      mutableMapOf(
+          "profilePicUrl" to user.profilePicUrl,
+          "qrCodeUrl" to user.qrCodeUrl,
+          "username" to user.username,
+          "accountStatus" to user.accountStatus,
+          "eventsAttendeeList" to user.eventsAttendeeList,
+          "eventsHostList" to user.eventsHostList,
+      )
+
+  return Pair(publicMap, privateMap)
 }

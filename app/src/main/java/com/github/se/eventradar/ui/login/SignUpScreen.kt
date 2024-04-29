@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -38,7 +39,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -121,8 +124,10 @@ fun SignUpScreen(
             Image(
                 painter = imageBitmap,
                 contentDescription = "Selected Profile Picture",
+                contentScale = ContentScale.Crop,
                 modifier =
                     Modifier.size(150.dp) // Adjust size as needed
+                        .clip(CircleShape)
                         .testTag("signUpProfilePicture")
                         .clickable {
                           imagePickerLauncher.launch("image/*")
@@ -135,8 +140,10 @@ fun SignUpScreen(
                         id =
                             R.drawable.placeholder), // Replace with your placeholder image resource
                 contentDescription = "Profile Picture Placeholder",
+                contentScale = ContentScale.Crop,
                 modifier =
                     Modifier.size(150.dp) // Adjust size as needed
+                        .clip(CircleShape)
                         .testTag("signUpProfilePicture")
                         .clickable {
                           imagePickerLauncher.launch("image/*")
