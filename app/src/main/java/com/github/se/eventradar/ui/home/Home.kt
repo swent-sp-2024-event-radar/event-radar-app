@@ -89,7 +89,7 @@ fun HomeScreen(
     navigationActions: NavigationActions
 ) {
 
-  //Ui States handled by viewModel
+  // Ui States handled by viewModel
   val uiState by viewModel.uiState.collectAsState()
   var selectedTabIndex by remember { mutableIntStateOf(if (uiState.tab == Tab.BROWSE) 0 else 1) }
   var viewToggleIcon by remember {

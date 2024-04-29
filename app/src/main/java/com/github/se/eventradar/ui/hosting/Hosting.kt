@@ -56,7 +56,7 @@ fun HostingScreen(
     viewModel: HostedEventsViewModel = hiltViewModel(),
     navigationActions: NavigationActions
 ) {
-    //Ui States handled by viewModel
+  // Ui States handled by viewModel
   val uiState by viewModel.uiState.collectAsState()
   var viewToggleIcon by remember {
     mutableStateOf(if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List)
