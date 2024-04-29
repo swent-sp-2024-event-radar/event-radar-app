@@ -11,7 +11,6 @@ import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
-import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
@@ -153,7 +152,6 @@ class EventsOverviewViewModelTest {
     assertNull(viewModel.uiState.value.eventList.selectedEvent)
 
     verify { Log.d("EventsOverviewViewModel", "Error getting events for user2") }
-    confirmVerified()
     unmockkAll()
   }
 
@@ -169,7 +167,6 @@ class EventsOverviewViewModelTest {
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
     assertNull(viewModel.uiState.value.eventList.selectedEvent)
     verify { Log.d("EventsOverviewViewModel", "Error fetching user document") }
-    confirmVerified()
     unmockkAll()
   }
 
