@@ -1,8 +1,11 @@
-package com.github.se.eventradar.model.event
+package com.github.se.eventradar.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.event.EventCategory
+import com.github.se.eventradar.model.event.EventTicket
+import com.github.se.eventradar.model.event.getEventCategory
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
