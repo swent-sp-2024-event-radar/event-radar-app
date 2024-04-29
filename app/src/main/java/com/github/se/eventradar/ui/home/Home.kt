@@ -28,7 +28,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -83,7 +82,6 @@ import com.github.se.eventradar.viewmodel.EventsOverviewUiState
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 import com.github.se.eventradar.viewmodel.Tab
-import com.github.se.eventradar.viewmodel.ViewType
 @Composable
 fun HomeScreen(
     viewModel: EventsOverviewViewModel = hiltViewModel(),
@@ -97,7 +95,7 @@ fun HomeScreen(
     }
     var viewToggleIcon by remember {
         mutableStateOf(
-            if (uiState.viewType == ViewType.LIST) Icons.Default.Place else Icons.AutoMirrored.Filled.List)
+            if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List)
     }
   LaunchedEffect(key1 = uiState.eventList) { viewModel.getEvents() }
   val context = LocalContext.current
@@ -174,7 +172,6 @@ fun HomeScreen(
               }
         }
 
-<<<<<<< HEAD
     SearchBarAndFilter(
         searchQuery = uiState.searchQuery,
         onSearchQueryChange = { uiState.searchQuery = it },
@@ -190,28 +187,9 @@ fun HomeScreen(
               end.linkTo(parent.end)
             })
 
-    if (selectedTabIndex == 0) {
-      if (viewToggleBrowseIndex == 0) {
-        EventList(
-            uiState.eventList.allEvents,
-            Modifier.fillMaxWidth().constrainAs(eventList) {
-              top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-              start.linkTo(parent.start)
-              end.linkTo(parent.end)
-            })
-      } else {
-        EventMap(
-            uiState.eventList.allEvents,
-            navigationActions,
-            Modifier.fillMaxWidth().constrainAs(eventMap) {
-              top.linkTo(tabs.bottom, margin = 8.dp)
-              start.linkTo(parent.start)
-              end.linkTo(parent.end)
-            })
-      }
-=======
+
     if (selectedTabIndex == 0) { //problem is the icon
-        if (uiState.viewType == ViewType.LIST) {
+        if (uiState.viewList) {
             EventList(
                 uiState.eventList.allEvents,
                 Modifier.fillMaxWidth().constrainAs(eventList) {
@@ -229,14 +207,12 @@ fun HomeScreen(
                     end.linkTo(parent.end)
                 })
         }
->>>>>>> a1747c7 (ViewModel handles changes to Tab + View Status)
     } else {
       // "Upcoming" tab content
       // TODO: Implement upcoming events
       Toast.makeText(context, "Upcoming events not yet available", Toast.LENGTH_SHORT).show()
       uiState.tab = Tab.BROWSE
         selectedTabIndex = if (uiState.tab == Tab.BROWSE) 0 else 1
-
     }
     // Note for now, the filter dialog is always open to verify the UI
     if (!uiState.isFilterDialogOpen) {
@@ -273,12 +249,8 @@ fun HomeScreen(
               absoluteRight.linkTo(parent.absoluteRight)
           },
           onClick = {
-              if (uiState.viewType == ViewType.LIST){
-                  uiState.viewType = ViewType.MAP
-              } else {
-                  uiState.viewType = ViewType.LIST
-              }
-              viewToggleIcon = if (uiState.viewType == ViewType.LIST) Icons.Default.Place else Icons.AutoMirrored.Filled.List
+              uiState.viewList = !uiState.viewList
+              viewToggleIcon = if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List
           },
           iconVector = viewToggleIcon)
   }

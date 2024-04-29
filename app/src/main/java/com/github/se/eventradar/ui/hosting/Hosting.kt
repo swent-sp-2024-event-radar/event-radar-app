@@ -50,8 +50,6 @@ import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 import com.github.se.eventradar.util.toast
 import com.github.se.eventradar.viewmodel.HostedEventsViewModel
-import com.github.se.eventradar.viewmodel.ViewType
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun HostingScreen(
@@ -61,7 +59,7 @@ fun HostingScreen(
   val uiState by viewModel.uiState.collectAsState()
     var viewToggleIcon by remember {
         mutableStateOf(
-            if (uiState.viewType == ViewType.LIST) Icons.Default.Place else Icons.AutoMirrored.Filled.List)
+            if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List)
     }
   LaunchedEffect(key1 = uiState.eventList) { viewModel.getHostedEvents() }
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("hostingScreen")) {
@@ -86,7 +84,7 @@ fun HostingScreen(
                     }))
     HorizontalDivider(
         modifier = Modifier.constrainAs(divider, { top.linkTo(title.bottom, margin = 10.dp) }))
-    if (uiState.viewType == ViewType.LIST) {
+    if (uiState.viewList) {
       EventList(
           uiState.eventList.allEvents,
          Modifier.fillMaxWidth().constrainAs(eventList) {
@@ -123,12 +121,8 @@ fun HostingScreen(
           ViewToggleFab(
               modifier = Modifier.testTag("viewToggleFab"),
               onClick = {
-                  if (uiState.viewType == ViewType.LIST){
-                      uiState.viewType = ViewType.MAP
-                  } else {
-                      uiState.viewType = ViewType.LIST
-                  }
-                  viewToggleIcon = if (uiState.viewType == ViewType.LIST) Icons.Default.Place else Icons.AutoMirrored.Filled.List
+                  uiState.viewList = !uiState.viewList
+                  viewToggleIcon = if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List
               },
               iconVector = viewToggleIcon)
         }
