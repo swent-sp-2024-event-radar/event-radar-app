@@ -50,6 +50,7 @@ import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.TopLevelDestination
+import com.google.firebase.auth.FirebaseAuth
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -59,11 +60,12 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun MessagesScreen(
     viewModel: MessagesViewModel = hiltViewModel(),
-    userId: String,
     navigationActions: NavigationActions
 ) {
   val uiState by viewModel.uiState.collectAsState()
   val context = LocalContext.current // only needed while the chat feature is not implemented
+  
+  val userId = FirebaseAuth.getInstance().currentUser?.uid!!
   viewModel.getMessages(userId)
 
   MessagesScreenUi(
@@ -71,7 +73,9 @@ fun MessagesScreen(
       uiState = uiState,
       onSelectedTabIndexChange = viewModel::onSelectedTabIndexChange,
       onSearchQueryChange = viewModel::onSearchQueryChange,
-      onChatClicked = { Toast.makeText(context, "Chat feature is not yet implemented", Toast.LENGTH_SHORT).show()},
+      onChatClicked = {
+        Toast.makeText(context, "Chat feature is not yet implemented", Toast.LENGTH_SHORT).show()
+      },
       onTabSelected = navigationActions::navigateTo,
       getUser = viewModel::getUser)
 }
@@ -101,7 +105,7 @@ fun MessagesScreenUi(
         BottomNavigationMenu(
             onTabSelected = onTabSelected,
             tabList = TOP_LEVEL_DESTINATIONS,
-            selectedItem = TOP_LEVEL_DESTINATIONS[2],
+            selectedItem = TOP_LEVEL_DESTINATIONS[1],
             modifier = Modifier.testTag("bottomNavMenu"))
       }) {
         Column(modifier = Modifier.padding(it).padding(top = 16.dp)) {
@@ -171,12 +175,17 @@ fun MessagesList(
     getUser: (String) -> User,
     modifier: Modifier = Modifier
 ) {
+  val filteredMessageList = messageList.filter { it.user1 == userId || it.user2 == userId }
+
   LazyColumn(modifier = modifier.padding(top = 16.dp)) {
-    items(messageList) { messageHistory ->
+    items(filteredMessageList) { messageHistory ->
       val toUser =
           getUser(
-              if (messageHistory.user1 != userId) messageHistory.user1 else messageHistory.user2)
-      MessagePreviewItem(messageHistory, userId, toUser, onChatClicked)
+              when {
+                userId == messageHistory.user1 -> messageHistory.user2
+                else -> messageHistory.user1
+              })
+      MessagePreviewItem(messageHistory, toUser, onChatClicked)
       Divider()
     }
   }
@@ -185,106 +194,120 @@ fun MessagesList(
 @Composable
 fun MessagePreviewItem(
     messageHistory: MessageHistory,
-    userId: String,
     toUser: User,
     onChatClicked: (MessageHistory) -> Unit,
     modifier: Modifier = Modifier
 ) {
   val mostRecentMessage = messageHistory.messages.last { it.id == messageHistory.latestMessageId }
-  
-  Row(modifier = modifier.clickable { onChatClicked(messageHistory) }, horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-    Image(
-        painter = rememberImagePainter(data = Uri.parse(toUser.profilePicUrl)),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier = Modifier.size(56.dp).padding(start = 16.dp).clip(CircleShape))
-    Column(modifier = Modifier.padding(start = 16.dp)) {
-      Text(
-          text = "${toUser.firstName} ${toUser.lastName}",
-          style =
-              TextStyle(
-                  fontSize = 16.sp,
-                  lineHeight = 24.sp,
-                  fontFamily = FontFamily(Font(R.font.roboto)),
-                  fontWeight = FontWeight.Bold,
-                  color = Color.Black,
-                  letterSpacing = 0.5.sp,
-              ))
-      Text(
-          text = mostRecentMessage.content,
-          maxLines = 2,
-          overflow = TextOverflow.Ellipsis,
-          style =
-              TextStyle(
-                  fontSize = 14.sp,
-                  lineHeight = 20.sp,
-                  fontFamily = FontFamily(Font(R.font.roboto)),
-                  fontWeight =
-                      if (mostRecentMessage.isRead) FontWeight.Normal else FontWeight.Bold,
-                  color = Color(0xFF49454F),
-                  letterSpacing = 0.25.sp,
-              ))
-    }
-    Spacer(modifier = Modifier.weight(1f))
-    
-    val today = LocalDateTime.of(LocalDate.now(ZoneId.systemDefault()), LocalTime.MIN)
-    val thisYear = today.minusYears(1)
-    
-    val pattern = when {
-      mostRecentMessage.dateTimeSent.isAfter(today) -> "HH:mm"
-      mostRecentMessage.dateTimeSent.isBefore(today) and mostRecentMessage.dateTimeSent.isAfter(thisYear) -> "MM/dd"
-      else -> "MM/dd/yyyy"
-    }
-    
-    Text(
-        text = mostRecentMessage.dateTimeSent.format(DateTimeFormatter.ofPattern(pattern)),
-        modifier = Modifier.padding(end = 16.dp))
-  }
+
+  Row(
+      modifier = modifier.fillMaxWidth().clickable { onChatClicked(messageHistory) },
+      horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
+      verticalAlignment = Alignment.CenterVertically) {
+        Image(
+            painter = rememberImagePainter(data = Uri.parse(toUser.profilePicUrl)),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.size(56.dp).padding(start = 16.dp).clip(CircleShape))
+        Column(modifier = Modifier.padding(start = 16.dp).fillMaxWidth(.7f)) {
+          Text(
+              text = "${toUser.firstName} ${toUser.lastName}",
+              style =
+                  TextStyle(
+                      fontSize = 16.sp,
+                      lineHeight = 24.sp,
+                      fontFamily = FontFamily(Font(R.font.roboto)),
+                      fontWeight = FontWeight.Bold,
+                      color = Color.Black,
+                      letterSpacing = 0.5.sp,
+                  ))
+          Text(
+              text = mostRecentMessage.content,
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+              style =
+                  TextStyle(
+                      fontSize = 14.sp,
+                      lineHeight = 20.sp,
+                      fontFamily = FontFamily(Font(R.font.roboto)),
+                      fontWeight =
+                          if (mostRecentMessage.isRead) FontWeight.Normal else FontWeight.Bold,
+                      color = Color(0xFF49454F),
+                      letterSpacing = 0.25.sp,
+                  ))
+        }
+        Spacer(modifier = Modifier.weight(1f))
+
+        val today = LocalDateTime.of(LocalDate.now(ZoneId.systemDefault()), LocalTime.MIN)
+        val thisYear = today.minusYears(1)
+
+        val pattern =
+            when {
+              mostRecentMessage.dateTimeSent.isAfter(today) -> "HH:mm"
+              mostRecentMessage.dateTimeSent.isBefore(today) and
+                  mostRecentMessage.dateTimeSent.isAfter(thisYear) -> "dd/MM"
+              else -> "dd/MM/yyyy"
+            }
+
+        Text(
+            text = mostRecentMessage.dateTimeSent.format(DateTimeFormatter.ofPattern(pattern)),
+            modifier = Modifier.padding(end = 16.dp))
+      }
 }
 
 @Preview
 @Composable
 fun PreviewMessagesScreen() {
-  MessagesScreenUi(
-      userId = "1",
-      uiState =
-          MessagesUiState(
-              messageList =
-                  listOf(
-                      MessageHistory(
-                          user1 = "1",
-                          user2 = "2",
-                          messages =
-                              mutableListOf(
-                                  Message(
-                                      sender = "1",
-                                      content = "Hello Hello Hello Hello Hello",
-                                      dateTimeSent = LocalDateTime.parse("2021-08-01T12:00:00"),
-                                      isRead = false,
-                                      id = "1")),
-                          latestMessageId = "1",
-                      ),
-            MessageHistory(
+  val messageList =
+      listOf(
+          MessageHistory(
+              user1 = "1",
+              user2 = "2",
+              messages =
+                  mutableListOf(
+                      Message(
+                          sender = "1",
+                          content = "Hello Hello Hello Hello Hello",
+                          dateTimeSent = LocalDateTime.parse("2021-08-01T12:00:00"),
+                          isRead = false,
+                          id = "1")),
+              latestMessageId = "1",
+          ),
+          MessageHistory(
               user1 = "1",
               user2 = "3",
               messages =
-              mutableListOf(
-                Message(
-                  sender = "3",
-                  content = "Hello Hello Hello Hello Hello",
-                  dateTimeSent = LocalDateTime.parse("2024-04-27T12:00:00"),
-                  isRead = true,
-                  id = "1")),
-              latestMessageId = "1",
-            ))),
+                  mutableListOf(
+                      Message(
+                          sender = "3",
+                          content = "Hello Hello Hello Hello Hello Hello Hello Hello",
+                          dateTimeSent = LocalDateTime.parse("2024-04-27T12:00:00"),
+                          isRead = true,
+                          id = "1"),
+                      Message(
+                          sender = "1",
+                          content = "This is the most recent message",
+                          dateTimeSent = LocalDateTime.parse("2024-04-29T16:00:00"),
+                          isRead = true,
+                          id = "2")),
+              latestMessageId = "2",
+          ))
+  MessagesScreenUi(
+      userId = "2",
+      uiState =
+          MessagesUiState(
+              messageList =
+                  messageList.sortedByDescending {
+                    it.messages.find { message -> message.id == it.latestMessageId }?.dateTimeSent
+                  }),
       onSelectedTabIndexChange = {},
       onSearchQueryChange = {},
       onChatClicked = {},
       onTabSelected = {},
       getUser = {
         User(
-            "2",
-            0,
+            "5",
+            "10/10/2003",
             "test@test.com",
             "John",
             "Doe",
@@ -292,8 +315,8 @@ fun PreviewMessagesScreen() {
             "active",
             emptyList(),
             emptyList(),
-          "content://com.google.android.apps.docs.storage/document/acc%3D1%3Bdoc%3Dencoded%3D_UfMfUb7G-_gMA2naQlf9EvwC7BF37dTn3wqEbCsPCFqL25u15za15OI19GK4g%3D",
-          "",
+            "content://com.google.android.apps.docs.storage/document/acc%3D1%3Bdoc%3Dencoded%3D_UfMfUb7G-_gMA2naQlf9EvwC7BF37dTn3wqEbCsPCFqL25u15za15OI19GK4g%3D",
+            "",
             "johndoe")
       })
 }

@@ -16,10 +16,12 @@ import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
-class MessagesViewModel @Inject constructor(
-  private val messagesRepository: IMessageRepository,
-  private val userRepository: IUserRepository,) :
-    ViewModel() {
+class MessagesViewModel
+@Inject
+constructor(
+    private val messagesRepository: IMessageRepository,
+    private val userRepository: IUserRepository,
+) : ViewModel() {
   private val _uiState = MutableStateFlow(MessagesUiState())
   val uiState: StateFlow<MessagesUiState> = _uiState
 
@@ -30,7 +32,7 @@ class MessagesViewModel @Inject constructor(
           _uiState.value = _uiState.value.copy(messageList = response.data)
         }
         is Resource.Failure -> {
-          Log.d("MessagesViewModel", "Error getting messages")
+          Log.d("MessagesViewModel", "Error getting messages: ${response.throwable.message}")
         }
       }
     }
@@ -43,15 +45,15 @@ class MessagesViewModel @Inject constructor(
   fun onSelectedTabIndexChange(index: Int) {
     _uiState.value = _uiState.value.copy(selectedTabIndex = index)
   }
-  
+
   fun getUser(userId: String): User {
     var user: User?
-    
+
     runBlocking { user = getUserAsync(userId) }
-    
+
     return user!!
   }
-  
+
   private suspend fun getUserAsync(userId: String): User? {
     return when (val response = userRepository.getUser(userId)) {
       is Resource.Success -> {

@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDateTime
 
 class FirebaseMessageRepository : IMessageRepository {
   private val db: FirebaseFirestore = Firebase.firestore
@@ -20,14 +21,31 @@ class FirebaseMessageRepository : IMessageRepository {
           messageRef
               .where(
                   Filter.or(
-                      Filter.arrayContains("from_user", uid), Filter.arrayContains("to_user", uid)))
-              .orderBy("messages/date_time_sent")
+                      Filter.equalTo("from_user", uid), Filter.equalTo("to_user", uid)))
+//              .orderBy(FieldPath.documentId())
               .get()
               .await()
       if (resultDocument == null || resultDocument.isEmpty) {
         return Resource.Success(emptyList())
       }
-      val messageHistories = resultDocument.documents.map { MessageHistory(it.data!!, it.id) }
+      val messageHistories = resultDocument.documents.map {
+        val messageHistoryMap = it.data!!
+        
+        val messages = messageRef.document(it.id).collection("messages_list").get().await()
+        
+        messageHistoryMap["messages"] = messages.documents.map { message ->
+          Message(
+              sender = message["sender"] as String,
+              content = message["content"] as String,
+              dateTimeSent = LocalDateTime.parse(message["date_time_sent"] as String),
+              isRead = message["message_read"] as Boolean,
+              id = message.id,
+          )
+        }
+        
+        MessageHistory(messageHistoryMap, it.id)
+      }
+      
       Resource.Success(messageHistories)
     } catch (e: Exception) {
       Resource.Failure(e)
@@ -41,11 +59,11 @@ class FirebaseMessageRepository : IMessageRepository {
             .where(
                 Filter.or(
                     Filter.and(
-                        Filter.arrayContains("from_user", user1),
-                        Filter.arrayContains("to_user", user2)),
+                        Filter.equalTo("from_user", user1),
+                        Filter.equalTo("to_user", user2)),
                     Filter.and(
-                        Filter.arrayContains("from_user", user2),
-                        Filter.arrayContains("to_user", user1)),
+                        Filter.equalTo("from_user", user2),
+                        Filter.equalTo("to_user", user1)),
                 ))
             .limit(1)
             .get()

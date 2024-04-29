@@ -3,10 +3,8 @@ package com.github.se.eventradar.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import com.github.se.eventradar.ui.home.HomeScreen
 import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.login.SignUpScreen
@@ -28,14 +26,7 @@ fun NavGraph(navController: NavHostController) {
       HomeScreen(navigationActions = navActions)
       context.toast("Scanner screen needs to be implemented")
     }
-    composable(
-      "${Route.MESSAGE}/{userId}",
-      arguments = listOf(navArgument("userId") { type = NavType.StringType }))
-    {
-      val userId = it.arguments!!.getString("userId")!!
-      MessagesScreen(userId = userId, navigationActions = navActions)
-      context.toast("Message main screen needs to be implemented")
-    }
+    composable(Route.MESSAGE) { MessagesScreen(navigationActions = navActions) }
     composable(Route.PROFILE) {
       HomeScreen(navigationActions = navActions)
       context.toast("Profile screen needs to be implemented")
