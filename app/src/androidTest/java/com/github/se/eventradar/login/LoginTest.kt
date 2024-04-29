@@ -54,10 +54,10 @@ class LoginTest : TestCase() {
   fun googleSignInReturnsValidActivityResult() {
     Intents.init()
     ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
-        loginButton {
-          assertIsDisplayed()
-          performClick()
-        }
+      loginButton {
+        assertIsDisplayed()
+        performClick()
+      }
 
       // assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)
       intended(toPackage("com.google.android.gms"))

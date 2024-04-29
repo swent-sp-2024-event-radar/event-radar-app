@@ -86,38 +86,38 @@ class SignupTest : TestCase() {
   fun googleSignInReturnsValidActivityResult() {
     Intents.init()
     ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
-        usernameTextField {
-          performScrollTo()
-          assertIsDisplayed()
-          performTextInput("test")
-        }
-        nameTextField {
-          performScrollTo()
-          assertIsDisplayed()
-          performTextInput("test")
-        }
-        surnameTextField {
-          performScrollTo()
-          assertIsDisplayed()
-          performTextInput("test")
-        }
-        phoneTextField {
-          performScrollTo()
-          assertIsDisplayed()
-          performTextInput("123456789")
-        }
-        birthDateTextField {
-          performScrollTo()
-          assertIsDisplayed()
-          performTextInput("01/01/2000")
-        }
+      usernameTextField {
+        performScrollTo()
+        assertIsDisplayed()
+        performTextInput("test")
+      }
+      nameTextField {
+        performScrollTo()
+        assertIsDisplayed()
+        performTextInput("test")
+      }
+      surnameTextField {
+        performScrollTo()
+        assertIsDisplayed()
+        performTextInput("test")
+      }
+      phoneTextField {
+        performScrollTo()
+        assertIsDisplayed()
+        performTextInput("123456789")
+      }
+      birthDateTextField {
+        performScrollTo()
+        assertIsDisplayed()
+        performTextInput("01/01/2000")
+      }
 
-        signUpButton {
-          performScrollTo()
-          assertIsDisplayed()
-          performClick()
-        }
-      
+      signUpButton {
+        performScrollTo()
+        assertIsDisplayed()
+        performClick()
+      }
+
       // assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)
       intended(toPackage("com.google.android.gms"))
     }
