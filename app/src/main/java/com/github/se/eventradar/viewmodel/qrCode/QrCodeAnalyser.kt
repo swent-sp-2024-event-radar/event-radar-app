@@ -17,8 +17,7 @@ class QrCodeAnalyser: ImageAnalysis.Analyzer {
     private val supportedImageFormats =
         listOf(ImageFormat.YUV_420_888, ImageFormat.YUV_422_888, ImageFormat.YUV_444_888)
 
-//    var decodedString: String? = null
-      var onDecoded: ((String?) -> Unit)? = null //
+    var onDecoded: ((String?) -> Unit)? = null //
 
     override fun analyze(image: ImageProxy) {
 
@@ -45,9 +44,7 @@ class QrCodeAnalyser: ImageAnalysis.Analyzer {
                         }
                         .decode(binaryBitmap)
                 //if onDecoded is null (has not been initialised b Viewmodel) will simply return Null
-
                 onDecoded?.invoke(result.toString())
-//                initialiseString(result.toString())
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally { // close image once scanning process done
@@ -61,9 +58,5 @@ class QrCodeAnalyser: ImageAnalysis.Analyzer {
         rewind()
         return ByteArray(remaining()).also { get(it) }
     }
-
-
-//    private fun initialiseString (result: String?) {
-//        decodedString = result
-//    }
 }
+
