@@ -29,10 +29,16 @@ constructor(
     filterEvents()
   }
 
-  fun onFilterApplyClicked(applyFilter: Boolean) {
-    _uiState.value = _uiState.value.copy(isFilterDialogOpen = applyFilter)
-    filterEvents()
-  }
+    fun onSearchActiveChanged(isActive: Boolean) {
+        _uiState.value = _uiState.value.copy(isSearchActive = isActive)
+    }
+
+    fun onFilterButtonClicked(isFilterDialogOpen: Boolean) {
+        _uiState.value = _uiState.value.copy(isFilterDialogOpen = isFilterDialogOpen)
+    }
+    fun onRadiusQueryChanged(radius: String) {
+        _uiState.value = _uiState.value.copy(radiusQuery = radius)
+    }
 
   private fun filterEvents() {
     val query = _uiState.value.searchQuery
@@ -41,11 +47,11 @@ constructor(
           it.eventName.contains(query, ignoreCase = true)
         }
 
-    if (_uiState.value.isFilterDialogOpen) {
-      filteredEvents.filter { it.category == _uiState.value.eventList.selectedEvent?.category }
-    } else {
-      filteredEvents
-    }
+//    if (_uiState.value.isFilterDialogOpen) {
+//      filteredEvents.filter { it.category == _uiState.value.eventList.selectedEvent?.category }
+//    } else {
+//      filteredEvents
+//    }
 
     _uiState.value =
         _uiState.value.copy(
@@ -107,9 +113,10 @@ constructor(
 data class EventsOverviewUiState(
     val eventList: EventList = EventList(emptyList(), emptyList(), null),
     var searchQuery: String = "",
+    var isSearchActive: Boolean = false,
     var isFilterDialogOpen: Boolean = false,
-    var radiusInputFilter: Double = -1.0,
-    var freeEventsFilter: Boolean = false,
+    var radiusQuery: String = "",
+    var freeEventsFilter: Boolean = true,
     var categorySelectionFilter: List<EventCategory> = emptyList(),
     var viewList: Boolean = true,
     var tab: Tab = Tab.BROWSE,

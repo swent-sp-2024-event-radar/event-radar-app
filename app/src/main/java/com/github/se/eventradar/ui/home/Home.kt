@@ -1,5 +1,6 @@
 package com.github.se.eventradar.ui.home
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -163,10 +164,10 @@ fun HomeScreen(
         }
 
     SearchBarAndFilter(
-        onSearchQueryChange = { viewModel.onSearchQueryChanged(it) },
+        onSearchQueryChanged = { viewModel.onSearchQueryChanged(it) },
         uiState = uiState,
-        showFilterPopUp = uiState.isFilterDialogOpen,
-        setShowFilterPopUp = { uiState.isFilterDialogOpen = it },
+        onSearchActiveChanged = { viewModel.onSearchActiveChanged(it) },
+        onFilterButtonClicked = { viewModel.onFilterButtonClicked(it) },
         modifier =
             Modifier.padding(horizontal = 16.dp, vertical = 8.dp).constrainAs(searchAndFilter) {
               top.linkTo(tabs.bottom, margin = 8.dp)
@@ -176,15 +177,8 @@ fun HomeScreen(
 
     if (selectedTabIndex == 0) {
       if (viewToggleBrowseIndex == 0) {
-        if (uiState.searchQuery == "") {
-          EventList(
-              uiState.eventList.allEvents,
-              Modifier.fillMaxWidth().constrainAs(eventList) {
-                top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-              })
-        } else {
+        if (uiState.isSearchActive) {
+            Log.d("Search is active", "Search is active")
           EventList(
               uiState.eventList.filteredEvents,
               Modifier.fillMaxWidth().constrainAs(eventList) {
@@ -192,16 +186,36 @@ fun HomeScreen(
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
               })
+        } else {
+            Log.d("Search is NOT active", "Search is NOT active")
+          EventList(
+              uiState.eventList.allEvents,
+              Modifier.fillMaxWidth().constrainAs(eventList) {
+                top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+              })
         }
       } else {
-        EventMap(
-            uiState.eventList.allEvents,
-            navigationActions,
-            Modifier.fillMaxWidth().constrainAs(eventMap) {
-              top.linkTo(tabs.bottom, margin = 8.dp)
-              start.linkTo(parent.start)
-              end.linkTo(parent.end)
-            })
+          if (uiState.isSearchActive) {
+              EventMap(
+                  uiState.eventList.filteredEvents,
+                  navigationActions,
+                  Modifier.fillMaxWidth().constrainAs(eventMap) {
+                      top.linkTo(tabs.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                  })
+          } else {
+              EventMap(
+                  uiState.eventList.allEvents,
+                  navigationActions,
+                  Modifier.fillMaxWidth().constrainAs(eventMap) {
+                      top.linkTo(tabs.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                  })
+          }
       }
     } else {
       // "Upcoming" tab content
@@ -209,11 +223,11 @@ fun HomeScreen(
       Toast.makeText(context, "Upcoming events not yet available", Toast.LENGTH_SHORT).show()
       selectedTabIndex = 0
     }
-    // Note for now, the filter dialog is always open to verify the UI
-    if (!uiState.isFilterDialogOpen) {
+    if (uiState.isFilterDialogOpen) {
       FilterPopUp(
+          onRadiusQueryChanged = { viewModel.onRadiusQueryChanged(it) },
           onRadiusChange = { radius ->
-            // Handle radius change
+              // Handle free selection change
           },
           onFreeSelectionChange = { isFree ->
             // Handle free selection change
@@ -260,17 +274,21 @@ fun HomeScreen(
 
 @Composable
 fun SearchBarAndFilter(
-    onSearchQueryChange: (String) -> Unit,
+    onSearchQueryChanged: (String) -> Unit,
     uiState: EventsOverviewUiState,
-    showFilterPopUp: Boolean,
-    setShowFilterPopUp: (Boolean) -> Unit,
+    onSearchActiveChanged: (Boolean) -> Unit,
+    onFilterButtonClicked: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
   Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
     // Search bar
     TextField(
         value = uiState.searchQuery,
-        onValueChange = { onSearchQueryChange(it) },
+        onValueChange = {
+            onSearchQueryChanged(it)
+            if (it == "") onSearchActiveChanged(false)
+            else onSearchActiveChanged(true)
+        },
         modifier = Modifier.weight(1f),
         maxLines = 1,
         shape = RoundedCornerShape(32.dp),
@@ -284,8 +302,7 @@ fun SearchBarAndFilter(
 
     // Filter button
     Button(
-        // function setShowFilterPopUp() needs to be created in the VM
-        onClick = { setShowFilterPopUp(!showFilterPopUp) },
+        onClick = { onFilterButtonClicked(!uiState.isFilterDialogOpen) },
         modifier = Modifier.padding(start = 8.dp)) {
           Text("Filter")
         }
@@ -294,7 +311,8 @@ fun SearchBarAndFilter(
 
 @Composable
 fun FilterPopUp(
-    onRadiusChange: (Double) -> Unit,
+    onRadiusQueryChanged: (String) -> Unit,
+    onRadiusChange: (String) -> Unit,
     onFreeSelectionChange: (Boolean) -> Unit,
     onCategorySelectionChange: (List<EventCategory>) -> Unit,
     modifier: Modifier = Modifier,
@@ -317,10 +335,8 @@ fun FilterPopUp(
                           fontSize = 16.sp,
                       ))
               TextField(
-                  value = uiState.radiusInputFilter.toString(),
-                  onValueChange = { input ->
-                    uiState.radiusInputFilter = input.toDoubleOrNull() ?: uiState.radiusInputFilter
-                  },
+                  value = uiState.radiusQuery,
+                  onValueChange = { onRadiusQueryChanged(it) },
                   keyboardOptions =
                       KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                   modifier = Modifier.width(70.dp).height(10.dp),
@@ -376,9 +392,8 @@ fun FilterPopUp(
           Button(
               onClick = {
                 // Apply filter
-                onRadiusChange(uiState.radiusInputFilter)
+                onRadiusChange(uiState.radiusQuery)
                 onFreeSelectionChange(uiState.freeEventsFilter)
-                onCategorySelectionChange(uiState.categorySelectionFilter)
                 onCategorySelectionChange(uiState.categorySelectionFilter)
               }) {
                 Text("Apply")
