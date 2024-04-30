@@ -14,11 +14,11 @@ import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.unmockkAll
+import java.time.LocalDateTime
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import java.time.LocalDateTime
 
 class FirebaseMessageRepositoryUnitTest {
 
@@ -213,82 +213,83 @@ class FirebaseMessageRepositoryUnitTest {
   fun `test updateReadStateForUser() when from user updates`() = runTest {
     val messageHistory = expectedMessageHistory
     val user = "1"
-    
+
     val captureUpdate = slot<Map<String, Any?>>()
     val expectedUpdateValues = mapOf("from_user_read" to true)
-    
+
     every { messagesRef.document(any()).update(capture(captureUpdate)) } returns mockTask(null)
-    
+
     val result = firebaseMessageRepository.updateReadStateForUser(user, messageHistory)
-    
+
     assert(result is Resource.Success)
     assert(captureUpdate.captured == expectedUpdateValues)
   }
-  
+
   @Test
   fun `test updateReadStateForUser() when to user updates`() = runTest {
     val messageHistory = expectedMessageHistory
     val user = "2"
-    
+
     val captureUpdate = slot<Map<String, Any?>>()
     val expectedUpdateValues = mapOf("to_user_read" to true)
-    
+
     every { messagesRef.document(any()).update(capture(captureUpdate)) } returns mockTask(null)
-    
+
     val result = firebaseMessageRepository.updateReadStateForUser(user, messageHistory)
-    
+
     assert(result is Resource.Success)
     assert(captureUpdate.captured == expectedUpdateValues)
   }
-  
+
   @Test
   fun `test updateReadStateForUser() with exception`() = runTest {
     val messageHistory = expectedMessageHistory
     val user = "1"
-    
+
     val exceptionMessage = "Exception"
     every { messagesRef.document(any()).update(any()) } throws Exception(exceptionMessage)
-    
+
     val result = firebaseMessageRepository.updateReadStateForUser(user, messageHistory)
-    
+
     assert(result is Resource.Failure)
     assert((result as Resource.Failure).throwable.message == exceptionMessage)
   }
-  
+
   @Test
   fun `test createNewMessageHistory()`() = runTest {
     val user1 = "1"
     val user2 = "2"
-    
+
     val captureAdd = slot<Map<String, Any?>>()
-    val expectedAddValues = mapOf(
-        "from_user" to user1,
-        "to_user" to user2,
-        "latest_message_id" to "",
-        "from_user_read" to false,
-        "to_user_read" to false,
-        "messages" to emptyList<Message>(),
-    )
-    
+    val expectedAddValues =
+        mapOf(
+            "from_user" to user1,
+            "to_user" to user2,
+            "latest_message_id" to "",
+            "from_user_read" to false,
+            "to_user_read" to false,
+            "messages" to emptyList<Message>(),
+        )
+
     every { messagesRef.add(capture(captureAdd)) } returns mockTask(mockDocumentReference)
     every { mockDocumentReference.id } returns "1"
-    
+
     val result = firebaseMessageRepository.createNewMessageHistory(user1, user2)
-    
+
     assert(result is Resource.Success)
     assert(captureAdd.captured == expectedAddValues)
   }
-  
+
   @Test
   fun `test createNewMessageHistory() with exception`() = runTest {
     val user1 = "1"
     val user2 = "2"
-    
+
     val exceptionMessage = "Exception"
     every { messagesRef.add(any()) } throws Exception(exceptionMessage)
-    
+
     val result = firebaseMessageRepository.createNewMessageHistory(user1, user2)
-    
+
     assert(result is Resource.Failure)
     assert((result as Resource.Failure).throwable.message == exceptionMessage)
   }

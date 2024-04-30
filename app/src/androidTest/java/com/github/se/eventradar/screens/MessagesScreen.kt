@@ -14,7 +14,7 @@ public class MessagesScreen(semanticsProvider: SemanticsNodeInteractionsProvider
   val tabs: KNode = child { hasTestTag("tabs") }
   val messagesTab: KNode = tabs.child { hasTestTag("messagesTab") }
   val contactsTab: KNode = tabs.child { hasTestTag("contactsTab") }
-  
+
   val messagesList: KNode = child { hasTestTag("messagesList") }
   val messagePreviewItem: KNode = messagesList.child { hasTestTag("messagePreviewItem") }
   val messageContentColumn: KNode = messagePreviewItem.child { hasTestTag("messageContentColumn") }

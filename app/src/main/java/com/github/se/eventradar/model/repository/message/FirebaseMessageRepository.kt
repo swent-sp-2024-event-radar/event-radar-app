@@ -8,8 +8,8 @@ import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.tasks.await
 import java.time.LocalDateTime
+import kotlinx.coroutines.tasks.await
 
 class FirebaseMessageRepository(db: FirebaseFirestore = Firebase.firestore) : IMessageRepository {
   private val messageRef: CollectionReference = db.collection("messages")
@@ -79,7 +79,11 @@ class FirebaseMessageRepository(db: FirebaseFirestore = Firebase.firestore) : IM
   ): Resource<Unit> {
     return try {
       val newMessage =
-          messageRef.document(messageHistory.id).collection("messages_list").add(message.toMap()).await()
+          messageRef
+              .document(messageHistory.id)
+              .collection("messages_list")
+              .add(message.toMap())
+              .await()
 
       val updatedValues =
           mapOf(

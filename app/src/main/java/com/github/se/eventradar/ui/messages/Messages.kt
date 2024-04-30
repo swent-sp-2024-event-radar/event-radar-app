@@ -197,43 +197,51 @@ fun MessagePreviewItem(
   val mostRecentMessage = messageHistory.messages.last { it.id == messageHistory.latestMessageId }
 
   Row(
-      modifier = modifier.fillMaxWidth().clickable { onChatClicked(messageHistory) }.testTag("messagePreviewItem"),
+      modifier =
+          modifier
+              .fillMaxWidth()
+              .clickable { onChatClicked(messageHistory) }
+              .testTag("messagePreviewItem"),
       horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
       verticalAlignment = Alignment.CenterVertically) {
         Image(
             painter = rememberImagePainter(data = Uri.parse(recipient.profilePicUrl)),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.size(56.dp).padding(start = 16.dp).clip(CircleShape).testTag("profilePic"))
-        Column(modifier = Modifier.padding(start = 16.dp).fillMaxWidth(.7f).testTag("messageContentColumn")) {
-          Text(
-              text = "${recipient.firstName} ${recipient.lastName}",
-              style =
-                  TextStyle(
-                      fontSize = 16.sp,
-                      lineHeight = 24.sp,
-                      fontFamily = FontFamily(Font(R.font.roboto)),
-                      fontWeight = FontWeight.Bold,
-                      color = Color.Black,
-                      letterSpacing = 0.5.sp,
-                  ),
-              modifier = Modifier.testTag("recipientName"))
-          Text(
-              text = mostRecentMessage.content,
-              maxLines = 1,
-              overflow = TextOverflow.Ellipsis,
-              style =
-                  TextStyle(
-                      fontSize = 14.sp,
-                      lineHeight = 20.sp,
-                      fontFamily = FontFamily(Font(R.font.roboto)),
-                      fontWeight =
-                          if (currentUserReadLatestMessage) FontWeight.Normal else FontWeight.Bold,
-                      color = Color(0xFF49454F),
-                      letterSpacing = 0.25.sp,
-                  ),
-              modifier = Modifier.testTag("messageContent"))
-        }
+            modifier =
+                Modifier.size(56.dp).padding(start = 16.dp).clip(CircleShape).testTag("profilePic"))
+        Column(
+            modifier =
+                Modifier.padding(start = 16.dp).fillMaxWidth(.7f).testTag("messageContentColumn")) {
+              Text(
+                  text = "${recipient.firstName} ${recipient.lastName}",
+                  style =
+                      TextStyle(
+                          fontSize = 16.sp,
+                          lineHeight = 24.sp,
+                          fontFamily = FontFamily(Font(R.font.roboto)),
+                          fontWeight = FontWeight.Bold,
+                          color = Color.Black,
+                          letterSpacing = 0.5.sp,
+                      ),
+                  modifier = Modifier.testTag("recipientName"))
+              Text(
+                  text = mostRecentMessage.content,
+                  maxLines = 1,
+                  overflow = TextOverflow.Ellipsis,
+                  style =
+                      TextStyle(
+                          fontSize = 14.sp,
+                          lineHeight = 20.sp,
+                          fontFamily = FontFamily(Font(R.font.roboto)),
+                          fontWeight =
+                              if (currentUserReadLatestMessage) FontWeight.Normal
+                              else FontWeight.Bold,
+                          color = Color(0xFF49454F),
+                          letterSpacing = 0.25.sp,
+                      ),
+                  modifier = Modifier.testTag("messageContent"))
+            }
         Spacer(modifier = Modifier.weight(1f))
 
         val today = LocalDateTime.of(LocalDate.now(ZoneId.systemDefault()), LocalTime.MIN)

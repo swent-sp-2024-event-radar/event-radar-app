@@ -25,6 +25,7 @@ import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
+import java.time.LocalDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -32,99 +33,88 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
 class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
-  
+
   @get:Rule val composeTestRule = createComposeRule()
-  
+
   // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
   @get:Rule val mockkRule = MockKRule(this)
-  
+
   // Relaxed mocks methods have a default implementation returning values
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
-  
+
   private lateinit var mockMessageRepository: IMessageRepository
   private lateinit var mockUserRepository: IUserRepository
   private lateinit var mockMessagesViewModel: MessagesViewModel
-  
+
   private val sampleMessagesList =
-    MutableStateFlow(
-      MessagesUiState(
-        userId = "1",
-        messageList = List(10) {
-          MessageHistory(
-            user1 = "1",
-            user2 = "$it",
-            latestMessageId = "1",
-            user1ReadMostRecentMessage = false,
-            user2ReadMostRecentMessage = true,
-            messages = mutableListOf(
-              Message(
-                sender = "$it",
-                content = "Test Message",
-                dateTimeSent = LocalDateTime.now(),
-                id = "1")
-            )
-          )
-        }
-      )
-    )
-  
+      MutableStateFlow(
+          MessagesUiState(
+              userId = "1",
+              messageList =
+                  List(10) {
+                    MessageHistory(
+                        user1 = "1",
+                        user2 = "$it",
+                        latestMessageId = "1",
+                        user1ReadMostRecentMessage = false,
+                        user2ReadMostRecentMessage = true,
+                        messages =
+                            mutableListOf(
+                                Message(
+                                    sender = "$it",
+                                    content = "Test Message",
+                                    dateTimeSent = LocalDateTime.now(),
+                                    id = "1")))
+                  }))
+
   @Before
   fun testSetup() = runTest {
     mockMessageRepository = MockMessageRepository()
     mockUserRepository = MockUserRepository()
-    
+
     mockkStatic(FirebaseAuth::class)
     every { FirebaseAuth.getInstance().currentUser!!.uid } returns "1"
-    
+
     for (i in 0..9) {
       mockUserRepository.addUser(
-        User(
-          userId = "$i",
-          birthDate = "01/01/2000",
-          email = "",
-          firstName = "Test",
-          lastName = "$i",
-          phoneNumber = "",
-          accountStatus = "active",
-          eventsAttendeeList = emptyList(),
-          eventsHostList = emptyList(),
-          profilePicUrl = "",
-          qrCodeUrl = "",
-          username = "Test$i"
-        )
-      )
+          User(
+              userId = "$i",
+              birthDate = "01/01/2000",
+              email = "",
+              firstName = "Test",
+              lastName = "$i",
+              phoneNumber = "",
+              accountStatus = "active",
+              eventsAttendeeList = emptyList(),
+              eventsHostList = emptyList(),
+              profilePicUrl = "",
+              qrCodeUrl = "",
+              username = "Test$i"))
     }
-    
+
     for (i in 0..9) {
-      val mh = mockMessageRepository.createNewMessageHistory(
-        "1", "$i"
-      )
-      
+      val mh = mockMessageRepository.createNewMessageHistory("1", "$i")
+
       mockMessageRepository.addMessage(
-        Message(
-          sender = "$i",
-          content = "Test Message",
-          dateTimeSent = LocalDateTime.now(),
-          id = "1"
-        ),
-        (mh as Resource.Success).data,
+          Message(
+              sender = "$i",
+              content = "Test Message",
+              dateTimeSent = LocalDateTime.now(),
+              id = "1"),
+          (mh as Resource.Success).data,
       )
     }
-    
+
     mockMessagesViewModel = MessagesViewModel(mockMessageRepository, mockUserRepository)
-    
+
     composeTestRule.setContent { MessagesScreen(mockMessagesViewModel, mockNavActions) }
   }
-  
-  @After
-  fun testTeardown() = runTest {
-    unmockkAll()
-  }
-  
+
+  @After fun testTeardown() = runTest { unmockkAll() }
+
   @Test
   fun screenDisplaysAllElementsCorrectly() = run {
     onComposeScreen<MessagesScreen>(composeTestRule) {

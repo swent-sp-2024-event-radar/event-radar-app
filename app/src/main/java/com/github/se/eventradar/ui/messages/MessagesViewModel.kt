@@ -10,11 +10,11 @@ import com.github.se.eventradar.model.repository.message.IMessageRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import javax.inject.Inject
 
 @HiltViewModel
 class MessagesViewModel
@@ -25,7 +25,7 @@ constructor(
 ) : ViewModel() {
   private val _uiState = MutableStateFlow(MessagesUiState())
   val uiState: StateFlow<MessagesUiState> = _uiState
-  
+
   init {
     getMessages(_uiState.value.userId)
   }
@@ -73,8 +73,8 @@ constructor(
 }
 
 data class MessagesUiState(
-  val userId: String = FirebaseAuth.getInstance().currentUser!!.uid,
-  val messageList: List<MessageHistory> = emptyList(),
-  val searchQuery: String = "",
-  val selectedTabIndex: Int = 0,
+    val userId: String = FirebaseAuth.getInstance().currentUser!!.uid,
+    val messageList: List<MessageHistory> = emptyList(),
+    val searchQuery: String = "",
+    val selectedTabIndex: Int = 0,
 )
