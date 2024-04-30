@@ -8,8 +8,8 @@ data class User(
     val lastName: String,
     val phoneNumber: String,
     val accountStatus: String,
-    val eventsAttendeeList: List<String>,
-    val eventsHostList: List<String>,
+    val eventsAttendeeSet: MutableSet<String>,
+    val eventsHostSet: MutableSet<String>,
     val friendsSet: MutableSet<String>,
     val profilePicUrl: String,
     val qrCodeUrl: String,
@@ -26,8 +26,8 @@ data class User(
       lastName = map["private/lastName"] as String,
       phoneNumber = map["private/phoneNumber"] as String,
       accountStatus = map["accountStatus"] as String,
-      eventsAttendeeList = convertToListOfStrings(map["eventsAttendeeList"]),
-      eventsHostList = convertToListOfStrings(map["eventsHostList"]),
+      eventsAttendeeSet = convertToMutableSetOfStrings(map["eventsAttendeeList"]),
+      eventsHostSet = convertToMutableSetOfStrings(map["eventsHostList"]),
       friendsSet = convertToMutableSetOfStrings(map["friendsList"]),
       profilePicUrl = map["profilePicUrl"] as String,
       qrCodeUrl = map["qrCodeUrl"] as String,
@@ -41,8 +41,8 @@ data class User(
     map["private/lastName"] = lastName
     map["private/phoneNumber"] = phoneNumber
     map["accountStatus"] = accountStatus
-    map["eventsAttendeeList"] = eventsAttendeeList
-    map["eventsHostList"] = eventsHostList
+    map["eventsAttendeeList"] = eventsAttendeeSet
+    map["eventsHostList"] = eventsHostSet
     map["profilePicUrl"] = profilePicUrl
     map["qrCodeUrl"] = qrCodeUrl
     map["username"] = username
@@ -50,18 +50,10 @@ data class User(
   }
 }
 
-private fun convertToListOfStrings(data: Any?): List<String> {
+private fun convertToMutableSetOfStrings(data: Any?): MutableSet<String> {
   return when (data) {
-    is List<*> -> data.filterIsInstance<String>().toList()
-    is String -> listOf(data)
-    else -> emptyList()
+    is List<*> -> data.filterIsInstance<String>().toMutableSet()
+    is String -> mutableSetOf(data)
+    else -> mutableSetOf()
   }
 }
-private fun convertToMutableSetOfStrings(data: Any?): MutableSet<String> {
-    return when (data) {
-        is List<*> -> data.filterIsInstance<String>().toMutableSet()
-        is String -> mutableSetOf(data)
-        else -> mutableSetOf()
-    }
-}
-

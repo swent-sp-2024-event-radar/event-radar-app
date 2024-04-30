@@ -60,8 +60,8 @@ class HostedEventsViewModelTest {
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1),
           mainOrganiser = "1",
-          organiserList = setOf("userid1"),
-          attendeeList = setOf("Test Attendee"),
+          organiserSet = setOf("userid1"),
+          attendeeSet = setOf("Test Attendee"),
           category = EventCategory.COMMUNITY,
           fireBaseID = "eventId1")
 
