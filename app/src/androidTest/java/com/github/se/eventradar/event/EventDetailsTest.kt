@@ -2,6 +2,11 @@ package com.github.se.eventradar.event
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.event.EventCategory
+import com.github.se.eventradar.model.event.EventDetailsViewModel
+import com.github.se.eventradar.model.event.EventTicket
+import com.github.se.eventradar.model.event.EventUiState
 import com.github.se.eventradar.screens.EventDetailsScreen
 import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.navigation.NavigationActions
@@ -10,9 +15,12 @@ import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.mockk.confirmVerified
+import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.verify
+import java.time.LocalDateTime
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -28,10 +36,30 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
 
   // Relaxed mocks methods have a default implementation returning values
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
+  @RelaxedMockK lateinit var mockViewModel: EventDetailsViewModel
+
+  private val sampleEventStates =
+      MutableStateFlow(
+          EventUiState(
+              eventName = "Debugging",
+              eventPhoto = "path",
+              start = LocalDateTime.MIN,
+              end = LocalDateTime.MAX,
+              location = Location(0.0, 0.0, "base address"),
+              description = "Let's debug some code together because we all enjoy kotlin !",
+              ticket = EventTicket("Luck", 0.0, 7),
+              mainOrganiser = "some.name@host.com",
+              category = EventCategory.COMMUNITY,
+          ))
+
+  private val eventId = "tdjWMT9Eon2ROTVakQb"
 
   @Before
   fun testSetup() {
-    composeTestRule.setContent { EventDetails(navigationActions = mockNavActions) }
+
+    every { mockViewModel.uiState } returns sampleEventStates
+
+    composeTestRule.setContent { EventDetails(mockViewModel, navigationActions = mockNavActions) }
   }
 
   @Test
@@ -46,20 +74,22 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
   @Test
   fun screenDisplaysContentElementsCorrectly() = run {
     ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
-      ticketButton { assertIsDisplayed() }
-      bottomNav { assertIsDisplayed() }
       eventImage { assertIsDisplayed() }
       descriptionTitle { assertIsDisplayed() }
-      descriptionContent { assertIsDisplayed() }
+      descriptionContent {
+        assertIsDisplayed()
+        assertTextContains("Let's debug some code together because we all enjoy kotlin !")
+      }
       distanceTitle { assertIsDisplayed() }
       distanceContent { assertIsDisplayed() }
-      dateTitle { assertIsDisplayed() }
-      dateContent { assertIsDisplayed() }
       categoryTitle { assertIsDisplayed() }
-      categoryContent { assertIsDisplayed() }
-      timeTitle { assertIsDisplayed() }
-      timeStartContent { assertIsDisplayed() }
-      timeEndContent { assertIsDisplayed() }
+      categoryContent {
+        assertIsDisplayed()
+        assertTextContains("Community")
+      }
+      dateTimeTitle { assertIsDisplayed() }
+      dateTimeStartContent { assertIsDisplayed() }
+      dateTimeEndContent { assertIsDisplayed() }
     }
   }
 

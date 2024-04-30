@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="event_description">Description</string>
+    <string name="event_location">Location</string>
+    <string name="event_distance">Distance</string>
+    <string name="event_date_and_time">Date and time</string>
+    <string name="event_dt_start">Start</string>
+    <string name="event_dt_end">End</string>
+    <string name="event_categories">Categories</string>
+
+    <string name="event_category_music">Music</string>
+    <string name="event_category_sport">Sports</string>
+    <string name="event_category_conference">Conference</string>
+    <string name="event_category_exhibition">Exhibition</string>
+    <string name="event_category_communities">Community</string>
+    <string name="event_category_party">Party</string>
+    <string name="event_category_social">Social</string>
+</resources>
+
+
+
