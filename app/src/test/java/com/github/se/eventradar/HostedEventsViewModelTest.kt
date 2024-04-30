@@ -60,8 +60,8 @@ class HostedEventsViewModelTest {
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1),
           mainOrganiser = "1",
-          organiserSet = setOf("userid1"),
-          attendeeSet = setOf("Test Attendee"),
+          organiserSet = mutableSetOf("userid1"),
+          attendeeSet = mutableSetOf("Test Attendee"),
           category = EventCategory.COMMUNITY,
           fireBaseID = "eventId1")
 
@@ -74,8 +74,9 @@ class HostedEventsViewModelTest {
           lastName = "Doe",
           phoneNumber = "1234567890",
           accountStatus = "active",
-          eventsAttendeeList = listOf("userId1", "userId2"),
-          eventsHostList = listOf(),
+          eventsAttendeeSet= mutableSetOf("userId1", "userId2"),
+          eventsHostSet = mutableSetOf(),
+          friendsSet = mutableSetOf(),
           profilePicUrl = "http://example.com/pic.jpg",
           qrCodeUrl = "http://example.com/qr.jpg",
           username = "john_doe")
@@ -99,14 +100,14 @@ class HostedEventsViewModelTest {
   @Test
   fun testGetHostedEventsSuccess() = runTest {
     val events =
-        listOf(
+        mutableSetOf(
             mockEvent.copy(fireBaseID = "eventId1"),
             mockEvent.copy(fireBaseID = "eventId2"),
             mockEvent.copy(fireBaseID = "eventId3"))
     events.forEach { event -> eventRepository.addEvent(event) }
 
-    val listOfEventIds = events.map { event -> event.fireBaseID }
-    val userWithHostedEvent = mockUser.copy(eventsHostList = listOfEventIds)
+    val setOfEventIds = events.map { event -> event.fireBaseID }.toMutableSet()
+    val userWithHostedEvent = mockUser.copy(eventsHostSet = setOfEventIds)
     userRepository.addUser(userWithHostedEvent)
 
     viewModel.getHostedEvents(userWithHostedEvent.userId)
@@ -124,13 +125,13 @@ class HostedEventsViewModelTest {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
     val events =
-        listOf(
+        mutableSetOf(
             mockEvent.copy(fireBaseID = "eventId1"),
             mockEvent.copy(fireBaseID = "eventId2"),
             mockEvent.copy(fireBaseID = "eventId3"))
     // event is not added to repo.
-    val listOfEventIds = events.map { event -> event.fireBaseID }
-    val userWithHostedEvent = mockUser.copy(eventsHostList = listOfEventIds)
+    val setOfEventIds = events.map { event -> event.fireBaseID }.toMutableSet()
+    val userWithHostedEvent = mockUser.copy(eventsHostSet = setOfEventIds)
     userRepository.addUser(userWithHostedEvent)
     viewModel.getHostedEvents(userWithHostedEvent.userId)
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
