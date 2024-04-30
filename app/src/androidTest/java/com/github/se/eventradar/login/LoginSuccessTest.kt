@@ -87,8 +87,9 @@ class LoginSuccessTest : TestCase() {
             lastName = "Doe",
             phoneNumber = "1234567890",
             accountStatus = "active",
-            eventsAttendeeList = emptyList(),
-            eventsHostList = emptyList(),
+            eventsAttendeeSet = mutableSetOf(),
+            eventsHostSet = mutableSetOf(),
+            friendsSet = mutableSetOf(),
             profilePicUrl = "",
             qrCodeUrl = "",
             username = "johndoe"))
