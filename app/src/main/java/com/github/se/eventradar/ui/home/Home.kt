@@ -165,9 +165,8 @@ fun HomeScreen(
 
     SearchBarAndFilter(
         onSearchQueryChanged = { viewModel.onSearchQueryChanged(it) },
-        uiState = uiState,
         onSearchActiveChanged = { viewModel.onSearchActiveChanged(it) },
-        onFilterButtonClicked = { viewModel.onFilterButtonClicked(it) },
+        onFilterDialogOpen = { viewModel.onFilterDialogOpen(it) },
         modifier =
             Modifier.padding(horizontal = 16.dp, vertical = 8.dp).constrainAs(searchAndFilter) {
               top.linkTo(tabs.bottom, margin = 8.dp)
@@ -177,9 +176,8 @@ fun HomeScreen(
 
     if (selectedTabIndex == 0) {
       if (viewToggleBrowseIndex == 0) {
-        if (uiState.isSearchActive) {
-            Log.d("Search is active", "Search is active")
-          EventList(
+        if (uiState.isSearchActive || uiState.isFilterActive) {
+            EventList(
               uiState.eventList.filteredEvents,
               Modifier.fillMaxWidth().constrainAs(eventList) {
                 top.linkTo(searchAndFilter.bottom, margin = 8.dp)
@@ -187,7 +185,6 @@ fun HomeScreen(
                 end.linkTo(parent.end)
               })
         } else {
-            Log.d("Search is NOT active", "Search is NOT active")
           EventList(
               uiState.eventList.allEvents,
               Modifier.fillMaxWidth().constrainAs(eventList) {
@@ -197,7 +194,7 @@ fun HomeScreen(
               })
         }
       } else {
-          if (uiState.isSearchActive) {
+          if (uiState.isSearchActive || uiState.isFilterActive) {
               EventMap(
                   uiState.eventList.filteredEvents,
                   navigationActions,
@@ -225,16 +222,8 @@ fun HomeScreen(
     }
     if (uiState.isFilterDialogOpen) {
       FilterPopUp(
+          onFilterApply = { viewModel.onFilterApply(it) },
           onRadiusQueryChanged = { viewModel.onRadiusQueryChanged(it) },
-          onRadiusChange = { radius ->
-              // Handle free selection change
-          },
-          onFreeSelectionChange = { isFree ->
-            // Handle free selection change
-          },
-          onCategorySelectionChange = { selectedCategories ->
-            // Handle category selection change
-          },
           modifier =
               Modifier.height(320.dp).width(230.dp).constrainAs(filterPopUp) {
                 top.linkTo(searchAndFilter.bottom)
@@ -275,9 +264,9 @@ fun HomeScreen(
 @Composable
 fun SearchBarAndFilter(
     onSearchQueryChanged: (String) -> Unit,
-    uiState: EventsOverviewUiState,
+    uiState: EventsOverviewUiState = EventsOverviewUiState(),
     onSearchActiveChanged: (Boolean) -> Unit,
-    onFilterButtonClicked: (Boolean) -> Unit,
+    onFilterDialogOpen: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
   Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
@@ -302,7 +291,7 @@ fun SearchBarAndFilter(
 
     // Filter button
     Button(
-        onClick = { onFilterButtonClicked(!uiState.isFilterDialogOpen) },
+        onClick = { onFilterDialogOpen(!uiState.isFilterDialogOpen) },
         modifier = Modifier.padding(start = 8.dp)) {
           Text("Filter")
         }
@@ -311,10 +300,8 @@ fun SearchBarAndFilter(
 
 @Composable
 fun FilterPopUp(
+    onFilterApply: (Boolean) -> Unit,
     onRadiusQueryChanged: (String) -> Unit,
-    onRadiusChange: (String) -> Unit,
-    onFreeSelectionChange: (Boolean) -> Unit,
-    onCategorySelectionChange: (List<EventCategory>) -> Unit,
     modifier: Modifier = Modifier,
     uiState: EventsOverviewUiState = EventsOverviewUiState()
 ) {
@@ -363,8 +350,8 @@ fun FilterPopUp(
                           fontSize = 16.sp,
                       ))
               Switch(
-                  checked = uiState.freeEventsFilter,
-                  onCheckedChange = { uiState.freeEventsFilter = it },
+                  checked = uiState.isFreeSwitchOn,
+                  onCheckedChange = { newState -> uiState.isFreeSwitchOn = newState },
               )
             }
 
@@ -391,10 +378,7 @@ fun FilterPopUp(
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
           Button(
               onClick = {
-                // Apply filter
-                onRadiusChange(uiState.radiusQuery)
-                onFreeSelectionChange(uiState.freeEventsFilter)
-                onCategorySelectionChange(uiState.categorySelectionFilter)
+                  onFilterApply(true)
               }) {
                 Text("Apply")
               }
@@ -405,7 +389,9 @@ fun FilterPopUp(
 }
 
 @Composable
-fun CategorySelection() {
+fun CategorySelection(
+    uiState: EventsOverviewUiState = EventsOverviewUiState()
+) {
   LazyColumn {
     items(EventCategory.entries) { category ->
       var isChecked by remember { mutableStateOf(false) }
@@ -415,7 +401,15 @@ fun CategorySelection() {
           modifier = Modifier.padding(vertical = 0.dp)) {
             Checkbox(
                 checked = isChecked,
-                onCheckedChange = { isChecked = it },
+                onCheckedChange = {
+                    isChecked = it
+                    if (isChecked) {
+                        uiState.categoriesCheckedList.add(category)
+                    } else {
+                        uiState.categoriesCheckedList.remove(category)
+                    }
+                    Log.d("CategorySelection", uiState.categoriesCheckedList.toString())
+                },
                 modifier = Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp))
             Text(
                 text = category.displayName,
