@@ -1,15 +1,12 @@
 package com.github.se.eventradar
 
 import com.github.se.eventradar.model.Location
-import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.event.MockEventRepository
-import com.github.se.eventradar.model.repository.user.IUserRepository
-import com.github.se.eventradar.model.repository.user.MockUserRepository
 import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,7 +25,6 @@ import org.junit.runner.Description
 class EventDetailsViewmodelUnitTest {
   private lateinit var viewModel: EventDetailsViewModel
   private lateinit var eventRepository: IEventRepository
-  private lateinit var userRepository: IUserRepository
 
   class MainDispatcherRule(
       private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
@@ -59,25 +55,9 @@ class EventDetailsViewmodelUnitTest {
           category = EventCategory.COMMUNITY,
           fireBaseID = "1")
 
-  private val mockUser =
-      User(
-          userId = "user1",
-          birthDate = "01/01/2000",
-          email = "test@example.com",
-          firstName = "John",
-          lastName = "Doe",
-          phoneNumber = "1234567890",
-          accountStatus = "active",
-          eventsAttendeeList = listOf("1", "2"),
-          eventsHostList = listOf("3"),
-          profilePicUrl = "http://example.com/pic.jpg",
-          qrCodeUrl = "http://example.com/qr.jpg",
-          username = "john_doe")
-
   @Before
   fun setUp() {
     eventRepository = MockEventRepository()
-    userRepository = MockUserRepository()
     viewModel = EventDetailsViewModel(eventRepository)
     viewModel.saveEventId(mockEvent.fireBaseID)
   }
