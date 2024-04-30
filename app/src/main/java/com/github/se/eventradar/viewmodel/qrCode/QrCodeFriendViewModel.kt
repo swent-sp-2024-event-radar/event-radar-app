@@ -21,6 +21,11 @@ enum class NavigationEvent {
   None,
   NavigateToNextScreen
 }
+
+enum class TAB {
+  MyQR,
+  ScanQR
+}
 // ViewModel & UI can be improved on by having a state where the UI reflects a loading icon if
 // firebase operations take a long time
 // would also need to handle the case where the updates really do fail within 1 minute's time.
@@ -30,14 +35,17 @@ enum class NavigationEvent {
 class QrCodeFriendViewModel
 @Inject
 constructor(
-    private val firebaseUserRepository: IUserRepository, // Dependency injection
-    qrCodeAnalyser: QrCodeAnalyser // Dependency injection
+  private val userRepository: IUserRepository, // Dependency injection
+  qrCodeAnalyser: QrCodeAnalyser // Dependency injection
 ) : ViewModel() {
 
   private val _decodedResult = MutableStateFlow<String?>(null)
 
   private val _navigationEvent = MutableStateFlow(NavigationEvent.None)
   val navigationEvent: StateFlow<NavigationEvent> = _navigationEvent.asStateFlow()
+
+  private val _tabState = MutableStateFlow(TAB.MyQR.ordinal)
+  val tabState: StateFlow<Int> = _tabState.asStateFlow()
 
   init {
     qrCodeAnalyser.onDecoded = { decodedString ->
@@ -59,8 +67,8 @@ constructor(
     viewModelScope.launch {
       val myUID = FirebaseAuth.getInstance().currentUser!!.uid
 
-      val friendUserDeferred = async { firebaseUserRepository.getUser(friendID) }
-      val currentUserDeferred = async { firebaseUserRepository.getUser(myUID) }
+      val friendUserDeferred = async { userRepository.getUser(friendID) }
+      val currentUserDeferred = async { userRepository.getUser(myUID) }
 
       val friendUser = friendUserDeferred.await()
       val currentUser = currentUserDeferred.await()
@@ -95,7 +103,7 @@ constructor(
           do {
             updateResult =
                 if (!user.friendsSet.contains(friendIDToAdd)) {
-                  firebaseUserRepository.updateUser(user)
+                  userRepository.updateUser(user)
                 } else {
                   Resource.Success(Unit) // No update needed, considers as success
                 }
@@ -113,4 +121,8 @@ constructor(
   fun resetNavigationEvent() {
     _navigationEvent.value = NavigationEvent.None
   }
+  fun changeTabState(tab: Int) {
+    _tabState.value = tab
+  }
+
 }
