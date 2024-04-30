@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.NavigationActions
@@ -39,7 +40,7 @@ import com.github.se.eventradar.viewmodel.qrCode.NavigationEvent
 import com.github.se.eventradar.viewmodel.qrCode.QrCodeFriendViewModel
 
 @Composable
-fun QrCodeScreen(viewModel: QrCodeFriendViewModel, navigationActions: NavigationActions) {
+fun QrCodeScreen(viewModel: QrCodeFriendViewModel = hiltViewModel(), navigationActions: NavigationActions) {
   val navigateState by viewModel.navigationEvent.collectAsState()
   val activeTabState by viewModel.tabState.collectAsState()
 
@@ -65,18 +66,21 @@ fun QrCodeScreen(viewModel: QrCodeFriendViewModel, navigationActions: Navigation
   val context = LocalContext.current
 
   ConstraintLayout(
-      modifier = Modifier.fillMaxSize().testTag("qrCodeScannerScreen"),
+      modifier = Modifier
+          .fillMaxSize()
+          .testTag("qrCodeScannerScreen"),
   ) {
     val (logo, tabs, bottomNav) = createRefs()
     Row(
         modifier =
-            Modifier.fillMaxWidth()
-                .fillMaxWidth()
-                .constrainAs(logo) {
-                  top.linkTo(parent.top, margin = 32.dp)
-                  start.linkTo(parent.start, margin = 16.dp)
-                }
-                .testTag("logo"),
+        Modifier
+            .fillMaxWidth()
+            .fillMaxWidth()
+            .constrainAs(logo) {
+                top.linkTo(parent.top, margin = 32.dp)
+                start.linkTo(parent.start, margin = 16.dp)
+            }
+            .testTag("logo"),
         verticalAlignment = Alignment.CenterVertically) {
           Image(
               painter = painterResource(id = R.drawable.event_logo),
@@ -87,14 +91,15 @@ fun QrCodeScreen(viewModel: QrCodeFriendViewModel, navigationActions: Navigation
 //        selectedTabIndex = selectedTabIndex,
           selectedTabIndex = activeTabState,
         modifier =
-            Modifier.fillMaxWidth()
-                .padding(top = 8.dp)
-                .constrainAs(tabs) {
-                  top.linkTo(logo.bottom, margin = 16.dp)
-                  start.linkTo(parent.start)
-                  end.linkTo(parent.end)
-                }
-                .testTag("tabs"),
+        Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+            .constrainAs(tabs) {
+                top.linkTo(logo.bottom, margin = 16.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
+            .testTag("tabs"),
         contentColor = MaterialTheme.colorScheme.primary) {
           Tab(
               selected = activeTabState == 0,
@@ -138,17 +143,19 @@ fun QrCodeScreen(viewModel: QrCodeFriendViewModel, navigationActions: Navigation
     if (activeTabState == 0) {
       Toast.makeText(context, "My Qr Code not yet available", Toast.LENGTH_SHORT).show()
     } else {
-      Column(modifier = Modifier.testTag("QrScanner")) { QrCodeCamera().QrCodeScanner() }
+      Column(modifier = Modifier.testTag("QrScanner")) { QrCodeCamera().QrCodeScanner(analyser = viewModel.qrCodeAnalyser) }
     }
     BottomNavigationMenu(
         onTabSelected = { tab -> navigationActions.navigateTo(tab) },
         tabList = TOP_LEVEL_DESTINATIONS,
         selectedItem = TOP_LEVEL_DESTINATIONS[0],
         modifier =
-            Modifier.testTag("bottomNavMenu").constrainAs(bottomNav) {
-              bottom.linkTo(parent.bottom)
-              start.linkTo(parent.start)
-              end.linkTo(parent.end)
+        Modifier
+            .testTag("bottomNavMenu")
+            .constrainAs(bottomNav) {
+                bottom.linkTo(parent.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
             })
   }
 }

@@ -32,7 +32,7 @@ import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
 class QrCodeCamera {
 
   @Composable
-  fun QrCodeScanner() {
+  fun QrCodeScanner(analyser: QrCodeAnalyser) {
 
     val context = LocalContext.current
     val lifeCycleOwner = LocalLifecycleOwner.current
@@ -66,7 +66,7 @@ class QrCodeCamera {
                   ImageAnalysis.Builder()
                       .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                       .build()
-              imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(context), QrCodeAnalyser())
+              imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(context), analyser)
 
               try {
                 cameraFutureProvider

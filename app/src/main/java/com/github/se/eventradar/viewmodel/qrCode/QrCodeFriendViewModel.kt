@@ -36,7 +36,7 @@ class QrCodeFriendViewModel
 @Inject
 constructor(
   private val userRepository: IUserRepository, // Dependency injection
-  qrCodeAnalyser: QrCodeAnalyser // Dependency injection
+  val qrCodeAnalyser: QrCodeAnalyser // Dependency injection
 ) : ViewModel() {
 
   private val _decodedResult = MutableStateFlow<String?>(null)
