@@ -44,14 +44,14 @@ class EventDetailsViewmodelUnitTest {
       Event(
           eventName = "Event 1",
           eventPhoto = "",
-          start = LocalDateTime.now(),
-          end = LocalDateTime.now(),
+          start = LocalDateTime.MAX,
+          end = LocalDateTime.MIN,
           location = Location(0.0, 0.0, "Test Location"),
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1),
           mainOrganiser = "1",
-          organiserList = mutableSetOf("Test Organiser"),
-          attendeeList = mutableSetOf("Test Attendee"),
+          organiserList = setOf("Test Organiser", "Organiser2"),
+          attendeeList = setOf("Test Attendee", "Attendee2"),
           category = EventCategory.COMMUNITY,
           fireBaseID = "1")
 
