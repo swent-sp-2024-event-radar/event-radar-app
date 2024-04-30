@@ -43,12 +43,12 @@ constructor(
     }
   }
 
-  fun onSearchQueryChange(query: String) {
-    _uiState.value = _uiState.value.copy(searchQuery = query)
+  fun onSearchQueryChange(query: String, state: MutableStateFlow<MessagesUiState> = _uiState) {
+    state.value = state.value.copy(searchQuery = query)
   }
 
-  fun onSelectedTabIndexChange(index: Int) {
-    _uiState.value = _uiState.value.copy(selectedTabIndex = index)
+  fun onSelectedTabIndexChange(index: Int, state: MutableStateFlow<MessagesUiState> = _uiState) {
+    state.value = state.value.copy(selectedTabIndex = index)
   }
 
   fun getUser(userId: String): User {
