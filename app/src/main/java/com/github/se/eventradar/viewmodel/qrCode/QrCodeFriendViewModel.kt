@@ -4,9 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
-import com.github.se.eventradar.model.repository.user.FirebaseUserRepository
+import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,9 +27,11 @@ enum class NavigationEvent {
 // personally gonna make this extra.
 
 @HiltViewModel
-class QrCodeFriendViewModel(
-    private val firebaseRepository: FirebaseUserRepository, // Dependency injection
-    qrCodeAnalyser: QrCodeAnalyser = QrCodeAnalyser()
+class QrCodeFriendViewModel
+@Inject
+constructor(
+    private val firebaseUserRepository: IUserRepository, // Dependency injection
+    qrCodeAnalyser: QrCodeAnalyser // Dependency injection
 ) : ViewModel() {
 
   private val _decodedResult = MutableStateFlow<String?>(null)
@@ -56,8 +59,8 @@ class QrCodeFriendViewModel(
     viewModelScope.launch {
       val myUID = FirebaseAuth.getInstance().currentUser!!.uid
 
-      val friendUserDeferred = async { firebaseRepository.getUser(friendID) }
-      val currentUserDeferred = async { firebaseRepository.getUser(myUID) }
+      val friendUserDeferred = async { firebaseUserRepository.getUser(friendID) }
+      val currentUserDeferred = async { firebaseUserRepository.getUser(myUID) }
 
       val friendUser = friendUserDeferred.await()
       val currentUser = currentUserDeferred.await()
@@ -84,7 +87,7 @@ class QrCodeFriendViewModel(
 
   // Utility function to retry updates until successful
   private suspend fun retryUpdate(user: User, friendIDToAdd: String): Boolean {
-    var updateResult: Resource<Any>? = null
+    var updateResult: Resource<Any>?
     val timeoutDuration = 10000L // Overall timeout duration in milliseconds for all retries
 
     val result =
@@ -92,7 +95,7 @@ class QrCodeFriendViewModel(
           do {
             updateResult =
                 if (!user.friendsSet.contains(friendIDToAdd)) {
-                  firebaseRepository.updateUser(user)
+                  firebaseUserRepository.updateUser(user)
                 } else {
                   Resource.Success(Unit) // No update needed, considers as success
                 }
