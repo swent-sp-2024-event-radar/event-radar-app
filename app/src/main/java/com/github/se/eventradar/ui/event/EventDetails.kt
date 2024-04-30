@@ -46,6 +46,7 @@ fun EventDetails(
     navigationActions: NavigationActions
 ) {
 
+  // TODO to be moved in viewModel init
   LaunchedEffect(Unit) { // Using `Unit` as a key to run only once
     viewModel.getEventData()
   }

@@ -76,6 +76,7 @@ import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.viewmodel.EventsOverviewUiState
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
@@ -186,7 +187,9 @@ fun HomeScreen(
               top.linkTo(searchAndFilter.bottom, margin = 8.dp)
               start.linkTo(parent.start)
               end.linkTo(parent.end)
-            })
+            }) { eventId ->
+              navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+            }
       } else {
         EventMap(
             uiState.eventList.allEvents,
@@ -416,12 +419,16 @@ fun CategorySelection() {
 }
 
 @Composable
-fun EventList(events: List<Event>, modifier: Modifier = Modifier) {
-  LazyColumn(modifier = modifier) { items(events) { event -> EventCard(event) } }
+fun EventList(
+    events: List<Event>,
+    modifier: Modifier = Modifier,
+    onEventClicked: (String) -> Unit
+) {
+  LazyColumn(modifier = modifier) { items(events) { event -> EventCard(event, onEventClicked) } }
 }
 
 @Composable
-fun EventCard(event: Event) {
+fun EventCard(event: Event, onEventClicked: (String) -> Unit) {
   // TODO: connected to event details
   val context = LocalContext.current
   Card(
@@ -432,7 +439,8 @@ fun EventCard(event: Event) {
       colors = cardColors(containerColor = MaterialTheme.colorScheme.surface),
       elevation = cardElevation(defaultElevation = 4.dp),
       onClick = {
-        Toast.makeText(context, "Event details not yet available", Toast.LENGTH_SHORT).show()
+        onEventClicked(event.fireBaseID)
+        // Toast.makeText(context, "Event details not yet available", Toast.LENGTH_SHORT).show()
       }) {
         Row(modifier = Modifier.fillMaxSize()) {
           Column(

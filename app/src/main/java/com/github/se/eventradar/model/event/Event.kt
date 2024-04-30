@@ -28,7 +28,7 @@ data class Event(
       end = LocalDateTime.parse(map["end"] as String),
       location =
           Location(
-              map["location_lat"] as Double,
+              latitude = map["location_lat"] as Double,
               longitude = map["location_lng"] as Double,
               address = map["location_name"] as String),
       description = map["description"] as String,
