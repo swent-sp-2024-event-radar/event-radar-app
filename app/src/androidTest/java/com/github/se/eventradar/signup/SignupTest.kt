@@ -18,6 +18,7 @@ import io.mockk.confirmVerified
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.verify
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -83,7 +84,7 @@ class SignupTest : TestCase() {
 
   /** This test checks that the google authentication works correctly */
   @Test
-  fun googleSignInReturnsValidActivityResult() {
+  fun googleSignInReturnsValidActivityResult() = runTest {
     Intents.init()
     ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
       usernameTextField {

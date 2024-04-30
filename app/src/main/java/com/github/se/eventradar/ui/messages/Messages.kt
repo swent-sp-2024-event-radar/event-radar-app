@@ -313,15 +313,16 @@ fun PreviewMessagesScreen() {
       onTabSelected = {},
       getUser = {
         User(
-            "5",
+            it,
             "10/10/2003",
             "test@test.com",
             "John",
             "Doe",
             "1234567890",
             "active",
-            emptyList(),
-            emptyList(),
+            mutableSetOf(),
+            mutableSetOf(),
+            mutableSetOf(),
             "content://com.google.android.apps.docs.storage/document/acc%3D1%3Bdoc%3Dencoded%3D_UfMfUb7G-_gMA2naQlf9EvwC7BF37dTn3wqEbCsPCFqL25u15za15OI19GK4g%3D",
             "",
             "johndoe")
