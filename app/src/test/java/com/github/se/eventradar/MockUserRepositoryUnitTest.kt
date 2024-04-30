@@ -20,8 +20,9 @@ class MockUserRepositoryUnitTest {
           lastName = "Doe",
           phoneNumber = "1234567890",
           accountStatus = "active",
-          eventsAttendeeList = listOf("event1", "event2"),
-          eventsHostList = listOf("event3"),
+          eventsAttendeeSet = mutableSetOf("event1", "event2"),
+          eventsHostSet = mutableSetOf("event3"),
+          friendsSet = mutableSetOf(),
           profilePicUrl = "http://example.com/pic.jpg",
           qrCodeUrl = "http://example.com/qr.jpg",
           username = "johndoe")

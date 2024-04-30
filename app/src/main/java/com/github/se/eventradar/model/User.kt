@@ -1,5 +1,7 @@
 package com.github.se.eventradar.model
 
+import com.github.se.eventradar.model.ConversionUtils.convertToMutableSetOfStrings
+
 data class User(
     val userId: String,
     val birthDate: String,
@@ -8,9 +10,9 @@ data class User(
     val lastName: String,
     val phoneNumber: String,
     val accountStatus: String,
-    val eventsAttendeeList: MutableSet<String>,
-    val eventsHostList: MutableSet<String>,
-    val friendList: MutableSet<String>,
+    val eventsAttendeeSet: MutableSet<String>,
+    val eventsHostSet: MutableSet<String>,
+    val friendsSet: MutableSet<String>,
     val profilePicUrl: String,
     val qrCodeUrl: String,
     val username: String,
@@ -26,12 +28,13 @@ data class User(
       lastName = map["private/lastName"] as String,
       phoneNumber = map["private/phoneNumber"] as String,
       accountStatus = map["accountStatus"] as String,
-      eventsAttendeeList = convertToListOfStrings(map["eventsAttendeeList"]),
-      eventsHostList = convertToListOfStrings(map["eventsHostList"]),
-      friendList = convertToListOfStrings(map["friendList"]),
+      eventsAttendeeSet = convertToMutableSetOfStrings(map["eventsAttendeeList"]),
+      eventsHostSet = convertToMutableSetOfStrings(map["eventsHostList"]),
+      friendsSet = convertToMutableSetOfStrings(map["friendsList"]),
       profilePicUrl = map["profilePicUrl"] as String,
       qrCodeUrl = map["qrCodeUrl"] as String,
       username = map["username"] as String)
+
 
   fun toMap(): HashMap<String, Any> {
     val map = HashMap<String, Any>()
@@ -41,8 +44,9 @@ data class User(
     map["private/lastName"] = lastName
     map["private/phoneNumber"] = phoneNumber
     map["accountStatus"] = accountStatus
-    map["eventsAttendeeList"] = eventsAttendeeList
-    map["eventsHostList"] = eventsHostList
+    map["eventsAttendeeList"] = eventsAttendeeSet
+    map["eventsHostList"] = eventsHostSet
+    map["friendsList"] = friendsSet
     map["profilePicUrl"] = profilePicUrl
     map["qrCodeUrl"] = qrCodeUrl
     map["username"] = username
@@ -50,10 +54,5 @@ data class User(
   }
 }
 
-private fun convertToListOfStrings(data: Any?): MutableSet<String> {
-  return when (data) {
-    is List<*> -> data.filterIsInstance<String>().toMutableSet()
-    is String -> mutableSetOf(data)
-    else -> mutableSetOf()
-  }
-}
+
+
