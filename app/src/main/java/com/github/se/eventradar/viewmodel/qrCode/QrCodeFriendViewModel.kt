@@ -20,10 +20,10 @@ enum class NavigationEvent {
   None,
   NavigateToNextScreen
 }
-// ViewModel & UI can be improved on by having a state where the UI reflects a loading icon if firebase operations take a long time
+// ViewModel & UI can be improved on by having a state where the UI reflects a loading icon if
+// firebase operations take a long time
 // would also need to handle the case where the updates really do fail within 1 minute's time.
 // personally gonna make this extra.
-
 
 @HiltViewModel
 class QrCodeFriendViewModel(
@@ -51,7 +51,6 @@ class QrCodeFriendViewModel(
           }
     }
   }
-
 
   private fun updateFriendList(friendID: String) {
     viewModelScope.launch {
@@ -86,23 +85,24 @@ class QrCodeFriendViewModel(
   // Utility function to retry updates until successful
   private suspend fun retryUpdate(user: User, friendIDToAdd: String): Boolean {
     var updateResult: Resource<Any>? = null
-    val timeoutDuration = 10000L  // Overall timeout duration in milliseconds for all retries
+    val timeoutDuration = 10000L // Overall timeout duration in milliseconds for all retries
 
-    val result = withTimeoutOrNull(timeoutDuration) {
+    val result =
+        withTimeoutOrNull(timeoutDuration) {
+          do {
+            updateResult =
+                if (!user.friendsSet.contains(friendIDToAdd)) {
+                  firebaseRepository.updateUser(user)
+                } else {
+                  Resource.Success(Unit) // No update needed, considers as success
+                }
+            if (updateResult is Resource.Failure) {
+              delay(1000) // Wait for a second before retrying to avoid overloading the server
+            }
+          } while (updateResult !is Resource.Success)
 
-      do {
-        updateResult = if (!user.friendsSet.contains(friendIDToAdd)) {
-          firebaseRepository.updateUser(user)
-        } else {
-          Resource.Success(Unit)  // No update needed, considers as success
+          updateResult
         }
-        if (updateResult is Resource.Failure) {
-          delay(1000)  // Wait for a second before retrying to avoid overloading the server
-        }
-      } while (updateResult !is Resource.Success)
-
-      updateResult
-    }
 
     return result is Resource.Success
   }
