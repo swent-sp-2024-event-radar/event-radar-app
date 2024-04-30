@@ -300,3 +300,10 @@ fun formatDateTime(dateTime: LocalDateTime): String {
   val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy - HH:mm")
   return dateTime.format(formatter)
 }
+
+@Composable
+fun buyTicket(){
+
+}
+
+
