@@ -43,8 +43,13 @@ class QrCodeFriendViewModel(private val firebaseRepository: FirebaseUserReposito
 }
     private fun updateFriendList(friendID: String) {
         viewModelScope.launch {
+<<<<<<< Updated upstream
 
             val myUID = FirebaseAuth.getInstance().currentUser!!.uid
+=======
+            val myUID = firebaseRepository.getInstance().currentUser!!.uid
+                .toString()  // Fetch the current user ID correctly //TODO CHANGE TO GET MY CURRENT()
+>>>>>>> Stashed changes
 
             val friendUserDeferred = async { firebaseRepository.getUser(friendID) }
             val currentUserDeferred =
