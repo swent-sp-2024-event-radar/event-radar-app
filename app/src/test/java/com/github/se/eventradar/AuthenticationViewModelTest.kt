@@ -67,7 +67,7 @@ class AuthenticationViewModelTest {
           accountStatus = "active",
           eventsAttendeeSet = mutableSetOf(),
           eventsHostSet = mutableSetOf(),
-        friendsSet = mutableSetOf(),
+          friendsSet = mutableSetOf(),
           profilePicUrl = "",
           qrCodeUrl = "",
           username = "john_doe")

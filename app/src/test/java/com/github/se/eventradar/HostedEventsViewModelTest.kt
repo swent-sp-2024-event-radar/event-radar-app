@@ -74,7 +74,7 @@ class HostedEventsViewModelTest {
           lastName = "Doe",
           phoneNumber = "1234567890",
           accountStatus = "active",
-          eventsAttendeeSet= mutableSetOf("userId1", "userId2"),
+          eventsAttendeeSet = mutableSetOf("userId1", "userId2"),
           eventsHostSet = mutableSetOf(),
           friendsSet = mutableSetOf(),
           profilePicUrl = "http://example.com/pic.jpg",
