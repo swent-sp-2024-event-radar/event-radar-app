@@ -85,6 +85,7 @@ fun MessagesScreenUi(
     getUser: (String) -> User
 ) {
   Scaffold(
+      modifier = Modifier.testTag("messagesScreen"),
       topBar = {
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = 32.dp, start = 16.dp).testTag("logo"),
@@ -173,13 +174,13 @@ fun MessagesList(
 
   LazyColumn(modifier = modifier.padding(top = 16.dp)) {
     items(filteredMessageList) { messageHistory ->
-      val toUser =
-          getUser(
-              when {
-                userId == messageHistory.user1 -> messageHistory.user2
-                else -> messageHistory.user1
-              })
-      MessagePreviewItem(messageHistory, toUser, onChatClicked)
+      val otherUser =
+          if (userId == messageHistory.user1) messageHistory.user2 else messageHistory.user1
+      val currentUserReadLatestMessage =
+          if (userId == messageHistory.user1) messageHistory.user1ReadMostRecentMessage
+          else messageHistory.user2ReadMostRecentMessage
+      val recipient = getUser(otherUser)
+      MessagePreviewItem(messageHistory, recipient, currentUserReadLatestMessage, onChatClicked)
       Divider()
     }
   }
@@ -188,24 +189,25 @@ fun MessagesList(
 @Composable
 fun MessagePreviewItem(
     messageHistory: MessageHistory,
-    toUser: User,
+    recipient: User,
+    currentUserReadLatestMessage: Boolean,
     onChatClicked: (MessageHistory) -> Unit,
     modifier: Modifier = Modifier
 ) {
   val mostRecentMessage = messageHistory.messages.last { it.id == messageHistory.latestMessageId }
 
   Row(
-      modifier = modifier.fillMaxWidth().clickable { onChatClicked(messageHistory) },
+      modifier = modifier.fillMaxWidth().clickable { onChatClicked(messageHistory) }.testTag("messagePreviewItem"),
       horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
       verticalAlignment = Alignment.CenterVertically) {
         Image(
-            painter = rememberImagePainter(data = Uri.parse(toUser.profilePicUrl)),
+            painter = rememberImagePainter(data = Uri.parse(recipient.profilePicUrl)),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.size(56.dp).padding(start = 16.dp).clip(CircleShape))
-        Column(modifier = Modifier.padding(start = 16.dp).fillMaxWidth(.7f)) {
+            modifier = Modifier.size(56.dp).padding(start = 16.dp).clip(CircleShape).testTag("profilePic"))
+        Column(modifier = Modifier.padding(start = 16.dp).fillMaxWidth(.7f).testTag("messageContentColumn")) {
           Text(
-              text = "${toUser.firstName} ${toUser.lastName}",
+              text = "${recipient.firstName} ${recipient.lastName}",
               style =
                   TextStyle(
                       fontSize = 16.sp,
@@ -214,7 +216,8 @@ fun MessagePreviewItem(
                       fontWeight = FontWeight.Bold,
                       color = Color.Black,
                       letterSpacing = 0.5.sp,
-                  ))
+                  ),
+              modifier = Modifier.testTag("recipientName"))
           Text(
               text = mostRecentMessage.content,
               maxLines = 1,
@@ -225,10 +228,11 @@ fun MessagePreviewItem(
                       lineHeight = 20.sp,
                       fontFamily = FontFamily(Font(R.font.roboto)),
                       fontWeight =
-                          if (mostRecentMessage.isRead) FontWeight.Normal else FontWeight.Bold,
+                          if (currentUserReadLatestMessage) FontWeight.Normal else FontWeight.Bold,
                       color = Color(0xFF49454F),
                       letterSpacing = 0.25.sp,
-                  ))
+                  ),
+              modifier = Modifier.testTag("messageContent"))
         }
         Spacer(modifier = Modifier.weight(1f))
 
@@ -245,11 +249,11 @@ fun MessagePreviewItem(
 
         Text(
             text = mostRecentMessage.dateTimeSent.format(DateTimeFormatter.ofPattern(pattern)),
-            modifier = Modifier.padding(end = 16.dp))
+            modifier = Modifier.padding(end = 16.dp).testTag("messageTime"))
       }
 }
 
-@Preview
+@Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun PreviewMessagesScreen() {
   val messageList =
@@ -257,39 +261,40 @@ fun PreviewMessagesScreen() {
           MessageHistory(
               user1 = "1",
               user2 = "2",
+              user1ReadMostRecentMessage = true,
+              user2ReadMostRecentMessage = false,
               messages =
                   mutableListOf(
                       Message(
                           sender = "1",
                           content = "Hello Hello Hello Hello Hello",
                           dateTimeSent = LocalDateTime.parse("2021-08-01T12:00:00"),
-                          isRead = false,
                           id = "1")),
               latestMessageId = "1",
           ),
           MessageHistory(
               user1 = "1",
               user2 = "3",
+              user1ReadMostRecentMessage = true,
+              user2ReadMostRecentMessage = false,
               messages =
                   mutableListOf(
                       Message(
                           sender = "3",
                           content = "Hello Hello Hello Hello Hello Hello Hello Hello",
                           dateTimeSent = LocalDateTime.parse("2024-04-27T12:00:00"),
-                          isRead = true,
                           id = "1"),
                       Message(
                           sender = "1",
                           content = "This is the most recent message",
                           dateTimeSent = LocalDateTime.parse("2024-04-29T16:00:00"),
-                          isRead = true,
                           id = "2")),
               latestMessageId = "2",
           ))
   MessagesScreenUi(
       uiState =
           MessagesUiState(
-              userId = "3",
+              userId = "1",
               messageList =
                   messageList.sortedByDescending {
                     it.messages.find { message -> message.id == it.latestMessageId }?.dateTimeSent

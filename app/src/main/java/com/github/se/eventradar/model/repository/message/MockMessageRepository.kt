@@ -38,30 +38,40 @@ class MockMessageRepository : IMessageRepository {
     val addMessage = mockMessageHistory.find { it.id == messageHistory.id }?.messages?.add(message)
 
     return if (addMessage != null && addMessage) {
-      mockMessageHistory.find { it.id == messageHistory.id }?.latestMessageId = message.id
+      mockMessageHistory
+          .find { it.id == messageHistory.id }
+          ?.let {
+            it.latestMessageId = message.id
+            it.user1ReadMostRecentMessage = message.sender == it.user1
+            it.user2ReadMostRecentMessage = message.sender == it.user2
+          }
       Resource.Success(Unit)
     } else {
       Resource.Failure(Exception("MessageHistory with id ${messageHistory.id} not found"))
     }
   }
 
-  override suspend fun updateMessageToReadState(
-      message: Message,
+  override suspend fun updateReadStateForUser(
+      userId: String,
       messageHistory: MessageHistory
   ): Resource<Unit> {
     val updateMessage =
         mockMessageHistory
             .find { it.id == messageHistory.id }
-            ?.messages
-            ?.find { it.id == message.id }
-            ?.let { it.isRead = true }
+            ?.let {
+              if (userId == it.user1) {
+                it.user1ReadMostRecentMessage = true
+              } else {
+                it.user2ReadMostRecentMessage = true
+              }
+            }
 
     return if (updateMessage != null) {
       Resource.Success(Unit)
     } else {
       Resource.Failure(
           Exception(
-              "Message with id ${message.id} not found in MessageHistory with id ${messageHistory.id}"))
+              "Message history with id ${messageHistory.id} not found or user with id $userId not found"))
     }
   }
 
@@ -73,6 +83,8 @@ class MockMessageRepository : IMessageRepository {
         MessageHistory(
             user1 = user1,
             user2 = user2,
+            user1ReadMostRecentMessage = false,
+            user2ReadMostRecentMessage = false,
             latestMessageId = "",
             messages = mutableListOf(),
             id = "${ticker++}")

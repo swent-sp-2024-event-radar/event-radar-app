@@ -73,8 +73,8 @@ constructor(
 }
 
 data class MessagesUiState(
-    val userId: String = FirebaseAuth.getInstance().currentUser!!.uid,
-    val messageList: List<MessageHistory> = emptyList(),
-    val searchQuery: String = "",
-    val selectedTabIndex: Int = 0,
+  val userId: String = FirebaseAuth.getInstance().currentUser!!.uid,
+  val messageList: List<MessageHistory> = emptyList(),
+  val searchQuery: String = "",
+  val selectedTabIndex: Int = 0,
 )

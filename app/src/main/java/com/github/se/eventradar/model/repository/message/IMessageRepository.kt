@@ -11,10 +11,7 @@ interface IMessageRepository {
 
   suspend fun addMessage(message: Message, messageHistory: MessageHistory): Resource<Unit>
 
-  suspend fun updateMessageToReadState(
-      message: Message,
-      messageHistory: MessageHistory
-  ): Resource<Unit>
+  suspend fun updateReadStateForUser(userId: String, messageHistory: MessageHistory): Resource<Unit>
 
   suspend fun createNewMessageHistory(user1: String, user2: String): Resource<MessageHistory>
 }
