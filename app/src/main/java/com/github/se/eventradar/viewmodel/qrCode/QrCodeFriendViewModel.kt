@@ -3,20 +3,27 @@ package com.github.se.eventradar.viewmodel.qrCode
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
+import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.FirebaseUserRepository
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 enum class NavigationEvent {
   None,
   NavigateToNextScreen
 }
+// ViewModel & UI can be improved on by having a state where the UI reflects a loading icon if firebase operations take a long time
+// would also need to handle the case where the updates really do fail within 1 minute's time.
+// personally gonna make this extra.
+
 
 @HiltViewModel
 class QrCodeFriendViewModel(
@@ -45,46 +52,59 @@ class QrCodeFriendViewModel(
     }
   }
 
+
   private fun updateFriendList(friendID: String) {
     viewModelScope.launch {
       val myUID = FirebaseAuth.getInstance().currentUser!!.uid
 
       val friendUserDeferred = async { firebaseRepository.getUser(friendID) }
-      val currentUserDeferred = async {
-        firebaseRepository.getUser(myUID)
-      } // Assume getting current user ID correctly
+      val currentUserDeferred = async { firebaseRepository.getUser(myUID) }
 
       val friendUser = friendUserDeferred.await()
       val currentUser = currentUserDeferred.await()
 
       if (friendUser is Resource.Success && currentUser is Resource.Success) {
-        val friendUpdatesDeferred = async {
-          if (!friendUser.data!!.friendsSet.contains(myUID)) {
-            friendUser.data.friendsSet.add(myUID)
-            firebaseRepository.updateUser(friendUser.data)
-          } else {
-            Resource.Success(Unit) // No update needed, still success
-          }
-        }
-        val userUpdatesDeferred = async {
-          if (!currentUser.data!!.friendsSet.contains(friendID)) {
-            currentUser.data.friendsSet.add(friendID)
-            firebaseRepository.updateUser(currentUser.data)
-          } else {
-            Resource.Success(Unit) // No update needed, still success
-          }
-        }
+        val friendUpdatesDeferred = async { retryUpdate(friendUser.data!!, myUID) }
+        val userUpdatesDeferred = async { retryUpdate(currentUser.data!!, friendID) }
 
+        // Await both updates to complete successfully
         val friendUpdateResult = friendUpdatesDeferred.await()
         val userUpdateResult = userUpdatesDeferred.await()
 
-        if (friendUpdateResult is Resource.Success && userUpdateResult is Resource.Success) {
+        // After successful updates, navigate to the next screen
+        if (friendUpdateResult && userUpdateResult) {
           _navigationEvent.value = NavigationEvent.NavigateToNextScreen
+        } else {
+          println("Failed to update user data to Firebase")
         }
       } else {
         println("Failed to fetch user data from Firebase")
       }
     }
+  }
+
+  // Utility function to retry updates until successful
+  private suspend fun retryUpdate(user: User, friendIDToAdd: String): Boolean {
+    var updateResult: Resource<Any>? = null
+    val timeoutDuration = 10000L  // Overall timeout duration in milliseconds for all retries
+
+    val result = withTimeoutOrNull(timeoutDuration) {
+
+      do {
+        updateResult = if (!user.friendsSet.contains(friendIDToAdd)) {
+          firebaseRepository.updateUser(user)
+        } else {
+          Resource.Success(Unit)  // No update needed, considers as success
+        }
+        if (updateResult is Resource.Failure) {
+          delay(1000)  // Wait for a second before retrying to avoid overloading the server
+        }
+      } while (updateResult !is Resource.Success)
+
+      updateResult
+    }
+
+    return result is Resource.Success
   }
 
   fun resetNavigationEvent() {
