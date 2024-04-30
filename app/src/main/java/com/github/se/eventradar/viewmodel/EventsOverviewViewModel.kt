@@ -34,7 +34,8 @@ constructor(
                       EventList(
                           response.data, response.data, _uiState.value.eventList.selectedEvent))
         }
-        is Resource.Failure -> Log.d("EventsOverviewViewModel", "Error getting events")
+        is Resource.Failure ->
+            Log.d("EventsOverviewViewModel", "Error getting events: ${response.throwable.message}")
       }
     }
   }

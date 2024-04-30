@@ -1,7 +1,8 @@
 package com.github.se.eventradar
 
 import android.util.Log
-import com.github.se.eventradar.model.*
+import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventTicket
@@ -10,9 +11,9 @@ import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
-import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockkStatic
+import io.mockk.unmockkAll
 import io.mockk.verify
 import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +23,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.junit.Assert.*
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -59,7 +60,7 @@ class EventsOverviewViewModelTest {
           location = Location(0.0, 0.0, "Test Location"),
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1),
-          contact = "Test Contact Email",
+          mainOrganiser = "1",
           organiserList = setOf("Test Organiser"),
           attendeeList = setOf("Test Attendee"),
           category = EventCategory.COMMUNITY,
@@ -68,7 +69,7 @@ class EventsOverviewViewModelTest {
   private val mockUser =
       User(
           userId = "user1",
-          age = 30,
+          birthDate = "01/01/2000",
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",
@@ -151,7 +152,7 @@ class EventsOverviewViewModelTest {
     assertNull(viewModel.uiState.value.eventList.selectedEvent)
 
     verify { Log.d("EventsOverviewViewModel", "Error getting events for user2") }
-    confirmVerified()
+    unmockkAll()
   }
 
   @Test
@@ -166,7 +167,7 @@ class EventsOverviewViewModelTest {
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
     assertNull(viewModel.uiState.value.eventList.selectedEvent)
     verify { Log.d("EventsOverviewViewModel", "Error fetching user document") }
-    confirmVerified()
+    unmockkAll()
   }
 
   @Test

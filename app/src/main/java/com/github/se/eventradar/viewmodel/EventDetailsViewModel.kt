@@ -5,6 +5,7 @@ import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.repository.event.FirebaseEventRepository
 import java.time.LocalDateTime
+import java.time.ZoneId
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -13,7 +14,7 @@ class EventDetailsViewModel(val eventId: String? = null) : ViewModel() {
     private val _uiState = MutableStateFlow(EventUiState())
     val uiState: StateFlow<EventUiState> = _uiState
 
-    suspend fun getEventData() {
+    /*suspend fun getEventData() {
         if (eventId != null) {
             when (val event = FirebaseEventRepository().getEvent(eventId)) {
                 is Resource.Success -> {
@@ -35,7 +36,7 @@ class EventDetailsViewModel(val eventId: String? = null) : ViewModel() {
                 }
             }
         }
-    }
+    }*/
 }
 data class EventUiState(
     val eventName: String = "",
