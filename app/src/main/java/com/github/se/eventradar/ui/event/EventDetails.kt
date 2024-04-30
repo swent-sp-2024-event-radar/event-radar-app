@@ -180,4 +180,41 @@ fun EventDetails(
 @Composable
 fun buyTicket(){
 
+  /*
+  // Go back button
+  Button(
+    onClick = { navigationActions.goBack() },
+    modifier =
+    Modifier.wrapContentSize()
+      .constrainAs(backButton) {
+        top.linkTo(image.bottom, margin = 8.dp)
+        start.linkTo(image.start, margin = 4.dp)
+      }
+      .testTag("goBackButton"),
+    colors =
+    ButtonDefaults.buttonColors(
+      contentColor = Color.Transparent,
+      containerColor = Color.Transparent,
+    ),
+  ) {
+    Icon(
+      painter = painterResource(id = R.drawable.back_arrow),
+      contentDescription = "Back navigation arrow",
+      tint = MaterialTheme.colorScheme.onSurface,
+      modifier = Modifier.width(24.dp).height(24.dp).align(Alignment.CenterVertically))
+  }
+
+  Text(
+    text = eventUiState.eventName,
+    style = componentStyle.titleStyle,
+    modifier =
+    Modifier.constrainAs(title) {
+      top.linkTo(image.bottom, margin = 32.dp)
+      start.linkTo(image.start)
+      end.linkTo(image.end)
+    }
+      .testTag("eventTitle"),
+    color = MaterialTheme.colorScheme.onSurface)
+
+  */
 }
