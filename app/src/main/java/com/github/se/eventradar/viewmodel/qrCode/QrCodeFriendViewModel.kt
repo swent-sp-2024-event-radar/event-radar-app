@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.repository.user.FirebaseUserRepository
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,6 +18,7 @@ enum class NavigationEvent {
     NavigateToNextScreen
 }
 
+@HiltViewModel
 class QrCodeFriendViewModel(private val firebaseRepository: FirebaseUserRepository, // Dependency injection
                             qrCodeAnalyser: QrCodeAnalyser = QrCodeAnalyser()): ViewModel() {
 
@@ -43,13 +45,8 @@ class QrCodeFriendViewModel(private val firebaseRepository: FirebaseUserReposito
 }
     private fun updateFriendList(friendID: String) {
         viewModelScope.launch {
-<<<<<<< Updated upstream
 
             val myUID = FirebaseAuth.getInstance().currentUser!!.uid
-=======
-            val myUID = firebaseRepository.getInstance().currentUser!!.uid
-                .toString()  // Fetch the current user ID correctly //TODO CHANGE TO GET MY CURRENT()
->>>>>>> Stashed changes
 
             val friendUserDeferred = async { firebaseRepository.getUser(friendID) }
             val currentUserDeferred =
