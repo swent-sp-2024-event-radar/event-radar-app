@@ -11,6 +11,7 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -34,18 +35,19 @@ constructor(
     viewModelScope.launch {
       when (val response = eventRepository.getEvent(eventId)) {
         is Resource.Success -> {
-          _uiState.value =
-              _uiState.value.copy(
-                  eventName = response.data!!.eventName,
-                  eventPhoto = response.data.eventPhoto,
-                  start = response.data.start,
-                  end = response.data.end,
-                  location = response.data.location,
-                  description = response.data.description,
-                  ticket = response.data.ticket,
-                  mainOrganiser = response.data.mainOrganiser,
-                  category = response.data.category,
-              )
+          _uiState.update {
+            it.copy(
+                eventName = response.data!!.eventName,
+                eventPhoto = response.data.eventPhoto,
+                start = response.data.start,
+                end = response.data.end,
+                location = response.data.location,
+                description = response.data.description,
+                ticket = response.data.ticket,
+                mainOrganiser = response.data.mainOrganiser,
+                category = response.data.category,
+            )
+          }
         }
         is Resource.Failure -> Log.d("EventDetailsViewModel", "Error getting event: ")
       }
