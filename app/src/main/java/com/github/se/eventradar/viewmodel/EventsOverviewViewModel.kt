@@ -74,6 +74,17 @@ constructor(
       }
     }
   }
+
+  fun onTabChanged(tab: Tab, state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
+    state.value = state.value.copy(tab = tab)
+  }
+
+  fun onViewListStatusChanged(
+      viewList: Boolean,
+      state: MutableStateFlow<EventsOverviewUiState> = _uiState
+  ) {
+    state.value = _uiState.value.copy(viewList = viewList)
+  }
 }
 
 data class EventsOverviewUiState(
@@ -89,5 +100,5 @@ data class EventsOverviewUiState(
 
 enum class Tab {
   BROWSE,
-  UPCOMING_EVENTS
+  UPCOMING
 }

@@ -64,10 +64,7 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
     every { mockHostedEventsViewModel.getHostedEvents(any()) } returns Unit
     every { mockHostedEventsViewModel.uiState } returns sampleEventList
     composeTestRule.setContent {
-      HostingScreen(
-          uid = "Test Organiser",
-          viewModel = mockHostedEventsViewModel,
-          navigationActions = mockNavActions)
+      HostingScreen(viewModel = mockHostedEventsViewModel, navigationActions = mockNavActions)
     }
   }
 

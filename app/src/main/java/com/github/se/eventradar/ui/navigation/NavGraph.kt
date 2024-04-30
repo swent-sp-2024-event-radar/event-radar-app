@@ -10,11 +10,12 @@ import com.github.se.eventradar.ui.hosting.HostingScreen
 import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.login.SignUpScreen
 import com.github.se.eventradar.util.toast
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun NavGraph(navController: NavHostController) {
-  val navActions = NavigationActions(navController)
+fun NavGraph(
+    navController: NavHostController,
+    navActions: NavigationActions = NavigationActions(navController)
+) {
   val context = LocalContext.current
 
   NavHost(navController, startDestination = Route.LOGIN) {
@@ -35,15 +36,6 @@ fun NavGraph(navController: NavHostController) {
       HomeScreen(navigationActions = navActions)
       context.toast("Profile screen needs to be implemented")
     }
-    composable(Route.MY_HOSTING) {
-      val currentUser = FirebaseAuth.getInstance().currentUser
-      val uid =
-          if (currentUser != null) {
-            currentUser.uid
-          } else {
-            throw IllegalStateException("User is not authenticated")
-          }
-      HostingScreen(uid = uid, navigationActions = navActions)
-    }
+    composable(Route.MY_HOSTING) { HostingScreen(navigationActions = navActions) }
   }
 }

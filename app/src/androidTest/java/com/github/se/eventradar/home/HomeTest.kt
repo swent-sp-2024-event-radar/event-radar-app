@@ -81,6 +81,8 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       eventCard { assertIsDisplayed() }
       bottomNav { assertIsDisplayed() }
       viewToggleFab { assertIsDisplayed() }
+      searchBarAndFilter { assertIsDisplayed() }
+      filterPopUp { assertIsDisplayed() }
     }
   }
 

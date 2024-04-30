@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -20,8 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,7 +37,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.*
-import com.github.se.eventradar.ui.home.EventList
 import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
@@ -52,16 +47,12 @@ import com.github.se.eventradar.viewmodel.HostedEventsViewModel
 
 @Composable
 fun HostingScreen(
-    uid: String,
     viewModel: HostedEventsViewModel = hiltViewModel(),
     navigationActions: NavigationActions
 ) {
   // Ui States handled by viewModel
   val uiState by viewModel.uiState.collectAsState()
-  var viewToggleIcon by remember {
-    mutableStateOf(if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List)
-  }
-  LaunchedEffect(key1 = uiState.eventList) { viewModel.getHostedEvents(uid) }
+  LaunchedEffect(key1 = uiState.eventList) { viewModel.getHostedEvents() }
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("hostingScreen")) {
     val (logo, title, divider, eventList, eventMap, bottomNav, buttons) = createRefs()
     Logo(
@@ -120,12 +111,8 @@ fun HostingScreen(
           Spacer(modifier = Modifier.width(16.dp))
           ViewToggleFab(
               modifier = Modifier.testTag("viewToggleFab"),
-              onClick = {
-                uiState.viewList = !uiState.viewList
-                viewToggleIcon =
-                    if (uiState.viewList) Icons.Default.Place else Icons.AutoMirrored.Filled.List
-              },
-              iconVector = viewToggleIcon)
+              onClick = { viewModel.onViewListStatusChanged(!uiState.viewList) },
+              iconVector = getIconFromViewListBool(uiState.viewList))
         }
     BottomNavigationMenu(
         onTabSelected = navigationActions::navigateTo,

@@ -11,6 +11,7 @@ import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
+import com.github.se.eventradar.viewmodel.Tab
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
@@ -180,5 +181,21 @@ class EventsOverviewViewModelTest {
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
     assertNull(viewModel.uiState.value.eventList.selectedEvent)
+  }
+
+  @Test
+  fun testViewListChange() = runTest {
+    viewModel.onViewListStatusChanged(viewList = false)
+    assert(viewModel.uiState.value.viewList.equals(false))
+    viewModel.onViewListStatusChanged(viewList = true)
+    assert(viewModel.uiState.value.viewList.equals(true))
+  }
+
+  @Test
+  fun testTabChange() = runTest {
+    viewModel.onTabChanged(tab = Tab.UPCOMING)
+    assert(viewModel.uiState.value.tab == Tab.UPCOMING)
+    viewModel.onTabChanged(tab = Tab.BROWSE)
+    assert(viewModel.uiState.value.tab == Tab.BROWSE)
   }
 }

@@ -112,8 +112,7 @@ class HostedEventsViewModelTest {
     viewModel.getHostedEvents(userWithHostedEvent.userId)
     assert(viewModel.uiState.value.eventList.allEvents.isNotEmpty())
     assert(viewModel.uiState.value.eventList.allEvents.size == 3)
-    assert(
-        viewModel.uiState.value.eventList.allEvents.containsAll(events)) // this is where it fails.
+    assert(viewModel.uiState.value.eventList.allEvents.containsAll(events))
     assert(viewModel.uiState.value.eventList.filteredEvents.size == 3)
     assert(viewModel.uiState.value.eventList.filteredEvents.containsAll(events))
     Assert.assertNull(viewModel.uiState.value.eventList.selectedEvent)
@@ -154,5 +153,13 @@ class HostedEventsViewModelTest {
     Assert.assertNull(viewModel.uiState.value.eventList.selectedEvent)
     verify { Log.d("HostedEventsViewModel", "Error fetching user document") }
     unmockkAll()
+  }
+
+  @Test
+  fun testViewListChange() = runTest {
+    viewModel.onViewListStatusChanged(viewList = false)
+    assert(viewModel.uiState.value.viewList.equals(false))
+    viewModel.onViewListStatusChanged(viewList = true)
+    assert(viewModel.uiState.value.viewList.equals(true))
   }
 }
