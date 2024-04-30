@@ -1,5 +1,7 @@
 package com.github.se.eventradar.model
 
+import com.github.se.eventradar.model.ConversionUtils.convertToMutableSetOfStrings
+
 data class User(
     val userId: String,
     val birthDate: String,
@@ -48,14 +50,5 @@ data class User(
     map["qrCodeUrl"] = qrCodeUrl
     map["username"] = username
     return map
-  }
-}
-
-private fun convertToMutableSetOfStrings(data: Any?): MutableSet<String> {
-  return when (data) {
-    is List<*> -> data.filterIsInstance<String>().toMutableSet()
-    is MutableSet<*> -> data.filterIsInstance<String>().toMutableSet()
-    is String -> mutableSetOf(data)
-    else -> mutableSetOf()
   }
 }

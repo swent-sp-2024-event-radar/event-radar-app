@@ -1,5 +1,6 @@
 package com.github.se.eventradar.model.event
 
+import com.github.se.eventradar.model.ConversionUtils.convertToMutableSetOfStrings
 import com.github.se.eventradar.model.Location
 import java.time.LocalDateTime
 
@@ -60,13 +61,5 @@ data class Event(
     map["attendees_list"] = attendeeSet.toList()
     map["category"] = category.name
     return map
-  }
-}
-
-private fun convertToMutableSetOfStrings(data: Any?): MutableSet<String> {
-  return when (data) {
-    is List<*> -> data.filterIsInstance<String>().toMutableSet()
-    is String -> mutableSetOf(data)
-    else -> mutableSetOf()
   }
 }
