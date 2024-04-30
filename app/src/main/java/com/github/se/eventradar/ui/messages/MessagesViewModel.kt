@@ -8,6 +8,7 @@ import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.model.repository.message.IMessageRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,8 +25,12 @@ constructor(
 ) : ViewModel() {
   private val _uiState = MutableStateFlow(MessagesUiState())
   val uiState: StateFlow<MessagesUiState> = _uiState
+  
+  init {
+    getMessages(_uiState.value.userId)
+  }
 
-  fun getMessages(uid: String) {
+  private fun getMessages(uid: String) {
     viewModelScope.launch {
       when (val response = messagesRepository.getMessages(uid)) {
         is Resource.Success -> {
@@ -68,6 +73,7 @@ constructor(
 }
 
 data class MessagesUiState(
+    val userId: String = FirebaseAuth.getInstance().currentUser!!.uid,
     val messageList: List<MessageHistory> = emptyList(),
     val searchQuery: String = "",
     val selectedTabIndex: Int = 0,

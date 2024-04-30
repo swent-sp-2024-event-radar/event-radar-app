@@ -50,7 +50,6 @@ import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.TopLevelDestination
-import com.google.firebase.auth.FirebaseAuth
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -64,12 +63,8 @@ fun MessagesScreen(
 ) {
   val uiState by viewModel.uiState.collectAsState()
   val context = LocalContext.current // only needed while the chat feature is not implemented
-  
-  val userId = FirebaseAuth.getInstance().currentUser?.uid!!
-  viewModel.getMessages(userId)
 
   MessagesScreenUi(
-      userId = userId,
       uiState = uiState,
       onSelectedTabIndexChange = viewModel::onSelectedTabIndexChange,
       onSearchQueryChange = viewModel::onSearchQueryChange,
@@ -82,7 +77,6 @@ fun MessagesScreen(
 
 @Composable
 fun MessagesScreenUi(
-    userId: String,
     uiState: MessagesUiState,
     onSelectedTabIndexChange: (Int) -> Unit,
     onSearchQueryChange: (String) -> Unit,
@@ -150,7 +144,7 @@ fun MessagesScreenUi(
           if (uiState.selectedTabIndex == 0) {
             MessagesList(
                 messageList = uiState.messageList,
-                userId = userId,
+                userId = uiState.userId,
                 searchQuery = uiState.searchQuery,
                 onChatClicked = onChatClicked,
                 getUser = getUser,
@@ -293,9 +287,9 @@ fun PreviewMessagesScreen() {
               latestMessageId = "2",
           ))
   MessagesScreenUi(
-      userId = "2",
       uiState =
           MessagesUiState(
+              userId = "3",
               messageList =
                   messageList.sortedByDescending {
                     it.messages.find { message -> message.id == it.latestMessageId }?.dateTimeSent

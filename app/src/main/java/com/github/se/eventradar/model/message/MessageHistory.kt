@@ -14,7 +14,7 @@ data class MessageHistory(
       user1 = map["from_user"] as String,
       user2 = map["to_user"] as String,
       latestMessageId = map["latest_message_id"] as String,
-      messages = getMapOfMessages(map["messages"]).toMutableList(),
+      messages = getMutableListOfMessages(map["messages"]).toMutableList(),
       id = id,
   )
 
@@ -28,16 +28,9 @@ data class MessageHistory(
   }
 }
 
-fun getMapOfMessages(messages: Any?): MutableList<Message> {
-  val messageList = mutableListOf<Message>()
-  when (messages) {
-    is MutableList<*> -> {
-      for (message in messages) {
-        if (message is Message) {
-          messageList.add(message)
-        }
-      }
-    }
+fun getMutableListOfMessages(messages: Any?): MutableList<Message> {
+  return when (messages) {
+    is List<*> -> messages.filterIsInstance<Message>().toMutableList()
+    else -> mutableListOf()
   }
-  return messageList
 }
