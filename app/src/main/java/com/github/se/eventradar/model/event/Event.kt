@@ -11,7 +11,7 @@ data class Event(
     var location: Location,
     var description: String,
     var ticket: EventTicket,
-    var contact: String,
+    var mainOrganiser: String,
     var organiserList: Set<String>,
     var attendeeList: Set<String>,
     var category: EventCategory,
@@ -34,9 +34,9 @@ data class Event(
       ticket =
           EventTicket(
               name = map["ticket_name"] as String,
-              price = map["ticket_price"] as Double,
-              capacity = map["ticket_quantity"] as Int),
-      contact = map["contact"] as String,
+              price = (map["ticket_price"] as Long).toDouble(),
+              capacity = (map["ticket_quantity"] as Long).toInt()),
+      mainOrganiser = map["main_organiser"] as String,
       organiserList = getSetOfStrings(map["organisers_list"]),
       attendeeList = getSetOfStrings(map["attendees_list"]),
       category = EventCategory.valueOf(map["category"] as String),
@@ -55,7 +55,7 @@ data class Event(
     map["ticket_name"] = ticket.name
     map["ticket_price"] = ticket.price
     map["ticket_quantity"] = ticket.capacity
-    map["contact"] = contact
+    map["main_organiser"] = mainOrganiser
     map["organisers_list"] = organiserList.toList()
     map["attendees_list"] = attendeeList.toList()
     map["category"] = category.name

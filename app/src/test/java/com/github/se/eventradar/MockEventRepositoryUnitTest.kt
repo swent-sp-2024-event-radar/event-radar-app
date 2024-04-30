@@ -24,7 +24,7 @@ class MockEventRepositoryUnitTest {
           location = Location(0.0, 0.0, "Test Location"),
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1),
-          contact = "Test Contact Email",
+          mainOrganiser = "1",
           organiserList = setOf("Test Organiser"),
           attendeeList = setOf("Test Attendee"),
           category = EventCategory.COMMUNITY,
