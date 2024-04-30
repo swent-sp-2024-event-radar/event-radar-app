@@ -1,6 +1,7 @@
 package com.github.se.eventradar.ui.qrCode
 
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
@@ -76,13 +77,11 @@ class QrCodeCamera {
                         preview,
                         imageAnalysis)
               } catch (e: Exception) {
-                e.printStackTrace()
+                  Log.e("QrCodeCameraFail", "Use case binding failed", e)
               }
               previewView
             },
             modifier = Modifier.weight(1.5f).aspectRatio(1f).padding(horizontal = 32.dp)
-            //                Text(
-            //                    text = code, )
             )
       }
     }

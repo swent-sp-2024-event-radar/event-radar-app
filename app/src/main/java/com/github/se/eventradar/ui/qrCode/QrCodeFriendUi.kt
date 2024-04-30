@@ -49,6 +49,7 @@ fun QrCodeScreen(viewModel: QrCodeFriendViewModel, navigationActions: Navigation
   LaunchedEffect(navigateState) {
     when (navigateState) {
       NavigationEvent.NavigateToNextScreen -> {
+//          navigationActions.navigate({Route.MESSAGE})
         navigationActions.navigateTo(
             TopLevelDestination( // TODO
                 route = Route.MESSAGE,
