@@ -50,8 +50,8 @@ class EventDetailsViewmodelUnitTest {
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1),
           mainOrganiser = "1",
-          organiserList = setOf("Test Organiser"),
-          attendeeList = setOf("Test Attendee"),
+          organiserList = mutableSetOf("Test Organiser"),
+          attendeeList = mutableSetOf("Test Attendee"),
           category = EventCategory.COMMUNITY,
           fireBaseID = "1")
 
