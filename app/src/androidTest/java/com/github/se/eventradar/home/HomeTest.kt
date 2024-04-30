@@ -56,8 +56,8 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
                             description = "Test Description",
                             ticket = EventTicket("Test Ticket", 0.0, 1),
                             mainOrganiser = "1",
-                            organiserList = setOf("Test Organiser"),
-                            attendeeList = setOf("Test Attendee"),
+                            organiserSet = mutableSetOf("Test Organiser"),
+                            attendeeSet = mutableSetOf("Test Attendee"),
                             category = EventCategory.COMMUNITY,
                             fireBaseID = "$it")
                       })))

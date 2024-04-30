@@ -38,8 +38,9 @@ class FirebaseUserRepositoryUnitTest {
           lastName = "",
           phoneNumber = "",
           accountStatus = "active",
-          eventsAttendeeList = emptyList(),
-          eventsHostList = emptyList(),
+          eventsAttendeeSet = mutableSetOf(),
+          eventsHostSet = mutableSetOf(),
+          friendsSet = mutableSetOf(),
           profilePicUrl = "",
           qrCodeUrl = "",
           username = "",
@@ -125,8 +126,9 @@ class FirebaseUserRepositoryUnitTest {
     every { mockDocumentSnapshot.data } returns
         mapOf(
             "accountStatus" to "active",
-            "eventsAttendeeList" to emptyList<String>(),
-            "eventsHostList" to emptyList<String>(),
+            "eventsAttendeeList" to mutableSetOf<String>(),
+            "eventsHostList" to mutableSetOf<String>(),
+            "friendsList" to mutableSetOf<String>(),
             "profilePicUrl" to "",
             "qrCodeUrl" to "",
             "username" to "",
@@ -180,8 +182,9 @@ class FirebaseUserRepositoryUnitTest {
         capturePublic.captured ==
             mapOf(
                 "accountStatus" to "active",
-                "eventsAttendeeList" to emptyList<String>(),
-                "eventsHostList" to emptyList<String>(),
+                "eventsAttendeeList" to mutableSetOf<String>(),
+                "eventsHostList" to mutableSetOf<String>(),
+                "friendsList" to mutableSetOf<String>(),
                 "profilePicUrl" to "",
                 "qrCodeUrl" to "",
                 "username" to "",
@@ -217,8 +220,9 @@ class FirebaseUserRepositoryUnitTest {
     val map =
         mapOf(
             "accountStatus" to "active",
-            "eventsAttendeeList" to emptyList<String>(),
-            "eventsHostList" to emptyList<String>(),
+            "eventsAttendeeList" to mutableSetOf<String>(),
+            "eventsHostList" to mutableSetOf<String>(),
+            "friendsList" to mutableSetOf<String>(),
             "profilePicUrl" to "",
             "qrCodeUrl" to "",
             "username" to "",
@@ -244,8 +248,9 @@ class FirebaseUserRepositoryUnitTest {
         capturePublic.captured ==
             mapOf(
                 "accountStatus" to "active",
-                "eventsAttendeeList" to emptyList<String>(),
-                "eventsHostList" to emptyList<String>(),
+                "eventsAttendeeList" to mutableSetOf<String>(),
+                "eventsHostList" to mutableSetOf<String>(),
+                "friendsList" to mutableSetOf<String>(),
                 "profilePicUrl" to "",
                 "qrCodeUrl" to "",
                 "username" to "",
@@ -266,8 +271,9 @@ class FirebaseUserRepositoryUnitTest {
     val map =
         mapOf(
             "accountStatus" to "active",
-            "eventsAttendeeList" to emptyList<String>(),
-            "eventsHostList" to emptyList<String>(),
+            "eventsAttendeeList" to mutableSetOf<String>(),
+            "eventsHostList" to mutableSetOf<String>(),
+            "friendsList" to mutableSetOf<String>(),
             "profilePicUrl" to "",
             "qrCodeUrl" to "",
             "username" to "",
@@ -310,8 +316,9 @@ class FirebaseUserRepositoryUnitTest {
         capturePublic.captured ==
             mapOf(
                 "accountStatus" to "active",
-                "eventsAttendeeList" to emptyList<String>(),
-                "eventsHostList" to emptyList<String>(),
+                "eventsAttendeeList" to mutableSetOf<String>(),
+                "eventsHostList" to mutableSetOf<String>(),
+                "friendsList" to mutableSetOf<String>(),
                 "profilePicUrl" to "",
                 "qrCodeUrl" to "",
                 "username" to "",
