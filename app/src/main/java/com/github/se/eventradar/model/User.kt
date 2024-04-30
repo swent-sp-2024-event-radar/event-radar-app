@@ -43,6 +43,7 @@ data class User(
     map["accountStatus"] = accountStatus
     map["eventsAttendeeList"] = eventsAttendeeSet
     map["eventsHostList"] = eventsHostSet
+    map["friendsList"] = friendsSet
     map["profilePicUrl"] = profilePicUrl
     map["qrCodeUrl"] = qrCodeUrl
     map["username"] = username
@@ -53,6 +54,7 @@ data class User(
 private fun convertToMutableSetOfStrings(data: Any?): MutableSet<String> {
   return when (data) {
     is List<*> -> data.filterIsInstance<String>().toMutableSet()
+    is MutableSet<*> -> data.filterIsInstance<String>().toMutableSet()
     is String -> mutableSetOf(data)
     else -> mutableSetOf()
   }

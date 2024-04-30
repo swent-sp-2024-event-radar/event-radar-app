@@ -156,6 +156,7 @@ private fun getMaps(user: User): Pair<Map<String, Any?>, Map<String, Any?>> {
           "accountStatus" to user.accountStatus,
           "eventsAttendeeList" to user.eventsAttendeeSet,
           "eventsHostList" to user.eventsHostSet,
+          "friendsList" to user.friendsSet,
       )
 
   return Pair(publicMap, privateMap)
