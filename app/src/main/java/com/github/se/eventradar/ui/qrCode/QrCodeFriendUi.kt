@@ -42,28 +42,28 @@ import com.github.se.eventradar.viewmodel.qrCode.NavigationEvent
 import com.github.se.eventradar.viewmodel.qrCode.QrCodeFriendViewModel
 
 @Composable
-fun QrCodeScreen(viewModel: QrCodeFriendViewModel,  navigationActions: NavigationActions) {
-    val navigateState by viewModel.navigationEvent.collectAsState()
+fun QrCodeScreen(viewModel: QrCodeFriendViewModel, navigationActions: NavigationActions) {
+  val navigateState by viewModel.navigationEvent.collectAsState()
 
-    // React to changes in navigation state
-    LaunchedEffect(navigateState) {
-        when (navigateState) {
-            NavigationEvent.NavigateToNextScreen -> {
-                navigationActions.navigateTo( TopLevelDestination( //TODO
-                    route = Route.MESSAGE,
-                    icon = R.drawable.chat_bubble,
-                    textId = R.string.message_chats,
-                )
-                )// Adjust according to your actual navigation logic
-                viewModel.resetNavigationEvent() // Reset the navigation event in the ViewModel to prevent repeated navigations
-            }
-            else -> Unit // Do nothing if the state is None or any other non-navigational state
-        }
+  // React to changes in navigation state
+  LaunchedEffect(navigateState) {
+    when (navigateState) {
+      NavigationEvent.NavigateToNextScreen -> {
+        navigationActions.navigateTo(
+            TopLevelDestination( // TODO
+                route = Route.MESSAGE,
+                icon = R.drawable.chat_bubble,
+                textId = R.string.message_chats,
+            )) // Adjust according to your actual navigation logic
+        viewModel.resetNavigationEvent() // Reset the navigation event in the ViewModel to prevent
+        // repeated navigations
+      }
+      else -> Unit // Do nothing if the state is None or any other non-navigational state
     }
+  }
 
   var selectedTabIndex by remember { mutableIntStateOf(0) }
   val context = LocalContext.current
-
 
   ConstraintLayout(
       modifier = Modifier.fillMaxSize().testTag("qrCodeScannerScreen"),
@@ -138,9 +138,7 @@ fun QrCodeScreen(viewModel: QrCodeFriendViewModel,  navigationActions: Navigatio
     if (selectedTabIndex == 0) {
       Toast.makeText(context, "My Qr Code not yet available", Toast.LENGTH_SHORT).show()
     } else {
-      Column(modifier = Modifier.testTag("QrScanner")) {
-        QrCodeCamera().QrCodeScanner()
-      }
+      Column(modifier = Modifier.testTag("QrScanner")) { QrCodeCamera().QrCodeScanner() }
     }
     BottomNavigationMenu(
         onTabSelected = { tab -> navigationActions.navigateTo(tab) },
@@ -155,13 +153,13 @@ fun QrCodeScreen(viewModel: QrCodeFriendViewModel,  navigationActions: Navigatio
   }
 }
 
-//private val dummyQrCodeScanned: (String) -> Unit = { qrCode ->
+// private val dummyQrCodeScanned: (String) -> Unit = { qrCode ->
 //  Log.d("QRCodeScanner", "QR Code Scanned: $qrCode")
 //  // You can perform any additional logic here for testing
-//}
+// }
 
-//@androidx.compose.ui.tooling.preview.Preview
-//@Composable
-//fun QrcodeScanTest() {
+// @androidx.compose.ui.tooling.preview.Preview
+// @Composable
+// fun QrcodeScanTest() {
 //  QrCodeScreen(viewNavigationActions(rememberNavController()))
-//}
+// }

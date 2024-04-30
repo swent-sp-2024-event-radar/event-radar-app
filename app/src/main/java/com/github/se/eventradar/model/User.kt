@@ -35,7 +35,6 @@ data class User(
       qrCodeUrl = map["qrCodeUrl"] as String,
       username = map["username"] as String)
 
-
   fun toMap(): HashMap<String, Any> {
     val map = HashMap<String, Any>()
     map["private/birthDate"] = birthDate
@@ -53,6 +52,3 @@ data class User(
     return map
   }
 }
-
-
-
