@@ -8,20 +8,17 @@ import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.event.EventUiState
 import com.github.se.eventradar.screens.EventDetailsScreen
-import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.mockk.confirmVerified
-import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.verify
 import java.time.LocalDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,29 +37,29 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
 
   private val sampleEventStates =
       MutableStateFlow(
-        EventUiState(
-          eventName = "Debugging",
-          eventPhoto = "path",
-          start = LocalDateTime.MIN,
-          end = LocalDateTime.MAX,
-          location = Location(0.0, 0.0, "base address"),
-          description = "Let's debug some code together because we all enjoy kotlin !",
-          ticket = EventTicket("Luck", 0.0, 7),
-          contact = "some.name@host.com",
-          category = EventCategory.COMMUNITY,
-        )
-      )
+          EventUiState(
+              eventName = "Debugging",
+              eventPhoto = "path",
+              start = LocalDateTime.MIN,
+              end = LocalDateTime.MAX,
+              location = Location(0.0, 0.0, "base address"),
+              description = "Let's debug some code together because we all enjoy kotlin !",
+              ticket = EventTicket("Luck", 0.0, 7),
+              mainOrganiser = "some.name@host.com",
+              category = EventCategory.COMMUNITY,
+          ))
 
   private val eventId = "tdjWMT9Eon2ROTVakQb"
 
-//  @Before
-//  fun testSetup() {
-//
-//    every { mockViewModel.uiState } returns sampleEventStates
-//    every { mockViewModel.eventId } returns eventId
-//
-//    composeTestRule.setContent { EventDetails(mockViewModel, navigationActions = mockNavActions) }
-//  }
+  //  @Before
+  //  fun testSetup() {
+  //
+  //    every { mockViewModel.uiState } returns sampleEventStates
+  //    every { mockViewModel.eventId } returns eventId
+  //
+  //    composeTestRule.setContent { EventDetails(mockViewModel, navigationActions = mockNavActions)
+  // }
+  //  }
 
   @Test
   fun screenDisplaysNavigationElementsCorrectly() = run {

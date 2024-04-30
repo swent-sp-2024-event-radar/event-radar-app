@@ -23,7 +23,6 @@ enum class EventCategory(val displayName: String) {
       SOCIAL -> context.getString(R.string.event_category_social)
     }
   }
-
 }
 
 fun getEventCategory(categoryString: String): EventCategory {
