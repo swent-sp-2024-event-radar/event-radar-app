@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  Generate APK:
+  generate-apk:
 
     runs-on: ubuntu-latest
 
