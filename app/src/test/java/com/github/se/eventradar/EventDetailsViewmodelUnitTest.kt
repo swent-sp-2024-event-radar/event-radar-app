@@ -69,6 +69,8 @@ class EventDetailsViewmodelUnitTest {
     viewModel.getEventData()
     assert(viewModel.uiState.value.eventName.isEmpty())
     assert(viewModel.uiState.value.description.isEmpty())
+    assert(viewModel.uiState.value.eventPhoto.isEmpty())
+    assert(viewModel.uiState.value.mainOrganiser.isEmpty())
   }
 
   @Test
@@ -98,5 +100,4 @@ class EventDetailsViewmodelUnitTest {
     viewModel.getEventData()
     assert(viewModel.uiState.value.eventName == mockEvent.eventName)
   }
-
 }

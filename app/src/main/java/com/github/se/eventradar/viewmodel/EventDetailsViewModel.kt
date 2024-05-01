@@ -49,7 +49,8 @@ constructor(
             )
           }
         }
-        is Resource.Failure -> Log.d("EventDetailsViewModel", "Error getting event: ${response.throwable.message}")
+        is Resource.Failure ->
+            Log.d("EventDetailsViewModel", "Error getting event: ${response.throwable.message}")
       }
     }
   }
