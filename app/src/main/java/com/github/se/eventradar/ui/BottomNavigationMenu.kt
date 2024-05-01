@@ -67,7 +67,7 @@ fun BottomNavigationMenu(
                         R.string.message_chats -> "messageChatBottomNav"
                         R.string.homeScreen_events -> "homeScreenEventBottomNav"
                         R.string.user_profile -> "userProfileBottomNav"
-                        R.string.my_hosted_events -> "myHostingBottomNav"
+                        R.string.hosting -> "myHostingBottomNav"
                         else -> "itemBottomNav"
                       }))
     }
