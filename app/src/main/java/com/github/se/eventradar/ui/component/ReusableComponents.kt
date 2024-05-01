@@ -1,6 +1,5 @@
 package com.github.se.eventradar.ui.component
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,7 +46,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -89,14 +87,13 @@ fun Logo(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun EventList(events: List<Event>, modifier: Modifier = Modifier) {
-  LazyColumn(modifier = modifier) { items(events) { event -> EventCard(event) } }
+fun EventList(events: List<Event>, modifier: Modifier = Modifier, onCardClick: (String) -> Unit) {
+  LazyColumn(modifier = modifier) { items(events) { event -> EventCard(event, onCardClick) } }
 }
 
 @Composable
-fun EventCard(event: Event) {
-  // TODO: connected to event details
-  val context = LocalContext.current
+fun EventCard(event: Event, onCardClick: (String) -> Unit) {
+  // val context = LocalContext.current
   Card(
       modifier =
           Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
@@ -105,7 +102,8 @@ fun EventCard(event: Event) {
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
       elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
       onClick = {
-        Toast.makeText(context, "Event details not yet available", Toast.LENGTH_SHORT).show()
+        onCardClick(event.fireBaseID)
+        // Toast.makeText(context, "Event details not yet available", Toast.LENGTH_SHORT).show()
       }) {
         Row(modifier = Modifier.fillMaxSize()) {
           Column(
