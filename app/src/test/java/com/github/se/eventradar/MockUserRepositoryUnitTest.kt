@@ -1,12 +1,16 @@
 package com.github.se.eventradar
 
+import android.net.Uri
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.Mockito.mock
 
 class MockUserRepositoryUnitTest {
   private lateinit var userRepository: IUserRepository
@@ -108,5 +112,27 @@ class MockUserRepositoryUnitTest {
   fun testIsUserLoggedInFalseCase() = runTest {
     val result = userRepository.doesUserExist("2")
     assert(result is Resource.Failure)
+  }
+
+  @Test
+  fun testUploadImage() = runTest {
+    val mockURI = mock(Uri::class.java)
+      val result = userRepository.uploadImage(mockURI, "1", true)
+      assert(result is Resource.Success)
+  }
+
+  @Test
+  fun testGetImage() = runTest {
+    // Arrange
+    val expectedUrl = "http://example.com/pic.jpg"
+    val userId = "1"
+    val isProfilePic = true
+
+    // Act
+    val result = userRepository.getImage(userId, isProfilePic)
+
+    // Assert
+    assertTrue(result is Resource.Success)
+    assertEquals(expectedUrl, (result as Resource.Success).data)
   }
 }

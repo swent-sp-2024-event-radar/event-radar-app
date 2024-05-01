@@ -1,11 +1,13 @@
 package com.github.se.eventradar.model.repository.user
 
+import android.net.Uri
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.tasks.await
 
 class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUserRepository {
@@ -132,6 +134,40 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
       } else {
         Resource.Failure(Exception("User not found"))
       }
+    } catch (e: Exception) {
+      Resource.Failure(e)
+    }
+  }
+
+  override suspend fun uploadImage(
+      selectedImageUri: Uri,
+      uid: String,
+      profilePicOrQRCode: Boolean
+  ): Resource<Unit> {
+    val storageRef =
+        if (profilePicOrQRCode) {
+          Firebase.storage.reference.child("Profile Pictures/$uid")
+        } else {
+          Firebase.storage.reference.child("QR Codes/$uid")
+        }
+    return try {
+      storageRef.putFile(selectedImageUri).await()
+      Resource.Success(Unit)
+    } catch (e: Exception) {
+      Resource.Failure(e)
+    }
+  }
+
+  override suspend fun getImage(uid: String, profilePicOrQRCode: Boolean): Resource<String> {
+    val storageRef =
+        if (profilePicOrQRCode) {
+          Firebase.storage.reference.child("Profile Pictures/$uid")
+        } else {
+          Firebase.storage.reference.child("QR Codes/$uid")
+        }
+    return try {
+      val url = storageRef.downloadUrl.await().toString()
+      Resource.Success(url)
     } catch (e: Exception) {
       Resource.Failure(e)
     }

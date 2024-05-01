@@ -31,19 +31,17 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
       return false
     }
 
-    // If no image is selected, use a placeholder image
-    val imageURI =
-        state.value.selectedImageUri
-            ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder")
+    val profilePicUrl = runBlocking { getImageAsync(user.uid, true) }
 
     val userValues =
         hashMapOf(
             "private/firstName" to state.value.firstName,
             "private/lastName" to state.value.lastName,
-            "private/phoneNumber" to state.value.phoneNumber,
+            "private/phoneNumber" to
+                state.value.selectedCountryCode.ext.plus(state.value.phoneNumber),
             "private/birthDate" to state.value.birthDate,
             "private/email" to user.email,
-            "profilePicUrl" to imageURI.toString(),
+            "profilePicUrl" to profilePicUrl,
             "qrCodeUrl" to "", // TODO: generate QR code here
             "username" to state.value.username,
             "accountStatus" to "active",
@@ -70,6 +68,35 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
     }
   }
 
+  private suspend fun uploadImageAsync(
+      selectedImageUri: Uri,
+      uid: String,
+      profilePicOrQRCode: Boolean
+  ): Boolean {
+    return when (val result =
+        userRepository.uploadImage(selectedImageUri, uid, profilePicOrQRCode)) {
+      is Resource.Success -> {
+        true
+      }
+      is Resource.Failure -> {
+        Log.d("LoginScreenViewModel", "Error uploading image: ${result.throwable.message}")
+        false
+      }
+    }
+  }
+
+  private suspend fun getImageAsync(uid: String, profilePicOrQRCode: Boolean): String {
+    return when (val result = userRepository.getImage(uid, profilePicOrQRCode)) {
+      is Resource.Success -> {
+        result.data
+      }
+      is Resource.Failure -> {
+        Log.d("LoginScreenViewModel", "Error getting image: ${result.throwable.message}")
+        ""
+      }
+    }
+  }
+
   fun doesUserExist(userId: String): Boolean {
     var userExists: Boolean
 
@@ -92,6 +119,11 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
 
   fun onSelectedImageUriChanged(uri: Uri?, state: MutableStateFlow<LoginUiState> = _uiState) {
     state.value = state.value.copy(selectedImageUri = uri)
+    val profilePicture = true
+    uri?.let {
+      Log.d("LoginScreenViewModel", "Selected image URI: $it")
+      runBlocking { uploadImageAsync(uri, Firebase.auth.currentUser!!.uid, profilePicture) }
+    }
   }
 
   fun onUsernameChanged(username: String, state: MutableStateFlow<LoginUiState> = _uiState) {
