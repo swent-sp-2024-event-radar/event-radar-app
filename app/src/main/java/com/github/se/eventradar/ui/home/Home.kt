@@ -182,7 +182,6 @@ fun HomeScreen(
     if (getTabIndexFromTabEnum(uiState.tab) == 0) {
       if (uiState.viewList) {
           if (uiState.isSearchActive || uiState.isFilterActive) {
-              Log.d("HomeScreen", "Filtered events: ${uiState.eventList.filteredEvents}")
               EventList(
                   uiState.eventList.filteredEvents,
                   Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
@@ -193,7 +192,6 @@ fun HomeScreen(
                   navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
               }
           } else {
-              Log.d("HomeScreen", "All events: ${uiState.eventList.allEvents}")
 
               EventList(
                   uiState.eventList.allEvents,

@@ -43,7 +43,6 @@ constructor(
 
     fun onRadiusQueryChanged(radius: String) {
         _uiState.value = _uiState.value.copy(radiusQuery = radius)
-        Log.d("UiState", "Radius inside state value: ${_uiState.value.radiusQuery}")
     }
 
     fun onFreeSwitchChanged(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
@@ -62,7 +61,6 @@ constructor(
         _uiState.value.eventList.allEvents.filter {
           it.eventName.contains(query, ignoreCase = true)
         }
-      Log.d("HomeScreen", "filteredEventsSearch: $filteredEventsSearch")
 
       // Filter based on radius query
         val radiusQuery = _uiState.value.radiusQuery
@@ -92,20 +90,17 @@ constructor(
                 true
             }
         }
-        Log.d("HomeScreen", "filteredEventsFree: $filteredEventsFree")
 
       // Filter based on categories selected
       val categoriesCheckedList = _uiState.value.categoriesCheckedList
       val filteredEventsCategory = _uiState.value.eventList.allEvents.filter { event ->
           categoriesCheckedList.any { it == event.category }
       }
-      Log.d("HomeScreen", "filteredEventsCategory: $filteredEventsCategory")
 
       val filteredEvents = filteredEventsSearch
           .intersect(filteredEventsRadius.toSet())
           .intersect(filteredEventsFree.toSet())
           .intersect(filteredEventsCategory.toSet())
-      Log.d("HomeScreen", "filteredEvents: $filteredEvents")
 
       _uiState.value =
           _uiState.value.copy(

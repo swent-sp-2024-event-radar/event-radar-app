@@ -160,7 +160,6 @@ fun SearchBarAndFilter(
                 onSearchQueryChanged(it)
                 if (it == "") onSearchActiveChanged(false)
                 else onSearchActiveChanged(true)
-                Log.d("HomeScreen", "searchQuery: ${uiState.searchQuery}")
             },
             modifier = Modifier.weight(1f),
             maxLines = 1,
@@ -177,7 +176,6 @@ fun SearchBarAndFilter(
         Button(
             onClick = {
                 onFilterDialogOpen()
-//            Log.d("SearchBarAndFilter", "Filter button clicked ${uiState.isFilterDialogOpen}")
             },
             modifier = Modifier.padding(start = 8.dp)) {
             Text("Filter")
@@ -212,7 +210,6 @@ fun FilterPopUp(
                         BasicTextField(
                             value = uiState.radiusQuery,
                             onValueChange = { onRadiusQueryChanged(it)
-                                Log.d("UiState", "RadiusQuery: ${uiState.radiusQuery}")
                             },
                             keyboardOptions =
                             KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
@@ -303,7 +300,6 @@ fun CategorySelection(
                         } else {
                             uiState.categoriesCheckedList.remove(category)
                         }
-                        Log.d("CategorySelection", "category selection: ${uiState.categoriesCheckedList}")
                     },
                     modifier = Modifier
                         .scale(0.6f)
