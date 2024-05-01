@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -35,6 +36,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
+import com.github.se.eventradar.model.repository.event.MockEventRepository
+import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.EventList
 import com.github.se.eventradar.ui.component.FilterPopUp
@@ -218,6 +221,7 @@ fun getTabIndexFromTabEnum(tab: Tab): Int {
         1
       }
   return selectedTabIndex
+}
 
 @Preview(showBackground = true, showSystemUi = true)
 @ExcludeFromJacocoGeneratedReport
