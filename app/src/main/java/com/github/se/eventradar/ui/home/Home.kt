@@ -1,6 +1,5 @@
 package com.github.se.eventradar.ui.home
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -60,6 +58,11 @@ fun HomeScreen(
   // Ui States handled by viewModel
   val uiState by viewModel.uiState.collectAsState()
   LaunchedEffect(key1 = uiState.eventList) { viewModel.getEvents() }
+  LaunchedEffect(key1 = uiState.tab) {
+    if (uiState.tab == Tab.UPCOMING) {
+      viewModel.getUpcomingEvents()
+    }
+  }
   val context = LocalContext.current
 
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("homeScreen")) {
@@ -132,12 +135,12 @@ fun HomeScreen(
 
     SearchBarAndFilter(
         searchQuery = uiState.searchQuery,
-        onSearchQueryChange = { uiState.searchQuery = it },
+        onSearchQueryChange = { newQuery -> viewModel.onSearchQueryChange(newQuery) },
         onSearchButtonClick = {
           // Handle search button click
         },
         showFilterPopUp = uiState.isFilterDialogOpen,
-        setShowFilterPopUp = { uiState.isFilterDialogOpen = it },
+        setShowFilterPopUp = { isOpen -> viewModel.setFilterDialogOpen(isOpen) },
         modifier =
             Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 .testTag("searchBarAndFilter")
@@ -167,9 +170,34 @@ fun HomeScreen(
             })
       }
     } else {
-      // "Upcoming" tab content
-      // TODO: Implement upcoming events
-      Toast.makeText(context, "Upcoming events not yet available", Toast.LENGTH_SHORT).show()
+      if (uiState.eventList.allEvents.isEmpty() && uiState.userLoggedIn) {
+        Text(
+            "You have no upcoming events",
+            modifier =
+                Modifier.constrainAs(eventList) {
+                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                })
+      } else if (!uiState.userLoggedIn) {
+        Text(
+            "Please log in",
+            modifier =
+                Modifier.constrainAs(eventList) {
+                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                })
+      } else {
+        EventList(
+            events = uiState.eventList.allEvents,
+            modifier =
+                Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
+                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                })
+      }
       viewModel.onTabChanged(Tab.BROWSE)
     }
     // Note for now, the filter dialog is always open to verify the UI

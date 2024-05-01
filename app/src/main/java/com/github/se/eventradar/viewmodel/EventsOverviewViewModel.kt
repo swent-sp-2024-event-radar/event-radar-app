@@ -12,6 +12,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -22,7 +24,11 @@ constructor(
     private val userRepository: IUserRepository
 ) : ViewModel() {
   private val _uiState = MutableStateFlow(EventsOverviewUiState())
-  val uiState: StateFlow<EventsOverviewUiState> = _uiState
+  val uiState: StateFlow<EventsOverviewUiState> = _uiState.asStateFlow()
+
+  init {
+    checkUserLoginStatus()
+  }
 
   fun getEvents() {
     viewModelScope.launch {
@@ -40,38 +46,67 @@ constructor(
     }
   }
 
-  fun getUpcomingEvents(uid: String) {
+  fun getUpcomingEvents() {
     viewModelScope.launch {
-      when (val userResponse = userRepository.getUser(uid)) {
-        is Resource.Success -> {
-          val user = userResponse.data!!
-          val attendeeList = user.eventsAttendeeSet.toList()
-          if (attendeeList.isNotEmpty()) {
-            when (val events = eventRepository.getEventsByIds(attendeeList)) {
-              is Resource.Success -> {
-                _uiState.value =
-                    _uiState.value.copy(
-                        eventList =
-                            EventList(
-                                events.data, events.data, _uiState.value.eventList.selectedEvent))
-              }
-              is Resource.Failure -> {
-                Log.d("EventsOverviewViewModel", "Error getting events for $uid")
-                _uiState.value =
-                    _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
-              }
-            }
-          } else {
+      userRepository.getCurrentUserId().let { userIdResource ->
+        when (userIdResource) {
+          is Resource.Success -> {
+            val uid = userIdResource.data
+            getUserEvents(uid)
+          }
+          is Resource.Failure -> {
+            Log.d(
+                "EventsOverviewViewModel",
+                "Error fetching user ID: ${userIdResource.throwable.message}")
             _uiState.value =
                 _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
           }
         }
-        is Resource.Failure -> {
-          Log.d("EventsOverviewViewModel", "Error fetching user document")
+      }
+    }
+  }
+
+  private suspend fun getUserEvents(uid: String) {
+    when (val userResponse = userRepository.getUser(uid)) {
+      is Resource.Success -> {
+        val user = userResponse.data!!
+        val attendeeList = user.eventsAttendeeSet.toList()
+        if (attendeeList.isNotEmpty()) {
+          when (val events = eventRepository.getEventsByIds(attendeeList)) {
+            is Resource.Success -> {
+              _uiState.value =
+                  _uiState.value.copy(
+                      eventList =
+                          EventList(
+                              events.data, events.data, _uiState.value.eventList.selectedEvent))
+            }
+            is Resource.Failure -> {
+              Log.d("EventsOverviewViewModel", "Error getting events for $uid")
+              _uiState.value =
+                  _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+            }
+          }
+        } else {
           _uiState.value =
               _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
         }
       }
+      is Resource.Failure -> {
+        Log.d("EventsOverviewViewModel", "Error fetching user document")
+        _uiState.value = _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+      }
+    }
+  }
+
+  private fun checkUserLoginStatus() {
+    viewModelScope.launch {
+      val userIdResource = userRepository.getCurrentUserId()
+      val isLoggedIn =
+          when (userIdResource) {
+            is Resource.Success -> true
+            else -> false
+          }
+      _uiState.update { currentState -> currentState.copy(userLoggedIn = isLoggedIn) }
     }
   }
 
@@ -82,17 +117,26 @@ constructor(
   fun onViewListStatusChanged(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
     state.value = state.value.copy(viewList = !state.value.viewList)
   }
+
+  fun setFilterDialogOpen(isOpen: Boolean) {
+    _uiState.update { currentState -> currentState.copy(isFilterDialogOpen = isOpen) }
+  }
+
+  fun onSearchQueryChange(newQuery: String) {
+    _uiState.update { currentState -> currentState.copy(searchQuery = newQuery) }
+  }
 }
 
 data class EventsOverviewUiState(
     val eventList: EventList = EventList(emptyList(), emptyList(), null),
-    var searchQuery: String = "",
-    var isFilterDialogOpen: Boolean = false,
-    var radiusInputFilter: Double = -1.0,
-    var freeEventsFilter: Boolean = false,
-    var categorySelectionFilter: List<EventCategory> = emptyList(),
-    var viewList: Boolean = true,
-    var tab: Tab = Tab.BROWSE,
+    val searchQuery: String = "",
+    val isFilterDialogOpen: Boolean = false,
+    val radiusInputFilter: Double = -1.0,
+    val freeEventsFilter: Boolean = false,
+    val categorySelectionFilter: List<EventCategory> = emptyList(),
+    val viewList: Boolean = true,
+    val tab: Tab = Tab.BROWSE,
+    val userLoggedIn: Boolean = false,
 )
 
 enum class Tab {
