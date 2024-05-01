@@ -60,11 +60,9 @@ jobs:
         run: ./gradlew assemble
 
       - name: Create the Keystore
-        env:
-          KEYSTORE_BASE64: $signing_key
         run: |
           # import keystore from secrets
-          echo $KEYSTORE_BASE64 | base64 -di > $RUNNER_TEMP/my_production.keystore
+          echo signing_key | base64 -di > $RUNNER_TEMP/my_production.keystore
 
       - name: Sign APK
         run: |
