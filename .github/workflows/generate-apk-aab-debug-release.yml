@@ -57,7 +57,7 @@ jobs:
 
       - name: Create the Keystore
         env:
-          KEYSTORE_BASE64: ${{ secrets.SIGNING_KEY }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
         run: |
           # import keystore from secrets
           echo $SIGNING_KEY | base64 -d > $RUNNER_TEMP/my_production.keystore
