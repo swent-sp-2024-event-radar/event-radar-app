@@ -93,7 +93,7 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
       }
 
       // Update the UI state to reflect the change
-      sampleEventList.value = sampleEventList.value.copy(viewList = !sampleEventList.value.viewList)
+      sampleEventList.value = sampleEventList.value.copy(viewList = false)
       step("Check if map is displayed") { map { assertIsDisplayed() } }
 
       step("Click on view toggle fab again") {
@@ -105,7 +105,7 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
       verify(exactly = 2) { mockHostedEventsViewModel.onViewListStatusChanged() }
 
       // Update the UI state to reflect the change
-      sampleEventList.value = sampleEventList.value.copy(viewList = !sampleEventList.value.viewList)
+      sampleEventList.value = sampleEventList.value.copy(viewList = true)
       step("Check if map is hidden") {
         map { assertDoesNotExist() }
         eventCard { assertIsDisplayed() }
