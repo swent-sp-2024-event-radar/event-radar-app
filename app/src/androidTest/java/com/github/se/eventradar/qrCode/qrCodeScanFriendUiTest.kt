@@ -7,15 +7,21 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
+import com.github.se.eventradar.model.repository.user.IUserRepository
+import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.screens.QrCodeScanFriendUiScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.qrCode.QrCodeScreen
+import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
+import com.github.se.eventradar.viewmodel.qrCode.QrCodeFriendViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen.Companion.onComposeScreen
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
+import io.mockk.mockk
+import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -41,10 +47,18 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
     // You can perform any additional logic here for testing
   }
 
+  private lateinit var viewModel: QrCodeFriendViewModel
+  private lateinit var userRepository: IUserRepository
+  private lateinit var qrCodeAnalyser: QrCodeAnalyser
+  private val myUID = "user1"
+
   @Before
   fun testSetup() {
     //        MockKAnnotations.init(this)
-    composeTestRule.setContent { QrCodeScreen(mockNavActions, dummyQrCodeScanned) }
+    userRepository = MockUserRepository()
+    qrCodeAnalyser = mockk<QrCodeAnalyser>(relaxed = true)
+    viewModel = QrCodeFriendViewModel(userRepository, qrCodeAnalyser, myUID)
+    composeTestRule.setContent { QrCodeScreen(viewModel, mockNavActions) }
     mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
   }
 
@@ -65,6 +79,15 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       qrScanner.assertIsDisplayed()
 
       bottomNavMenu.assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun testTabInteraction() = run {
+    onComposeScreen<QrCodeScanFriendUiScreen>(composeTestRule) {
+      scanQrTab.performClick()
+      // Assert that the ViewModel's active tab state has changed to ScanQR
+      assertEquals(QrCodeFriendViewModel.TAB.ScanQR, viewModel.tabState.value)
     }
   }
 }

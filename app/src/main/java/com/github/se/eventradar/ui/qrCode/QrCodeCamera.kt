@@ -77,12 +77,11 @@ class QrCodeCamera {
                         preview,
                         imageAnalysis)
               } catch (e: Exception) {
-                  Log.e("QrCodeCameraFail", "Use case binding failed", e)
+                Log.e("QrCodeCameraFail", "Use case binding failed", e)
               }
               previewView
             },
-            modifier = Modifier.weight(1.5f).aspectRatio(1f).padding(horizontal = 32.dp)
-            )
+            modifier = Modifier.weight(1.5f).aspectRatio(1f).padding(horizontal = 32.dp))
       }
     }
   }

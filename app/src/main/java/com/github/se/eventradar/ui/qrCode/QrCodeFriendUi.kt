@@ -36,19 +36,21 @@ import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.TopLevelDestination
-import com.github.se.eventradar.viewmodel.qrCode.NavigationEvent
 import com.github.se.eventradar.viewmodel.qrCode.QrCodeFriendViewModel
 
 @Composable
-fun QrCodeScreen(viewModel: QrCodeFriendViewModel = hiltViewModel(), navigationActions: NavigationActions) {
-  val navigateState by viewModel.navigationEvent.collectAsState()
+fun QrCodeScreen(
+    viewModel: QrCodeFriendViewModel = hiltViewModel(),
+    navigationActions: NavigationActions
+) {
+  val navigateState by viewModel.action.collectAsState()
   val activeTabState by viewModel.tabState.collectAsState()
 
   // React to changes in navigation state
   LaunchedEffect(navigateState) {
     when (navigateState) {
-      NavigationEvent.NavigateToNextScreen -> {
-//          navigationActions.navigate({Route.MESSAGE})
+      QrCodeFriendViewModel.Action.NavigateToNextScreen -> {
+        //          navigationActions.navigate({Route.MESSAGE})
         navigationActions.navigateTo(
             TopLevelDestination( // TODO
                 route = Route.MESSAGE,
@@ -62,25 +64,22 @@ fun QrCodeScreen(viewModel: QrCodeFriendViewModel = hiltViewModel(), navigationA
     }
   }
 
-//  var selectedTabIndex by remember { mutableIntStateOf(0) }
+  //  var selectedTabIndex by remember { mutableIntStateOf(0) }
   val context = LocalContext.current
 
   ConstraintLayout(
-      modifier = Modifier
-          .fillMaxSize()
-          .testTag("qrCodeScannerScreen"),
+      modifier = Modifier.fillMaxSize().testTag("qrCodeScannerScreen"),
   ) {
     val (logo, tabs, bottomNav) = createRefs()
     Row(
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .fillMaxWidth()
-            .constrainAs(logo) {
-                top.linkTo(parent.top, margin = 32.dp)
-                start.linkTo(parent.start, margin = 16.dp)
-            }
-            .testTag("logo"),
+            Modifier.fillMaxWidth()
+                .fillMaxWidth()
+                .constrainAs(logo) {
+                  top.linkTo(parent.top, margin = 32.dp)
+                  start.linkTo(parent.start, margin = 16.dp)
+                }
+                .testTag("logo"),
         verticalAlignment = Alignment.CenterVertically) {
           Image(
               painter = painterResource(id = R.drawable.event_logo),
@@ -88,22 +87,21 @@ fun QrCodeScreen(viewModel: QrCodeFriendViewModel = hiltViewModel(), navigationA
               modifier = Modifier.size(width = 186.dp, height = 50.dp))
         }
     TabRow(
-//        selectedTabIndex = selectedTabIndex,
-          selectedTabIndex = activeTabState,
+        //
+        selectedTabIndex = activeTabState.ordinal,
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp)
-            .constrainAs(tabs) {
-                top.linkTo(logo.bottom, margin = 16.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }
-            .testTag("tabs"),
+            Modifier.fillMaxWidth()
+                .padding(top = 8.dp)
+                .constrainAs(tabs) {
+                  top.linkTo(logo.bottom, margin = 16.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                }
+                .testTag("tabs"),
         contentColor = MaterialTheme.colorScheme.primary) {
           Tab(
-              selected = activeTabState == 0,
-              onClick = { viewModel.changeTabState(0)},
+              selected = activeTabState == QrCodeFriendViewModel.TAB.MyQR,
+              onClick = { viewModel.changeTabState(QrCodeFriendViewModel.TAB.MyQR) },
               modifier = Modifier.testTag("My QR Code"),
           ) {
             Text(
@@ -121,8 +119,10 @@ fun QrCodeScreen(viewModel: QrCodeFriendViewModel = hiltViewModel(), navigationA
                 modifier = Modifier.padding(bottom = 8.dp))
           }
           Tab(
-              selected = activeTabState == 1,
-              onClick = { viewModel.changeTabState(1) }, //selectedTabIndex = 1
+              selected = activeTabState == QrCodeFriendViewModel.TAB.ScanQR,
+              onClick = {
+                viewModel.changeTabState(QrCodeFriendViewModel.TAB.ScanQR)
+              }, // selectedTabIndex = 1
               modifier = Modifier.testTag("Scan QR Code")) {
                 Text(
                     text = "Scan QR Code",
@@ -140,22 +140,22 @@ fun QrCodeScreen(viewModel: QrCodeFriendViewModel = hiltViewModel(), navigationA
               }
         }
 
-    if (activeTabState == 0) {
+    if (activeTabState == QrCodeFriendViewModel.TAB.MyQR) {
       Toast.makeText(context, "My Qr Code not yet available", Toast.LENGTH_SHORT).show()
     } else {
-      Column(modifier = Modifier.testTag("QrScanner")) { QrCodeCamera().QrCodeScanner(analyser = viewModel.qrCodeAnalyser) }
+      Column(modifier = Modifier.testTag("QrScanner")) {
+        QrCodeCamera().QrCodeScanner(analyser = viewModel.qrCodeAnalyser)
+      }
     }
     BottomNavigationMenu(
         onTabSelected = { tab -> navigationActions.navigateTo(tab) },
         tabList = TOP_LEVEL_DESTINATIONS,
         selectedItem = TOP_LEVEL_DESTINATIONS[0],
         modifier =
-        Modifier
-            .testTag("bottomNavMenu")
-            .constrainAs(bottomNav) {
-                bottom.linkTo(parent.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
+            Modifier.testTag("bottomNavMenu").constrainAs(bottomNav) {
+              bottom.linkTo(parent.bottom)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
             })
   }
 }
