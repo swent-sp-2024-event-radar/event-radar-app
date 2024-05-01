@@ -122,7 +122,6 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
     state.value = state.value.copy(selectedImageUri = uri)
     val profilePictureFolder = "Profile_Pictures"
     uri?.let {
-      Log.d("LoginScreenViewModel", "Selected image URI: $it")
       runBlocking { uploadImageAsync(uri, Firebase.auth.currentUser!!.uid, profilePictureFolder) }
     }
   }
