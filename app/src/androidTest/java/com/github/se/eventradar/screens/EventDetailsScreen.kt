@@ -24,7 +24,7 @@ public class EventDetailsScreen(semanticsProvider: SemanticsNodeInteractionsProv
   val dateContent: KNode = onNode { hasTestTag("dateContent") }
   val categoryTitle: KNode = onNode { hasTestTag("categoryTitle") }
   val categoryContent: KNode = onNode { hasTestTag("categoryContent") }
-  val timeTitle: KNode = onNode { hasTestTag("timeTitle") }
-  val timeStartContent: KNode = onNode { hasTestTag("timeStartContent") }
-  val timeEndContent: KNode = onNode { hasTestTag("timeEndContent") }
+  val dateTimeTitle: KNode = onNode { hasTestTag("timeTitle") }
+  val dateTimeStartContent: KNode = onNode { hasTestTag("timeStartContent") }
+  val dateTimeEndContent: KNode = onNode { hasTestTag("timeEndContent") }
 }
