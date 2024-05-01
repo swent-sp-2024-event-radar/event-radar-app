@@ -117,8 +117,8 @@ class MockUserRepositoryUnitTest {
   @Test
   fun testUploadImage() = runTest {
     val mockURI = mock(Uri::class.java)
-      val result = userRepository.uploadImage(mockURI, "1", "Profile_Pictures")
-      assert(result is Resource.Success)
+    val result = userRepository.uploadImage(mockURI, "1", "Profile_Pictures")
+    assert(result is Resource.Success)
   }
 
   @Test

@@ -31,7 +31,8 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
       return false
     }
 
-    val profilePicUrl = runBlocking { getImageAsync(user.uid, true) }
+    val profilePicFolder = "Profile_Pictures"
+    val profilePicUrl = runBlocking { getImageAsync(user.uid, profilePicFolder) }
 
     val userValues =
         hashMapOf(
@@ -45,8 +46,8 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
             "qrCodeUrl" to "", // TODO: generate QR code here
             "username" to state.value.username,
             "accountStatus" to "active",
-            "eventsAttendeeList" to emptyList<String>(),
-            "eventsHostList" to emptyList<String>(),
+            "eventsAttendeeList" to mutableListOf<String>(),
+            "eventsHostList" to mutableListOf<String>(),
         )
 
     // Add a new document with a generated ID into collection "users"
@@ -71,10 +72,9 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
   private suspend fun uploadImageAsync(
       selectedImageUri: Uri,
       uid: String,
-      profilePicOrQRCode: Boolean
+      folderName: String
   ): Boolean {
-    return when (val result =
-        userRepository.uploadImage(selectedImageUri, uid, profilePicOrQRCode)) {
+    return when (val result = userRepository.uploadImage(selectedImageUri, uid, folderName)) {
       is Resource.Success -> {
         true
       }
@@ -85,9 +85,10 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
     }
   }
 
-  private suspend fun getImageAsync(uid: String, profilePicOrQRCode: Boolean): String {
-    return when (val result = userRepository.getImage(uid, profilePicOrQRCode)) {
+  private suspend fun getImageAsync(uid: String, folderName: String): String {
+    return when (val result = userRepository.getImage(uid, folderName)) {
       is Resource.Success -> {
+        Log.d("LoginScreenViewModel", "Image URL: ${result.data}")
         result.data
       }
       is Resource.Failure -> {
@@ -119,10 +120,10 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
 
   fun onSelectedImageUriChanged(uri: Uri?, state: MutableStateFlow<LoginUiState> = _uiState) {
     state.value = state.value.copy(selectedImageUri = uri)
-    val profilePicture = true
+    val profilePictureFolder = "Profile_Pictures"
     uri?.let {
       Log.d("LoginScreenViewModel", "Selected image URI: $it")
-      runBlocking { uploadImageAsync(uri, Firebase.auth.currentUser!!.uid, profilePicture) }
+      runBlocking { uploadImageAsync(uri, Firebase.auth.currentUser!!.uid, profilePictureFolder) }
     }
   }
 
