@@ -91,7 +91,7 @@ fun EventCategory(modifier: Modifier, eventUiState: EventUiState, style: EventCo
         color = style.subTitleColor,
         modifier = Modifier.testTag("categoryTitle"))
     Text(
-        text = eventUiState.category.toString(LocalContext.current),
+        text = eventUiState.category.convertToResString(LocalContext.current),
         style = style.contentStyle,
         color = style.contentColor,
         modifier = Modifier.testTag("categoryContent"))

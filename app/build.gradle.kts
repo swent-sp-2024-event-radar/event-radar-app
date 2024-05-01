@@ -64,6 +64,7 @@ android {
     }
 
     testOptions {
+      unitTests.isReturnDefaultValues = true
         packagingOptions {
             jniLibs {
                 useLegacyPackaging = true

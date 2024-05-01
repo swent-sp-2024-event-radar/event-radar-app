@@ -38,7 +38,7 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var mockViewModel: EventDetailsViewModel
 
-  private val sampleEventStates =
+  private val sampleEventDetailsUiState =
       MutableStateFlow(
           EventUiState(
               eventName = "Debugging",
@@ -57,7 +57,7 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
   @Before
   fun testSetup() {
 
-    every { mockViewModel.uiState } returns sampleEventStates
+    every { mockViewModel.uiState } returns sampleEventDetailsUiState
 
     composeTestRule.setContent { EventDetails(mockViewModel, navigationActions = mockNavActions) }
   }
