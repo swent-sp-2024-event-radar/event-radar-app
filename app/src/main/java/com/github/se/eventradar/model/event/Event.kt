@@ -49,9 +49,9 @@ data class Event(
     map["photo_url"] = eventPhoto
     map["start"] = start.toString()
     map["end"] = end.toString()
-    map["location_name"] = location.address
     map["location_lat"] = location.latitude
     map["location_lng"] = location.longitude
+    map["location_name"] = location.address
     map["description"] = description
     map["ticket_name"] = ticket.name
     map["ticket_price"] = ticket.price
