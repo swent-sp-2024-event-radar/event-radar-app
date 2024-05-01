@@ -44,11 +44,11 @@ class NavigationActions(val navController: NavController) {
 
 fun getTopLevelDestination(targetRoute: String): TopLevelDestination {
   val foundDestination = TOP_LEVEL_DESTINATIONS.find { it.route == targetRoute }
-  if (foundDestination != null) {
-    return foundDestination
+  return if (foundDestination != null) {
+    foundDestination
   } else {
     Log.d("Null Error", "Top level destination does not exist for R String Id: $targetRoute")
-    return TOP_LEVEL_DESTINATIONS[2]
+    TOP_LEVEL_DESTINATIONS[2]
   }
 }
 

@@ -64,7 +64,11 @@ import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.viewmodel.EventsOverviewUiState
 
 fun getIconFromViewListBool(viewList: Boolean): ImageVector {
-  if (viewList) return Icons.Default.Place else return Icons.AutoMirrored.Filled.List
+  return if (viewList) {
+    Icons.Default.Place
+  } else {
+    Icons.AutoMirrored.Filled.List
+  }
 }
 
 @Composable

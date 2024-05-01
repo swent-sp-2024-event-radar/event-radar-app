@@ -84,7 +84,7 @@ fun HostingScreen(
           })
     } else {
       EventMap(
-          uiState.eventList.allEvents,
+          uiState.eventList.filteredEvents,
           navigationActions,
           Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
             top.linkTo(divider.bottom, margin = 8.dp)
