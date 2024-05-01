@@ -31,75 +31,85 @@ constructor(
   val uiState: StateFlow<EventsOverviewUiState> = _uiState
 
   fun onSearchQueryChanged(query: String) {
-    _uiState.value = _uiState.value.copy(searchQuery = query)
-    filterEvents()
+      _uiState.value = _uiState.value.copy(searchQuery = query)
   }
     fun onSearchActiveChanged(isSearchActive: Boolean) {
         _uiState.value = _uiState.value.copy(isSearchActive = isSearchActive)
     }
 
-    fun onFilterDialogOpen(isFilterDialogOpen: Boolean) {
-        _uiState.value = _uiState.value.copy(isFilterDialogOpen = isFilterDialogOpen)
-    }
-
-    fun onFilterApply(isFilterActive: Boolean) {
-        _uiState.value = _uiState.value.copy(isFilterActive = isFilterActive)
-        filterEvents()
+    fun onFilterDialogOpen(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
+        state.value = state.value.copy(isFilterDialogOpen = !state.value.isFilterDialogOpen)
     }
 
     fun onRadiusQueryChanged(radius: String) {
         _uiState.value = _uiState.value.copy(radiusQuery = radius)
-        Log.d("UiState", "Updated UI state: ${_uiState.value.radiusQuery}")
+        Log.d("UiState", "Radius inside state value: ${_uiState.value.radiusQuery}")
     }
 
-  private fun filterEvents() {
+    fun onFreeSwitchChanged(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
+        state.value = state.value.copy(isFreeSwitchOn = !state.value.isFreeSwitchOn)
+    }
+
+    fun onFilterApply(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
+        state.value = state.value.copy(isFilterActive = true)
+        filterEvents()
+    }
+
+  fun filterEvents() {
       // Filter based on search query
-    val searchQuery = _uiState.value.searchQuery
+    val query = _uiState.value.searchQuery
       val filteredEventsSearch =
-        _uiState.value.eventList.filteredEvents.filter {
-          it.eventName.contains(searchQuery, ignoreCase = true)
+        _uiState.value.eventList.allEvents.filter {
+          it.eventName.contains(query, ignoreCase = true)
         }
-      _uiState.value =
-          _uiState.value.copy(
-              eventList = _uiState.value.eventList.copy(filteredEvents = filteredEventsSearch))
+      Log.d("HomeScreen", "filteredEventsSearch: $filteredEventsSearch")
 
       // Filter based on radius query
-        val radiusQuery = _uiState.value.radiusQuery.toDouble()
+        val radiusQuery = _uiState.value.radiusQuery
+
       // For now, use a fixed user location - but this should be updated to use the user's actual location
       val userLocation = Location(
           latitude = 38.92,
           longitude = 78.78,
           address = "Ecublens"
       )
-      val filteredEventsRadius = _uiState.value.eventList.filteredEvents.filter {event ->
-          val distance = calculateDistance(userLocation, event.location)
-          distance <= radiusQuery
-        }
-        _uiState.value =
-            _uiState.value.copy(
-                eventList = _uiState.value.eventList.copy(filteredEvents = filteredEventsRadius))
+      val filteredEventsRadius =
+          if (radiusQuery == "") {
+            _uiState.value.eventList.allEvents
+          } else {
+              _uiState.value.eventList.allEvents.filter { event ->
+                  val distance = calculateDistance(userLocation, event.location)
+                  distance <= radiusQuery.toDouble()
+              }
+          }
 
       // Filter based on free switch
       val isFreeSwitchOn = _uiState.value.isFreeSwitchOn
-        val filteredEventsFree = _uiState.value.eventList.filteredEvents.filter {
+        val filteredEventsFree = _uiState.value.eventList.allEvents.filter {
             if (isFreeSwitchOn) {
                 it.ticket.price == 0.0
             } else {
                 true
             }
         }
-        _uiState.value =
-            _uiState.value.copy(
-                eventList = _uiState.value.eventList.copy(filteredEvents = filteredEventsFree))
+        Log.d("HomeScreen", "filteredEventsFree: $filteredEventsFree")
 
       // Filter based on categories selected
       val categoriesCheckedList = _uiState.value.categoriesCheckedList
-      val filteredEventsCategory = _uiState.value.eventList.filteredEvents.filter { event ->
+      val filteredEventsCategory = _uiState.value.eventList.allEvents.filter { event ->
           categoriesCheckedList.any { it == event.category }
       }
-      _uiState.value = _uiState.value.copy(
-          eventList = _uiState.value.eventList.copy(filteredEvents = filteredEventsCategory)
-      )
+      Log.d("HomeScreen", "filteredEventsCategory: $filteredEventsCategory")
+
+      val filteredEvents = filteredEventsSearch
+          .intersect(filteredEventsRadius.toSet())
+          .intersect(filteredEventsFree.toSet())
+          .intersect(filteredEventsCategory.toSet())
+      Log.d("HomeScreen", "filteredEvents: $filteredEvents")
+
+      _uiState.value =
+          _uiState.value.copy(
+              eventList = _uiState.value.eventList.copy(filteredEvents = filteredEvents.toList()))
   }
 
     // Calculates distance between 2 coordinate points based on Haversine formula
@@ -182,7 +192,7 @@ data class EventsOverviewUiState(
     var isFilterActive: Boolean = false,
     var radiusQuery: String = "",
     var isFreeSwitchOn: Boolean = true,
-    var categoriesCheckedList: MutableSet<EventCategory> = mutableSetOf(),
+    var categoriesCheckedList: MutableSet<EventCategory> = mutableSetOf(*enumValues<EventCategory>()),
     var viewList: Boolean = true,
     var tab: Tab = Tab.BROWSE,
 )
