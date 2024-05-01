@@ -31,3 +31,4 @@ replay_pid*
 local.properties
 secrets.properties
 app/local.properties
+*.keystore
