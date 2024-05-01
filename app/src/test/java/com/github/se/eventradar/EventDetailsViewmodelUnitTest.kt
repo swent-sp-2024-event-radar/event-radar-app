@@ -65,10 +65,38 @@ class EventDetailsViewmodelUnitTest {
   }
 
   @Test
-  fun testGetEvent() = runTest {
+  fun testGetEventWithNoDataInDataBase() = runTest {
+    viewModel.getEventData()
+    assert(viewModel.uiState.value.eventName.isEmpty())
+    assert(viewModel.uiState.value.description.isEmpty())
+  }
+
+  @Test
+  fun testGetEventSuccess() = runTest {
     eventRepository.addEvent(mockEvent)
     viewModel.getEventData()
 
     assert(viewModel.uiState.value.eventName == mockEvent.eventName)
+    assert(viewModel.uiState.value.description == mockEvent.description)
+    assert(viewModel.uiState.value.mainOrganiser == mockEvent.mainOrganiser)
+    assert(viewModel.uiState.value.start == mockEvent.start)
+    assert(viewModel.uiState.value.end == mockEvent.end)
+    assert(viewModel.uiState.value.location == mockEvent.location)
+    assert(viewModel.uiState.value.ticket == mockEvent.ticket)
+    assert(viewModel.uiState.value.category == mockEvent.category)
   }
+
+  @Test
+  fun testGetEventWithUpdateAndFetchAgain() = runTest {
+    eventRepository.addEvent(mockEvent)
+    viewModel.getEventData()
+
+    assert(viewModel.uiState.value.eventName == mockEvent.eventName)
+
+    mockEvent.eventName = "New Name"
+    assert(viewModel.uiState.value.eventName != mockEvent.eventName)
+    viewModel.getEventData()
+    assert(viewModel.uiState.value.eventName == mockEvent.eventName)
+  }
+
 }
