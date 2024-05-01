@@ -97,18 +97,13 @@ constructor(
       }
     }
   }
-
-  private fun checkUserLoginStatus() {
-    viewModelScope.launch {
-      val userIdResource = userRepository.getCurrentUserId()
-      val isLoggedIn =
-          when (userIdResource) {
-            is Resource.Success -> true
-            else -> false
-          }
-      _uiState.update { currentState -> currentState.copy(userLoggedIn = isLoggedIn) }
+    fun checkUserLoginStatus() {
+        viewModelScope.launch {
+            val userIdResource = userRepository.getCurrentUserId()
+            val isLoggedIn = userIdResource is Resource.Success
+            _uiState.update { currentState -> currentState.copy(userLoggedIn = isLoggedIn) }
+        }
     }
-  }
 
   fun onTabChanged(tab: Tab, state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
     state.value = state.value.copy(tab = tab)
@@ -125,6 +120,7 @@ constructor(
   fun onSearchQueryChange(newQuery: String) {
     _uiState.update { currentState -> currentState.copy(searchQuery = newQuery) }
   }
+    /* TODO Christine
     fun setRadiusInputFilter(radius: Double) {
         _uiState.update { currentState ->
             currentState.copy(radiusInputFilter = radius)
@@ -135,6 +131,8 @@ constructor(
             currentState.copy(freeEventsFilter = isFree)
         }
     }
+
+     */
 }
 
 data class EventsOverviewUiState(
