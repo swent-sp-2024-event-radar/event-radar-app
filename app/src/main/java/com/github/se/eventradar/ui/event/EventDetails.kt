@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.Location
@@ -81,12 +82,10 @@ fun EventDetails(
             modifier = Modifier.testTag("bottomNavMenu"))
       },
       floatingActionButton = {
-        // ticket button
+        // register button
         FloatingActionButton(
             onClick = { /*TODO*/},
-            modifier = Modifier
-              .padding(bottom = 16.dp, end = 16.dp)
-              .testTag("ticketButton"),
+            modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("ticketButton"),
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
         ) {
           Icon(
@@ -97,9 +96,7 @@ fun EventDetails(
           )
         }
       }) { innerPadding ->
-        ConstraintLayout(modifier = Modifier
-          .fillMaxSize()
-          .padding(innerPadding)) {
+        ConstraintLayout(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
           val (image, backButton, title, description, distance, category, dateAndTime) =
               createRefs()
           val imagePainter: Painter = rememberImagePainter(eventUiState.eventPhoto)
@@ -107,37 +104,48 @@ fun EventDetails(
               painter = imagePainter,
               contentDescription = "Event banner image",
               modifier =
-              Modifier
-                .fillMaxWidth()
-                .height(imageHeight)
-                .constrainAs(image) {
-                  top.linkTo(parent.top, margin = 0.dp)
-                  start.linkTo(parent.start, margin = 0.dp)
-                }
-                .testTag("eventImage"),
+                  Modifier.fillMaxWidth()
+                      .height(imageHeight)
+                      .constrainAs(image) {
+                        top.linkTo(parent.top, margin = 0.dp)
+                        start.linkTo(parent.start, margin = 0.dp)
+                      }
+                      .testTag("eventImage"),
               contentScale = ContentScale.FillWidth)
 
           // Go back button
-          GoBackButton(modifier =
-          Modifier
-            .wrapContentSize()
-            .constrainAs(backButton) {
-              top.linkTo(image.bottom, margin = 8.dp)
-              start.linkTo(image.start, margin = 4.dp)
-            }) { navigationActions.goBack() }
-
+          Button(
+              onClick = { navigationActions.goBack() },
+              modifier =
+                  Modifier.wrapContentSize()
+                      .constrainAs(backButton) {
+                        top.linkTo(image.bottom, margin = 8.dp)
+                        start.linkTo(image.start, margin = 4.dp)
+                      }
+                      .testTag("goBackButton"),
+              colors =
+                  ButtonDefaults.buttonColors(
+                      contentColor = Color.Transparent,
+                      containerColor = Color.Transparent,
+                  ),
+          ) {
+            Icon(
+                painter = painterResource(id = R.drawable.back_arrow),
+                contentDescription = "Back navigation arrow",
+                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.width(24.dp).height(24.dp).align(Alignment.CenterVertically))
+          }
 
           Text(
               text = eventUiState.eventName,
               style = componentStyle.titleStyle,
               modifier =
-              Modifier
-                .constrainAs(title) {
-                  top.linkTo(image.bottom, margin = 32.dp)
-                  start.linkTo(image.start)
-                  end.linkTo(image.end)
-                }
-                .testTag("eventTitle"),
+                  Modifier.constrainAs(title) {
+                        top.linkTo(image.bottom, margin = 32.dp)
+                        start.linkTo(image.start)
+                        end.linkTo(image.end)
+                      }
+                      .testTag("eventTitle"),
               color = MaterialTheme.colorScheme.onSurface)
 
           EventDescription(
@@ -180,6 +188,7 @@ fun EventDetails(
         }
       }
 }
+
 
 @Composable
 fun GoBackButton(modifier: Modifier, goBack: ()->Unit){
@@ -264,7 +273,5 @@ fun BuyTicket(/*viewModel: EventDetailsViewModel = hiltViewModel(),*/ navigation
       }
     }
   }
-
-
 
 }

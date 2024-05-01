@@ -21,15 +21,15 @@ constructor(
     private val eventRepository: IEventRepository,
 ) : ViewModel() {
 
+  private val _uiState = MutableStateFlow(EventUiState())
+  val uiState: StateFlow<EventUiState> = _uiState
+
   // TODO would require assisted data injection to have this as a parameters
   private lateinit var eventId: String
 
   fun saveEventId(eventId: String) {
     this.eventId = eventId
   }
-
-  private val _uiState = MutableStateFlow(EventUiState())
-  val uiState: StateFlow<EventUiState> = _uiState
 
   fun getEventData() {
     viewModelScope.launch {

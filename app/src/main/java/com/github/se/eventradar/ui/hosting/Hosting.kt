@@ -81,7 +81,7 @@ fun HostingScreen(
             top.linkTo(divider.bottom, margin = 8.dp)
             start.linkTo(parent.start)
             end.linkTo(parent.end)
-          }){ eventId ->
+          }) { eventId ->
         navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
       }
     } else {
