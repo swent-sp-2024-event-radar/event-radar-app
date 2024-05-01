@@ -160,13 +160,8 @@ fun QrCodeScreen(
   }
 }
 
-// private val dummyQrCodeScanned: (String) -> Unit = { qrCode ->
-//  Log.d("QRCodeScanner", "QR Code Scanned: $qrCode")
-//  // You can perform any additional logic here for testing
-// }
-
 // @androidx.compose.ui.tooling.preview.Preview
 // @Composable
 // fun QrcodeScanTest() {
-//  QrCodeScreen(viewNavigationActions(rememberNavController()))
+//  QrCodeScreen(navigationActions = NavigationActions(),
 // }
