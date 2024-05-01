@@ -1,4 +1,4 @@
-package com.github.se.eventradar.home
+package com.github.se.eventradar.hosting
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -7,11 +7,11 @@ import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.event.EventTicket
-import com.github.se.eventradar.screens.HomeScreen
-import com.github.se.eventradar.ui.home.HomeScreen
+import com.github.se.eventradar.screens.HostingScreen
+import com.github.se.eventradar.ui.hosting.HostingScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
-import com.github.se.eventradar.viewmodel.EventsOverviewUiState
-import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
+import com.github.se.eventradar.viewmodel.HostedEventsUiState
+import com.github.se.eventradar.viewmodel.HostedEventsViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -29,21 +29,18 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
-
+class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
-
   // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
   @get:Rule val mockkRule = MockKRule(this)
-
   // Relaxed mocks methods have a default implementation returning values
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
-  @RelaxedMockK lateinit var mockEventsOverviewViewModel: EventsOverviewViewModel
+  @RelaxedMockK lateinit var mockHostedEventsViewModel: HostedEventsViewModel
 
   private val sampleEventList =
       MutableStateFlow(
-          EventsOverviewUiState(
+          HostedEventsUiState(
               eventList =
                   EventList(
                       List(20) {
@@ -64,30 +61,30 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
 
   @Before
   fun testSetup() {
-    every { mockEventsOverviewViewModel.getEvents() } returns Unit
-    every { mockEventsOverviewViewModel.uiState } returns sampleEventList
-    composeTestRule.setContent { HomeScreen(mockEventsOverviewViewModel, mockNavActions) }
+    every { mockHostedEventsViewModel.getHostedEvents(any()) } returns Unit
+    every { mockHostedEventsViewModel.uiState } returns sampleEventList
+    composeTestRule.setContent {
+      HostingScreen(viewModel = mockHostedEventsViewModel, navigationActions = mockNavActions)
+    }
   }
 
   @Test
   fun screenDisplaysAllElementsCorrectly() = run {
-    onComposeScreen<HomeScreen>(composeTestRule) {
+    onComposeScreen<HostingScreen>(composeTestRule) {
       logo { assertIsDisplayed() }
-      tabs { assertIsDisplayed() }
-      upcomingTab { assertIsDisplayed() }
-      browseTab { assertIsDisplayed() }
+      myHostedEventsTitle { assertIsDisplayed() }
       eventCard { assertIsDisplayed() }
       bottomNav { assertIsDisplayed() }
+      floatingActionButtons { assertIsDisplayed() }
+      createEventFab { assertIsDisplayed() }
       viewToggleFab { assertIsDisplayed() }
-      searchBarAndFilter { assertIsDisplayed() }
-      filterPopUp { assertIsDisplayed() }
       eventList { assertIsDisplayed() }
     }
   }
 
   @Test
   fun mapDisplaysOnceViewToggleFabIsClicked() = run {
-    onComposeScreen<HomeScreen>(composeTestRule) {
+    onComposeScreen<HostingScreen>(composeTestRule) {
       step("Click on view toggle fab") {
         viewToggleFab {
           assertIsDisplayed()
@@ -105,7 +102,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
           performClick()
         }
       }
-      verify(exactly = 2) { mockEventsOverviewViewModel.onViewListStatusChanged() }
+      verify(exactly = 2) { mockHostedEventsViewModel.onViewListStatusChanged() }
 
       // Update the UI state to reflect the change
       sampleEventList.value = sampleEventList.value.copy(viewList = true)
@@ -117,11 +114,11 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
   }
 
   @Test
-  fun getEventsIsCalledOnLaunch() = run {
-    onComposeScreen<HomeScreen>(composeTestRule) {
-      verify(exactly = 1) { mockEventsOverviewViewModel.getEvents() }
-      verify(exactly = 1) { mockEventsOverviewViewModel.uiState }
-      confirmVerified(mockEventsOverviewViewModel)
+  fun getHostedEventsIsCalledOnLaunch() = run {
+    onComposeScreen<HostingScreen>(composeTestRule) {
+      verify(exactly = 1) { mockHostedEventsViewModel.getHostedEvents(any()) }
+      verify(exactly = 1) { mockHostedEventsViewModel.uiState }
+      confirmVerified(mockHostedEventsViewModel)
     }
   }
 }
