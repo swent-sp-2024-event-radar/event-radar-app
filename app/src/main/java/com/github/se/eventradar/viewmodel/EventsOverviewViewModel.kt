@@ -97,13 +97,14 @@ constructor(
       }
     }
   }
-    fun checkUserLoginStatus() {
-        viewModelScope.launch {
-            val userIdResource = userRepository.getCurrentUserId()
-            val isLoggedIn = userIdResource is Resource.Success
-            _uiState.update { currentState -> currentState.copy(userLoggedIn = isLoggedIn) }
-        }
+
+  fun checkUserLoginStatus() {
+    viewModelScope.launch {
+      val userIdResource = userRepository.getCurrentUserId()
+      val isLoggedIn = userIdResource is Resource.Success
+      _uiState.update { currentState -> currentState.copy(userLoggedIn = isLoggedIn) }
     }
+  }
 
   fun onTabChanged(tab: Tab, state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
     state.value = state.value.copy(tab = tab)
@@ -120,19 +121,19 @@ constructor(
   fun onSearchQueryChange(newQuery: String) {
     _uiState.update { currentState -> currentState.copy(searchQuery = newQuery) }
   }
-    /* TODO Christine
-    fun setRadiusInputFilter(radius: Double) {
-        _uiState.update { currentState ->
-            currentState.copy(radiusInputFilter = radius)
-        }
-    }
-    fun setFreeEventsFilter(isFree: Boolean) {
-        _uiState.update { currentState ->
-            currentState.copy(freeEventsFilter = isFree)
-        }
-    }
+  /* TODO Christine
+  fun setRadiusInputFilter(radius: Double) {
+      _uiState.update { currentState ->
+          currentState.copy(radiusInputFilter = radius)
+      }
+  }
+  fun setFreeEventsFilter(isFree: Boolean) {
+      _uiState.update { currentState ->
+          currentState.copy(freeEventsFilter = isFree)
+      }
+  }
 
-     */
+   */
 }
 
 data class EventsOverviewUiState(
@@ -140,7 +141,7 @@ data class EventsOverviewUiState(
     val searchQuery: String = "",
     val isFilterDialogOpen: Boolean = false,
     // TODO: Christine, please update `radiusInputFilter` and `freeEventsFilter` to `val`.
-// Note: This implies changes in ReusableComponents.kt.
+    // Note: This implies changes in ReusableComponents.kt.
     var radiusInputFilter: Double = -1.0,
     var freeEventsFilter: Boolean = false,
     val categorySelectionFilter: List<EventCategory> = emptyList(),

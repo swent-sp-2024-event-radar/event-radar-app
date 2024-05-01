@@ -131,8 +131,8 @@ class EventsOverviewViewModelTest {
 
     userRepository.addUser(mockUser)
     // MockUser is on the attendeeList for events with id "1" and "2"
-      (userRepository as MockUserRepository).updateCurrentUserId("user1")
-      viewModel.getUpcomingEvents()
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    viewModel.getUpcomingEvents()
 
     assert(viewModel.uiState.value.eventList.allEvents.size == 2)
     assert(viewModel.uiState.value.eventList.allEvents == listOf(event1, event2))
@@ -148,8 +148,8 @@ class EventsOverviewViewModelTest {
     userRepository.addUser(mockUser.copy(userId = "user2"))
     // MockUser is on the attendeeList for events with id "1" and "2" but these are not in the
     // eventRepository
-      (userRepository as MockUserRepository).updateCurrentUserId("user2")
-      viewModel.getUpcomingEvents()
+    (userRepository as MockUserRepository).updateCurrentUserId("user2")
+    viewModel.getUpcomingEvents()
 
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
@@ -164,7 +164,7 @@ class EventsOverviewViewModelTest {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
     val userId = "userNotFound"
-      (userRepository as MockUserRepository).updateCurrentUserId(userId)
+    (userRepository as MockUserRepository).updateCurrentUserId(userId)
     viewModel.getUpcomingEvents()
 
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
@@ -179,7 +179,7 @@ class EventsOverviewViewModelTest {
     val userWithEmptyList =
         mockUser.copy(userId = "userWithEmptyList", eventsAttendeeSet = mutableSetOf())
     userRepository.addUser(userWithEmptyList)
-      (userRepository as MockUserRepository).updateCurrentUserId("userWithEmptyList")
+    (userRepository as MockUserRepository).updateCurrentUserId("userWithEmptyList")
     viewModel.getUpcomingEvents()
 
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
@@ -187,24 +187,21 @@ class EventsOverviewViewModelTest {
     assertNull(viewModel.uiState.value.eventList.selectedEvent)
   }
 
-    @Test
-    fun testGetUpcomingEventsUserNotLoggedIn() = runTest {
-        mockkStatic(Log::class)
-        every { Log.d(any(), any()) } returns 0
-        (userRepository as MockUserRepository).updateCurrentUserId(null) //no user logged in
+  @Test
+  fun testGetUpcomingEventsUserNotLoggedIn() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+    (userRepository as MockUserRepository).updateCurrentUserId(null) // no user logged in
 
-        viewModel.getUpcomingEvents()
+    viewModel.getUpcomingEvents()
 
-        assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
-        assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
-        assertNull(viewModel.uiState.value.eventList.selectedEvent)
-        verify {
-            Log.d(
-                "EventsOverviewViewModel",
-                "Error fetching user ID: No user currently signed in"
-            )
-        }
+    assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
+    assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
+    assertNull(viewModel.uiState.value.eventList.selectedEvent)
+    verify {
+      Log.d("EventsOverviewViewModel", "Error fetching user ID: No user currently signed in")
     }
+  }
 
   @Test
   fun testViewListChange() = runTest {
@@ -222,48 +219,47 @@ class EventsOverviewViewModelTest {
     assert(viewModel.uiState.value.tab == Tab.BROWSE)
   }
 
-    @Test
-    fun testSetFilterDialogOpen() = runTest {
-        viewModel.setFilterDialogOpen(true)
-        assert(viewModel.uiState.value.isFilterDialogOpen)
+  @Test
+  fun testSetFilterDialogOpen() = runTest {
+    viewModel.setFilterDialogOpen(true)
+    assert(viewModel.uiState.value.isFilterDialogOpen)
 
-        viewModel.setFilterDialogOpen(false)
-        assert(!viewModel.uiState.value.isFilterDialogOpen)
-    }
+    viewModel.setFilterDialogOpen(false)
+    assert(!viewModel.uiState.value.isFilterDialogOpen)
+  }
 
-    @Test
-    fun testOnSearchQueryChange() = runTest {
-        val newQuery = "sample search"
-        viewModel.onSearchQueryChange(newQuery)
-        assert(newQuery == viewModel.uiState.value.searchQuery)
+  @Test
+  fun testOnSearchQueryChange() = runTest {
+    val newQuery = "sample search"
+    viewModel.onSearchQueryChange(newQuery)
+    assert(newQuery == viewModel.uiState.value.searchQuery)
 
-        val anotherQuery = "another search"
-        viewModel.onSearchQueryChange(anotherQuery)
-        assert(anotherQuery == viewModel.uiState.value.searchQuery)
-    }
+    val anotherQuery = "another search"
+    viewModel.onSearchQueryChange(anotherQuery)
+    assert(anotherQuery == viewModel.uiState.value.searchQuery)
+  }
 
-    @Test
-    fun testUserLoggedIn() = runTest {
-        userRepository.addUser(mockUser)
-        (userRepository as MockUserRepository).updateCurrentUserId("user1")
-        viewModel.checkUserLoginStatus()
-        assert(viewModel.uiState.value.userLoggedIn)
-    }
-    @Test
-    fun testUserDefaultNotLoggedIn() = runTest {
-        viewModel.checkUserLoginStatus()
-        assert(!viewModel.uiState.value.userLoggedIn)
-    }
+  @Test
+  fun testUserLoggedIn() = runTest {
+    userRepository.addUser(mockUser)
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    viewModel.checkUserLoginStatus()
+    assert(viewModel.uiState.value.userLoggedIn)
+  }
 
-    @Test
-    fun testUserLoggedOut() = runTest {
-        userRepository.addUser(mockUser)
-        (userRepository as MockUserRepository).updateCurrentUserId("user1")
-        viewModel.checkUserLoginStatus()
-        (userRepository as MockUserRepository).updateCurrentUserId(null)
-        viewModel.checkUserLoginStatus()
-        assert(!viewModel.uiState.value.userLoggedIn)
-    }
+  @Test
+  fun testUserDefaultNotLoggedIn() = runTest {
+    viewModel.checkUserLoginStatus()
+    assert(!viewModel.uiState.value.userLoggedIn)
+  }
 
-
+  @Test
+  fun testUserLoggedOut() = runTest {
+    userRepository.addUser(mockUser)
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    viewModel.checkUserLoginStatus()
+    (userRepository as MockUserRepository).updateCurrentUserId(null)
+    viewModel.checkUserLoginStatus()
+    assert(!viewModel.uiState.value.userLoggedIn)
+  }
 }

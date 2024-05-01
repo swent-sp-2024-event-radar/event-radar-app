@@ -120,10 +120,9 @@ class MockUserRepositoryUnitTest {
 
   @Test
   fun testGetCurrentUserIdFailure() = runTest {
-    (userRepository as MockUserRepository).updateCurrentUserId(null)  // Ensure no user is set
+    (userRepository as MockUserRepository).updateCurrentUserId(null) // Ensure no user is set
     val result = userRepository.getCurrentUserId()
     assert(result is Resource.Failure)
     assert((result as Resource.Failure).throwable.message == "No user currently signed in")
   }
-
 }
