@@ -68,6 +68,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
+import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
@@ -471,6 +472,7 @@ fun EventCard(event: Event) {
 }
 
 @Preview(showBackground = true, showSystemUi = true)
+@ExcludeFromJacocoGeneratedReport
 @Composable
 fun HomeScreenPreview() {
   val mockEventRepo = MockEventRepository()
