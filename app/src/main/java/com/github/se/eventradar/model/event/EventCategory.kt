@@ -25,15 +25,3 @@ enum class EventCategory(val displayName: String) {
     }
   }
 }
-<<<<<<< HEAD
-=======
-
-fun getEventCategory(categoryString: String): EventCategory {
-  return try {
-    enumValueOf<EventCategory>(categoryString.uppercase())
-  } catch (e: IllegalArgumentException) {
-    Log.d("EventCategory", "Invalid category for $categoryString defaulting to SOCIAL")
-    EventCategory.SOCIAL // Default to SOCIAL if categoryString is not valid
-  }
-}
->>>>>>> main

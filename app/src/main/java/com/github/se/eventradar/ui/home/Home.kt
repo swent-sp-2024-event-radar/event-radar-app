@@ -240,7 +240,7 @@ fun HomeScreen(
           uiState = uiState,
           onRadiusQueryChanged = { viewModel.onRadiusQueryChanged(it) },
           modifier = Modifier
-              .height(320.dp)
+              .height(355.dp)
               .width(230.dp)
               .testTag("filterPopUp")
               .constrainAs(filterPopUp) {

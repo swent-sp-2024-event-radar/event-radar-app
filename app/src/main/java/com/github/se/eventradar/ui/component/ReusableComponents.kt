@@ -234,7 +234,7 @@ fun FilterPopUp(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 // Slider for free selection
                 Row(
@@ -251,8 +251,6 @@ fun FilterPopUp(
                         onCheckedChange = { onFreeSwitchChanged() },
                     )
                 }
-
-                Spacer(modifier = Modifier.height(4.dp))
 
                 // Buttons for category selection
                 Text(
