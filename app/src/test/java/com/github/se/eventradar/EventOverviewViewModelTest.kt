@@ -131,7 +131,8 @@ class EventsOverviewViewModelTest {
 
     userRepository.addUser(mockUser)
     // MockUser is on the attendeeList for events with id "1" and "2"
-    viewModel.getUpcomingEvents("user1")
+      (userRepository as MockUserRepository).updateCurrentUserId("user1")
+      viewModel.getUpcomingEvents()
 
     assert(viewModel.uiState.value.eventList.allEvents.size == 2)
     assert(viewModel.uiState.value.eventList.allEvents == listOf(event1, event2))
@@ -144,10 +145,11 @@ class EventsOverviewViewModelTest {
   fun testGetUpcomingEventsWithEventsNotInRepo() = runTest {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
-    (userRepository as MockUserRepository).addUser(mockUser.copy(userId = "user2"))
+    userRepository.addUser(mockUser.copy(userId = "user2"))
     // MockUser is on the attendeeList for events with id "1" and "2" but these are not in the
     // eventRepository
-    viewModel.getUpcomingEvents("user2")
+      (userRepository as MockUserRepository).updateCurrentUserId("user2")
+      viewModel.getUpcomingEvents()
 
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
@@ -162,8 +164,8 @@ class EventsOverviewViewModelTest {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
     val userId = "userNotFound"
-
-    viewModel.getUpcomingEvents(userId)
+      (userRepository as MockUserRepository).updateCurrentUserId(userId)
+    viewModel.getUpcomingEvents()
 
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
@@ -177,7 +179,8 @@ class EventsOverviewViewModelTest {
     val userWithEmptyList =
         mockUser.copy(userId = "userWithEmptyList", eventsAttendeeSet = mutableSetOf())
     userRepository.addUser(userWithEmptyList)
-    viewModel.getUpcomingEvents("userWithEmptyList")
+      (userRepository as MockUserRepository).updateCurrentUserId("userWithEmptyList")
+    viewModel.getUpcomingEvents()
 
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
@@ -187,9 +190,9 @@ class EventsOverviewViewModelTest {
   @Test
   fun testViewListChange() = runTest {
     viewModel.onViewListStatusChanged()
-    assert(viewModel.uiState.value.viewList.equals(false))
+    assert(!viewModel.uiState.value.viewList)
     viewModel.onViewListStatusChanged()
-    assert(viewModel.uiState.value.viewList.equals(true))
+    assert(viewModel.uiState.value.viewList)
   }
 
   @Test

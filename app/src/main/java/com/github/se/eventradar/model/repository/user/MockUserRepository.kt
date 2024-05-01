@@ -63,4 +63,8 @@ class MockUserRepository : IUserRepository {
       Resource.Failure(Exception("No user currently signed in"))
     }
   }
+  // Helper method to set the current user ID for testing
+  fun updateCurrentUserId(userId: String?) {
+    currentUserId = userId
+  }
 }

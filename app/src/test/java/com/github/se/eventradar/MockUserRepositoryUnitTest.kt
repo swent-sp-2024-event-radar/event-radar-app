@@ -98,15 +98,32 @@ class MockUserRepositoryUnitTest {
   }
 
   @Test
-  fun testIsUserLoggedIn() = runTest {
+  fun testDoesUserExist() = runTest {
     userRepository.addUser(mockUser)
     val result = userRepository.doesUserExist("1")
     assert(result is Resource.Success)
   }
 
   @Test
-  fun testIsUserLoggedInFalseCase() = runTest {
+  fun testDoesUserExistFalseCase() = runTest {
     val result = userRepository.doesUserExist("2")
     assert(result is Resource.Failure)
   }
+
+  @Test
+  fun testGetCurrentUserIdSuccess() = runTest {
+    (userRepository as MockUserRepository).updateCurrentUserId("1")
+    val result = userRepository.getCurrentUserId()
+    assert(result is Resource.Success)
+    assert((result as Resource.Success).data == "1")
+  }
+
+  @Test
+  fun testGetCurrentUserIdFailure() = runTest {
+    (userRepository as MockUserRepository).updateCurrentUserId(null)  // Ensure no user is set
+    val result = userRepository.getCurrentUserId()
+    assert(result is Resource.Failure)
+    assert((result as Resource.Failure).throwable.message == "No user currently signed in")
+  }
+
 }
