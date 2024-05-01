@@ -27,6 +27,11 @@ constructor(
     private val _uiState = MutableStateFlow(MyQrCodeUiState())
     val uiState: StateFlow<MyQrCodeUiState> = _uiState
     val qrCodesFolder = Folders.QR_Codes.folderName
+
+    init{
+        getQRCode()
+    }
+
     fun getQRCode(uid: String? = Firebase.auth.currentUser?.uid){
         if (uid == null) {
             Log.d("MyQrCodeViewModel", "User not logged in")
