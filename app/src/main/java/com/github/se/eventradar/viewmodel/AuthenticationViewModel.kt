@@ -31,24 +31,42 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
       return false
     }
 
-    // If no image is selected, use a placeholder image
-    val imageURI =
-        state.value.selectedImageUri
-            ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder")
+    val profilePicFolder = "Profile_Pictures"
+    var uploadedPictureSuccessfully: Boolean
+    var profilePicUrl = ""
+
+    // runBlocking { uploadImageAsync(state.value.selectedImageUri, user.uid, profilePicFolder) }
+    // runBlocking { profilePicUrl = getImageAsync(user.uid, profilePicFolder) }
+    /*
+    runBlocking {
+      uploadedPictureSuccessfully =
+          uploadImageAsync(state.value.selectedImageUri, user.uid, profilePicFolder)
+      if (uploadedPictureSuccessfully) {
+        profilePicUrl = getImageAsync(user.uid, profilePicFolder)
+      }
+    }
+
+
+    if (!uploadedPictureSuccessfully) {
+      return false
+    }
+
+       */
 
     val userValues =
         hashMapOf(
             "private/firstName" to state.value.firstName,
             "private/lastName" to state.value.lastName,
-            "private/phoneNumber" to state.value.phoneNumber,
+            "private/phoneNumber" to
+                state.value.selectedCountryCode.ext.plus(state.value.phoneNumber),
             "private/birthDate" to state.value.birthDate,
             "private/email" to user.email,
-            "profilePicUrl" to imageURI.toString(),
+            "profilePicUrl" to profilePicUrl,
             "qrCodeUrl" to "", // TODO: generate QR code here
             "username" to state.value.username,
             "accountStatus" to "active",
-            "eventsAttendeeList" to emptyList<String>(),
-            "eventsHostList" to emptyList<String>(),
+            "eventsAttendeeList" to mutableListOf<String>(),
+            "eventsHostList" to mutableListOf<String>(),
         )
 
     // Add a new document with a generated ID into collection "users"
@@ -66,6 +84,38 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
       is Resource.Failure -> {
         Log.d("LoginScreenViewModel", "Error adding user: ${result.throwable.message}")
         false
+      }
+    }
+  }
+
+  private suspend fun uploadImageAsync(
+      selectedImageUri: Uri?,
+      uid: String,
+      folderName: String
+  ): Boolean {
+    if (selectedImageUri == null) {
+      return false
+    }
+    return when (val result = userRepository.uploadImage(selectedImageUri, uid, folderName)) {
+      is Resource.Success -> {
+        true
+      }
+      is Resource.Failure -> {
+        Log.d("LoginScreenViewModel", "Error uploading image: ${result.throwable.message}")
+        false
+      }
+    }
+  }
+
+  private suspend fun getImageAsync(uid: String, folderName: String): String {
+    return when (val result = userRepository.getImage(uid, folderName)) {
+      is Resource.Success -> {
+        Log.d("LoginScreenViewModel", "Image URL: ${result.data}")
+        result.data
+      }
+      is Resource.Failure -> {
+        Log.d("LoginScreenViewModel", "Error getting image: ${result.throwable.message}")
+        ""
       }
     }
   }

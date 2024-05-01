@@ -1,5 +1,6 @@
 package com.github.se.eventradar.model.repository.user
 
+import android.net.Uri
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 
@@ -18,4 +19,8 @@ interface IUserRepository {
   suspend fun deleteUser(user: User): Resource<Unit>
 
   suspend fun doesUserExist(userId: String): Resource<Unit>
+
+  suspend fun uploadImage(selectedImageUri: Uri, uid: String, folderName: String): Resource<Unit>
+
+  suspend fun getImage(uid: String, folderName: String): Resource<String>
 }

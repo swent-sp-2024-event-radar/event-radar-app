@@ -1,5 +1,6 @@
 package com.github.se.eventradar.model.repository.user
 
+import android.net.Uri
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 
@@ -53,5 +54,25 @@ class MockUserRepository : IUserRepository {
     return if (mockUsers.none { userId == it.userId })
         Resource.Failure(Exception("User not logged in"))
     else Resource.Success(Unit)
+  }
+
+  override suspend fun uploadImage(
+      selectedImageUri: Uri,
+      uid: String,
+      folderName: String
+  ): Resource<Unit> {
+    return try {
+      Resource.Success(Unit)
+    } catch (e: Exception) {
+      Resource.Failure(e)
+    }
+  }
+
+  override suspend fun getImage(uid: String, folderName: String): Resource<String> {
+    return try {
+      Resource.Success("http://example.com/$folderName/pic.jpg")
+    } catch (e: Exception) {
+      Resource.Failure(e)
+    }
   }
 }
