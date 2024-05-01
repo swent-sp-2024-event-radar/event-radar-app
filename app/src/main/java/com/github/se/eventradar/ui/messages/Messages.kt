@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberImagePainter
+import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.message.Message
@@ -262,6 +263,7 @@ fun MessagePreviewItem(
 }
 
 @Preview(showSystemUi = true, showBackground = true)
+@ExcludeFromJacocoGeneratedReport
 @Composable
 fun PreviewMessagesScreen() {
   val messageList =
