@@ -4,9 +4,6 @@ env:
   # The name of the main module repository
   main_project_module: app
 
-  # The name of the Play Store
-  playstore_name: Frogobox ID
-
 on:
 
   push:
@@ -58,38 +55,32 @@ jobs:
       - name: Build apk release project (APK) - ${{ env.main_project_module }} module
         run: ./gradlew assemble
 
-      - name: Sign app APK
-        uses: r0adkll/sign-android-release@v1
-        # ID used to access action output
-        id: sign_app
-        with:
-          releaseDirectory: app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-          alias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
+      - name: Create the Keystore
         env:
-          # override default build-tools version (33.0.0) -- optional
-          BUILD_TOOLS_VERSION: "34.0.0"
+          KEYSTORE_BASE64: ${{ secrets.SIGNING_KEY }}
+        run: |
+          # import keystore from secrets
+          echo $SIGNING_KEY | base64 -d > $RUNNER_TEMP/my_production.keystore
 
-      # Example use of `signedReleaseFile` output -- not needed
-      - name: Upload signed app bundle
-      - uses: actions/upload-artifact@v2
-        with:
-          name: Signed app bundle
-          path: ${{sign_app.outputs.signedReleaseFile}}
+      - name: Sign APK
+        run: |
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore $RUNNER_TEMP/my_production.keystore -storepass ${{ secrets.KEYSTORE_PASSWORD }} ${{ env.main_project_module }}/build/outputs/apk/release/app-release-unsigned.apk ${{ secrets.ALIAS }}
+
+      - name: Verify and Zipalign APK
+        run: |
+          zipalign -v -p 4 ${{ env.main_project_module }}/build/outputs/apk/release/app-release-unsigned.apk ${{ env.main_project_module }}/build/outputs/apk/release/app-release.apk
 
       # Upload Artifact Build
       # Noted For Output [main_project_module]/build/outputs/apk/debug/
       - name: Upload APK Debug - ${{ env.repository_name }}
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) debug generated
+          name: ${{ env.date_today }} - ${{ env.repository_name }} - APK(s) debug generated
           path: ${{ env.main_project_module }}/build/outputs/apk/debug/
 
       # Noted For Output [main_project_module]/build/outputs/apk/release/
       - name: Upload APK Release - ${{ env.repository_name }}
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated
+          name: ${{ env.date_today }} - ${{ env.repository_name }} - APK(s) release generated
           path: ${{ env.main_project_module }}/build/outputs/apk/release/
