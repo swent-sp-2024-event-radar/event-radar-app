@@ -89,6 +89,15 @@ class HostedEventsViewModelTest {
   }
 
   @Test
+  fun testAddUserFalseCase() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+    viewModel.getHostedEvents(null)
+    verify { Log.d("HostedEventsViewModel", "User not logged in") }
+    unmockkAll()
+  }
+
+  @Test
   fun testGetHostedEventsEmpty() = runTest {
     userRepository.addUser(mockUser)
     viewModel.getHostedEvents(mockUser.userId)
@@ -113,8 +122,7 @@ class HostedEventsViewModelTest {
     viewModel.getHostedEvents(userWithHostedEvent.userId)
     assert(viewModel.uiState.value.eventList.allEvents.isNotEmpty())
     assert(viewModel.uiState.value.eventList.allEvents.size == 3)
-    assert(
-        viewModel.uiState.value.eventList.allEvents.containsAll(events)) // this is where it fails.
+    assert(viewModel.uiState.value.eventList.allEvents.containsAll(events))
     assert(viewModel.uiState.value.eventList.filteredEvents.size == 3)
     assert(viewModel.uiState.value.eventList.filteredEvents.containsAll(events))
     Assert.assertNull(viewModel.uiState.value.eventList.selectedEvent)
@@ -155,5 +163,13 @@ class HostedEventsViewModelTest {
     Assert.assertNull(viewModel.uiState.value.eventList.selectedEvent)
     verify { Log.d("HostedEventsViewModel", "Error fetching user document") }
     unmockkAll()
+  }
+
+  @Test
+  fun testViewListChange() = runTest {
+    viewModel.onViewListStatusChanged()
+    assert(viewModel.uiState.value.viewList.equals(false))
+    viewModel.onViewListStatusChanged()
+    assert(viewModel.uiState.value.viewList.equals(true))
   }
 }

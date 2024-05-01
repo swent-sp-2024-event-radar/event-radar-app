@@ -11,13 +11,16 @@ import androidx.navigation.navArgument
 import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.home.HomeScreen
+import com.github.se.eventradar.ui.hosting.HostingScreen
 import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.login.SignUpScreen
 import com.github.se.eventradar.util.toast
 
 @Composable
-fun NavGraph(navController: NavHostController) {
-  val navActions = NavigationActions(navController)
+fun NavGraph(
+    navController: NavHostController,
+    navActions: NavigationActions = NavigationActions(navController)
+) {
   val context = LocalContext.current
 
   NavHost(navController, startDestination = Route.LOGIN) {
@@ -48,9 +51,6 @@ fun NavGraph(navController: NavHostController) {
       HomeScreen(navigationActions = navActions)
       context.toast("Profile screen needs to be implemented")
     }
-    composable(Route.MY_HOSTING) {
-      HomeScreen(navigationActions = navActions)
-      context.toast("My hosted events screen needs to be implemented")
-    }
+    composable(Route.MY_HOSTING) { HostingScreen(navigationActions = navActions) }
   }
 }
