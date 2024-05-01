@@ -33,6 +33,7 @@ The structure of the user database is as follows:
           "accountStatus": "active",
           "eventsAttendeeList": ["event_id1", "event_id2"],
           "eventsHostList": ["event_id1", "event_id2"],
+          "friendsList": ["user_id1", "user_id2"],
           "profilePicUrl": "https://stackoverflow.com/questions/46585330/firestore-security-rules-for-public-and-private-fields",
           "qrCodeUrl": "https://stackoverflow.com/questions/46585330/firestore-security-rules-for-public-and-private-fields",
           "username": "chaha"
