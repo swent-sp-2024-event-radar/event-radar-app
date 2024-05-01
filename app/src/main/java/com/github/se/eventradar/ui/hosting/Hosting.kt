@@ -78,7 +78,7 @@ fun HostingScreen(
     if (uiState.viewList) {
       EventList(
           uiState.eventList.allEvents,
-          Modifier.fillMaxWidth().constrainAs(eventList) {
+          Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
             top.linkTo(divider.bottom, margin = 8.dp)
             start.linkTo(parent.start)
             end.linkTo(parent.end)

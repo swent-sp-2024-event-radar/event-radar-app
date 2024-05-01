@@ -78,6 +78,7 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
       floatingActionButtons { assertIsDisplayed() }
       createEventFab { assertIsDisplayed() }
       viewToggleFab { assertIsDisplayed() }
+      eventList { assertIsDisplayed() }
     }
   }
 

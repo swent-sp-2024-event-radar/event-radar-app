@@ -89,6 +89,15 @@ class HostedEventsViewModelTest {
   }
 
   @Test
+  fun testAddUserFalseCase() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+    viewModel.getHostedEvents(null)
+    verify { Log.d("HostedEventsViewModel", "User not logged in") }
+    unmockkAll()
+  }
+
+  @Test
   fun testGetHostedEventsEmpty() = runTest {
     userRepository.addUser(mockUser)
     viewModel.getHostedEvents(mockUser.userId)

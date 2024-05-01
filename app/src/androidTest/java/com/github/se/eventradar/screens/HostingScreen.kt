@@ -17,4 +17,5 @@ class HostingScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   val createEventFab: KNode = floatingActionButtons.child { hasTestTag("createEventFab") }
   val viewToggleFab: KNode = floatingActionButtons.child { hasTestTag("viewToggleFab") }
   val map: KNode = child { hasTestTag("map") }
+  val eventList: KNode = child { hasTestTag("eventList") }
 }

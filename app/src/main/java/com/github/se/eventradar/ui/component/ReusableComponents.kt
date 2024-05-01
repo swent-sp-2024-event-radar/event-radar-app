@@ -70,7 +70,7 @@ fun getIconFromViewListBool(viewList: Boolean): ImageVector {
 @Composable
 fun ViewToggleFab(modifier: Modifier = Modifier, onClick: () -> Unit, iconVector: ImageVector) {
   FloatingActionButton(onClick = { onClick() }, modifier = modifier) {
-    Icon(imageVector = iconVector, contentDescription = null)
+    Icon(imageVector = iconVector, contentDescription = "Icon")
   }
 }
 
