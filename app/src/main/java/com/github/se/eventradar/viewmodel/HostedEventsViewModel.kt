@@ -7,7 +7,8 @@ import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
-import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,36 +25,40 @@ constructor(
   private val _uiState = MutableStateFlow(HostedEventsUiState())
   val uiState: StateFlow<HostedEventsUiState> = _uiState
 
-  fun getHostedEvents(uid: String = FirebaseAuth.getInstance().currentUser!!.uid) {
-    viewModelScope.launch {
-      when (val userResponse = userRepository.getUser(uid)) {
-        is Resource.Success -> {
-          val user = userResponse.data!!
-          val eventsHostList = user.eventsHostList
-          if (eventsHostList.isNotEmpty()) {
-            when (val events = eventRepository.getEventsByIds(eventsHostList)) {
-              is Resource.Success -> {
-                _uiState.value =
-                    _uiState.value.copy(
-                        eventList =
-                            EventList(
-                                events.data, events.data, _uiState.value.eventList.selectedEvent))
+  fun getHostedEvents(uid: String? = Firebase.auth.currentUser?.uid) {
+    if (uid == null) {
+      Log.d("HostedEventsViewModel", "User not logged in")
+    } else {
+      viewModelScope.launch {
+        when (val userResponse = userRepository.getUser(uid)) {
+          is Resource.Success -> {
+            val user = userResponse.data!!
+            val eventsHostList = user.eventsHostList
+            if (eventsHostList.isNotEmpty()) {
+              when (val events = eventRepository.getEventsByIds(eventsHostList)) {
+                is Resource.Success -> {
+                  _uiState.value =
+                      _uiState.value.copy(
+                          eventList =
+                              EventList(
+                                  events.data, events.data, _uiState.value.eventList.selectedEvent))
+                }
+                is Resource.Failure -> {
+                  Log.d("HostedEventsViewModel", "Error getting hosted events for $uid")
+                  _uiState.value =
+                      _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+                }
               }
-              is Resource.Failure -> {
-                Log.d("HostedEventsViewModel", "Error getting hosted events for $uid")
-                _uiState.value =
-                    _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
-              }
+            } else {
+              _uiState.value =
+                  _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
             }
-          } else {
+          }
+          is Resource.Failure -> {
+            Log.d("HostedEventsViewModel", "Error fetching user document")
             _uiState.value =
                 _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
           }
-        }
-        is Resource.Failure -> {
-          Log.d("HostedEventsViewModel", "Error fetching user document")
-          _uiState.value =
-              _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
         }
       }
     }

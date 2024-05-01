@@ -147,7 +147,7 @@ fun HomeScreen(
         EventList(
             uiState.eventList.allEvents,
             Modifier.fillMaxWidth().constrainAs(eventList) {
-              top.linkTo(tabs.bottom, margin = 8.dp)
+              top.linkTo(searchAndFilter.bottom, margin = 8.dp)
               start.linkTo(parent.start)
               end.linkTo(parent.end)
             })
@@ -186,6 +186,14 @@ fun HomeScreen(
                     end.linkTo(parent.end)
                   })
     }
+    ViewToggleFab(
+        modifier =
+            Modifier.padding(16.dp).testTag("viewToggleFab").constrainAs(viewToggle) {
+              bottom.linkTo(bottomNav.top)
+              absoluteRight.linkTo(parent.absoluteRight)
+            },
+        onClick = { viewModel.onViewListStatusChanged(!uiState.viewList) },
+        iconVector = getIconFromViewListBool(uiState.viewList))
 
     BottomNavigationMenu(
         onTabSelected = { tab -> navigationActions.navigateTo(tab) },
@@ -197,14 +205,6 @@ fun HomeScreen(
               start.linkTo(parent.start)
               end.linkTo(parent.end)
             })
-    ViewToggleFab(
-        modifier =
-            Modifier.padding(16.dp).testTag("viewToggleFab").constrainAs(viewToggle) {
-              bottom.linkTo(bottomNav.top)
-              absoluteRight.linkTo(parent.absoluteRight)
-            },
-        onClick = { viewModel.onViewListStatusChanged(!uiState.viewList) },
-        iconVector = getIconFromViewListBool(uiState.viewList))
   }
 }
 

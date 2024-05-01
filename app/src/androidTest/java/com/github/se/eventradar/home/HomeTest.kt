@@ -55,7 +55,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
                             location = Location(0.0, 0.0, "Test Location"),
                             description = "Test Description",
                             ticket = EventTicket("Test Ticket", 0.0, 1),
-                            mainOrganiser = "1",
+                            mainOrganiser = "Test Contact Email",
                             organiserList = setOf("Test Organiser"),
                             attendeeList = setOf("Test Attendee"),
                             category = EventCategory.COMMUNITY,
@@ -65,9 +65,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
   @Before
   fun testSetup() {
     every { mockEventsOverviewViewModel.getEvents() } returns Unit
-
     every { mockEventsOverviewViewModel.uiState } returns sampleEventList
-
     composeTestRule.setContent { HomeScreen(mockEventsOverviewViewModel, mockNavActions) }
   }
 
@@ -95,7 +93,10 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
           performClick()
         }
       }
+      verify(exactly = 1) { mockEventsOverviewViewModel.onViewListStatusChanged(false) }
 
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(viewList = false)
       step("Check if map is displayed") { map { assertIsDisplayed() } }
 
       step("Click on view toggle fab again") {
@@ -104,7 +105,10 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
           performClick()
         }
       }
+      verify(exactly = 1) { mockEventsOverviewViewModel.onViewListStatusChanged(true) }
 
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(viewList = true)
       step("Check if map is hidden") {
         map { assertDoesNotExist() }
         eventCard { assertIsDisplayed() }

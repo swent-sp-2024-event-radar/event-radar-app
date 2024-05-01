@@ -15,7 +15,7 @@ import com.github.se.eventradar.viewmodel.HostedEventsViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
-import io.github.kakaocup.compose.node.element.ComposeScreen
+import io.github.kakaocup.compose.node.element.ComposeScreen.Companion.onComposeScreen
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
@@ -70,7 +70,7 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
 
   @Test
   fun screenDisplaysAllElementsCorrectly() = run {
-    ComposeScreen.onComposeScreen<HostingScreen>(composeTestRule) {
+    onComposeScreen<HostingScreen>(composeTestRule) {
       logo { assertIsDisplayed() }
       myHostedEventsTitle { assertIsDisplayed() }
       eventCard { assertIsDisplayed() }
@@ -83,14 +83,17 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
 
   @Test
   fun mapDisplaysOnceViewToggleFabIsClicked() = run {
-    ComposeScreen.onComposeScreen<HostingScreen>(composeTestRule) {
+    onComposeScreen<HostingScreen>(composeTestRule) {
       step("Click on view toggle fab") {
         viewToggleFab {
           assertIsDisplayed()
           performClick()
         }
       }
+      verify(exactly = 1) { mockHostedEventsViewModel.onViewListStatusChanged(false) }
 
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(viewList = false)
       step("Check if map is displayed") { map { assertIsDisplayed() } }
 
       step("Click on view toggle fab again") {
@@ -99,7 +102,10 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
           performClick()
         }
       }
+      verify(exactly = 1) { mockHostedEventsViewModel.onViewListStatusChanged(true) }
 
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(viewList = true)
       step("Check if map is hidden") {
         map { assertDoesNotExist() }
         eventCard { assertIsDisplayed() }
@@ -109,7 +115,7 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
 
   @Test
   fun getHostedEventsIsCalledOnLaunch() = run {
-    ComposeScreen.onComposeScreen<HostingScreen>(composeTestRule) {
+    onComposeScreen<HostingScreen>(composeTestRule) {
       verify(exactly = 1) { mockHostedEventsViewModel.getHostedEvents(any()) }
       verify(exactly = 1) { mockHostedEventsViewModel.uiState }
       confirmVerified(mockHostedEventsViewModel)
