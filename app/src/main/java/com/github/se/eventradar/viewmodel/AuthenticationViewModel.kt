@@ -35,9 +35,9 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
     var uploadedPictureSuccessfully: Boolean
     var profilePicUrl = ""
 
-      // runBlocking { uploadImageAsync(state.value.selectedImageUri, user.uid, profilePicFolder) }
-        // runBlocking { profilePicUrl = getImageAsync(user.uid, profilePicFolder) }
-      /*
+    // runBlocking { uploadImageAsync(state.value.selectedImageUri, user.uid, profilePicFolder) }
+    // runBlocking { profilePicUrl = getImageAsync(user.uid, profilePicFolder) }
+    /*
     runBlocking {
       uploadedPictureSuccessfully =
           uploadImageAsync(state.value.selectedImageUri, user.uid, profilePicFolder)
