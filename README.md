@@ -9,8 +9,8 @@ TODO: Add detailed app description and demo
 
 ## Architecture Diagram
 ![architecture diagram](images/architecture-diagram.png)
-[Image Link](https://excalidraw.com/#json=1c_DrTFZCSGprCvJNBYHn,B0sXrISCY8YdKgiTqy9xDA)
-_revised 9/4/2024_
+[Image Link](https://excalidraw.com/#json=n2223D8IlggcIHplABkOC,MMKRiq6O-Cz21lEovHRE3w)
+_revised 1/5/2024_
 
 ## Backend
 ### Users database
