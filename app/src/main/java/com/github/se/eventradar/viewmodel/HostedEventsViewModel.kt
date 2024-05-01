@@ -64,11 +64,8 @@ constructor(
     }
   }
 
-  fun onViewListStatusChanged(
-      viewList: Boolean,
-      state: MutableStateFlow<HostedEventsUiState> = _uiState
-  ) {
-    state.value = _uiState.value.copy(viewList = viewList)
+  fun onViewListStatusChanged(state: MutableStateFlow<HostedEventsUiState> = _uiState) {
+    state.value = state.value.copy(viewList = !state.value.viewList)
   }
 }
 

@@ -192,7 +192,7 @@ fun HomeScreen(
               bottom.linkTo(bottomNav.top)
               absoluteRight.linkTo(parent.absoluteRight)
             },
-        onClick = { viewModel.onViewListStatusChanged(!uiState.viewList) },
+        onClick = { viewModel.onViewListStatusChanged() },
         iconVector = getIconFromViewListBool(uiState.viewList))
 
     BottomNavigationMenu(

@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.*
@@ -77,7 +76,7 @@ fun HostingScreen(
         modifier = Modifier.constrainAs(divider, { top.linkTo(title.bottom, margin = 10.dp) }))
     if (uiState.viewList) {
       EventList(
-          uiState.eventList.allEvents,
+          uiState.eventList.filteredEvents,
           Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
             top.linkTo(divider.bottom, margin = 8.dp)
             start.linkTo(parent.start)
@@ -111,7 +110,7 @@ fun HostingScreen(
           Spacer(modifier = Modifier.width(16.dp))
           ViewToggleFab(
               modifier = Modifier.testTag("viewToggleFab"),
-              onClick = { viewModel.onViewListStatusChanged(!uiState.viewList) },
+              onClick = { viewModel.onViewListStatusChanged() },
               iconVector = getIconFromViewListBool(uiState.viewList))
         }
     BottomNavigationMenu(

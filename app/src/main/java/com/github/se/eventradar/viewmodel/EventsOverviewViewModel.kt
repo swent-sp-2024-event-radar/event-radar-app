@@ -79,11 +79,8 @@ constructor(
     state.value = state.value.copy(tab = tab)
   }
 
-  fun onViewListStatusChanged(
-      viewList: Boolean,
-      state: MutableStateFlow<EventsOverviewUiState> = _uiState
-  ) {
-    state.value = _uiState.value.copy(viewList = viewList)
+  fun onViewListStatusChanged(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
+    state.value = state.value.copy(viewList = !state.value.viewList)
   }
 }
 

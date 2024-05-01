@@ -186,9 +186,9 @@ class EventsOverviewViewModelTest {
 
   @Test
   fun testViewListChange() = runTest {
-    viewModel.onViewListStatusChanged(viewList = false)
+    viewModel.onViewListStatusChanged()
     assert(viewModel.uiState.value.viewList.equals(false))
-    viewModel.onViewListStatusChanged(viewList = true)
+    viewModel.onViewListStatusChanged()
     assert(viewModel.uiState.value.viewList.equals(true))
   }
 
