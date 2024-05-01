@@ -31,7 +31,7 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
       return false
     }
 
-    val profilePicFolder = "Profile_Pictures"
+    val profilePicFolder = Folders.PROFILE_PICTURES.folderName
     var uploadedPictureSuccessfully: Boolean
     var profilePicUrl = ""
 
