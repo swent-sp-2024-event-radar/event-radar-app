@@ -31,6 +31,10 @@ constructor(
     this.eventId = eventId
   }
 
+  fun getEventId(): String {
+    return this.eventId
+  }
+
   fun getEventData() {
     viewModelScope.launch {
       when (val response = eventRepository.getEvent(eventId)) {
@@ -53,6 +57,10 @@ constructor(
             Log.d("EventDetailsViewModel", "Error getting event: ${response.throwable.message}")
       }
     }
+  }
+
+  fun isTicketFree(): Boolean {
+    return uiState.value.ticket.price == 0.0
   }
 }
 
