@@ -32,7 +32,26 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
     }
 
     val profilePicFolder = "Profile_Pictures"
-    val profilePicUrl = runBlocking { getImageAsync(user.uid, profilePicFolder) }
+    var uploadedPictureSuccessfully: Boolean
+    var profilePicUrl = ""
+
+      // runBlocking { uploadImageAsync(state.value.selectedImageUri, user.uid, profilePicFolder) }
+        // runBlocking { profilePicUrl = getImageAsync(user.uid, profilePicFolder) }
+      /*
+    runBlocking {
+      uploadedPictureSuccessfully =
+          uploadImageAsync(state.value.selectedImageUri, user.uid, profilePicFolder)
+      if (uploadedPictureSuccessfully) {
+        profilePicUrl = getImageAsync(user.uid, profilePicFolder)
+      }
+    }
+
+
+    if (!uploadedPictureSuccessfully) {
+      return false
+    }
+
+       */
 
     val userValues =
         hashMapOf(
@@ -70,10 +89,13 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
   }
 
   private suspend fun uploadImageAsync(
-      selectedImageUri: Uri,
+      selectedImageUri: Uri?,
       uid: String,
       folderName: String
   ): Boolean {
+    if (selectedImageUri == null) {
+      return false
+    }
     return when (val result = userRepository.uploadImage(selectedImageUri, uid, folderName)) {
       is Resource.Success -> {
         true
@@ -120,10 +142,6 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
 
   fun onSelectedImageUriChanged(uri: Uri?, state: MutableStateFlow<LoginUiState> = _uiState) {
     state.value = state.value.copy(selectedImageUri = uri)
-    val profilePictureFolder = "Profile_Pictures"
-    uri?.let {
-      runBlocking { uploadImageAsync(uri, Firebase.auth.currentUser!!.uid, profilePictureFolder) }
-    }
   }
 
   fun onUsernameChanged(username: String, state: MutableStateFlow<LoginUiState> = _uiState) {
