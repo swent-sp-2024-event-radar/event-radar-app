@@ -55,6 +55,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
+import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.navigation.NavigationActions
@@ -322,6 +323,7 @@ fun PhoneNumberInput(
 }
 
 @Preview
+@ExcludeFromJacocoGeneratedReport
 @Composable
 fun PreviewSignUpScreen() {
   SignUpScreen(LoginViewModel(MockUserRepository()), NavigationActions(rememberNavController()))
