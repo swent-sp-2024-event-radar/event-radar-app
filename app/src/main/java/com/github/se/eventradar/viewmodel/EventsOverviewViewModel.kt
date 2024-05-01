@@ -153,8 +153,8 @@ constructor(
       when (val userResponse = userRepository.getUser(uid)) {
         is Resource.Success -> {
           val user = userResponse.data!!
-          val attendeeList = user.eventsAttendeeList
-          if (attendeeList.isNotEmpty()) { // will it ever be that
+          val attendeeList = user.eventsAttendeeSet.toList()
+          if (attendeeList.isNotEmpty()) {
             when (val events = eventRepository.getEventsByIds(attendeeList)) {
               is Resource.Success -> {
                 _uiState.value =
@@ -182,6 +182,14 @@ constructor(
       }
     }
   }
+
+  fun onTabChanged(tab: Tab, state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
+    state.value = state.value.copy(tab = tab)
+  }
+
+  fun onViewListStatusChanged(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
+    state.value = state.value.copy(viewList = !state.value.viewList)
+  }
 }
 
 data class EventsOverviewUiState(
@@ -199,5 +207,5 @@ data class EventsOverviewUiState(
 
 enum class Tab {
   BROWSE,
-  UPCOMING_EVENTS
+  UPCOMING
 }

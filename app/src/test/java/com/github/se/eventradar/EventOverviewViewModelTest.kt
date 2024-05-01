@@ -11,6 +11,7 @@ import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
+import com.github.se.eventradar.viewmodel.Tab
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
@@ -61,8 +62,8 @@ class EventsOverviewViewModelTest {
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1),
           mainOrganiser = "1",
-          organiserList = setOf("Test Organiser"),
-          attendeeList = setOf("Test Attendee"),
+          organiserSet = mutableSetOf("Test Organiser"),
+          attendeeSet = mutableSetOf("Test Attendee"),
           category = EventCategory.COMMUNITY,
           fireBaseID = "1")
 
@@ -75,8 +76,9 @@ class EventsOverviewViewModelTest {
           lastName = "Doe",
           phoneNumber = "1234567890",
           accountStatus = "active",
-          eventsAttendeeList = listOf("1", "2"),
-          eventsHostList = listOf("3"),
+          eventsAttendeeSet = mutableSetOf("1", "2"),
+          eventsHostSet = mutableSetOf("3"),
+          friendsSet = mutableSetOf(),
           profilePicUrl = "http://example.com/pic.jpg",
           qrCodeUrl = "http://example.com/qr.jpg",
           username = "john_doe")
@@ -173,12 +175,28 @@ class EventsOverviewViewModelTest {
   @Test
   fun testGetUpcomingEventsEmptyAttendeeList() = runTest {
     val userWithEmptyList =
-        mockUser.copy(userId = "userWithEmptyList", eventsAttendeeList = emptyList())
+        mockUser.copy(userId = "userWithEmptyList", eventsAttendeeSet = mutableSetOf())
     userRepository.addUser(userWithEmptyList)
     viewModel.getUpcomingEvents("userWithEmptyList")
 
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
     assertNull(viewModel.uiState.value.eventList.selectedEvent)
+  }
+
+  @Test
+  fun testViewListChange() = runTest {
+    viewModel.onViewListStatusChanged()
+    assert(viewModel.uiState.value.viewList.equals(false))
+    viewModel.onViewListStatusChanged()
+    assert(viewModel.uiState.value.viewList.equals(true))
+  }
+
+  @Test
+  fun testTabChange() = runTest {
+    viewModel.onTabChanged(tab = Tab.UPCOMING)
+    assert(viewModel.uiState.value.tab == Tab.UPCOMING)
+    viewModel.onTabChanged(tab = Tab.BROWSE)
+    assert(viewModel.uiState.value.tab == Tab.BROWSE)
   }
 }

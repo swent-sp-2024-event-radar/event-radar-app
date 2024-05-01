@@ -1,5 +1,6 @@
 package com.github.se.eventradar.model.event
 
+import com.github.se.eventradar.model.ConversionUtils.convertToMutableSetOfStrings
 import com.github.se.eventradar.model.Location
 import java.time.LocalDateTime
 
@@ -12,10 +13,10 @@ data class Event(
     var description: String,
     var ticket: EventTicket,
     var mainOrganiser: String,
-    var organiserList: Set<String>,
-    var attendeeList: Set<String>,
+    val organiserSet: MutableSet<String>,
+    val attendeeSet: MutableSet<String>,
     var category: EventCategory,
-    var fireBaseID: String
+    val fireBaseID: String
 ) {
   constructor(
       map: Map<String, Any>,
@@ -37,8 +38,8 @@ data class Event(
               price = (map["ticket_price"] as Long).toDouble(),
               capacity = (map["ticket_quantity"] as Long).toInt()),
       mainOrganiser = map["main_organiser"] as String,
-      organiserList = getSetOfStrings(map["organisers_list"]),
-      attendeeList = getSetOfStrings(map["attendees_list"]),
+      organiserSet = convertToMutableSetOfStrings(map["organisers_list"]),
+      attendeeSet = convertToMutableSetOfStrings(map["attendees_list"]),
       category = EventCategory.valueOf(map["category"] as String),
       fireBaseID = id)
 
@@ -48,25 +49,17 @@ data class Event(
     map["photo_url"] = eventPhoto
     map["start"] = start.toString()
     map["end"] = end.toString()
-    map["location_name"] = location.address
     map["location_lat"] = location.latitude
     map["location_lng"] = location.longitude
+    map["location_name"] = location.address
     map["description"] = description
     map["ticket_name"] = ticket.name
     map["ticket_price"] = ticket.price
     map["ticket_quantity"] = ticket.capacity
     map["main_organiser"] = mainOrganiser
-    map["organisers_list"] = organiserList.toList()
-    map["attendees_list"] = attendeeList.toList()
+    map["organisers_list"] = organiserSet.toList()
+    map["attendees_list"] = attendeeSet.toList()
     map["category"] = category.name
     return map
-  }
-}
-
-private fun getSetOfStrings(data: Any?): Set<String> {
-  return when (data) {
-    is List<*> -> data.filterIsInstance<String>().toSet()
-    is String -> setOf(data)
-    else -> emptySet()
   }
 }
