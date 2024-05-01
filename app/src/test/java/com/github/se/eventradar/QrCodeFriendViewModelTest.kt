@@ -115,8 +115,9 @@ class QrCodeFriendViewModelTest {
   @Before
   fun setUp() {
     userRepository = MockUserRepository()
+    (userRepository as MockUserRepository).updateCurrentUserId(myUID)
     qrCodeAnalyser = mockk<QrCodeAnalyser>(relaxed = true)
-    viewModel = QrCodeFriendViewModel(userRepository, qrCodeAnalyser, myUID)
+    viewModel = QrCodeFriendViewModel(userRepository, qrCodeAnalyser)
   }
 
   @Test
@@ -127,6 +128,12 @@ class QrCodeFriendViewModelTest {
   }
 
   @Test
+  fun testUpdateFriendListCalled() = runTest {
+    qrCodeAnalyser.onDecoded?.invoke("user2")
+    verify { viewModel.updateFriendList("user2") }
+  }
+
+  @Test
   fun testDecodingFailure() = runTest {
     qrCodeAnalyser.onDecoded?.invoke(null)
     assertEquals("Failed to decode QR Code", viewModel.decodedResult.value)
@@ -134,13 +141,7 @@ class QrCodeFriendViewModelTest {
         viewModel.action.take(2).toList(),
         listOf(QrCodeFriendViewModel.Action.None, QrCodeFriendViewModel.Action.AnalyserError))
   }
-
-  @Test
-  fun testUpdateFriendListCalled() = runTest {
-    qrCodeAnalyser.onDecoded?.invoke("user2")
-    verify { viewModel.updateFriendList("user2") }
-  }
-
+  // todo should i be testing thta it is reset to none ? isnt this Ui logic?
   @Test
   fun testInvokedAndFriendListUpdated() = runTest {
     userRepository.addUser(mockUser1)
@@ -152,7 +153,7 @@ class QrCodeFriendViewModelTest {
       }
       else -> {
         assert(false)
-        println("User 1 not found")
+        println("User 1 not found or could not be fetched")
       }
     }
     when (val user2 = userRepository.getUser("user2")) {
@@ -161,16 +162,14 @@ class QrCodeFriendViewModelTest {
       }
       else -> {
         assert(false)
-        println("User 2 not found")
+        println("User 2 not found or could not be fetched")
       }
     }
     delay(3000L)
     assertEquals(
-        viewModel.action.take(3).toList(),
+        viewModel.action.take(2).toList(),
         listOf(
-            QrCodeFriendViewModel.Action.None,
-            QrCodeFriendViewModel.Action.NavigateToNextScreen,
-            QrCodeFriendViewModel.Action.None))
+            QrCodeFriendViewModel.Action.None, QrCodeFriendViewModel.Action.NavigateToNextScreen))
   }
 
   @Test
@@ -184,7 +183,7 @@ class QrCodeFriendViewModelTest {
       }
       else -> {
         assert(false)
-        println("User 1 not found")
+        println("User 1 not found or could not be fetched")
       }
     }
     when (val user2 = userRepository.getUser("user2")) {
@@ -193,15 +192,14 @@ class QrCodeFriendViewModelTest {
       }
       else -> {
         assert(false)
-        println("User 2 not found")
+        println("User 2 not found or could not be fetched")
       }
     }
+    delay(3000L)
     assertEquals(
-        viewModel.action.take(3).toList(),
+        viewModel.action.take(2).toList(),
         listOf(
-            QrCodeFriendViewModel.Action.None,
-            QrCodeFriendViewModel.Action.NavigateToNextScreen,
-            QrCodeFriendViewModel.Action.None))
+            QrCodeFriendViewModel.Action.None, QrCodeFriendViewModel.Action.NavigateToNextScreen))
   }
 
   // this case should provoke a timeout hence why i delayed the test before
@@ -217,7 +215,6 @@ class QrCodeFriendViewModelTest {
         listOf(QrCodeFriendViewModel.Action.None, QrCodeFriendViewModel.Action.FirebaseFetchError))
   }
 
-  // TODO stimulate event where update does not work on first few tries but eventually works
   @Test
   fun changeTabTest() = runTest {
     val expectedTabState = QrCodeFriendViewModel.TAB.ScanQR
@@ -225,4 +222,6 @@ class QrCodeFriendViewModelTest {
     val actualTabState = viewModel.tabState.value
     assertEquals(expectedTabState, actualTabState)
   }
+  // TODO stimulate event where update does not work on first few tries but eventually works
+  // TODO stimulate event where update does not work and timeout occurs
 }

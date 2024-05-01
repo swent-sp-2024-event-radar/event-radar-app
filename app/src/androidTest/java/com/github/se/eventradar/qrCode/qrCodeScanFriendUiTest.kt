@@ -56,8 +56,9 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
   fun testSetup() {
     //        MockKAnnotations.init(this)
     userRepository = MockUserRepository()
+    (userRepository as MockUserRepository).updateCurrentUserId(myUID)
     qrCodeAnalyser = mockk<QrCodeAnalyser>(relaxed = true)
-    viewModel = QrCodeFriendViewModel(userRepository, qrCodeAnalyser, myUID)
+    viewModel = QrCodeFriendViewModel(userRepository, qrCodeAnalyser)
     composeTestRule.setContent { QrCodeScreen(viewModel, mockNavActions) }
     mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
   }

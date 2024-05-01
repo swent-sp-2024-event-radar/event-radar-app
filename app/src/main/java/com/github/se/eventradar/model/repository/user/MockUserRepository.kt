@@ -5,6 +5,7 @@ import com.github.se.eventradar.model.User
 
 class MockUserRepository : IUserRepository {
   private val mockUsers = mutableListOf<User>()
+  var currentUserId: String? = null // Simulate current user ID
 
   override suspend fun getUsers(): Resource<List<User>> {
     return Resource.Success(mockUsers)
@@ -53,5 +54,17 @@ class MockUserRepository : IUserRepository {
     return if (mockUsers.none { userId == it.userId })
         Resource.Failure(Exception("User not logged in"))
     else Resource.Success(Unit)
+  }
+
+  override suspend fun getCurrentUserId(): Resource<String> {
+    return if (currentUserId != null) {
+      Resource.Success(currentUserId!!)
+    } else {
+      Resource.Failure(Exception("No user currently signed in"))
+    }
+  }
+  // Helper method to set the current user ID for testing
+  fun updateCurrentUserId(userId: String?) {
+    currentUserId = userId
   }
 }

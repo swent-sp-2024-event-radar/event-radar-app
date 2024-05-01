@@ -1,4 +1,3 @@
 package com.github.se.eventradar.model.di
 
-class StringDatabaseModule {
-}
+class StringDatabaseModule {}

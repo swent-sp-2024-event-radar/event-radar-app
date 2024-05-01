@@ -29,7 +29,6 @@ class QrCodeFriendViewModel
 constructor(
     private val userRepository: IUserRepository, // Dependency injection
     val qrCodeAnalyser: QrCodeAnalyser, // Dependency injection
-    private val myUID: String
 ) : ViewModel() {
 
   enum class Action {
@@ -37,13 +36,16 @@ constructor(
     NavigateToNextScreen,
     FirebaseFetchError,
     FirebaseUpdateError,
-    AnalyserError
+    AnalyserError,
+    CantGetMyUID
   }
 
   enum class TAB {
     MyQR,
     ScanQR // TODO
   }
+
+  private var myUID = ""
 
   private val _decodedResult = MutableStateFlow<String?>(null)
   val decodedResult: StateFlow<String?> = _decodedResult.asStateFlow()
@@ -57,6 +59,16 @@ constructor(
   //  val myUID = FirebaseAuth.getInstance().currentUser!!.uid
 
   init {
+    viewModelScope.launch {
+      when (userRepository.getCurrentUserId()) {
+        is Resource.Success -> {
+          myUID = (userRepository.getCurrentUserId() as Resource.Success<String>).data
+        }
+        is Resource.Failure -> {
+          _action.value = Action.CantGetMyUID
+        }
+      }
+    }
     qrCodeAnalyser.onDecoded = { decodedString ->
       _decodedResult.value = decodedString ?: "Failed to decode QR Code"
     }
