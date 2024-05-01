@@ -142,14 +142,9 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
   override suspend fun uploadImage(
       selectedImageUri: Uri,
       uid: String,
-      profilePicOrQRCode: Boolean
+      folderName: String
   ): Resource<Unit> {
-    val storageRef =
-        if (profilePicOrQRCode) {
-          Firebase.storage.reference.child("Profile Pictures/$uid")
-        } else {
-          Firebase.storage.reference.child("QR Codes/$uid")
-        }
+    val storageRef = Firebase.storage.reference.child("$folderName/$uid")
     return try {
       storageRef.putFile(selectedImageUri).await()
       Resource.Success(Unit)
@@ -158,13 +153,8 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
     }
   }
 
-  override suspend fun getImage(uid: String, profilePicOrQRCode: Boolean): Resource<String> {
-    val storageRef =
-        if (profilePicOrQRCode) {
-          Firebase.storage.reference.child("Profile Pictures/$uid")
-        } else {
-          Firebase.storage.reference.child("QR Codes/$uid")
-        }
+  override suspend fun getImage(uid: String, folderName: String): Resource<String> {
+    val storageRef = Firebase.storage.reference.child("$folderName/$uid")
     return try {
       val url = storageRef.downloadUrl.await().toString()
       Resource.Success(url)

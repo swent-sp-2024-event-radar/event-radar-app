@@ -59,7 +59,7 @@ class MockUserRepository : IUserRepository {
   override suspend fun uploadImage(
       selectedImageUri: Uri,
       uid: String,
-      profilePicOrQRCode: Boolean
+      folderName: String
   ): Resource<Unit> {
     return try {
       Resource.Success(Unit)
@@ -68,9 +68,9 @@ class MockUserRepository : IUserRepository {
     }
   }
 
-  override suspend fun getImage(uid: String, profilePicOrQRCode: Boolean): Resource<String> {
+  override suspend fun getImage(uid: String, folderName: String): Resource<String> {
     return try {
-      Resource.Success("http://example.com/pic.jpg")
+      Resource.Success("http://example.com/$folderName/pic.jpg")
     } catch (e: Exception) {
       Resource.Failure(e)
     }

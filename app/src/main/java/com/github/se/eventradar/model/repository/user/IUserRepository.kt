@@ -20,11 +20,7 @@ interface IUserRepository {
 
   suspend fun doesUserExist(userId: String): Resource<Unit>
 
-  suspend fun uploadImage(
-      selectedImageUri: Uri,
-      uid: String,
-      profilePicOrQRCode: Boolean
-  ): Resource<Unit>
+  suspend fun uploadImage(selectedImageUri: Uri, uid: String, folderName: String): Resource<Unit>
 
-  suspend fun getImage(uid: String, profilePicOrQRCode: Boolean): Resource<String>
+  suspend fun getImage(uid: String, folderName: String): Resource<String>
 }

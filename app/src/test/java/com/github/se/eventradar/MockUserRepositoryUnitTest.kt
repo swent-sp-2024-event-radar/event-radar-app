@@ -27,8 +27,8 @@ class MockUserRepositoryUnitTest {
           eventsAttendeeSet = mutableSetOf("event1", "event2"),
           eventsHostSet = mutableSetOf("event3"),
           friendsSet = mutableSetOf(),
-          profilePicUrl = "http://example.com/pic.jpg",
-          qrCodeUrl = "http://example.com/qr.jpg",
+          profilePicUrl = "http://example.com/Profile_Pictures/pic.jpg",
+          qrCodeUrl = "http://example.com/QR_Codes/qr.jpg",
           username = "johndoe")
 
   @Before
@@ -117,19 +117,18 @@ class MockUserRepositoryUnitTest {
   @Test
   fun testUploadImage() = runTest {
     val mockURI = mock(Uri::class.java)
-      val result = userRepository.uploadImage(mockURI, "1", true)
+      val result = userRepository.uploadImage(mockURI, "1", "Profile_Pictures")
       assert(result is Resource.Success)
   }
 
   @Test
   fun testGetImage() = runTest {
     // Arrange
-    val expectedUrl = "http://example.com/pic.jpg"
+    val expectedUrl = "http://example.com/Profile_Pictures/pic.jpg"
     val userId = "1"
-    val isProfilePic = true
 
     // Act
-    val result = userRepository.getImage(userId, isProfilePic)
+    val result = userRepository.getImage(userId, "Profile_Pictures")
 
     // Assert
     assertTrue(result is Resource.Success)
