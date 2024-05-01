@@ -144,6 +144,10 @@ dependencies {
     androidTestImplementation("io.mockk:mockk:1.13.10")
     androidTestImplementation("io.mockk:mockk-android:1.13.10")
     androidTestImplementation("io.mockk:mockk-agent:1.13.10")
+    androidTestImplementation ("androidx.test:runner:1.5.2")
+    androidTestImplementation ("androidx.test:rules:1.5.0")
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation ("androidx.test.espresso:espresso-intents:3.5.1")
 
     //Robolectric
     testImplementation("org.robolectric:robolectric:4.11.1")
@@ -153,9 +157,23 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
 
-    //QR CODE
+    //QR CODE (Zxing)
     implementation ("com.google.zxing:core:3.4.1")
+
+    implementation ("androidx.activity:activity-compose:1.9.0")
+
+    // CameraX
+    implementation ("androidx.camera:camera-camera2:1.3.3")
+    implementation ("androidx.camera:camera-lifecycle:1.3.3")
+    implementation ("androidx.camera:camera-view:1.3.3")
+
+    // Android Test
+
+    androidTestImplementation ("androidx.test.uiautomator:uiautomator:2.2.0")
+
 }
+
+
 
 secrets {
     // Optionally specify a different file name containing your secrets.

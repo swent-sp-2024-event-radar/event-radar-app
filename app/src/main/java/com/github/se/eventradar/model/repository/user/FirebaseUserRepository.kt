@@ -3,6 +3,7 @@ package com.github.se.eventradar.model.repository.user
 import android.net.Uri
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -85,14 +86,13 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
   override suspend fun addUser(map: Map<String, Any?>, documentId: String): Resource<Unit> {
     val user = User(map, documentId)
     val maps: Pair<Map<String, Any?>, Map<String, Any?>> = getMaps(user)
-
     return try {
-      userRef.document(documentId).set(maps.first).await()
+      userRef.document(user.userId).update(maps.first).await()
       userRef
-          .document(documentId)
+          .document(user.userId)
           .collection("private")
           .document("private")
-          .set(maps.second)
+          .update(maps.second)
           .await()
       Resource.Success(Unit)
     } catch (e: Exception) {
@@ -160,6 +160,15 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
       Resource.Success(url)
     } catch (e: Exception) {
       Resource.Failure(e)
+    }
+  }
+
+  override suspend fun getCurrentUserId(): Resource<String> {
+    val userId = Firebase.auth.currentUser?.uid
+    return if (userId != null) {
+      Resource.Success(userId)
+    } else {
+      Resource.Failure(Exception("No user currently signed in"))
     }
   }
 }
