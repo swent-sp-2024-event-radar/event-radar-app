@@ -62,7 +62,7 @@ jobs:
       - name: Create the Keystore
         run: |
           # import keystore from secrets
-          echo signing_key | base64 -di > $RUNNER_TEMP/my_production.keystore
+          echo $signing_key | base64 -di > $RUNNER_TEMP/my_production.keystore
 
       - name: Sign APK
         run: |
