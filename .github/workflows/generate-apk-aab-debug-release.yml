@@ -3,7 +3,7 @@ name: Generated APK AAB (Upload - Create Artifact To Github Action)
 env:
   # The name of the main module repository
   main_project_module: app
-  key_store_password: ${{ secrets.KEYSTORE_PASSWORD }}
+  key_store_password: ${{ secrets.KEY_STORE_PASSWORD }}
   key_password: ${{ secrets.KEY_PASSWORD }}
   signing_key: ${{ secrets.SIGNING_KEY }}
   alias: ${{ secrets.ALIAS }}
