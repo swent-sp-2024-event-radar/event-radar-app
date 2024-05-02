@@ -3,11 +3,6 @@ name: Generated APK AAB (Upload - Create Artifact To Github Action)
 env:
   # The name of the main module repository
   main_project_module: app
-  key_store_password: ${{ secrets.KEY_STORE_PASSWORD }}
-  key_password: ${{ secrets.KEY_PASSWORD }}
-  signing_key: ${{ secrets.SIGNING_KEY }}
-  alias: ${{ secrets.ALIAS }}
-  signing_key_path: keystore.jks
 
 on:
 
@@ -60,9 +55,14 @@ jobs:
       - name: Create the Keystore
         run: |
           # import keystore from secrets
-          echo $signing_key | base64 -di > $signing_key_path
+          echo $signing_key | base64 -di > "${RUNNER_TEMP}"/keystore/keystore.jks
 
       - name: Build Release apk
+        env:
+          key_store_password: ${{ secrets.KEY_STORE_PASSWORD }}
+          key_password: ${{ secrets.KEY_PASSWORD }}
+          signing_key: ${{ secrets.SIGNING_KEY }}
+          alias: ${{ secrets.ALIAS }}
         run: ./gradlew assembleRelease
 
       # Upload Artifact Build
