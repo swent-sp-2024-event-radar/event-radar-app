@@ -130,7 +130,6 @@ constructor(
   }
 
   fun changeAction(action: Action) {
-    println("Changing action to $action")
     _action.value = action
   }
 }

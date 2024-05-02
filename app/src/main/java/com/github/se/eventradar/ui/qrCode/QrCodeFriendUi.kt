@@ -50,16 +50,9 @@ fun QrCodeScreen(
 
   // React to changes in navigation state
   LaunchedEffect(navigateState) {
-    println("launched")
     when (navigateState) {
       ScanFriendQrViewModel.Action.NavigateToNextScreen -> {
-        println("entered state")
-        navigationActions.navigateTo(
-            TopLevelDestination( // TODO
-                route = Route.MESSAGE,
-                icon = R.drawable.chat_bubble,
-                textId = R.string.message_chats,
-            )) // Adjust according to your actual navigation logic
+        navigationActions.navigateTo(TOP_LEVEL_DESTINATIONS[1]) //TODO change to private message screen with friend // Adjust according to your actual navigation logic
         viewModel.resetNavigationEvent() // Reset the navigation event in the ViewModel to prevent
       }
       else -> Unit // Do nothing if the state is None or any other non-navigational state
@@ -145,7 +138,7 @@ fun QrCodeScreen(
       Toast.makeText(context, "My Qr Code not yet available", Toast.LENGTH_SHORT).show()
     } else {
       Column(modifier = Modifier.testTag("QrScanner")) {
-        QrCodeCamera().QrCodeScanner(analyser = viewModel.qrCodeAnalyser)
+        QrCodeScanner(analyser = viewModel.qrCodeAnalyser)
       }
     }
     BottomNavigationMenu(

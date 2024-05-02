@@ -29,8 +29,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
 
-class QrCodeCamera {
-
   @Composable
   fun QrCodeScanner(analyser: QrCodeAnalyser) {
 
@@ -85,4 +83,4 @@ class QrCodeCamera {
       }
     }
   }
-}
+
