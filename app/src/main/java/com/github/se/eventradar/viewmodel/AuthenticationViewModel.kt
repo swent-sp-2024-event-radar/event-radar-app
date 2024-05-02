@@ -33,11 +33,12 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
 
     val profilePicFolder = "Profile_Pictures"
 
-    val imageUri = if (state.value.selectedImageUri == null) {
-        Uri.parse("android.resource://com.github.se.eventradar/drawable/place_holder.png")
-    } else {
-        state.value.selectedImageUri!!
-    }
+    val imageUri =
+        if (state.value.selectedImageUri == null) {
+          Uri.parse("android.resource://com.github.se.eventradar/drawable/place_holder.png")
+        } else {
+          state.value.selectedImageUri!!
+        }
 
     val profilePicUrl = runBlocking { uploadImageAsync(imageUri, user.uid, profilePicFolder) }
 
