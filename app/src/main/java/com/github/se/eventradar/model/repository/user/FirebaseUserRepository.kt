@@ -85,9 +85,9 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
     val user = User(map, documentId)
     val maps: Pair<Map<String, Any?>, Map<String, Any?>> = getMaps(user)
     return try {
-      userRef.document(user.userId).update(maps.first).await()
+      userRef.document(documentId).update(maps.first).await()
       userRef
-          .document(user.userId)
+          .document(documentId)
           .collection("private")
           .document("private")
           .update(maps.second)
@@ -137,15 +137,6 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
     }
   }
 
-  override suspend fun getCurrentUserId(): Resource<String> {
-    val userId = Firebase.auth.currentUser?.uid
-    return if (userId != null) {
-      Resource.Success(userId)
-    } else {
-      Resource.Failure(Exception("No user currently signed in"))
-    }
-  }
-}
 
 private fun getMaps(user: User): Pair<Map<String, Any?>, Map<String, Any?>> {
   val privateMap =
@@ -169,4 +160,13 @@ private fun getMaps(user: User): Pair<Map<String, Any?>, Map<String, Any?>> {
       )
 
   return Pair(publicMap, privateMap)
+}
+    override suspend fun getCurrentUserId(): Resource<String> {
+        val userId = Firebase.auth.currentUser?.uid
+        return if (userId != null) {
+            Resource.Success(userId)
+        } else {
+            Resource.Failure(Exception("No user currently signed in"))
+        }
+    }
 }

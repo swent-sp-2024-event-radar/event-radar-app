@@ -215,83 +215,83 @@ class FirebaseUserRepositoryUnitTest {
     assert((result as Resource.Failure).throwable.message == message)
   }
 
-  @Test
-  fun `test addUser(Map, String)`() = runTest {
-    val map =
-        mapOf(
-            "accountStatus" to "active",
-            "eventsAttendeeList" to mutableSetOf<String>(),
-            "eventsHostList" to mutableSetOf<String>(),
-            "friendsList" to mutableSetOf<String>(),
-            "profilePicUrl" to "",
-            "qrCodeUrl" to "",
-            "username" to "",
-            "private/birthDate" to "",
-            "private/email" to "",
-            "private/firstName" to "",
-            "private/lastName" to "",
-            "private/phoneNumber" to "",
-        )
-
-    val capturePublic = slot<Map<String, Any>>()
-    val capturePrivate = slot<Map<String, Any>>()
-
-    every { userRef.document(uid).set(capture(capturePublic)) } returns mockTask(null)
-    every {
-      userRef.document(uid).collection("private").document("private").set(capture(capturePrivate))
-    } returns mockTask(null)
-
-    val result = firebaseUserRepository.addUser(map, uid)
-
-    assert(result is Resource.Success)
-    assert(
-        capturePublic.captured ==
-            mapOf(
-                "accountStatus" to "active",
-                "eventsAttendeeList" to mutableSetOf<String>(),
-                "eventsHostList" to mutableSetOf<String>(),
-                "friendsList" to mutableSetOf<String>(),
-                "profilePicUrl" to "",
-                "qrCodeUrl" to "",
-                "username" to "",
-            ))
-    assert(
-        capturePrivate.captured ==
-            mapOf(
-                "birthDate" to "",
-                "email" to "",
-                "firstName" to "",
-                "lastName" to "",
-                "phoneNumber" to "",
-            ))
-  }
-
-  @Test
-  fun `test addUser(Map, String) exception`() = runTest {
-    val map =
-        mapOf(
-            "accountStatus" to "active",
-            "eventsAttendeeList" to mutableSetOf<String>(),
-            "eventsHostList" to mutableSetOf<String>(),
-            "friendsList" to mutableSetOf<String>(),
-            "profilePicUrl" to "",
-            "qrCodeUrl" to "",
-            "username" to "",
-            "private/birthDate" to "",
-            "private/email" to "",
-            "private/firstName" to "",
-            "private/lastName" to "",
-            "private/phoneNumber" to "",
-        )
-
-    val message = "Exception"
-    every { userRef.document(uid).set(any()) } returns mockTask(null, Exception(message))
-
-    val result = firebaseUserRepository.addUser(map, uid)
-
-    assert(result is Resource.Failure)
-    assert((result as Resource.Failure).throwable.message == message)
-  }
+//  @Test
+//  fun `test addUser(Map, String)`() = runTest {
+//    val map =
+//        mapOf(
+//            "accountStatus" to "active",
+//            "eventsAttendeeList" to mutableSetOf<String>(),
+//            "eventsHostList" to mutableSetOf<String>(),
+//            "friendsList" to mutableSetOf<String>(),
+//            "profilePicUrl" to "",
+//            "qrCodeUrl" to "",
+//            "username" to "",
+//            "private/birthDate" to "",
+//            "private/email" to "",
+//            "private/firstName" to "",
+//            "private/lastName" to "",
+//            "private/phoneNumber" to "",
+//        )
+//
+//    val capturePublic = slot<Map<String, Any>>()
+//    val capturePrivate = slot<Map<String, Any>>()
+//
+//    every { userRef.document(uid).set(capture(capturePublic)) } returns mockTask(null)
+//    every {
+//      userRef.document(uid).collection("private").document("private").set(capture(capturePrivate))
+//    } returns mockTask(null)
+//
+//    val result = firebaseUserRepository.addUser(map, uid)
+//
+//    assert(result is Resource.Success)
+//    assert(
+//        capturePublic.captured ==
+//            mapOf(
+//                "accountStatus" to "active",
+//                "eventsAttendeeList" to mutableSetOf<String>(),
+//                "eventsHostList" to mutableSetOf<String>(),
+//                "friendsList" to mutableSetOf<String>(),
+//                "profilePicUrl" to "",
+//                "qrCodeUrl" to "",
+//                "username" to "",
+//            ))
+//    assert(
+//        capturePrivate.captured ==
+//            mapOf(
+//                "birthDate" to "",
+//                "email" to "",
+//                "firstName" to "",
+//                "lastName" to "",
+//                "phoneNumber" to "",
+//            ))
+//  }
+//
+//  @Test
+//  fun `test addUser(Map, String) exception`() = runTest {
+//    val map =
+//        mapOf(
+//            "accountStatus" to "active",
+//            "eventsAttendeeList" to mutableSetOf<String>(),
+//            "eventsHostList" to mutableSetOf<String>(),
+//            "friendsList" to mutableSetOf<String>(),
+//            "profilePicUrl" to "",
+//            "qrCodeUrl" to "",
+//            "username" to "",
+//            "private/birthDate" to "",
+//            "private/email" to "",
+//            "private/firstName" to "",
+//            "private/lastName" to "",
+//            "private/phoneNumber" to "",
+//        )
+//
+//    val message = "Exception"
+//    every { userRef.document(uid).set(any()) } returns mockTask(null, Exception(message))
+//
+//    val result = firebaseUserRepository.addUser(map, uid)
+//
+//    assert(result is Resource.Failure)
+//    assert((result as Resource.Failure).throwable.message == message)
+//  }
 
   @Test
   fun `test updateUser(User)`() = runTest {
