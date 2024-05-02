@@ -14,67 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "1043895872028-6den44d6umgv4mufatgejviia7e8rfeh.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.github.se.eventradar",
-            "certificate_hash": "217e8ff02ac39469371144f63e1b8e7a9f2c038b"
-          }
-        },
-        {
-          "client_id": "1043895872028-918i6c09a6vhgdamlmm7aod340b1abuf.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.github.se.eventradar",
-            "certificate_hash": "3c2524e97d5ef63f5435accd55477401350acc12"
-          }
-        },
-        {
-          "client_id": "1043895872028-92rmdtbv0lgs1rqthq25mvsna1r471p9.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.github.se.eventradar",
-            "certificate_hash": "5442421412b48c2f417d209da737c6edcf1c2963"
-          }
-        },
-        {
           "client_id": "1043895872028-9ioo4qv653erkc4mjk2iamgnb05aoccm.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.github.se.eventradar",
             "certificate_hash": "2c45b8ed3561a0f5fc5965ca4ec994f84eb1fff2"
-          }
-        },
-        {
-          "client_id": "1043895872028-efhi2pie1m2pavsl7t0bepv32upj7n2d.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.github.se.eventradar",
-            "certificate_hash": "37d4e326fc7f5e97faf6c8b18a32ebbad71f5007"
-          }
-        },
-        {
-          "client_id": "1043895872028-ks7injh2uol90fdp8d23hqsolauqqsob.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.github.se.eventradar",
-            "certificate_hash": "19be1632615cb98a087b5219eba4bed886d02f68"
-          }
-        },
-        {
-          "client_id": "1043895872028-qtsl89l8bqrqsumkdjet3lcoo2fe1f3m.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.github.se.eventradar",
-            "certificate_hash": "291ef412fb7e43ab8a1a6d027e6f04b08f43438a"
-          }
-        },
-        {
-          "client_id": "1043895872028-trafp5iu953idaupo1vm1qdj8h84rpgg.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.github.se.eventradar",
-            "certificate_hash": "00592c43872087feac804073c21f41246c32cc81"
           }
         },
         {
