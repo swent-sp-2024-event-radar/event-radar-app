@@ -70,7 +70,7 @@ jobs:
           alias: $alias
           keyStorePassword: $key_store_password
           keyPassword: $key_password
-          zipAlign: true
+          zipAlign: false
 
       # Upload Artifact Build
       # Noted For Output [main_project_module]/build/outputs/apk/debug/
