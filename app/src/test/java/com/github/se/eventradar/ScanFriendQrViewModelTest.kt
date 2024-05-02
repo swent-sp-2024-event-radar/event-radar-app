@@ -123,7 +123,7 @@ class ScanFriendQrViewModelTest {
     val testDecodedString = "user2"
     println("onDecodedInvoked")
     qrCodeAnalyser.onDecoded?.invoke(testDecodedString)
-    assertEquals(testDecodedString, viewModel.decodedResult.value)
+    assertEquals(testDecodedString, viewModel.uiState.value.decodedResult)
   }
 
   @Test
@@ -131,8 +131,8 @@ class ScanFriendQrViewModelTest {
     userRepository.addUser(mockUser1)
     userRepository.addUser(mockUser2)
     qrCodeAnalyser.onDecoded?.invoke(null)
-    assertEquals("Failed to decode QR Code", viewModel.decodedResult.value)
-    assertEquals(ScanFriendQrViewModel.Action.AnalyserError, viewModel.action.value)
+    assertEquals("Failed to decode QR Code", viewModel.uiState.value.decodedResult)
+    assertEquals(ScanFriendQrViewModel.Action.AnalyserError, viewModel.uiState.value.action)
   }
   // todo should i be testing thta it is reset to none ? isnt this Ui logic?
   @Test
@@ -158,7 +158,7 @@ class ScanFriendQrViewModelTest {
         println("User 2 not found or could not be fetched")
       }
     }
-    assertEquals(ScanFriendQrViewModel.Action.NavigateToNextScreen, viewModel.action.value)
+    assertEquals(ScanFriendQrViewModel.Action.NavigateToNextScreen, viewModel.uiState.value.action)
   }
 
   @Test
@@ -184,6 +184,6 @@ class ScanFriendQrViewModelTest {
         println("User 2 not found or could not be fetched")
       }
     }
-    assertEquals(ScanFriendQrViewModel.Action.NavigateToNextScreen, viewModel.action.value)
+    assertEquals(ScanFriendQrViewModel.Action.NavigateToNextScreen, viewModel.uiState.value.action)
   }
 }

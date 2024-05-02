@@ -11,7 +11,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 // TODO ViewModel & UI can be improved on by having a state where the UI reflects a loading icon if
@@ -26,14 +25,8 @@ constructor(
     val qrCodeAnalyser: QrCodeAnalyser, // Dependency injection
 ) : ViewModel() {
 
-  private val _decodedResult = MutableStateFlow<String?>(null)
-  val decodedResult: StateFlow<String?> = _decodedResult.asStateFlow()
-
-  private val _action = MutableStateFlow(Action.None)
-  val action: StateFlow<Action> = _action.asStateFlow()
-
-  private val _tabState = MutableStateFlow(TAB.MyQR)
-  val tabState: StateFlow<TAB> = _tabState.asStateFlow()
+  private val _uiState = MutableStateFlow(QrCodeScanFriendState())
+  val uiState: StateFlow<QrCodeScanFriendState> = _uiState
 
   enum class Action {
     None,
@@ -44,7 +37,7 @@ constructor(
     CantGetMyUID
   }
 
-  enum class TAB {
+  enum class Tab {
     MyQR,
     ScanQR
   }
@@ -62,10 +55,12 @@ constructor(
         }
       }
     }
+
     qrCodeAnalyser.onDecoded = { decodedString ->
       Log.d("QrCodeFriendViewModel", "Decoded QR Code: $decodedString")
       val result = decodedString ?: "Failed to decode QR Code"
-      _decodedResult.value = result // Update state flow
+      _uiState.value = _uiState.value.copy(decodedResult = result) // Update state flow
+      //      _decodedResult.value = result // Update state flow
       if (result != "Failed to decode QR Code") {
         updateFriendList(result) // Directly call updateFriendList
       } else {
@@ -75,9 +70,8 @@ constructor(
   }
 
   private fun updateFriendList(decodedString: String) { // private
-    val uidex = "AwOXI3dCWjfYKk7bnBQ0S94WxbD2"
-
-    val friendID = decodedString.take(uidex.length)
+    val uiLength = 28
+    val friendID = decodedString.take(uiLength)
     Log.d("QrCodeFriendViewModel", "Friend ID: $friendID")
 
     viewModelScope.launch {
@@ -128,14 +122,20 @@ constructor(
   }
 
   fun resetNavigationEvent() {
-    _action.value = Action.None
+    _uiState.value = _uiState.value.copy(action = Action.None)
   }
 
-  fun changeTabState(tab: TAB) {
-    _tabState.value = tab
+  fun changeTabState(tab: Tab) {
+    _uiState.value = _uiState.value.copy(tabState = tab)
   }
 
   fun changeAction(action: Action) {
-    _action.value = action
+    _uiState.value = _uiState.value.copy(action = action)
   }
+
+  data class QrCodeScanFriendState(
+      val decodedResult: String = "",
+      val action: Action = Action.None,
+      val tabState: Tab = Tab.MyQR
+  )
 }

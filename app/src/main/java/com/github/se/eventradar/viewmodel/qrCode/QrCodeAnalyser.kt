@@ -43,8 +43,8 @@ class QrCodeAnalyser @Inject constructor() : ImageAnalysis.Analyzer {
                       mapOf(DecodeHintType.POSSIBLE_FORMATS to arrayListOf(BarcodeFormat.QR_CODE)))
                 }
                 .decode(binaryBitmap)
-          // Log the decoded string
-          Log.d("QrCodeAnalyser", "Decoded string: ${result.text}")
+        // Log the decoded string
+        Log.d("QrCodeAnalyser", "Decoded string: ${result.text}")
         // if onDecoded is null (has not been initialised b Viewmodel) will simply return Null
         onDecoded?.invoke(result.toString())
       } catch (e: Exception) {

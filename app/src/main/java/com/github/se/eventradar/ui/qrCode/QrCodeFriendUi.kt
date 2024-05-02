@@ -14,7 +14,6 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -43,12 +42,12 @@ fun QrCodeScreen(
     viewModel: ScanFriendQrViewModel = hiltViewModel(),
     navigationActions: NavigationActions
 ) {
-  val navigateState by viewModel.action.collectAsStateWithLifecycle()
-  val activeTabState by viewModel.tabState.collectAsStateWithLifecycle()
+
+  val qrScanUiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
   // React to changes in navigation state
-  LaunchedEffect(navigateState) {
-    when (navigateState) {
+  LaunchedEffect(qrScanUiState.action) {
+    when (qrScanUiState.action) {
       ScanFriendQrViewModel.Action.NavigateToNextScreen -> {
         navigationActions.navigateTo(
             TOP_LEVEL_DESTINATIONS[
@@ -82,7 +81,7 @@ fun QrCodeScreen(
         }
     TabRow(
         //
-        selectedTabIndex = activeTabState.ordinal,
+        selectedTabIndex = qrScanUiState.tabState.ordinal,
         modifier =
             Modifier.fillMaxWidth()
                 .padding(top = 8.dp)
@@ -94,8 +93,8 @@ fun QrCodeScreen(
                 .testTag("tabs"),
         contentColor = MaterialTheme.colorScheme.primary) {
           Tab(
-              selected = activeTabState == ScanFriendQrViewModel.TAB.MyQR,
-              onClick = { viewModel.changeTabState(ScanFriendQrViewModel.TAB.MyQR) },
+              selected = qrScanUiState.tabState == ScanFriendQrViewModel.Tab.MyQR,
+              onClick = { viewModel.changeTabState(ScanFriendQrViewModel.Tab.MyQR) },
               modifier = Modifier.testTag("My QR Code"),
           ) {
             Text(
@@ -113,9 +112,9 @@ fun QrCodeScreen(
                 modifier = Modifier.padding(bottom = 8.dp))
           }
           Tab(
-              selected = activeTabState == ScanFriendQrViewModel.TAB.ScanQR,
+              selected = qrScanUiState.tabState == ScanFriendQrViewModel.Tab.ScanQR,
               onClick = {
-                viewModel.changeTabState(ScanFriendQrViewModel.TAB.ScanQR)
+                viewModel.changeTabState(ScanFriendQrViewModel.Tab.ScanQR)
               }, // selectedTabIndex = 1
               modifier = Modifier.testTag("Scan QR Code")) {
                 Text(
@@ -134,7 +133,7 @@ fun QrCodeScreen(
               }
         }
 
-    if (activeTabState == ScanFriendQrViewModel.TAB.MyQR) {
+    if (qrScanUiState.tabState == ScanFriendQrViewModel.Tab.MyQR) {
       Toast.makeText(context, "My Qr Code not yet available", Toast.LENGTH_SHORT).show()
     } else {
       Column(modifier = Modifier.testTag("QrScanner")) {
@@ -153,9 +152,3 @@ fun QrCodeScreen(
             })
   }
 }
-
-// @androidx.compose.ui.tooling.preview.Preview
-// @Composable
-// fun QrcodeScanTest() {
-//  QrCodeScreen(navigationActions = NavigationActions(),
-// }

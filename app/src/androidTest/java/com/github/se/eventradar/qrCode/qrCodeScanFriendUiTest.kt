@@ -1,7 +1,6 @@
 package com.github.se.eventradar.qrCode
 
 import android.Manifest
-import android.util.Log
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -50,10 +49,6 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
 
   private lateinit var mDevice: UiDevice
 
-  private val dummyQrCodeScanned: (String) -> Unit = { qrCode ->
-    Log.d("QRCodeScanner", "QR Code Scanned: $qrCode")
-    // You can perform any additional logic here for testing
-  }
   private lateinit var viewModel: ScanFriendQrViewModel
   private lateinit var userRepository: IUserRepository
   private lateinit var qrCodeAnalyser: QrCodeAnalyser
@@ -75,18 +70,11 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
   fun displaysAllComponentsCorrectly_CameraPermittedAlways(): Unit = run {
     onComposeScreen<QrCodeScanFriendUiScreen>(composeTestRule) {
       scanQrTab.performClick()
-      //      allowPermissionsWhileUsingApp()
-
       logo.assertIsDisplayed()
-
       tabs.assertIsDisplayed()
-
       myQrTab.assertIsDisplayed()
-
       scanQrTab.assertIsDisplayed()
-
       qrScanner.assertIsDisplayed()
-
       bottomNavMenu.assertIsDisplayed()
     }
   }
@@ -96,7 +84,7 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
     onComposeScreen<QrCodeScanFriendUiScreen>(composeTestRule) {
       scanQrTab.performClick()
       // Assert that the ViewModel's active tab state has changed to ScanQR
-      assertEquals(ScanFriendQrViewModel.TAB.ScanQR, viewModel.tabState.value)
+      assertEquals(ScanFriendQrViewModel.Tab.ScanQR, viewModel.uiState.value.tabState)
     }
   }
 
@@ -109,112 +97,3 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
     }
   }
 }
-
-//  @Test
-//  fun displaysAllComponentsCorrectly_CameraPermittedOnce(): Unit = run {
-//    onComposeScreen<QrCodeScanFriendUiScreen>(composeTestRule) {
-//      scanQrTab.performClick()
-////      allowPermissionsOnce()
-//
-//      logo.assertIsDisplayed()
-//
-//      tabs.assertIsDisplayed()
-//
-//      myQrTab.assertIsDisplayed()
-//
-//      scanQrTab.assertIsDisplayed()
-//
-//      qrScanner.assertIsDisplayed()
-//
-//      bottomNavMenu.assertIsDisplayed()
-//    }
-//  }
-
-//  @Test
-//  fun displaysAllComponentsCorrectly_CameraDenied(): Unit = run {
-//    onComposeScreen<QrCodeScanFriendUiScreen>(composeTestRule) {
-//      scanQrTab.performClick()
-//      denyPermissions()
-//
-//      logo.assertIsDisplayed()
-//
-//      tabs.assertIsDisplayed()
-//
-//      myQrTab.assertIsDisplayed()
-//
-//      scanQrTab.assertIsDisplayed()
-//
-//      bottomNavMenu.assertIsDisplayed()
-//    }
-//  }
-//
-//  private fun allowPermissionsWhileUsingApp() {
-//    if (Build.VERSION.SDK_INT >= 23) {
-//      val allowPermissions: UiObject = mDevice.findObject(UiSelector().text("While using the
-// app"))
-//      if (allowPermissions.exists()) {
-//        try {
-//          allowPermissions.click()
-//        } catch (e: UiObjectNotFoundException) {
-//          println("There is no permissions dialog to interact with ")
-//          throw e
-//        }
-//      }
-//    }
-//  }
-//
-//  private fun allowPermissionsOnce() {
-//    if (Build.VERSION.SDK_INT >= 23) {
-//      val allowPermissions: UiObject = mDevice.findObject(UiSelector().text("Only this time"))
-//      if (allowPermissions.exists()) {
-//        try {
-//          allowPermissions.click()
-//        } catch (e: UiObjectNotFoundException) {
-//          println("There is no permissions dialog to interact with ")
-//          throw e
-//        }
-//      }
-//    }
-//  }
-//
-//  private fun denyPermissions() {
-//    if (Build.VERSION.SDK_INT >= 23) {
-//      val allowPermissions: UiObject = mDevice.findObject(UiSelector().text("Don't Allow"))
-//      if (allowPermissions.exists()) {
-//        try {
-//          allowPermissions.click()
-//        } catch (e: UiObjectNotFoundException) {
-//          println("There is no permissions dialog to interact with ")
-//          throw e
-//        }
-//      }
-//    }
-//  }
-// }
-
-//                logo { assertIsDisplayed() }
-//                tabs { assertIsDisplayed() }
-//                myQrTab { assertIsDisplayed() }
-//                scanQrTab { assertIsDisplayed() }
-//                qrScanner { assertIsDisplayed() }
-//                bottomNavMenu { assertIsDisplayed() }
-//            }
-//        }
-// }
-
-// @Test
-// fun qrCodeScanFriendUi_displaysAllComponentsCorrectly() {
-//    composeTestRule.setContent {
-//        QrCodeScreen(mockNavActions) // Assuming a fake implementation for NavigationActions
-//    }
-//
-//    QrCodeScanFriendUiScreen(composeTestRule).apply {
-//        logo.assertIsDisplayed()
-//        tabs.assertIsDisplayed()
-//        myQrTab.assertIsDisplayed()
-//        scanQrTab.assertIsDisplayed()
-//        qrScanner.assertIsDisplayed()
-//        bottomNavMenu.assertIsDisplayed()
-//    }
-// }
-// }
