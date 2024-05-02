@@ -75,15 +75,23 @@ class JoinEventUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   }
 
   @Test
-  fun screenDisplaysContentElementsCorrectly() = run {
+  fun screenDisplaysContentElements() = run {
     ComposeScreen.onComposeScreen<JoinEventScreen>(composeTestRule) {
       eventTitle {
         assertIsDisplayed()
         assertTextContains("Debugging")
       }
       ticketsTitle { assertIsDisplayed() }
-      ticketCard { assertIsDisplayed() }
-      /*ticketName{
+      ticketCard {
+        assertIsDisplayed()
+      }
+      /* Can't retrieve node at index '0' of '(hasParentThat(TestTag = 'ticketCard'))
+       * && (TestTag = 'ticketInfo')'
+       * There are no existing nodes for that selector.
+      ticketInfo{
+        assertIsDisplayed()
+      }
+      ticketName{
         assertIsDisplayed()
         assertTextContains(sampleEventDetailsUiState.value.ticket.name)
       }

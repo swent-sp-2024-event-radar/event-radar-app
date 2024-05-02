@@ -1,5 +1,6 @@
 package com.github.se.eventradar
 
+import android.util.Log
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
@@ -7,6 +8,9 @@ import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.event.MockEventRepository
+import io.mockk.every
+import io.mockk.mockkStatic
+import io.mockk.unmockkAll
 import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -66,11 +70,16 @@ class EventDetailsViewmodelUnitTest {
 
   @Test
   fun testGetEventWithNoDataInDataBase() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
     viewModel.getEventData()
     assert(viewModel.uiState.value.eventName.isEmpty())
     assert(viewModel.uiState.value.description.isEmpty())
     assert(viewModel.uiState.value.eventPhoto.isEmpty())
     assert(viewModel.uiState.value.mainOrganiser.isEmpty())
+
+    unmockkAll()
   }
 
   @Test
@@ -92,12 +101,31 @@ class EventDetailsViewmodelUnitTest {
   fun testGetEventWithUpdateAndFetchAgain() = runTest {
     eventRepository.addEvent(mockEvent)
     viewModel.getEventData()
-
     assert(viewModel.uiState.value.eventName == mockEvent.eventName)
 
     mockEvent.eventName = "New Name"
     assert(viewModel.uiState.value.eventName != mockEvent.eventName)
+
     viewModel.getEventData()
     assert(viewModel.uiState.value.eventName == mockEvent.eventName)
   }
+
+  @Test
+  fun testTicketIsFree() = runTest {
+    eventRepository.addEvent(mockEvent)
+    mockEvent.ticket = EventTicket("Paid", 0.0, 10)
+    viewModel.getEventData()
+    assert(viewModel.isTicketFree())
+  }
+
+  @Test
+  fun testTicketIsNotFree() = runTest {
+    eventRepository.addEvent(mockEvent)
+    val randomPrice: Double = kotlin.random.Random.nextDouble(0.001, Double.MAX_VALUE)
+    mockEvent.ticket = EventTicket("Paid", randomPrice, 10)
+    viewModel.getEventData()
+    assert(!viewModel.isTicketFree())
+  }
+
+
 }

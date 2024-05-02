@@ -10,6 +10,7 @@ import com.github.se.eventradar.model.event.EventUiState
 import com.github.se.eventradar.screens.EventDetailsScreen
 import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.Route
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -58,6 +59,7 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
   fun testSetup() {
 
     every { mockViewModel.uiState } returns sampleEventDetailsUiState
+    every { mockViewModel.getEventId() } returns eventId
 
     composeTestRule.setContent { EventDetails(mockViewModel, navigationActions = mockNavActions) }
   }
@@ -109,4 +111,21 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
     verify { mockNavActions.goBack() }
     confirmVerified(mockNavActions)
   }
+
+  @Test
+  fun ticketButtonTriggersNavigation() = run {
+    ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
+      ticketButton {
+        // arrange: verify the pre-conditions
+        assertIsDisplayed()
+        assertIsEnabled()
+
+        performClick()
+      }
+    }
+    // assert: the nav action has been called
+    verify { mockNavActions.navController.navigate("${Route.EVENT_DETAILS_TICKETS}/$eventId") }
+    confirmVerified(mockNavActions)
+  }
+
 }

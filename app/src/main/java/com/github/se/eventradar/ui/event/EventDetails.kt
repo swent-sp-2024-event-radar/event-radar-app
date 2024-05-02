@@ -315,7 +315,7 @@ fun BuyTicket(
                     modifier =
                         Modifier.fillMaxWidth()
                             .fillMaxHeight()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                            .padding(horizontal = 16.dp, vertical = 4.dp).testTag("ticketInfo"),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically) {
                       val style =

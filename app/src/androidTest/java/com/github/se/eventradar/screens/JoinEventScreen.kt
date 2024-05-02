@@ -16,6 +16,8 @@ public class JoinEventScreen(semanticsProvider: SemanticsNodeInteractionsProvide
   val eventTitle: KNode = onNode { hasTestTag("eventTitle") }
   val ticketsTitle: KNode = onNode { hasTestTag("ticketsTitle") }
   val ticketCard: KNode = onNode { hasTestTag("ticketCard") }
-  val ticketName: KNode = ticketCard.child { hasTestTag("ticketName") }
-  val ticketPrice: KNode = ticketCard.child { hasTestTag("ticketPrice") }
+  val ticketInfo: KNode = ticketCard.child { hasTestTag("ticketInfo") }
+  val ticketName: KNode = ticketInfo.child { hasTestTag("ticketName") }
+  val ticketPrice: KNode = ticketInfo.child { hasTestTag("ticketPrice") }
+
 }
