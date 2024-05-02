@@ -66,7 +66,7 @@ jobs:
 
       - name: Sign APK
         run: |
-          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore $RUNNER_TEMP/my_production.keystore -storepass $key_store_password $main_project_module/build/outputs/apk/release/app-release-signed.apk $alias
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore $RUNNER_TEMP/my_production.keystore -storepass $key_store_password $main_project_module/build/outputs/apk/release/app-release-unsigned.apk $alias
 
       # Upload Artifact Build
       # Noted For Output [main_project_module]/build/outputs/apk/debug/
