@@ -156,7 +156,7 @@ fun HomeScreen(
         if (uiState.isSearchActive || uiState.isFilterActive) {
           EventList(
               uiState.eventList.filteredEvents,
-              Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
+              Modifier.testTag("filteredEventList").fillMaxWidth().constrainAs(eventList) {
                 top.linkTo(searchAndFilter.bottom, margin = 8.dp)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
@@ -179,7 +179,7 @@ fun HomeScreen(
           EventMap(
               uiState.eventList.filteredEvents,
               navigationActions,
-              Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
+              Modifier.testTag("filteredMap").fillMaxWidth().constrainAs(eventMap) {
                 top.linkTo(tabs.bottom, margin = 8.dp)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)

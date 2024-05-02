@@ -10,6 +10,7 @@ import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.screens.HomeScreen
 import com.github.se.eventradar.ui.home.HomeScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.viewmodel.EventsOverviewUiState
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -82,30 +83,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       viewToggleFab { assertIsDisplayed() }
       searchBarAndFilter { assertIsDisplayed() }
       eventList { assertIsDisplayed() }
-
       filterPopUp { assertIsNotDisplayed() }
-      step("Click on filter button") {
-        filterButton {
-          assertIsDisplayed()
-          performClick()
-        }
-      }
-
-      // Update the UI state to reflect the change
-      sampleEventList.value = sampleEventList.value.copy(isFilterDialogOpen = true)
-      step("Check if filter pop up is displayed") { filterPopUp { assertIsDisplayed() } }
-
-      step("Click on filter button again") {
-        filterButton {
-          assertIsDisplayed()
-          performClick()
-        }
-      }
-      verify(exactly = 2) { mockEventsOverviewViewModel.onFilterDialogOpen() }
-
-      // Update the UI state to reflect the change
-      sampleEventList.value = sampleEventList.value.copy(isFilterDialogOpen = false)
-      step("Check if filter pop up is hidden") { filterPopUp { assertDoesNotExist() } }
     }
   }
 
@@ -137,6 +115,111 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
         map { assertDoesNotExist() }
         eventCard { assertIsDisplayed() }
       }
+    }
+  }
+
+
+  @Test
+  fun filterPopUpDisplaysOnceFilterClicked() = run {
+    onComposeScreen<HomeScreen>(composeTestRule) {
+      step("Click on filter button") {
+        filterButton {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(isFilterDialogOpen = true)
+      step("Check if filter pop up is displayed") { filterPopUp { assertIsDisplayed() } }
+
+      step("Click on filter button again") {
+        filterButton {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+      verify(exactly = 2) { mockEventsOverviewViewModel.onFilterDialogOpen() }
+
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(isFilterDialogOpen = false)
+      step("Check if filter pop up is hidden") { filterPopUp { assertDoesNotExist() } }
+    }
+  }
+
+  @Test
+  fun filterClickedShowsResults() = run {
+    onComposeScreen<HomeScreen>(composeTestRule) {
+      step("Click on filter button") {
+        filterButton {
+          performClick()
+        }
+      }
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(isFilterDialogOpen = true)
+      step("Check if filter pop up is displayed") { filterPopUp { assertIsDisplayed() } }
+      verify { mockEventsOverviewViewModel.onFilterDialogOpen() }
+
+      radiusInput {
+        assertIsDisplayed()
+        performClick()
+        performTextInput("10")
+      }
+      verify { mockEventsOverviewViewModel.onRadiusQueryChanged("10") }
+
+//      freeSwitch {
+//        assertIsDisplayed()
+//        performClick()
+//      }
+//      sampleEventList.value = sampleEventList.value.copy(isFreeSwitchOn = false)
+//      verify { mockEventsOverviewViewModel.onFreeSwitchChanged() }
+//
+//      step("Click on filter apply button") {
+//        filterApplyButton {
+//          assertIsDisplayed()
+//          performClick()
+//        }
+//      }
+//
+//      filteredEventList { assertIsDisplayed() }
+//      eventCard { assertIsDisplayed() }
+//
+//      // Update the UI state to reflect the change
+//      sampleEventList.value = sampleEventList.value.copy(isFilterActive = true)
+//      verify { mockEventsOverviewViewModel.onFilterApply() }
+//      verify { mockEventsOverviewViewModel.uiState }
+//      verify { mockEventsOverviewViewModel.filterEvents() }
+//      confirmVerified(mockEventsOverviewViewModel)
+    }
+  }
+
+  @Test
+  fun typingInSearchBarShowsResults() = run {
+    onComposeScreen<HomeScreen>(composeTestRule) {
+      searchBar {
+        assertIsDisplayed()
+        performClick()
+        performTextInput("Event 0")
+      }
+
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(isSearchActive = true)
+
+      filteredEventList { assertIsDisplayed() }
+      eventCard { assertIsDisplayed() }
+
+      verify { mockEventsOverviewViewModel.onSearchQueryChanged("Event 0") }
+      verify { mockEventsOverviewViewModel.onSearchActiveChanged(true) }
+      verify { mockEventsOverviewViewModel.uiState }
+      verify { mockEventsOverviewViewModel.filterEvents() }
+
+      searchBar { performTextClearance() }
+
+      verify { mockEventsOverviewViewModel.onSearchQueryChanged("") }
+      verify { mockEventsOverviewViewModel.onSearchActiveChanged(false) }
+      verify { mockEventsOverviewViewModel.getEvents() }
+
+      confirmVerified(mockEventsOverviewViewModel)
     }
   }
 

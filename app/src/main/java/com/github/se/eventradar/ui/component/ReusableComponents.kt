@@ -158,7 +158,9 @@ fun SearchBarAndFilter(
           onSearchQueryChanged(it)
           if (it == "") onSearchActiveChanged(false) else onSearchActiveChanged(true)
         },
-        modifier = Modifier.weight(1f),
+        modifier = Modifier
+            .weight(1f)
+            .testTag("searchBar"),
         maxLines = 1,
         shape = RoundedCornerShape(32.dp),
         colors =
@@ -206,11 +208,13 @@ fun FilterPopUp(
                 onValueChange = { onRadiusQueryChanged(it) },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 modifier =
-                    Modifier.fillMaxWidth()
+                    Modifier
+                        .fillMaxWidth()
                         .border(
                             width = 1.dp,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            shape = RoundedCornerShape(10)),
+                            shape = RoundedCornerShape(10))
+                        .testTag("radiusInput"),
                 textStyle = TextStyle.Default.copy(fontSize = 16.sp),
                 singleLine = true)
           }
@@ -236,6 +240,7 @@ fun FilterPopUp(
               Switch(
                   checked = uiState.isFreeSwitchOn,
                   onCheckedChange = { onFreeSwitchChanged() },
+                  modifier = Modifier.testTag("freeSwitch")
               )
             }
 
@@ -260,7 +265,12 @@ fun FilterPopUp(
 
         // Button to apply filter
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-          Button(onClick = { onFilterApply() }) { Text(stringResource(id = R.string.filter_apply)) }
+          Button(
+              onClick = { onFilterApply() },
+              modifier =  Modifier.testTag("filterApplyButton")
+          ) {
+              Text(stringResource(id = R.string.filter_apply))
+        }
         }
       }
     }
