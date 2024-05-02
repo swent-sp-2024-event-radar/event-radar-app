@@ -50,7 +50,7 @@ jobs:
         run: |
           # import keystore from secrets
           echo $encoded_string > keystore-b64.txt
-          base64 -d keystore-b64.txt > keystore.jks
+          base64 -di keystore-b64.txt > keystore.jks
 
       - name: Build Release apk
         env:
