@@ -17,6 +17,7 @@ import io.mockk.slot
 import io.mockk.unmockkAll
 import io.mockk.unmockkStatic
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -32,6 +33,7 @@ class FirebaseUserRepositoryUnitTest {
   @RelaxedMockK lateinit var mockDocumentSnapshotPrivate: DocumentSnapshot
   @RelaxedMockK lateinit var mockQuerySnapshot: QuerySnapshot
   @RelaxedMockK lateinit var mockDb: FirebaseFirestore
+  @RelaxedMockK lateinit var mockCoroutineDispatcher: TestCoroutineDispatcher
 
   private lateinit var firebaseUserRepository: FirebaseUserRepository
 
@@ -64,7 +66,8 @@ class FirebaseUserRepositoryUnitTest {
 
     every { mockDb.collection("users") } returns userRef
 
-    firebaseUserRepository = FirebaseUserRepository(db = mockDb)
+    mockCoroutineDispatcher = TestCoroutineDispatcher()
+    firebaseUserRepository = FirebaseUserRepository(mockCoroutineDispatcher, db = mockDb)
   }
 
   @After

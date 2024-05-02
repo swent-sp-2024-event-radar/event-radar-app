@@ -8,10 +8,14 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUserRepository {
+class FirebaseUserRepository(
+    private val ioDispatcher: CoroutineDispatcher,
+    db: FirebaseFirestore = Firebase.firestore
+) : IUserRepository {
   private val userRef: CollectionReference = db.collection("users")
 
   private val birthdateString = "private/birthDate"
@@ -146,7 +150,7 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
       folderName: String
   ): Resource<String> {
     val storageRef = Firebase.storage.reference.child("$folderName/$uid")
-    return withContext(kotlinx.coroutines.Dispatchers.IO) {
+    return withContext(ioDispatcher) {
       try {
         // Start the upload task
         val uploadTask = storageRef.putFile(selectedImageUri)
@@ -165,20 +169,24 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
     }
   }
 
-  /*
-  // TODO: Will be used when QR Code is implemented
   override suspend fun getImage(uid: String, folderName: String): Resource<String> {
     val storageRef = Firebase.storage.reference.child("$folderName/$uid")
-    return withContext(kotlinx.coroutines.Dispatchers.IO) {
+    val placeholderRef = Firebase.storage.reference.child("$folderName/placeholder.png")
+    return withContext(ioDispatcher) {
       try {
         val url = storageRef.downloadUrl.await().toString()
         Resource.Success(url)
       } catch (e: Exception) {
-        Resource.Failure(e)
+        // If the image with the uid does not exist, try to download the placeholder image
+        try {
+          val placeholderUrl = placeholderRef.downloadUrl.await().toString()
+          Resource.Success(placeholderUrl)
+        } catch (e: Exception) {
+          Resource.Failure(Exception("Image not found"))
+        }
       }
     }
   }
-   */
 
   private fun getMaps(user: User): Pair<Map<String, Any?>, Map<String, Any?>> {
     val privateMap =

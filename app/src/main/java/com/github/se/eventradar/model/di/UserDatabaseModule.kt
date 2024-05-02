@@ -7,6 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -14,6 +15,6 @@ class FirebaseUserDatabaseModule {
   @Provides
   @Singleton
   fun provideFirebaseUserRepository(): IUserRepository {
-    return FirebaseUserRepository()
+    return FirebaseUserRepository(Dispatchers.IO)
   }
 }

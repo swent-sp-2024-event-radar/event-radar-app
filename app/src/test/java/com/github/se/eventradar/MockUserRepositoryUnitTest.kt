@@ -6,6 +6,8 @@ import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -119,21 +121,17 @@ class MockUserRepositoryUnitTest {
     assert(result is Resource.Success)
   }
 
-  /*
-  // TODO: Will be used when QR Code is implemented
   @Test
   fun testGetImage() = runTest {
-  // Arrange
-  val expectedUrl = "http://example.com/Profile_Pictures/pic.jpg"
-  val userId = "1"
+    // Arrange
+    val expectedUrl = "http://example.com/Profile_Pictures/pic.jpg"
+    val userId = "1"
 
-  // Act
-  val result = userRepository.getImage(userId, "Profile_Pictures")
+    // Act
+    val result = userRepository.getImage(userId, "Profile_Pictures")
 
-  // Assert
-  assertTrue(result is Resource.Success)
-  assertEquals(expectedUrl, (result as Resource.Success).data)
+    // Assert
+    assertTrue(result is Resource.Success)
+    assertEquals(expectedUrl, (result as Resource.Success).data)
   }
-   */
-
 }

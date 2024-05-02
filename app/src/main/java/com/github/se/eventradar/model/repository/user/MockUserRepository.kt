@@ -68,8 +68,6 @@ class MockUserRepository : IUserRepository {
     }
   }
 
-  /*
-    // TODO: Will be used when QR Code is implemented
   override suspend fun getImage(uid: String, folderName: String): Resource<String> {
     return try {
       Resource.Success("http://example.com/$folderName/pic.jpg")
@@ -77,5 +75,4 @@ class MockUserRepository : IUserRepository {
       Resource.Failure(e)
     }
   }
-   */
 }

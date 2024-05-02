@@ -77,7 +77,10 @@ fun SignUpScreen(
           contract = FirebaseAuthUIActivityResultContract(),
           onResult = { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-              viewModel.addUser()
+              val addUserError = viewModel.addUser()
+              if (addUserError) {
+                Throwable("Error adding user")
+              }
               navigationActions.navController.navigate(Route.HOME)
             } else {
               openErrorDialog.value = true

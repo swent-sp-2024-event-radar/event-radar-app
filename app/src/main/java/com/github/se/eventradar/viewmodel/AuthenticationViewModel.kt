@@ -33,16 +33,15 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
 
     val profilePicFolder = "Profile_Pictures"
 
-    val imageUri =
-        state.value.selectedImageUri
-            ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/place_holder.png")
+    val imageUri = state.value.selectedImageUri
 
     val profilePicUrl =
-        if (imageUri != null) {
-          runBlocking { uploadImageAsync(imageUri, user.uid, profilePicFolder) }
+        if (imageUri == null) {
+          Log.d("LoginScreenViewModel", "ImageUri is null, taking default Profile Picture")
+          runBlocking { getImageAsync(user.uid, profilePicFolder) }
         } else {
-          Log.d("LoginScreenViewModel", "ImageUri is null")
-          return false
+          Log.d("LoginScreenViewModel", "ImageUri is not null, uploading Profile Picture")
+          runBlocking { uploadImageAsync(imageUri, user.uid, profilePicFolder) }
         }
 
     if (profilePicUrl.isEmpty()) {
@@ -100,8 +99,6 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
     }
   }
 
-  /*
-    // TODO: Will be used when QR Code is implemented
   private suspend fun getImageAsync(uid: String, folderName: String): String {
     return when (val result = userRepository.getImage(uid, folderName)) {
       is Resource.Success -> {
@@ -114,8 +111,6 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
       }
     }
   }
-
-     */
 
   fun doesUserExist(userId: String): Boolean {
     var userExists: Boolean
