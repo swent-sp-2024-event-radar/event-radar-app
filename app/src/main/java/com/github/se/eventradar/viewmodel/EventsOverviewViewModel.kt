@@ -49,6 +49,16 @@ constructor(
         state.value = state.value.copy(isFreeSwitchOn = !state.value.isFreeSwitchOn)
     }
 
+    fun onCategorySelectionChanged(category: EventCategory) {
+        val categoriesCheckedList = _uiState.value.categoriesCheckedList
+        if (categoriesCheckedList.contains(category)) {
+            categoriesCheckedList.remove(category)
+        } else {
+            categoriesCheckedList.add(category)
+        }
+        _uiState.value = _uiState.value.copy(categoriesCheckedList = categoriesCheckedList)
+    }
+
     fun onFilterApply(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
         state.value = state.value.copy(isFilterActive = true)
         filterEvents()
@@ -189,15 +199,15 @@ constructor(
 
 data class EventsOverviewUiState(
     val eventList: EventList = EventList(emptyList(), emptyList(), null),
-    var searchQuery: String = "",
-    var isSearchActive: Boolean = false,
-    var isFilterDialogOpen: Boolean = false,
-    var isFilterActive: Boolean = false,
-    var radiusQuery: String = "",
-    var isFreeSwitchOn: Boolean = true,
-    var categoriesCheckedList: MutableSet<EventCategory> = mutableSetOf(*enumValues<EventCategory>()),
-    var viewList: Boolean = true,
-    var tab: Tab = Tab.BROWSE,
+    val searchQuery: String = "",
+    val isSearchActive: Boolean = false,
+    val isFilterDialogOpen: Boolean = false,
+    val isFilterActive: Boolean = false,
+    val radiusQuery: String = "",
+    val isFreeSwitchOn: Boolean = true,
+    val categoriesCheckedList: MutableSet<EventCategory> = mutableSetOf(*enumValues<EventCategory>()),
+    val viewList: Boolean = true,
+    val tab: Tab = Tab.BROWSE,
 )
 
 enum class Tab {

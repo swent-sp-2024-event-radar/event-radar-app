@@ -51,6 +51,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -63,6 +64,7 @@ import com.github.se.eventradar.R
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.viewmodel.EventsOverviewUiState
+import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 
 fun getIconFromViewListBool(viewList: Boolean): ImageVector {
   return if (viewList) {
@@ -169,7 +171,7 @@ fun SearchBarAndFilter(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent),
-            placeholder = { Text("Search event...") },
+            placeholder = { Text(stringResource(id = R.string.home_search_placeholder)) },
             trailingIcon = { Icon(Icons.Default.Search, contentDescription = null) })
 
         // Filter button
@@ -178,7 +180,7 @@ fun SearchBarAndFilter(
                 onFilterDialogOpen()
             },
             modifier = Modifier.padding(start = 8.dp)) {
-            Text("Filter")
+            Text(stringResource(id = R.string.filter))
         }
     }
 }
@@ -189,6 +191,7 @@ fun FilterPopUp(
     onFilterApply: () -> Unit,
     uiState: EventsOverviewUiState,
     onRadiusQueryChanged: (String) -> Unit,
+    viewModel: EventsOverviewViewModel,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier) {
@@ -203,7 +206,7 @@ fun FilterPopUp(
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Box( modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Radius: ",
+                            text = stringResource(id = R.string.radius_label),
                             style = TextStyle(fontSize = 16.sp))
                     }
                     Box(modifier = Modifier.weight(1f)) {
@@ -226,7 +229,7 @@ fun FilterPopUp(
                     }
                     Box(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "  km",
+                            text = stringResource(id = R.string.radius_km_label),
                             style = TextStyle(fontSize = 16.sp))
                     }
                 }
@@ -238,7 +241,7 @@ fun FilterPopUp(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start) {
                     Text(
-                        text = "Free Events Only:  ",
+                        text = stringResource(id = R.string.free_events_label),
                         style =
                         TextStyle(
                             fontSize = 16.sp,
@@ -251,7 +254,7 @@ fun FilterPopUp(
 
                 // Buttons for category selection
                 Text(
-                    text = "Category: ",
+                    text = stringResource(id = R.string.category_label),
                     modifier = Modifier.weight(1f),
                     style =
                     TextStyle(
@@ -261,7 +264,10 @@ fun FilterPopUp(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start) {
-                    CategorySelection(uiState)
+                    CategorySelection(
+                        onCategorySelectionChanged = { viewModel.onCategorySelectionChanged(it) },
+                        uiState = uiState
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -272,7 +278,7 @@ fun FilterPopUp(
                         onClick = {
                             onFilterApply()
                         }) {
-                        Text("Apply")
+                        Text(stringResource(id = R.string.filter_apply))
                     }
                 }
             }
@@ -282,25 +288,19 @@ fun FilterPopUp(
 
 @Composable
 fun CategorySelection(
-    uiState: EventsOverviewUiState
+    onCategorySelectionChanged: (EventCategory) -> Unit,
+    uiState: EventsOverviewUiState,
 ) {
     LazyColumn {
         items(EventCategory.entries) { category ->
-            var isChecked by remember { mutableStateOf(true) }
+            val isChecked = category in uiState.categoriesCheckedList
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
                 modifier = Modifier.padding(vertical = 0.dp)) {
                 Checkbox(
                     checked = isChecked,
-                    onCheckedChange = {
-                        isChecked = it
-                        if (isChecked) {
-                            uiState.categoriesCheckedList.add(category)
-                        } else {
-                            uiState.categoriesCheckedList.remove(category)
-                        }
-                    },
+                    onCheckedChange = { onCategorySelectionChanged(category) },
                     modifier = Modifier
                         .scale(0.6f)
                         .size(10.dp)
