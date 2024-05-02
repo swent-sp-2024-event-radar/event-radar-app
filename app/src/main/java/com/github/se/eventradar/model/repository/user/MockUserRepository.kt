@@ -13,6 +13,7 @@ class MockUserRepository : IUserRepository {
    */
   // associate folderName to
   private val mockImagesDatabase = mutableMapOf<User, MutableMap<String, String>>()
+  private var currentUserId: String? = null // Simulate current user ID
 
   override suspend fun getUsers(): Resource<List<User>> {
     return Resource.Success(mockUsers)
@@ -107,5 +108,17 @@ class MockUserRepository : IUserRepository {
         Resource.Failure(Exception("Image from folder $folderName not found for user $uid"))
       }
     }
+  }
+
+  override suspend fun getCurrentUserId(): Resource<String> {
+    return if (currentUserId != null) {
+      Resource.Success(currentUserId!!)
+    } else {
+      Resource.Failure(Exception("No user currently signed in"))
+    }
+  }
+  // Helper method to set the current user ID for testing
+  fun updateCurrentUserId(userId: String?) {
+    currentUserId = userId
   }
 }
