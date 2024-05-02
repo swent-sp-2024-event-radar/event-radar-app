@@ -49,7 +49,7 @@ jobs:
           ENCODED_STRING: ${{ secrets.SIGNING_KEY }}
         run: |
           # import keystore from secrets
-          echo $ENCODED_STRING | base64 -di > "./keystore/keystore.jks"
+          echo $ENCODED_STRING | base64 -di > $RUNNER_TEMP/keystore/keystore.jks
 
       - name: Build Release apk
         env:
