@@ -81,12 +81,66 @@ class MockUserRepositoryUnitTest {
   }
 
   @Test
+  fun testUpdateNonExistentUser() = runTest {
+    // Arrange
+    val nonExistentUser = User(
+      userId = "nonExistentId",
+      birthDate = "01/01/2000",
+      email = "test@example.com",
+      firstName = "John",
+      lastName = "Doe",
+      phoneNumber = "1234567890",
+      accountStatus = "active",
+      eventsAttendeeSet = mutableListOf("event1", "event2"),
+      eventsHostSet = mutableListOf("event3"),
+      friendsSet = mutableListOf(),
+      profilePicUrl = "http://example.com/Profile_Pictures/pic.jpg",
+      qrCodeUrl = "http://example.com/QR_Codes/qr.jpg",
+      username = "johndoe"
+    )
+
+    // Act
+    val result = userRepository.updateUser(nonExistentUser)
+
+    // Assert
+    assertTrue(result is Resource.Failure)
+    assertEquals("User with id ${nonExistentUser.userId} not found", (result as Resource.Failure).throwable.message)
+  }
+
+  @Test
   fun testDeleteUser() = runTest {
     userRepository.addUser(mockUser)
     userRepository.deleteUser(mockUser)
     val result = userRepository.getUser("1")
     assert(result is Resource.Failure)
     assert((result as Resource.Failure).throwable.message == "User with id 1 not found")
+  }
+
+  @Test
+  fun testDeleteNonExistentUser() = runTest {
+    // Arrange
+    val nonExistentUser = User(
+      userId = "nonExistentId",
+      birthDate = "01/01/2000",
+      email = "test@example.com",
+      firstName = "John",
+      lastName = "Doe",
+      phoneNumber = "1234567890",
+      accountStatus = "active",
+      eventsAttendeeSet = mutableListOf("event1", "event2"),
+      eventsHostSet = mutableListOf("event3"),
+      friendsSet = mutableListOf(),
+      profilePicUrl = "http://example.com/Profile_Pictures/pic.jpg",
+      qrCodeUrl = "http://example.com/QR_Codes/qr.jpg",
+      username = "johndoe"
+    )
+
+    // Act
+    val result = userRepository.deleteUser(nonExistentUser)
+
+    // Assert
+    assertTrue(result is Resource.Failure)
+    assertEquals("User with id ${nonExistentUser.userId} not found", (result as Resource.Failure).throwable.message)
   }
 
   @Test
@@ -116,9 +170,35 @@ class MockUserRepositoryUnitTest {
 
   @Test
   fun testUploadImage() = runTest {
-    val mockURI = mock(Uri::class.java)
+    // Arrange
+    val mockURI = Uri.parse("new_pic")
+    val folderName = "Profile_Pictures"
+    val expectedProfilePicUrl = "http://example.com/$folderName/$mockURI.jpg"
+    val addUserResult = userRepository.addUser(mockUser)
+    assertTrue(addUserResult is Resource.Success)
+
+    // Act
+    val result = userRepository.uploadImage(mockURI, "1", folderName)
+
+    // Assert
+    assertTrue(result is Resource.Success)
+    assertEquals(expectedProfilePicUrl, (result as Resource.Success).data)
+  }
+
+  @Test
+  fun testUploadImageExceptionMessage() = runTest {
+    // Arrange
+    val mockURI = Uri.parse("invalid_uri")
+    val expectedMessage = "Invalid URI"
+
+    // Act
     val result = userRepository.uploadImage(mockURI, "1", "Profile_Pictures")
-    assert(result is Resource.Success)
+
+
+    // Assert
+    assertTrue(userRepository.getUser("1") is Resource.Failure)
+    assertTrue(result is Resource.Failure)
+    assertEquals(expectedMessage, (result as Resource.Failure).throwable.message)
   }
 
   @Test
@@ -133,5 +213,18 @@ class MockUserRepositoryUnitTest {
     // Assert
     assertTrue(result is Resource.Success)
     assertEquals(expectedUrl, (result as Resource.Success).data)
+  }
+
+  @Test
+  fun testGetImageException() = runTest {
+    // Arrange
+    val userId = "invalid_id"
+
+    // Act
+    val result = userRepository.getImage(userId, "Profile_Pictures")
+
+    // Assert
+    assertTrue(result is Resource.Failure)
+    assertEquals("Invalid user ID", (result as Resource.Failure).throwable.message)
   }
 }

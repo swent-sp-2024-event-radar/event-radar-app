@@ -3,6 +3,7 @@ package com.github.se.eventradar.model.repository.user
 import android.net.Uri
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
+import kotlinx.coroutines.runBlocking
 
 class MockUserRepository : IUserRepository {
   private val mockUsers = mutableListOf<User>()
@@ -57,19 +58,45 @@ class MockUserRepository : IUserRepository {
   }
 
   override suspend fun uploadImage(
-      selectedImageUri: Uri,
-      uid: String,
-      folderName: String
+    selectedImageUri: Uri,
+    uid: String,
+    folderName: String
   ): Resource<String> {
-    return try {
-      Resource.Success("http://example.com/$folderName/pic.jpg")
-    } catch (e: Exception) {
-      Resource.Failure(e)
+    val index = mockUsers.indexOfFirst { it.userId == uid }
+    val profilePicUrl = "http://example.com/$folderName/${selectedImageUri}.jpg"
+
+    return if (index != -1) {
+      val user = User(
+        userId = uid,
+        username = mockUsers[index].username,
+        qrCodeUrl = mockUsers[index].qrCodeUrl,
+        email = mockUsers[index].email,
+        birthDate = mockUsers[index].birthDate,
+        phoneNumber = mockUsers[index].phoneNumber,
+        firstName = mockUsers[index].firstName,
+        lastName = mockUsers[index].lastName,
+        accountStatus = mockUsers[index].accountStatus,
+        eventsAttendeeSet = mockUsers[index].eventsAttendeeSet,
+        eventsHostSet = mockUsers[index].eventsHostSet,
+        friendsSet = mockUsers[index].friendsSet,
+        profilePicUrl = profilePicUrl
+        )
+      val updateUser = runBlocking {updateUser(user) }
+      if (updateUser is Resource.Failure) {
+        return Resource.Failure(Exception("Failed to update user"))
+      }
+      Resource.Success(profilePicUrl)
+    } else {
+      Resource.Failure(Exception("User with id $uid not found"))
     }
   }
 
   override suspend fun getImage(uid: String, folderName: String): Resource<String> {
     return try {
+
+      if (mockUsers.none { uid == it.userId }) {
+        throw Exception("Invalid user ID")
+      }
       Resource.Success("http://example.com/$folderName/pic.jpg")
     } catch (e: Exception) {
       Resource.Failure(e)

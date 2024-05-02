@@ -1,5 +1,6 @@
 package com.github.se.eventradar
 
+import android.net.Uri
 import android.util.Log
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
@@ -427,6 +428,19 @@ class FirebaseUserRepositoryUnitTest {
     assert(result is Resource.Failure)
     assert((result as Resource.Failure).throwable.message == message)
   }
+
+    @Test
+    fun `test uploadImage()` () = runTest {
+
+        val folderName = "Profile_Pictures"
+
+        every { userRef.document(uid).collection(folderName).document("pic.jpg").set(any()) } returns mockTask(null)
+
+        val result = firebaseUserRepository.uploadImage(Uri.EMPTY, uid, folderName)
+
+        assert(result is Resource.Success)
+        assert((result as Resource.Success).data == "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2Fplaceholder.png?alt=media&token=ba4b4efb-ff45-4617-b60f-3789e8fb75b6")
+    }
 }
 
 /**
