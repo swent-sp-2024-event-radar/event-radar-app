@@ -84,30 +84,28 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       eventList { assertIsDisplayed() }
 
       filterPopUp { assertIsNotDisplayed() }
-        step("Click on filter button") {
-            filterButton {
-                assertIsDisplayed()
-                performClick()
-            }
+      step("Click on filter button") {
+        filterButton {
+          assertIsDisplayed()
+          performClick()
         }
+      }
 
-        // Update the UI state to reflect the change
-        sampleEventList.value = sampleEventList.value.copy(isFilterDialogOpen = true)
-        step("Check if filter pop up is displayed") { filterPopUp { assertIsDisplayed() } }
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(isFilterDialogOpen = true)
+      step("Check if filter pop up is displayed") { filterPopUp { assertIsDisplayed() } }
 
-        step("Click on filter button again") {
-            filterButton {
-                assertIsDisplayed()
-                performClick()
-            }
+      step("Click on filter button again") {
+        filterButton {
+          assertIsDisplayed()
+          performClick()
         }
-        verify(exactly = 2) { mockEventsOverviewViewModel.onFilterDialogOpen() }
+      }
+      verify(exactly = 2) { mockEventsOverviewViewModel.onFilterDialogOpen() }
 
-        // Update the UI state to reflect the change
-        sampleEventList.value = sampleEventList.value.copy(isFilterDialogOpen = false)
-        step("Check if filter pop up is hidden") {
-            filterPopUp { assertDoesNotExist() }
-        }
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(isFilterDialogOpen = false)
+      step("Check if filter pop up is hidden") { filterPopUp { assertDoesNotExist() } }
     }
   }
 
