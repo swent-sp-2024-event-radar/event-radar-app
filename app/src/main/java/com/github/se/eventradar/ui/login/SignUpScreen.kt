@@ -55,6 +55,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
+import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.navigation.NavigationActions
@@ -236,7 +237,6 @@ fun SignUpScreen(
                           unfocusedPrefixColor = MaterialTheme.colorScheme.primary),
               shape = RoundedCornerShape(12.dp),
               isError = uiState.birthDateIsError,
-              keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
           )
         }
     Row(
@@ -324,6 +324,7 @@ fun PhoneNumberInput(
 }
 
 @Preview
+@ExcludeFromJacocoGeneratedReport
 @Composable
 fun PreviewSignUpScreen() {
   SignUpScreen(LoginViewModel(MockUserRepository()), NavigationActions(rememberNavController()))

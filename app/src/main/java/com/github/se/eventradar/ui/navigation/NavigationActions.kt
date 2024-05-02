@@ -1,5 +1,6 @@
 package com.github.se.eventradar.ui.navigation
 
+import android.util.Log
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.github.se.eventradar.R
@@ -41,6 +42,16 @@ class NavigationActions(val navController: NavController) {
   }
 }
 
+fun getTopLevelDestination(targetRoute: String): TopLevelDestination {
+  val foundDestination = TOP_LEVEL_DESTINATIONS.find { it.route == targetRoute }
+  return if (foundDestination != null) {
+    foundDestination
+  } else {
+    Log.d("Null Error", "Top level destination does not exist for R String Id: $targetRoute")
+    TOP_LEVEL_DESTINATIONS[2]
+  }
+}
+
 val TOP_LEVEL_DESTINATIONS =
     listOf(
         TopLevelDestination(
@@ -61,7 +72,7 @@ val TOP_LEVEL_DESTINATIONS =
         TopLevelDestination(
             route = Route.MY_HOSTING,
             icon = R.drawable.celebration,
-            textId = R.string.my_hosted_events,
+            textId = R.string.hosting,
         ),
         TopLevelDestination(
             route = Route.PROFILE,

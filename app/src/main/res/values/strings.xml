@@ -4,6 +4,8 @@
     <string name="default_web_client_id" translatable="false">webClientId.apps.googleusercontent.com</string>
     <string name="test1">test1</string>
     <string name="test2">test2</string>
+    <string name="hosted_events_title">My Hosted Events</string>
+    <string name ="create_event_button">Create New Event</string>
     <string name="overview">Overview</string>
     <string name="map">Map</string>
     <string name="search">Search a Task</string>
@@ -23,9 +25,7 @@
     <string name="message_chats">Messages</string>
     <string name="homeScreen_events">Home</string>
     <string name="user_profile">Profile</string>
-    <string name="my_hosted_events">My hosting</string>
-    <string name="profile_pics_folder">Profile_Pictures</string>
-    <string name="qr_codes_folder">QR_Codes</string>
+    <string name="hosting">Hosting</string>
 </resources>
 
 
