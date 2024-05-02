@@ -25,6 +25,7 @@ import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.verify
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -98,16 +99,16 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       assertEquals(ScanFriendQrViewModel.TAB.ScanQR, viewModel.tabState.value)
     }
   }
-}
 
-// @Test
-// fun switchesScreenWhenNavigatedToNextScreen() = run {
-//  onComposeScreen<QrCodeScanFriendUiScreen>(composeTestRule) {
-//    viewModel.changeAction(QrCodeFriendViewModel.Action.NavigateToNextScreen)
-//    verify { mockNavActions.navigateTo(any()) }
-//  }
-// }
-// }
+  @Test
+  fun switchesScreenWhenNavigatedToNextScreen() = run {
+    onComposeScreen<QrCodeScanFriendUiScreen>(composeTestRule) {
+      viewModel.changeAction(ScanFriendQrViewModel.Action.NavigateToNextScreen)
+      composeTestRule.waitForIdle()
+      verify { mockNavActions.navigateTo(any()) }
+    }
+  }
+}
 
 //  @Test
 //  fun displaysAllComponentsCorrectly_CameraPermittedOnce(): Unit = run {

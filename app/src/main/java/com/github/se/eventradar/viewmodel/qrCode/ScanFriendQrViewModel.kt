@@ -129,7 +129,8 @@ constructor(
     _tabState.value = tab
   }
 
-  private fun changeAction(action: Action) {
+  fun changeAction(action: Action) {
+    println("Changing action to $action")
     _action.value = action
   }
 }
