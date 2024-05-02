@@ -78,7 +78,7 @@ class MockUserRepository : IUserRepository {
       selectedImageUri: Uri,
       uid: String,
       folderName: String
-  ): Resource<String> {
+  ): Resource<Unit> {
     val userList = mockImagesDatabase.keys.filter { user -> user.userId == uid }
     return if (userList.isEmpty()) {
       Resource.Failure(Exception("User with id $uid not found"))
@@ -87,7 +87,7 @@ class MockUserRepository : IUserRepository {
     } else {
       val user = userList[0]
       mockImagesDatabase[user]?.replace(folderName, "http://example.com/$folderName/pic.jpg")
-      Resource.Success("Image $selectedImageUri uploaded to $folderName for user $uid")
+      Resource.Success(Unit)
     }
   }
 

@@ -142,8 +142,8 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
       selectedImageUri: Uri,
       uid: String,
       folderName: String
-  ): Resource<String> {
-    return Resource.Success("To Be Implemented")
+  ): Resource<Unit> {
+    return Resource.Success(Unit)
   }
 
   override suspend fun getImage(uid: String, folderName: String): Resource<String> {
