@@ -26,21 +26,12 @@ android {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables { useSupportLibrary = true }
   }
-  
-  signingConfigs {
-    create("release") {
-      storeFile = file("keystore/keystore.jks")
-      storePassword = System.getenv("key_store_password")
-      keyAlias = System.getenv("alias")
-      keyPassword = System.getenv("key_password")
-    }
-  }
 
   buildTypes {
     release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-      signingConfig = signingConfigs.getByName("release")
+      signingConfig = null
     }
     debug {
       enableUnitTestCoverage = true
