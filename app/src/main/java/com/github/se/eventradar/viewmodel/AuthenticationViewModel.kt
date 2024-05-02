@@ -33,9 +33,11 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
 
     val profilePicFolder = "Profile_Pictures"
 
-    val imageUri =
-        state.value.selectedImageUri
-            ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder.png")
+    val imageUri = if (state.value.selectedImageUri == null) {
+        Uri.parse("android.resource://com.github.se.eventradar/drawable/place_holder.png")
+    } else {
+        state.value.selectedImageUri!!
+    }
 
     val profilePicUrl = runBlocking { uploadImageAsync(imageUri, user.uid, profilePicFolder) }
 
@@ -80,13 +82,10 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
   }
 
   private suspend fun uploadImageAsync(
-      selectedImageUri: Uri?,
+      selectedImageUri: Uri,
       uid: String,
       folderName: String
   ): String {
-    if (selectedImageUri == null) {
-      return ""
-    }
     return when (val imageUrl = userRepository.uploadImage(selectedImageUri, uid, folderName)) {
       is Resource.Success -> {
         Log.d("LoginScreenViewModel", "Image uploaded successfully: ${imageUrl.data}")
