@@ -88,6 +88,43 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), navigationActions: 
 
   val openErrorDialog = remember { mutableStateOf(false) }
 
+
+    /*
+    val launcher =
+        rememberLauncherForActivityResult(
+            contract = FirebaseAuthUIActivityResultContract(),
+            onResult = { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val user = FirebaseAuth.getInstance().currentUser
+                    if (user != null) {
+                        // User is signed in, check if they are documented in the "users" collection
+                        Firebase.firestore.collection("users").document(user.email!!)
+                            .get()
+                            .addOnSuccessListener { document ->
+                                if (document.exists()) {
+                                    // User is documented, navigate to the home screen
+                                    navigationActions.navController.navigate(Route.HOME) {
+                                        // Pop all screens from the back stack to finish the login screen activity
+                                        popUpTo(Route.LOGIN) { inclusive = true }
+                                    }
+                                } else {
+                                    // User is not documented, navigate to the sign-up screen
+                                    context.toast("Please create an account first")
+                                    navigationActions.navController.navigate(Route.SIGNUP)
+                                }
+                            }
+                            .addOnFailureListener { e ->
+                                // Handle any errors here
+                                openErrorDialog.value = true
+                            }
+                    } else {
+                        // User is not signed in, navigate to the sign-up screen
+                        context.toast("Please create an account first")
+                        navigationActions.navController.navigate(Route.SIGNUP)
+                    }
+                } else openErrorDialog.value = true
+            })
+     */
   val launcher =
       rememberLauncherForActivityResult(
           contract = FirebaseAuthUIActivityResultContract(),
