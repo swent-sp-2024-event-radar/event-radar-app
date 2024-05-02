@@ -33,9 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.NavigationActions
-import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.eventradar.ui.navigation.TopLevelDestination
 import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
 
 // TODO cleaner code for Navigation and to correct screen
@@ -52,7 +50,10 @@ fun QrCodeScreen(
   LaunchedEffect(navigateState) {
     when (navigateState) {
       ScanFriendQrViewModel.Action.NavigateToNextScreen -> {
-        navigationActions.navigateTo(TOP_LEVEL_DESTINATIONS[1]) //TODO change to private message screen with friend // Adjust according to your actual navigation logic
+        navigationActions.navigateTo(
+            TOP_LEVEL_DESTINATIONS[
+                1]) // TODO change to private message screen with friend // Adjust according to your
+                    // actual navigation logic
         viewModel.resetNavigationEvent() // Reset the navigation event in the ViewModel to prevent
       }
       else -> Unit // Do nothing if the state is None or any other non-navigational state
