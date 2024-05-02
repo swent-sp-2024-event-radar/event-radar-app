@@ -164,7 +164,6 @@ fun HomeScreen(
                 navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
               }
         } else {
-
           EventList(
               uiState.eventList.allEvents,
               Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {

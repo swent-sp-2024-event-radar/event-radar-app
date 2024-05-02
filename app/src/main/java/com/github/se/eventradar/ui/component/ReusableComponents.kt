@@ -170,7 +170,12 @@ fun SearchBarAndFilter(
         trailingIcon = { Icon(Icons.Default.Search, contentDescription = null) })
 
     // Filter button
-    Button(onClick = { onFilterDialogOpen() }, modifier = Modifier.padding(start = 8.dp)) {
+    Button(
+        onClick = { onFilterDialogOpen() },
+        modifier = Modifier
+            .padding(start = 8.dp)
+            .testTag("filterButton")
+    ) {
       Text(stringResource(id = R.string.filter))
     }
   }
