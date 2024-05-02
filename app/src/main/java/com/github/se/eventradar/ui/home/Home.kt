@@ -150,68 +150,68 @@ fun HomeScreen(
                   end.linkTo(parent.end)
                 })
 
-    if (getTabIndexFromTabEnum(uiState.tab) == 0) {
-      if (uiState.viewList) {
-        EventList(
-            uiState.eventList.allEvents,
-            Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
-              top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-              start.linkTo(parent.start)
-              end.linkTo(parent.end)
-            }) { eventId ->
-              navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-            }
-      } else {
-        EventMap(
-            uiState.eventList.allEvents,
-            navigationActions,
-            Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
-              top.linkTo(tabs.bottom, margin = 8.dp)
-              start.linkTo(parent.start)
-              end.linkTo(parent.end)
-            })
+    if (uiState.tab == Tab.BROWSE) {
+      when {
+        (uiState.viewList) ->
+            EventList(
+                uiState.eventList.allEvents,
+                Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
+                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                }) { eventId ->
+                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+                }
+        else ->
+            EventMap(
+                uiState.eventList.allEvents,
+                navigationActions,
+                Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
+                  top.linkTo(tabs.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                })
       }
     } else {
-      if (uiState.eventList.allEvents.isEmpty() && uiState.userLoggedIn) {
-        Text(
-            "You have no upcoming events",
-            modifier =
-                Modifier.testTag("noUpcomingEventsText").constrainAs(eventList) {
-                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+      when {
+        (!uiState.userLoggedIn) ->
+            Text(
+                "Please log in",
+                modifier =
+                    Modifier.testTag("pleaseLogInText").constrainAs(eventList) {
+                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                    })
+        (uiState.eventList.allEvents.isEmpty()) ->
+            Text(
+                "You have no upcoming events",
+                modifier =
+                    Modifier.testTag("noUpcomingEventsText").constrainAs(eventList) {
+                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                    })
+        (uiState.viewList) ->
+            EventList(
+                events = uiState.eventList.allEvents,
+                modifier =
+                    Modifier.testTag("eventListUpcoming").fillMaxWidth().constrainAs(eventList) {
+                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                    }) { eventId ->
+                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+                }
+        else ->
+            EventMap(
+                uiState.eventList.allEvents,
+                navigationActions,
+                Modifier.testTag("mapUpcoming").fillMaxWidth().constrainAs(eventMap) {
+                  top.linkTo(tabs.bottom, margin = 8.dp)
                   start.linkTo(parent.start)
                   end.linkTo(parent.end)
                 })
-      } else if (!uiState.userLoggedIn) {
-        Text(
-            "Please log in",
-            modifier =
-                Modifier.testTag("pleaseLogInText").constrainAs(eventList) {
-                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                  start.linkTo(parent.start)
-                  end.linkTo(parent.end)
-                })
-      } else {
-        if (uiState.viewList) {
-          EventList(
-              events = uiState.eventList.allEvents,
-              modifier =
-                  Modifier.testTag("eventListUpcoming").fillMaxWidth().constrainAs(eventList) {
-                    top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                  }) { eventId ->
-                navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-              }
-        } else {
-          EventMap(
-              uiState.eventList.allEvents,
-              navigationActions,
-              Modifier.testTag("mapUpcoming").fillMaxWidth().constrainAs(eventMap) {
-                top.linkTo(tabs.bottom, margin = 8.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-              })
-        }
       }
     }
     // Note for now, the filter dialog is always open to verify the UI

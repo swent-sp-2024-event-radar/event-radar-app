@@ -52,7 +52,7 @@ constructor(
         when (userIdResource) {
           is Resource.Success -> {
             val uid = userIdResource.data
-            getUserEvents(uid)
+            getUserUpcomingEvents(uid)
           }
           is Resource.Failure -> {
             Log.d(
@@ -66,7 +66,7 @@ constructor(
     }
   }
 
-  private suspend fun getUserEvents(uid: String) {
+  private suspend fun getUserUpcomingEvents(uid: String) {
     when (val userResponse = userRepository.getUser(uid)) {
       is Resource.Success -> {
         val user = userResponse.data!!
