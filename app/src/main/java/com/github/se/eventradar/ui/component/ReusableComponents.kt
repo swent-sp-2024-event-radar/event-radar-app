@@ -172,12 +172,9 @@ fun SearchBarAndFilter(
     // Filter button
     Button(
         onClick = { onFilterDialogOpen() },
-        modifier = Modifier
-            .padding(start = 8.dp)
-            .testTag("filterButton")
-    ) {
-      Text(stringResource(id = R.string.filter))
-    }
+        modifier = Modifier.padding(start = 8.dp).testTag("filterButton")) {
+          Text(stringResource(id = R.string.filter))
+        }
   }
 }
 
