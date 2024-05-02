@@ -2,6 +2,7 @@ package com.github.se.eventradar.model.repository.user
 
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -134,6 +135,15 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
       }
     } catch (e: Exception) {
       Resource.Failure(e)
+    }
+  }
+
+  override suspend fun getCurrentUserId(): Resource<String> {
+    val userId = Firebase.auth.currentUser?.uid
+    return if (userId != null) {
+      Resource.Success(userId)
+    } else {
+      Resource.Failure(Exception("No user currently signed in"))
     }
   }
 }

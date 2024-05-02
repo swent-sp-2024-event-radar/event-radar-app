@@ -1,7 +1,6 @@
 package com.github.se.eventradar.screens
 
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
-import androidx.compose.ui.test.hasTestTag
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.github.kakaocup.compose.node.element.KNode
 
@@ -20,4 +19,8 @@ class HomeScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   val eventList: KNode = child { hasTestTag("eventList") }
   val searchBarAndFilter: KNode = child { hasTestTag("searchBarAndFilter") }
   val filterPopUp: KNode = child { hasTestTag("filterPopUp") }
+  val noUpcomingEventsText: KNode = child { hasTestTag("noUpcomingEventsText") }
+  val pleaseLogInText: KNode = child { hasTestTag("pleaseLogInText") }
+  val eventListUpcoming: KNode = child { hasTestTag("eventListUpcoming") }
+  val mapUpcoming: KNode = child { hasTestTag("mapUpcoming") }
 }

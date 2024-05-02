@@ -1,6 +1,5 @@
 package com.github.se.eventradar.ui.home
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,10 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -59,8 +56,8 @@ fun HomeScreen(
 ) {
   // Ui States handled by viewModel
   val uiState by viewModel.uiState.collectAsState()
-  LaunchedEffect(key1 = uiState.eventList) { viewModel.getEvents() }
-  val context = LocalContext.current
+
+  LaunchedEffect(Unit) { viewModel.getEvents() }
 
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("homeScreen")) {
     val (logo, tabs, searchAndFilter, filterPopUp, eventList, eventMap, bottomNav, viewToggle) =
@@ -93,7 +90,10 @@ fun HomeScreen(
         contentColor = MaterialTheme.colorScheme.primary) {
           Tab(
               selected = getTabIndexFromTabEnum(uiState.tab) == 0,
-              onClick = { viewModel.onTabChanged(Tab.BROWSE) },
+              onClick = {
+                viewModel.onTabChanged(Tab.BROWSE)
+                viewModel.getEvents()
+              },
               modifier = Modifier.testTag("browseTab"),
           ) {
             Text(
@@ -112,7 +112,10 @@ fun HomeScreen(
           }
           Tab(
               selected = getTabIndexFromTabEnum(uiState.tab) == 1,
-              onClick = { viewModel.onTabChanged(Tab.UPCOMING) },
+              onClick = {
+                viewModel.onTabChanged(Tab.UPCOMING)
+                viewModel.getUpcomingEvents()
+              },
               modifier = Modifier.testTag("upcomingTab")) {
                 Text(
                     text = "Upcoming",
@@ -132,12 +135,12 @@ fun HomeScreen(
 
     SearchBarAndFilter(
         searchQuery = uiState.searchQuery,
-        onSearchQueryChange = { uiState.searchQuery = it },
+        onSearchQueryChange = { newQuery -> viewModel.onSearchQueryChange(newQuery) },
         onSearchButtonClick = {
           // Handle search button click
         },
         showFilterPopUp = uiState.isFilterDialogOpen,
-        setShowFilterPopUp = { uiState.isFilterDialogOpen = it },
+        setShowFilterPopUp = { viewModel.changeFilterDialogOpen() },
         modifier =
             Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 .testTag("searchBarAndFilter")
@@ -147,43 +150,80 @@ fun HomeScreen(
                   end.linkTo(parent.end)
                 })
 
-    if (getTabIndexFromTabEnum(uiState.tab) == 0) {
-      if (uiState.viewList) {
-        EventList(
-            uiState.eventList.allEvents,
-            Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
-              top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-              start.linkTo(parent.start)
-              end.linkTo(parent.end)
-            }) { eventId ->
-              navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-            }
-      } else {
-        EventMap(
-            uiState.eventList.allEvents,
-            navigationActions,
-            Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
-              top.linkTo(tabs.bottom, margin = 8.dp)
-              start.linkTo(parent.start)
-              end.linkTo(parent.end)
-            })
+    if (uiState.tab == Tab.BROWSE) {
+      when {
+        (uiState.viewList) ->
+            EventList(
+                uiState.eventList.allEvents,
+                Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
+                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                }) { eventId ->
+                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+                }
+        else ->
+            EventMap(
+                uiState.eventList.allEvents,
+                navigationActions,
+                Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
+                  top.linkTo(tabs.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                })
       }
     } else {
-      // "Upcoming" tab content
-      // TODO: Implement upcoming events
-      Toast.makeText(context, "Upcoming events not yet available", Toast.LENGTH_SHORT).show()
-      viewModel.onTabChanged(Tab.BROWSE)
+      when {
+        (!uiState.userLoggedIn) ->
+            Text(
+                "Please log in",
+                modifier =
+                    Modifier.testTag("pleaseLogInText").constrainAs(eventList) {
+                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                    })
+        (uiState.eventList.allEvents.isEmpty()) ->
+            Text(
+                "You have no upcoming events",
+                modifier =
+                    Modifier.testTag("noUpcomingEventsText").constrainAs(eventList) {
+                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                    })
+        (uiState.viewList) ->
+            EventList(
+                events = uiState.eventList.allEvents,
+                modifier =
+                    Modifier.testTag("eventListUpcoming").fillMaxWidth().constrainAs(eventList) {
+                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                    }) { eventId ->
+                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+                }
+        else ->
+            EventMap(
+                uiState.eventList.allEvents,
+                navigationActions,
+                Modifier.testTag("mapUpcoming").fillMaxWidth().constrainAs(eventMap) {
+                  top.linkTo(tabs.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                })
+      }
     }
     // Note for now, the filter dialog is always open to verify the UI
     if (!uiState.isFilterDialogOpen) {
       FilterPopUp(
-          onRadiusChange = { radius ->
+          onRadiusChange = {
             // Handle radius change
           },
-          onFreeSelectionChange = { isFree ->
+          onFreeSelectionChange = {
             // Handle free selection change
           },
-          onCategorySelectionChange = { selectedCategories ->
+          onCategorySelectionChange = {
             // Handle category selection change
           },
           modifier =
