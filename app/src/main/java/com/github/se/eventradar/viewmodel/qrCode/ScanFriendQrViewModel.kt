@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 // TODO ViewModel & UI can be improved to error message for each different type of Error ?
 
 @HiltViewModel
-class QrCodeFriendViewModel
+class ScanFriendQrViewModel
 @Inject
 constructor(
     private val userRepository: IUserRepository, // Dependency injection
@@ -129,7 +129,7 @@ constructor(
     _tabState.value = tab
   }
 
-  fun changeAction(action: Action) {
+  private fun changeAction(action: Action) {
     _action.value = action
   }
 }

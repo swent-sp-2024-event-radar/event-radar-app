@@ -36,13 +36,13 @@ import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.TopLevelDestination
-import com.github.se.eventradar.viewmodel.qrCode.QrCodeFriendViewModel
+import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
 
 // TODO cleaner code for Navigation and to correct screen
 
 @Composable
 fun QrCodeScreen(
-    viewModel: QrCodeFriendViewModel = hiltViewModel(),
+    viewModel: ScanFriendQrViewModel = hiltViewModel(),
     navigationActions: NavigationActions
 ) {
   val navigateState by viewModel.action.collectAsState()
@@ -52,7 +52,7 @@ fun QrCodeScreen(
   LaunchedEffect(navigateState) {
     println("launched")
     when (navigateState) {
-      QrCodeFriendViewModel.Action.NavigateToNextScreen -> {
+      ScanFriendQrViewModel.Action.NavigateToNextScreen -> {
         println("entered state")
         navigationActions.navigateTo(
             TopLevelDestination( // TODO
@@ -101,8 +101,8 @@ fun QrCodeScreen(
                 .testTag("tabs"),
         contentColor = MaterialTheme.colorScheme.primary) {
           Tab(
-              selected = activeTabState == QrCodeFriendViewModel.TAB.MyQR,
-              onClick = { viewModel.changeTabState(QrCodeFriendViewModel.TAB.MyQR) },
+              selected = activeTabState == ScanFriendQrViewModel.TAB.MyQR,
+              onClick = { viewModel.changeTabState(ScanFriendQrViewModel.TAB.MyQR) },
               modifier = Modifier.testTag("My QR Code"),
           ) {
             Text(
@@ -120,9 +120,9 @@ fun QrCodeScreen(
                 modifier = Modifier.padding(bottom = 8.dp))
           }
           Tab(
-              selected = activeTabState == QrCodeFriendViewModel.TAB.ScanQR,
+              selected = activeTabState == ScanFriendQrViewModel.TAB.ScanQR,
               onClick = {
-                viewModel.changeTabState(QrCodeFriendViewModel.TAB.ScanQR)
+                viewModel.changeTabState(ScanFriendQrViewModel.TAB.ScanQR)
               }, // selectedTabIndex = 1
               modifier = Modifier.testTag("Scan QR Code")) {
                 Text(
@@ -141,7 +141,7 @@ fun QrCodeScreen(
               }
         }
 
-    if (activeTabState == QrCodeFriendViewModel.TAB.MyQR) {
+    if (activeTabState == ScanFriendQrViewModel.TAB.MyQR) {
       Toast.makeText(context, "My Qr Code not yet available", Toast.LENGTH_SHORT).show()
     } else {
       Column(modifier = Modifier.testTag("QrScanner")) {
