@@ -78,6 +78,7 @@ constructor(
     val uidex = "AwOXI3dCWjfYKk7bnBQ0S94WxbD2"
 
     val friendID = decodedString.take(uidex.length)
+    Log.d("QrCodeFriendViewModel", "Friend ID: $friendID")
 
     viewModelScope.launch {
       val friendUserDeferred = async { userRepository.getUser(friendID) }
