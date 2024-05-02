@@ -1,7 +1,7 @@
 package com.github.se.eventradar.ui.qrCode
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -30,16 +31,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.TopLevelDestination
+import com.github.se.eventradar.viewmodel.MyQrCodeViewModel
 import com.github.se.eventradar.viewmodel.qrCode.QrCodeFriendViewModel
 
 @Composable
 fun QrCodeScreen(
+    myQrCodeViewModel: MyQrCodeViewModel = hiltViewModel(),
     viewModel: QrCodeFriendViewModel = hiltViewModel(),
     navigationActions: NavigationActions
 ) {
@@ -63,14 +68,13 @@ fun QrCodeScreen(
       else -> Unit // Do nothing if the state is None or any other non-navigational state
     }
   }
-
   //  var selectedTabIndex by remember { mutableIntStateOf(0) }
   val context = LocalContext.current
 
   ConstraintLayout(
       modifier = Modifier.fillMaxSize().testTag("qrCodeScannerScreen"),
   ) {
-    val (logo, tabs, bottomNav) = createRefs()
+    val (logo, tabs, myqrcode, bottomNav) = createRefs()
     Row(
         modifier =
             Modifier.fillMaxWidth()
@@ -141,7 +145,15 @@ fun QrCodeScreen(
         }
 
     if (activeTabState == QrCodeFriendViewModel.TAB.MyQR) {
-      Toast.makeText(context, "My Qr Code not yet available", Toast.LENGTH_SHORT).show()
+
+      MyQrCodeComposable(
+          myQrCodeViewModel,
+          modifier =
+              Modifier.testTag("myQrCodeScreen").constrainAs(myqrcode) {
+                top.linkTo(tabs.bottom, margin = 32.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+              })
     } else {
       Column(modifier = Modifier.testTag("QrScanner")) {
         QrCodeCamera().QrCodeScanner(analyser = viewModel.qrCodeAnalyser)
@@ -160,6 +172,35 @@ fun QrCodeScreen(
   }
 }
 
+@Composable
+fun MyQrCodeComposable(viewModel: MyQrCodeViewModel, modifier: Modifier) {
+  val uiState by viewModel.uiState.collectAsState()
+  Column(
+      modifier = modifier,
+      verticalArrangement = Arrangement.Center, // Vertically center the content
+      horizontalAlignment = Alignment.CenterHorizontally // Horizontally center the content
+      ) {
+        Text(
+            "@username {}", // uiState.qrCode
+            modifier = Modifier.testTag("username"),
+            fontSize = 36.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 0.36.sp,
+            fontFamily = FontFamily.Default,
+            color = MaterialTheme.colorScheme.onBackground // Set the color to black,
+            )
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data("https://cdn.britannica.com/17/155017-050-9AC96FC8/Example-QR-code.jpg") //uiState.qrCode (only works for jpg)
+                .crossfade(true)
+                .build(),
+            //error = painterResource(R.drawable.qr_code), // should be a error indicative
+            //placeholder = painterResource(R.drawable.placeholder), // should be loading image
+            contentDescription = stringResource(R.string.my_qr_code),
+            modifier = Modifier.size(width = 300.dp, height = 300.dp).testTag("QrCodeImage"))
+      }
+}
+
 // private val dummyQrCodeScanned: (String) -> Unit = { qrCode ->
 //  Log.d("QRCodeScanner", "QR Code Scanned: $qrCode")
 //  // You can perform any additional logic here for testing
@@ -168,5 +209,9 @@ fun QrCodeScreen(
 // @androidx.compose.ui.tooling.preview.Preview
 // @Composable
 // fun QrcodeScanTest() {
-//  QrCodeScreen(viewNavigationActions(rememberNavController()))
+//    val mockEventRepo = MockEventRepository()
+//    val mockUserRepo = MockUserRepository()
+//    val mockQrCodeAnalyser = QrCodeAnalyser()
+//  QrCodeScreen( MyQrCodeViewModel(mockUserRepo), QrCodeFriendViewModel(mockUserRepo,
+// mockQrCodeAnalyser), NavigationActions(rememberNavController()))
 // }

@@ -116,7 +116,7 @@ dependencies {
     implementation("com.google.firebase:firebase-database-ktx")
 
     // Coil
-    implementation("io.coil-kt:coil-compose:1.4.0")
+    implementation("io.coil-kt:coil-compose:2.4.0")
     
     // Dagger Hilt
     implementation("com.google.dagger:hilt-android:${rootProject.extra.get("hiltVersion")}")

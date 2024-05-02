@@ -23,5 +23,6 @@ interface IUserRepository {
   suspend fun uploadImage(selectedImageUri: Uri, uid: String, folderName: String): Resource<Unit>
 
   suspend fun getImage(uid: String, folderName: String): Resource<String>
+
   suspend fun getCurrentUserId(): Resource<String>
 }
