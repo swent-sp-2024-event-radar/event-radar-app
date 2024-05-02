@@ -5,7 +5,7 @@ import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
-import com.github.se.eventradar.viewmodel.qrCode.QrCodeFriendViewModel
+import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,9 +22,9 @@ import org.junit.runner.Description
 
 // TODO stimulate event where update does not work on first few tries but eventually works
 @ExperimentalCoroutinesApi
-class QrCodeFriendViewModelTest {
+class ScanFriendQrViewModelTest {
 
-  private lateinit var viewModel: QrCodeFriendViewModel
+  private lateinit var viewModel: ScanFriendQrViewModel
   private lateinit var userRepository: IUserRepository
   private lateinit var qrCodeAnalyser: QrCodeAnalyser
 
@@ -113,7 +113,7 @@ class QrCodeFriendViewModelTest {
     userRepository = MockUserRepository()
     (userRepository as MockUserRepository).updateCurrentUserId(myUID)
     qrCodeAnalyser = QrCodeAnalyser()
-    viewModel = QrCodeFriendViewModel(userRepository, qrCodeAnalyser)
+    viewModel = ScanFriendQrViewModel(userRepository, qrCodeAnalyser)
   }
 
   @Test
@@ -132,7 +132,7 @@ class QrCodeFriendViewModelTest {
     userRepository.addUser(mockUser2)
     qrCodeAnalyser.onDecoded?.invoke(null)
     assertEquals("Failed to decode QR Code", viewModel.decodedResult.value)
-    assertEquals(QrCodeFriendViewModel.Action.AnalyserError, viewModel.action.value)
+    assertEquals(ScanFriendQrViewModel.Action.AnalyserError, viewModel.action.value)
   }
   // todo should i be testing thta it is reset to none ? isnt this Ui logic?
   @Test
@@ -158,7 +158,7 @@ class QrCodeFriendViewModelTest {
         println("User 2 not found or could not be fetched")
       }
     }
-    assertEquals(QrCodeFriendViewModel.Action.NavigateToNextScreen, viewModel.action.value)
+    assertEquals(ScanFriendQrViewModel.Action.NavigateToNextScreen, viewModel.action.value)
   }
 
   @Test
@@ -184,6 +184,6 @@ class QrCodeFriendViewModelTest {
         println("User 2 not found or could not be fetched")
       }
     }
-    assertEquals(QrCodeFriendViewModel.Action.NavigateToNextScreen, viewModel.action.value)
+    assertEquals(ScanFriendQrViewModel.Action.NavigateToNextScreen, viewModel.action.value)
   }
 }

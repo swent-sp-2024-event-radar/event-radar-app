@@ -19,12 +19,21 @@ import kotlinx.coroutines.launch
 // TODO ViewModel & UI can be improved to error message for each different type of Error ?
 
 @HiltViewModel
-class QrCodeFriendViewModel
+class ScanFriendQrViewModel
 @Inject
 constructor(
     private val userRepository: IUserRepository, // Dependency injection
     val qrCodeAnalyser: QrCodeAnalyser, // Dependency injection
 ) : ViewModel() {
+
+  private val _decodedResult = MutableStateFlow<String?>(null)
+  val decodedResult: StateFlow<String?> = _decodedResult.asStateFlow()
+
+  private val _action = MutableStateFlow(Action.None)
+  val action: StateFlow<Action> = _action.asStateFlow()
+
+  private val _tabState = MutableStateFlow(TAB.MyQR)
+  val tabState: StateFlow<TAB> = _tabState.asStateFlow()
 
   enum class Action {
     None,
@@ -41,15 +50,6 @@ constructor(
   }
 
   private var myUID = ""
-
-  private val _decodedResult = MutableStateFlow<String?>(null)
-  val decodedResult: StateFlow<String?> = _decodedResult.asStateFlow()
-
-  private val _action = MutableStateFlow(Action.None)
-  val action: StateFlow<Action> = _action.asStateFlow()
-
-  private val _tabState = MutableStateFlow(TAB.MyQR)
-  val tabState: StateFlow<TAB> = _tabState.asStateFlow()
 
   init {
     viewModelScope.launch {

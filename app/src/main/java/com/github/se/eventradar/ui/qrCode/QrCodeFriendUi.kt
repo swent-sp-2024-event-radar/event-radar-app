@@ -14,7 +14,6 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,36 +29,30 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.NavigationActions
-import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.eventradar.ui.navigation.TopLevelDestination
-import com.github.se.eventradar.viewmodel.qrCode.QrCodeFriendViewModel
+import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
 
 // TODO cleaner code for Navigation and to correct screen
 
 @Composable
 fun QrCodeScreen(
-    viewModel: QrCodeFriendViewModel = hiltViewModel(),
+    viewModel: ScanFriendQrViewModel = hiltViewModel(),
     navigationActions: NavigationActions
 ) {
-  val navigateState by viewModel.action.collectAsState()
-  val activeTabState by viewModel.tabState.collectAsState()
+  val navigateState by viewModel.action.collectAsStateWithLifecycle()
+  val activeTabState by viewModel.tabState.collectAsStateWithLifecycle()
 
   // React to changes in navigation state
   LaunchedEffect(navigateState) {
-    println("launched")
     when (navigateState) {
-      QrCodeFriendViewModel.Action.NavigateToNextScreen -> {
-        println("entered state")
+      ScanFriendQrViewModel.Action.NavigateToNextScreen -> {
         navigationActions.navigateTo(
-            TopLevelDestination( // TODO
-                route = Route.MESSAGE,
-                icon = R.drawable.chat_bubble,
-                textId = R.string.message_chats,
-            )) // Adjust according to your actual navigation logic
+            TOP_LEVEL_DESTINATIONS[
+                1]) // TODO change to private message screen with friend // Adjust according to your
         viewModel.resetNavigationEvent() // Reset the navigation event in the ViewModel to prevent
       }
       else -> Unit // Do nothing if the state is None or any other non-navigational state
@@ -101,8 +94,8 @@ fun QrCodeScreen(
                 .testTag("tabs"),
         contentColor = MaterialTheme.colorScheme.primary) {
           Tab(
-              selected = activeTabState == QrCodeFriendViewModel.TAB.MyQR,
-              onClick = { viewModel.changeTabState(QrCodeFriendViewModel.TAB.MyQR) },
+              selected = activeTabState == ScanFriendQrViewModel.TAB.MyQR,
+              onClick = { viewModel.changeTabState(ScanFriendQrViewModel.TAB.MyQR) },
               modifier = Modifier.testTag("My QR Code"),
           ) {
             Text(
@@ -120,9 +113,9 @@ fun QrCodeScreen(
                 modifier = Modifier.padding(bottom = 8.dp))
           }
           Tab(
-              selected = activeTabState == QrCodeFriendViewModel.TAB.ScanQR,
+              selected = activeTabState == ScanFriendQrViewModel.TAB.ScanQR,
               onClick = {
-                viewModel.changeTabState(QrCodeFriendViewModel.TAB.ScanQR)
+                viewModel.changeTabState(ScanFriendQrViewModel.TAB.ScanQR)
               }, // selectedTabIndex = 1
               modifier = Modifier.testTag("Scan QR Code")) {
                 Text(
@@ -141,11 +134,11 @@ fun QrCodeScreen(
               }
         }
 
-    if (activeTabState == QrCodeFriendViewModel.TAB.MyQR) {
+    if (activeTabState == ScanFriendQrViewModel.TAB.MyQR) {
       Toast.makeText(context, "My Qr Code not yet available", Toast.LENGTH_SHORT).show()
     } else {
       Column(modifier = Modifier.testTag("QrScanner")) {
-        QrCodeCamera().QrCodeScanner(analyser = viewModel.qrCodeAnalyser)
+        QrCodeScanner(analyser = viewModel.qrCodeAnalyser)
       }
     }
     BottomNavigationMenu(
