@@ -72,6 +72,15 @@ android {
             }
         }
     }
+  
+    signingConfigs {
+      create("release") {
+        storeFile = file("keystore.jks")
+        storePassword = System.getenv("key_store_password")
+        keyAlias = System.getenv("alias")
+        keyPassword = System.getenv("key_password")
+      }
+    }
 }
 
 dependencies {
