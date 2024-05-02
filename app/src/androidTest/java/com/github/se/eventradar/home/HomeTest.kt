@@ -85,9 +85,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       filterPopUp { assertIsNotDisplayed() }
       filterButton {
           assertIsDisplayed()
-          performClick()
-      }
-    }
+          performClick() }
   }
 
   @Test
