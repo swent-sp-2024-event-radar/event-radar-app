@@ -1,13 +1,7 @@
 package com.github.se.eventradar.ui.home
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,29 +9,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults.cardColors
-import androidx.compose.material3.CardDefaults.cardElevation
-import androidx.compose.material3.CardDefaults.shape
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TextFieldDefaults.shape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -84,29 +59,27 @@ fun HomeScreen(
 ) {
   // Ui States handled by viewModel
   val uiState by viewModel.uiState.collectAsState()
-  LaunchedEffect(key1 = uiState.eventList, key2 = uiState.isSearchActive, key3 = uiState.isFilterActive) {
-      if (uiState.isSearchActive || uiState.isFilterActive) {
+  LaunchedEffect(
+      key1 = uiState.eventList, key2 = uiState.isSearchActive, key3 = uiState.isFilterActive) {
+        if (uiState.isSearchActive || uiState.isFilterActive) {
           viewModel.filterEvents()
-      } else {
+        } else {
           viewModel.getEvents()
+        }
       }
-  }
   val context = LocalContext.current
 
-  ConstraintLayout(modifier = Modifier
-      .fillMaxSize()
-      .testTag("homeScreen")) {
+  ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("homeScreen")) {
     val (logo, tabs, searchAndFilter, filterPopUp, eventList, eventMap, bottomNav, viewToggle) =
         createRefs()
     Row(
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .constrainAs(logo) {
-                top.linkTo(parent.top, margin = 32.dp)
-                start.linkTo(parent.start, margin = 16.dp)
-            }
-            .testTag("logo"),
+            Modifier.fillMaxWidth()
+                .constrainAs(logo) {
+                  top.linkTo(parent.top, margin = 32.dp)
+                  start.linkTo(parent.start, margin = 16.dp)
+                }
+                .testTag("logo"),
         verticalAlignment = Alignment.CenterVertically) {
           Image(
               painter = painterResource(id = R.drawable.event_logo),
@@ -116,15 +89,14 @@ fun HomeScreen(
     TabRow(
         selectedTabIndex = getTabIndexFromTabEnum(uiState.tab),
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp)
-            .constrainAs(tabs) {
-                top.linkTo(logo.bottom, margin = 16.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }
-            .testTag("tabs"),
+            Modifier.fillMaxWidth()
+                .padding(top = 8.dp)
+                .constrainAs(tabs) {
+                  top.linkTo(logo.bottom, margin = 16.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                }
+                .testTag("tabs"),
         contentColor = MaterialTheme.colorScheme.primary) {
           Tab(
               selected = getTabIndexFromTabEnum(uiState.tab) == 0,
@@ -170,58 +142,58 @@ fun HomeScreen(
         uiState = uiState,
         onSearchActiveChanged = { viewModel.onSearchActiveChanged(it) },
         onFilterDialogOpen = { viewModel.onFilterDialogOpen() },
-        modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .testTag("searchBarAndFilter")
-            .constrainAs(searchAndFilter) {
-                top.linkTo(tabs.bottom, margin = 8.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            })
+        modifier =
+            Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                .testTag("searchBarAndFilter")
+                .constrainAs(searchAndFilter) {
+                  top.linkTo(tabs.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                })
 
     if (getTabIndexFromTabEnum(uiState.tab) == 0) {
       if (uiState.viewList) {
-          if (uiState.isSearchActive || uiState.isFilterActive) {
-              EventList(
-                  uiState.eventList.filteredEvents,
-                  Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
-                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                      start.linkTo(parent.start)
-                      end.linkTo(parent.end)
-                  }) { eventId ->
-                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+        if (uiState.isSearchActive || uiState.isFilterActive) {
+          EventList(
+              uiState.eventList.filteredEvents,
+              Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
+                top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+              }) { eventId ->
+                navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
               }
-          } else {
+        } else {
 
-              EventList(
-                  uiState.eventList.allEvents,
-                  Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
-                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                      start.linkTo(parent.start)
-                      end.linkTo(parent.end)
-                  }) { eventId ->
-                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+          EventList(
+              uiState.eventList.allEvents,
+              Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
+                top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+              }) { eventId ->
+                navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
               }
-          }
+        }
       } else {
         if (uiState.isSearchActive || uiState.isFilterActive) {
-            EventMap(
-                uiState.eventList.filteredEvents,
-                navigationActions,
-                Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
-                    top.linkTo(tabs.bottom, margin = 8.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                })
+          EventMap(
+              uiState.eventList.filteredEvents,
+              navigationActions,
+              Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
+                top.linkTo(tabs.bottom, margin = 8.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+              })
         } else {
-            EventMap(
-                uiState.eventList.allEvents,
-                navigationActions,
-                Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
-                    top.linkTo(tabs.bottom, margin = 8.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                })
+          EventMap(
+              uiState.eventList.allEvents,
+              navigationActions,
+              Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
+                top.linkTo(tabs.bottom, margin = 8.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+              })
         }
       }
     } else {
@@ -238,14 +210,12 @@ fun HomeScreen(
           uiState = uiState,
           onRadiusQueryChanged = { viewModel.onRadiusQueryChanged(it) },
           viewModel = viewModel,
-          modifier = Modifier
-              .height(355.dp)
-              .width(230.dp)
-              .testTag("filterPopUp")
-              .constrainAs(filterPopUp) {
-                  top.linkTo(searchAndFilter.bottom)
-                  end.linkTo(parent.end)
-              },
+          modifier =
+              Modifier.height(355.dp).width(230.dp).testTag("filterPopUp").constrainAs(
+                  filterPopUp) {
+                    top.linkTo(searchAndFilter.bottom)
+                    end.linkTo(parent.end)
+                  },
       )
     }
 
@@ -263,12 +233,10 @@ fun HomeScreen(
         tabList = TOP_LEVEL_DESTINATIONS,
         selectedItem = getTopLevelDestination(Route.HOME),
         modifier =
-        Modifier
-            .testTag("bottomNavMenu")
-            .constrainAs(bottomNav) {
-                bottom.linkTo(parent.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
+            Modifier.testTag("bottomNavMenu").constrainAs(bottomNav) {
+              bottom.linkTo(parent.bottom)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
             })
   }
 }

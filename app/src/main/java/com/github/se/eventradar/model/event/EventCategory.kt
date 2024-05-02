@@ -1,7 +1,6 @@
 package com.github.se.eventradar.model.event
 
 import android.content.Context
-import android.util.Log
 import com.github.se.eventradar.R
 
 enum class EventCategory(val displayName: String) {

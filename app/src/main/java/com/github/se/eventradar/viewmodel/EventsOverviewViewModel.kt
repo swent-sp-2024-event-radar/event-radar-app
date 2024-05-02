@@ -11,14 +11,14 @@ import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class EventsOverviewViewModel
@@ -31,111 +31,112 @@ constructor(
   val uiState: StateFlow<EventsOverviewUiState> = _uiState
 
   fun onSearchQueryChanged(query: String) {
-      _uiState.value = _uiState.value.copy(searchQuery = query)
+    _uiState.value = _uiState.value.copy(searchQuery = query)
   }
-    fun onSearchActiveChanged(isSearchActive: Boolean) {
-        _uiState.value = _uiState.value.copy(isSearchActive = isSearchActive)
-    }
 
-    fun onFilterDialogOpen(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
-        state.value = state.value.copy(isFilterDialogOpen = !state.value.isFilterDialogOpen)
-    }
+  fun onSearchActiveChanged(isSearchActive: Boolean) {
+    _uiState.value = _uiState.value.copy(isSearchActive = isSearchActive)
+  }
 
-    fun onRadiusQueryChanged(radius: String) {
-        _uiState.value = _uiState.value.copy(radiusQuery = radius)
-    }
+  fun onFilterDialogOpen(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
+    state.value = state.value.copy(isFilterDialogOpen = !state.value.isFilterDialogOpen)
+  }
 
-    fun onFreeSwitchChanged(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
-        state.value = state.value.copy(isFreeSwitchOn = !state.value.isFreeSwitchOn)
-    }
+  fun onRadiusQueryChanged(radius: String) {
+    _uiState.value = _uiState.value.copy(radiusQuery = radius)
+  }
 
-    fun onCategorySelectionChanged(category: EventCategory) {
-        val categoriesCheckedList = _uiState.value.categoriesCheckedList
-        if (categoriesCheckedList.contains(category)) {
-            categoriesCheckedList.remove(category)
-        } else {
-            categoriesCheckedList.add(category)
-        }
-        _uiState.value = _uiState.value.copy(categoriesCheckedList = categoriesCheckedList)
-    }
+  fun onFreeSwitchChanged(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
+    state.value = state.value.copy(isFreeSwitchOn = !state.value.isFreeSwitchOn)
+  }
 
-    fun onFilterApply(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
-        state.value = state.value.copy(isFilterActive = true)
-        filterEvents()
+  fun onCategorySelectionChanged(category: EventCategory) {
+    val categoriesCheckedList = _uiState.value.categoriesCheckedList
+    if (categoriesCheckedList.contains(category)) {
+      categoriesCheckedList.remove(category)
+    } else {
+      categoriesCheckedList.add(category)
     }
+    _uiState.value = _uiState.value.copy(categoriesCheckedList = categoriesCheckedList)
+  }
+
+  fun onFilterApply(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
+    state.value = state.value.copy(isFilterActive = true)
+    filterEvents()
+  }
 
   fun filterEvents() {
-      // Filter based on search query
+    // Filter based on search query
     val query = _uiState.value.searchQuery
-      val filteredEventsSearch =
+    val filteredEventsSearch =
         _uiState.value.eventList.allEvents.filter {
           it.eventName.contains(query, ignoreCase = true)
         }
 
-      // Filter based on radius query
-        val radiusQuery = _uiState.value.radiusQuery
+    // Filter based on radius query
+    val radiusQuery = _uiState.value.radiusQuery
 
-      // For now, use a fixed user location - but this should be updated to use the user's actual location
-      val userLocation = Location(
-          latitude = 38.92,
-          longitude = 78.78,
-          address = "Ecublens"
-      )
-      val filteredEventsRadius =
-          if (radiusQuery == "") {
-            _uiState.value.eventList.allEvents
-          } else {
-              _uiState.value.eventList.allEvents.filter { event ->
-                  val distance = calculateDistance(userLocation, event.location)
-                  distance <= radiusQuery.toDouble()
-              }
+    // For now, use a fixed user location - but this should be updated to use the user's actual
+    // location
+    val userLocation = Location(latitude = 38.92, longitude = 78.78, address = "Ecublens")
+    val filteredEventsRadius =
+        if (radiusQuery == "") {
+          _uiState.value.eventList.allEvents
+        } else {
+          _uiState.value.eventList.allEvents.filter { event ->
+            val distance = calculateDistance(userLocation, event.location)
+            distance <= radiusQuery.toDouble()
           }
-
-      // Filter based on free switch
-      val isFreeSwitchOn = _uiState.value.isFreeSwitchOn
-        val filteredEventsFree = _uiState.value.eventList.allEvents.filter {
-            if (isFreeSwitchOn) {
-                it.ticket.price == 0.0
-            } else {
-                true
-            }
         }
 
-      // Filter based on categories selected
-      val categoriesCheckedList = _uiState.value.categoriesCheckedList
-      val filteredEventsCategory = _uiState.value.eventList.allEvents.filter { event ->
+    // Filter based on free switch
+    val isFreeSwitchOn = _uiState.value.isFreeSwitchOn
+    val filteredEventsFree =
+        _uiState.value.eventList.allEvents.filter {
+          if (isFreeSwitchOn) {
+            it.ticket.price == 0.0
+          } else {
+            true
+          }
+        }
+
+    // Filter based on categories selected
+    val categoriesCheckedList = _uiState.value.categoriesCheckedList
+    val filteredEventsCategory =
+        _uiState.value.eventList.allEvents.filter { event ->
           categoriesCheckedList.any { it == event.category }
-      }
+        }
 
-      val filteredEvents = filteredEventsSearch
-          .intersect(filteredEventsRadius.toSet())
-          .intersect(filteredEventsFree.toSet())
-          .intersect(filteredEventsCategory.toSet())
+    val filteredEvents =
+        filteredEventsSearch
+            .intersect(filteredEventsRadius.toSet())
+            .intersect(filteredEventsFree.toSet())
+            .intersect(filteredEventsCategory.toSet())
 
-      _uiState.value =
-          _uiState.value.copy(
-              eventList = _uiState.value.eventList.copy(filteredEvents = filteredEvents.toList()))
+    _uiState.value =
+        _uiState.value.copy(
+            eventList = _uiState.value.eventList.copy(filteredEvents = filteredEvents.toList()))
   }
 
-    // Calculates distance between 2 coordinate points based on Haversine formula
-    // Accounts for earth's curvature
-    private fun calculateDistance(location1: Location, location2: Location): Double {
-        val lat1 = Math.toRadians(location1.latitude)
-        val lon1 = Math.toRadians(location1.longitude)
-        val lat2 = Math.toRadians(location2.latitude)
-        val lon2 = Math.toRadians(location2.longitude)
+  // Calculates distance between 2 coordinate points based on Haversine formula
+  // Accounts for earth's curvature
+  private fun calculateDistance(location1: Location, location2: Location): Double {
+    val lat1 = Math.toRadians(location1.latitude)
+    val lon1 = Math.toRadians(location1.longitude)
+    val lat2 = Math.toRadians(location2.latitude)
+    val lon2 = Math.toRadians(location2.longitude)
 
-        val diffLon = lon2 - lon1
-        val diffLat = lat2 - lat1
+    val diffLon = lon2 - lon1
+    val diffLat = lat2 - lat1
 
-        val a = sin(diffLat / 2).pow(2) + cos(lat1) * cos(lat2) * sin(diffLon / 2).pow(2)
-        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    val a = sin(diffLat / 2).pow(2) + cos(lat1) * cos(lat2) * sin(diffLon / 2).pow(2)
+    val c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
-        // Radius of the Earth in km (since radius input is in km)
-        val radius = 6371.0
+    // Radius of the Earth in km (since radius input is in km)
+    val radius = 6371.0
 
-        return radius * c
-    }
+    return radius * c
+  }
 
   fun getEvents() {
     viewModelScope.launch {
@@ -205,7 +206,8 @@ data class EventsOverviewUiState(
     val isFilterActive: Boolean = false,
     val radiusQuery: String = "",
     val isFreeSwitchOn: Boolean = true,
-    val categoriesCheckedList: MutableSet<EventCategory> = mutableSetOf(*enumValues<EventCategory>()),
+    val categoriesCheckedList: MutableSet<EventCategory> =
+        mutableSetOf(*enumValues<EventCategory>()),
     val viewList: Boolean = true,
     val tab: Tab = Tab.BROWSE,
 )

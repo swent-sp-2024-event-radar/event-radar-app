@@ -1,6 +1,5 @@
 package com.github.se.eventradar.ui.component
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -32,7 +31,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -40,8 +38,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -154,35 +150,30 @@ fun SearchBarAndFilter(
     onFilterDialogOpen: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
-        // Search bar
-        TextField(
-            value = uiState.searchQuery,
-            onValueChange = {
-                onSearchQueryChanged(it)
-                if (it == "") onSearchActiveChanged(false)
-                else onSearchActiveChanged(true)
-            },
-            modifier = Modifier.weight(1f),
-            maxLines = 1,
-            shape = RoundedCornerShape(32.dp),
-            colors =
+  Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
+    // Search bar
+    TextField(
+        value = uiState.searchQuery,
+        onValueChange = {
+          onSearchQueryChanged(it)
+          if (it == "") onSearchActiveChanged(false) else onSearchActiveChanged(true)
+        },
+        modifier = Modifier.weight(1f),
+        maxLines = 1,
+        shape = RoundedCornerShape(32.dp),
+        colors =
             TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent),
-            placeholder = { Text(stringResource(id = R.string.home_search_placeholder)) },
-            trailingIcon = { Icon(Icons.Default.Search, contentDescription = null) })
+        placeholder = { Text(stringResource(id = R.string.home_search_placeholder)) },
+        trailingIcon = { Icon(Icons.Default.Search, contentDescription = null) })
 
-        // Filter button
-        Button(
-            onClick = {
-                onFilterDialogOpen()
-            },
-            modifier = Modifier.padding(start = 8.dp)) {
-            Text(stringResource(id = R.string.filter))
-        }
+    // Filter button
+    Button(onClick = { onFilterDialogOpen() }, modifier = Modifier.padding(start = 8.dp)) {
+      Text(stringResource(id = R.string.filter))
     }
+  }
 }
 
 @Composable
@@ -194,96 +185,84 @@ fun FilterPopUp(
     viewModel: EventsOverviewViewModel,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier) {
-        Card(
-            modifier = Modifier.padding(12.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        ) {
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp)) {
-                // Text input for radius
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Box( modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(id = R.string.radius_label),
-                            style = TextStyle(fontSize = 16.sp))
-                    }
-                    Box(modifier = Modifier.weight(1f)) {
-                        BasicTextField(
-                            value = uiState.radiusQuery,
-                            onValueChange = { onRadiusQueryChanged(it)
-                            },
-                            keyboardOptions =
-                            KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .border(
-                                    width = 1.dp,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    shape = RoundedCornerShape(10)
-                                ),
-                            textStyle = TextStyle.Default.copy(fontSize = 16.sp),
-                            singleLine = true
-                        )
-                    }
-                    Box(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(id = R.string.radius_km_label),
-                            style = TextStyle(fontSize = 16.sp))
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // Slider for free selection
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start) {
-                    Text(
-                        text = stringResource(id = R.string.free_events_label),
-                        style =
-                        TextStyle(
-                            fontSize = 16.sp,
-                        ))
-                    Switch(
-                        checked = uiState.isFreeSwitchOn,
-                        onCheckedChange = { onFreeSwitchChanged() },
-                    )
-                }
-
-                // Buttons for category selection
-                Text(
-                    text = stringResource(id = R.string.category_label),
-                    modifier = Modifier.weight(1f),
-                    style =
-                    TextStyle(
-                        fontSize = 16.sp,
-                    ))
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start) {
-                    CategorySelection(
-                        onCategorySelectionChanged = { viewModel.onCategorySelectionChanged(it) },
-                        uiState = uiState
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // Button to apply filter
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                    Button(
-                        onClick = {
-                            onFilterApply()
-                        }) {
-                        Text(stringResource(id = R.string.filter_apply))
-                    }
-                }
-            }
+  Box(modifier = modifier) {
+    Card(
+        modifier = Modifier.padding(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+    ) {
+      Column(modifier = Modifier.fillMaxSize().padding(12.dp)) {
+        // Text input for radius
+        Row(modifier = Modifier.fillMaxWidth()) {
+          Box(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(id = R.string.radius_label),
+                style = TextStyle(fontSize = 16.sp))
+          }
+          Box(modifier = Modifier.weight(1f)) {
+            BasicTextField(
+                value = uiState.radiusQuery,
+                onValueChange = { onRadiusQueryChanged(it) },
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            shape = RoundedCornerShape(10)),
+                textStyle = TextStyle.Default.copy(fontSize = 16.sp),
+                singleLine = true)
+          }
+          Box(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(id = R.string.radius_km_label),
+                style = TextStyle(fontSize = 16.sp))
+          }
         }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        // Slider for free selection
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start) {
+              Text(
+                  text = stringResource(id = R.string.free_events_label),
+                  style =
+                      TextStyle(
+                          fontSize = 16.sp,
+                      ))
+              Switch(
+                  checked = uiState.isFreeSwitchOn,
+                  onCheckedChange = { onFreeSwitchChanged() },
+              )
+            }
+
+        // Buttons for category selection
+        Text(
+            text = stringResource(id = R.string.category_label),
+            modifier = Modifier.weight(1f),
+            style =
+                TextStyle(
+                    fontSize = 16.sp,
+                ))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start) {
+              CategorySelection(
+                  onCategorySelectionChanged = { viewModel.onCategorySelectionChanged(it) },
+                  uiState = uiState)
+            }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        // Button to apply filter
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+          Button(onClick = { onFilterApply() }) { Text(stringResource(id = R.string.filter_apply)) }
+        }
+      }
     }
+  }
 }
 
 @Composable
@@ -291,28 +270,25 @@ fun CategorySelection(
     onCategorySelectionChanged: (EventCategory) -> Unit,
     uiState: EventsOverviewUiState,
 ) {
-    LazyColumn {
-        items(EventCategory.entries) { category ->
-            val isChecked = category in uiState.categoriesCheckedList
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier.padding(vertical = 0.dp)) {
-                Checkbox(
-                    checked = isChecked,
-                    onCheckedChange = { onCategorySelectionChanged(category) },
-                    modifier = Modifier
-                        .scale(0.6f)
-                        .size(10.dp)
-                        .padding(start = 10.dp))
-                Text(
-                    text = category.displayName,
-                    style =
+  LazyColumn {
+    items(EventCategory.entries) { category ->
+      val isChecked = category in uiState.categoriesCheckedList
+      Row(
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.Start,
+          modifier = Modifier.padding(vertical = 0.dp)) {
+            Checkbox(
+                checked = isChecked,
+                onCheckedChange = { onCategorySelectionChanged(category) },
+                modifier = Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp))
+            Text(
+                text = category.displayName,
+                style =
                     TextStyle(
                         fontSize = 16.sp,
                     ),
-                    modifier = Modifier.padding(start = 16.dp))
-            }
-        }
+                modifier = Modifier.padding(start = 16.dp))
+          }
     }
+  }
 }
