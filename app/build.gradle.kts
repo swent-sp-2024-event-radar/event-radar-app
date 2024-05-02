@@ -63,23 +63,23 @@ val activityComposeVersion = "1.9.0"
 val androidXCameraVersion = "1.3.3"
 val androidXEmulatorVersion = "2.3.0"
 dependencies {
-  implementation("androidx.core:core-ktx:1.13.0")
-  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-  implementation("androidx.activity:activity-compose:1.9.0")
+  implementation("androidx.core:core-ktx:1.7.0")
+  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
+  implementation("androidx.activity:activity-compose:1.8.2")
   implementation("androidx.compose.ui:ui-graphics")
-  implementation("androidx.compose.material:material:1.6.6")
-  implementation("androidx.compose.material3:material3:1.2.1")
+  implementation("androidx.compose.material:material:1.1.1")
+  implementation("androidx.compose.material3:material3:1.1.2")
   implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 
   // Navigation
-  implementation("androidx.navigation:navigation-compose:2.7.7")
-  implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+  implementation("androidx.navigation:navigation-compose:2.6.0-rc01")
+  implementation("androidx.navigation:navigation-ui-ktx:2.7.5")
 
   // Google Maps
   implementation("com.google.maps.android:maps-compose:4.3.3")
   implementation("com.google.maps.android:maps-compose-utils:4.3.3")
-  implementation("com.google.android.gms:play-services-maps:18.2.0")
-  implementation("com.google.android.gms:play-services-auth:21.1.0")
+  implementation("com.google.android.gms:play-services-maps:18.1.0")
+  implementation("com.google.android.gms:play-services-auth:20.6.0")
 
   implementation("androidx.appcompat:appcompat:1.6.1")
   implementation("androidx.constraintlayout:constraintlayout:2.1.4")
@@ -87,31 +87,6 @@ dependencies {
   // Jetpack Compose
   implementation(platform("androidx.compose:compose-bom:2024.02.02"))
   implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
-    implementation("androidx.core:core-ktx:1.13.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-    implementation ("androidx.activity:activity-compose:$activityComposeVersion")
-    implementation("androidx.activity:activity-compose:$activityComposeVersion")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.material:material:1.6.6")
-    implementation("androidx.compose.material3:material3:1.2.1")
-    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
-
-    // Navigation
-    implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
-
-    // Google Maps
-    implementation("com.google.maps.android:maps-compose:4.3.3")
-    implementation("com.google.maps.android:maps-compose-utils:4.3.3")
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
-    implementation("com.google.android.gms:play-services-auth:21.1.0")
-
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-
-    // Jetpack Compose
-    implementation(platform("androidx.compose:compose-bom:2024.02.02"))
-    implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
   implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
   androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.02"))
   implementation("androidx.compose.ui:ui")
@@ -129,25 +104,25 @@ dependencies {
   implementation("com.google.android.play:core-ktx:1.8.1")
   implementation("com.google.firebase:firebase-database-ktx")
 
-    // Coil
-    implementation("io.coil-kt:coil-compose:1.4.0")
-    
-    // Dagger Hilt
-    implementation("com.google.dagger:hilt-android:${rootProject.extra.get("hiltVersion")}")
-    kapt("com.google.dagger:hilt-android-compiler:${rootProject.extra.get("hiltVersion")}")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1-Beta")
-    kaptTest("com.google.dagger:hilt-android-compiler:2.51.1")
-    testImplementation("com.google.dagger:hilt-android-testing:2.44")
-    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.51.1")
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    // JUnit
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    
-    testImplementation("androidx.arch.core:core-testing:2.2.0")
-    
-    testImplementation("org.json:json:20220924")
+  // Coil
+  implementation("io.coil-kt:coil-compose:2.6.0")
+
+  // Dagger Hilt
+  implementation("com.google.dagger:hilt-android:${rootProject.extra.get("hiltVersion")}")
+  kapt("com.google.dagger:hilt-android-compiler:${rootProject.extra.get("hiltVersion")}")
+  testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1-Beta")
+  kaptTest("com.google.dagger:hilt-android-compiler:2.44")
+  testImplementation("com.google.dagger:hilt-android-testing:2.44")
+  kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
+  androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
+  implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+  // JUnit
+  testImplementation("junit:junit:4.13.2")
+  androidTestImplementation("androidx.test.ext:junit:1.1.5")
+
+  testImplementation("androidx.arch.core:core-testing:2.2.0")
+
+  testImplementation("org.json:json:20220924")
     
     // Mockk & Espresso
     testImplementation("io.mockk:mockk:1.13.10")
@@ -180,7 +155,6 @@ dependencies {
     implementation ("androidx.camera:camera-view:$androidXCameraVersion")
 
     // Android Test
-
     androidTestImplementation ("androidx.test.uiautomator:uiautomator:$androidXEmulatorVersion")
 
 }
