@@ -29,7 +29,7 @@ android {
   
   signingConfigs {
     create("release") {
-      storeFile = file("app/event_radar_release.keystore")
+      storeFile = file("keystore/event_radar_release.keystore")
       storePassword = System.getenv("key_store_password")
       keyAlias = System.getenv("alias")
       keyPassword = System.getenv("key_password")

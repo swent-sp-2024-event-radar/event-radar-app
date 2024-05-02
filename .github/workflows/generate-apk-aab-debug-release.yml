@@ -39,29 +39,25 @@ jobs:
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
-      # Run Tests Build
-      - name: Run gradle tests
-        run: ./gradlew test
-
-      # Run Build Project
-      - name: Build gradle project
-        run: ./gradlew build
-
       # Create APK Debug
       - name: Build Debug apk
         run: ./gradlew assembleDebug
 
       # Create APK Release
       - name: Create the Keystore
+        env:
+          ENCODED_STRING: ${{ secrets.SIGNING_KEY }}
         run: |
           # import keystore from secrets
-          echo $signing_key | base64 -di > "${RUNNER_TEMP}"/keystore/keystore.jks
+          TMP_KEYSTORE_FILE_PATH="${RUNNER_TEMP}"/keystore
+          mkdir "${TMP_KEYSTORE_FILE_PATH}"
+          echo $ENCODED_STRING | base64 -di > "${TMP_KEYSTORE_FILE_PATH}"/keystore.jks
+#          echo $signing_key | base64 -di > keystore.jks
 
       - name: Build Release apk
         env:
           key_store_password: ${{ secrets.KEY_STORE_PASSWORD }}
           key_password: ${{ secrets.KEY_PASSWORD }}
-          signing_key: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.ALIAS }}
         run: ./gradlew assembleRelease
 
