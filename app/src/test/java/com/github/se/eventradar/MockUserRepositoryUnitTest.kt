@@ -28,7 +28,7 @@ class MockUserRepositoryUnitTest {
           eventsHostSet = mutableSetOf("event3"),
           friendsSet = mutableSetOf(),
           profilePicUrl = "http://example.com/Profile_Pictures/pic.jpg",
-          qrCodeUrl = "http://example.com/QR_Codes/pic.jpg",
+          qrCodeUrl = "http://example.com/QR_Codes/qr.jpg",
           username = "johndoe")
 
   @Before
