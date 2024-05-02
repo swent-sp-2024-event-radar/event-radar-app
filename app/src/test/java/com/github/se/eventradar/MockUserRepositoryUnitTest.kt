@@ -121,17 +121,21 @@ class MockUserRepositoryUnitTest {
     assert(result is Resource.Success)
   }
 
-  @Test
-  fun testGetImage() = runTest {
-    // Arrange
-    val expectedUrl = "http://example.com/Profile_Pictures/pic.jpg"
-    val userId = "1"
+/*
+// TODO: Will be used when QR Code is implemented
+@Test
+fun testGetImage() = runTest {
+// Arrange
+val expectedUrl = "http://example.com/Profile_Pictures/pic.jpg"
+val userId = "1"
 
-    // Act
-    val result = userRepository.getImage(userId, "Profile_Pictures")
+// Act
+val result = userRepository.getImage(userId, "Profile_Pictures")
 
-    // Assert
-    assertTrue(result is Resource.Success)
-    assertEquals(expectedUrl, (result as Resource.Success).data)
-  }
+// Assert
+assertTrue(result is Resource.Success)
+assertEquals(expectedUrl, (result as Resource.Success).data)
+}
+ */
+
 }

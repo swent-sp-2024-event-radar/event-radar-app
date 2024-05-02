@@ -1,5 +1,6 @@
 package com.github.se.eventradar
 
+import android.net.Uri
 import android.util.Log
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
@@ -16,11 +17,15 @@ import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.unmockkAll
 import io.mockk.unmockkStatic
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class FirebaseUserRepositoryUnitTest {
 
   @RelaxedMockK lateinit var userRef: CollectionReference
@@ -421,30 +426,6 @@ class FirebaseUserRepositoryUnitTest {
     assert((result as Resource.Failure).throwable.message == message)
   }
 
-  /*
-  @Test
-  fun `test uploadImage(Uri, String, String)`() = runTest {
-      val uri = Uri.parse("http://example.com/pic.jpg")
-      val folderName = "folder"
-
-      val result = firebaseUserRepository.uploadImage(uri, uid, folderName)
-
-      assert(result is Resource.Success)
-      assert((result as Resource.Success).data == "http://example.com/folder/pic.jpg")
-  }
-
-  @Test
-  fun `test uploadImage(Uri, String, String) exception`() = runTest {
-      val uri = Uri.parse("http://example.com/pic.jpg")
-      val folderName = "folder"
-
-      val message = "Exception"
-      val result = firebaseUserRepository.uploadImage(uri, uid, folderName)
-
-      assert(result is Resource.Failure)
-      assert((result as Resource.Failure).throwable.message == message)
-  }
-   */
 }
 
 /**

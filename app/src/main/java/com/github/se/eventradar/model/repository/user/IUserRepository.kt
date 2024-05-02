@@ -22,5 +22,8 @@ interface IUserRepository {
 
   suspend fun uploadImage(selectedImageUri: Uri, uid: String, folderName: String): Resource<String>
 
+  /*
+    // TODO: Will be used when QR Code is implemented
   suspend fun getImage(uid: String, folderName: String): Resource<String>
+   */
 }
