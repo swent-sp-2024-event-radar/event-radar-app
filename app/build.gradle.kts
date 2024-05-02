@@ -37,7 +37,7 @@ android {
         keystoreFile.renameTo(File("event_radar_release_keystore.jks"))
       }
       
-      storeFile = file("event_radar_release.keystore")
+      storeFile = file("event_radar_release_keystore.jks")
       storePassword = System.getenv("key_store_password")
       keyAlias = System.getenv("alias")
       keyPassword = System.getenv("key_password")
