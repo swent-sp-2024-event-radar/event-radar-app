@@ -94,41 +94,6 @@ dependencies {
   debugImplementation("androidx.compose.ui:ui-test-manifest")
   androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 
-<<<<<<< HEAD
-    // Coil
-    implementation("io.coil-kt:coil-compose:2.4.0")
-    
-    // Dagger Hilt
-    implementation("com.google.dagger:hilt-android:${rootProject.extra.get("hiltVersion")}")
-    kapt("com.google.dagger:hilt-android-compiler:${rootProject.extra.get("hiltVersion")}")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1-Beta")
-    kaptTest("com.google.dagger:hilt-android-compiler:2.44")
-    testImplementation("com.google.dagger:hilt-android-testing:2.44")
-    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
-    // JUnit
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    
-    testImplementation("androidx.arch.core:core-testing:2.2.0")
-    
-    testImplementation("org.json:json:20220924")
-    
-    // Mockk & Espresso
-    testImplementation("io.mockk:mockk:1.13.10")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
-    androidTestImplementation("com.kaspersky.android-components:kaspresso:1.4.3")
-    androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:1.4.1")
-    androidTestImplementation("io.mockk:mockk:1.13.10")
-    androidTestImplementation("io.mockk:mockk-android:1.13.10")
-    androidTestImplementation("io.mockk:mockk-agent:1.13.10")
-    androidTestImplementation ("androidx.test:runner:1.5.2")
-    androidTestImplementation ("androidx.test:rules:1.5.0")
-    androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation ("androidx.test.espresso:espresso-intents:3.5.1")
-=======
   // Firebase BoM
   implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
   implementation("com.google.firebase:firebase-auth-ktx")
@@ -137,10 +102,9 @@ dependencies {
   implementation("com.google.firebase:firebase-firestore")
   implementation("com.google.android.play:core-ktx:1.8.1")
   implementation("com.google.firebase:firebase-database-ktx")
->>>>>>> nikhen/mock-get-image-upload-image-tests
 
   // Coil
-  implementation("io.coil-kt:coil-compose:1.4.0")
+  implementation("io.coil-kt:coil-compose:2.6.0")
 
   // Dagger Hilt
   implementation("com.google.dagger:hilt-android:${rootProject.extra.get("hiltVersion")}")
@@ -155,22 +119,6 @@ dependencies {
   testImplementation("junit:junit:4.13.2")
   androidTestImplementation("androidx.test.ext:junit:1.1.5")
 
-<<<<<<< HEAD
-    //QR CODE (Zxing)
-    implementation ("com.google.zxing:core:3.4.1")
-
-    implementation ("androidx.activity:activity-compose:1.9.0")
-
-    // CameraX
-    implementation ("androidx.camera:camera-camera2:1.3.3")
-    implementation ("androidx.camera:camera-lifecycle:1.3.3")
-    implementation ("androidx.camera:camera-view:1.3.3")
-
-    // Android Test
-
-    androidTestImplementation ("androidx.test.uiautomator:uiautomator:2.2.0")
-
-=======
   testImplementation("androidx.arch.core:core-testing:2.2.0")
 
   testImplementation("org.json:json:20220924")
@@ -193,9 +141,19 @@ dependencies {
   implementation("com.squareup.okhttp3:okhttp")
   implementation("com.squareup.okhttp3:logging-interceptor")
 
-  // QR CODE
-  implementation("com.google.zxing:core:3.4.1")
->>>>>>> nikhen/mock-get-image-upload-image-tests
+  //QR CODE (Zxing)
+  implementation ("com.google.zxing:core:3.4.1")
+
+  implementation ("androidx.activity:activity-compose:1.9.0")
+
+  // CameraX
+  implementation ("androidx.camera:camera-camera2:1.3.3")
+  implementation ("androidx.camera:camera-lifecycle:1.3.3")
+  implementation ("androidx.camera:camera-view:1.3.3")
+
+  // Android Test
+
+  androidTestImplementation ("androidx.test.uiautomator:uiautomator:2.2.0")
 }
 
 

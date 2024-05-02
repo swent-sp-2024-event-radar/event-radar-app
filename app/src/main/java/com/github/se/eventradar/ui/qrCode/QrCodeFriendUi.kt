@@ -145,12 +145,11 @@ fun QrCodeScreen(
         }
 
     if (activeTabState == QrCodeFriendViewModel.TAB.MyQR) {
-
-      MyQrCodeComposable(
+      MyQrCodeScreen(
           myQrCodeViewModel,
           modifier =
               Modifier.testTag("myQrCodeScreen").constrainAs(myqrcode) {
-                top.linkTo(tabs.bottom, margin = 32.dp)
+                top.linkTo(tabs.bottom, margin = 74.dp)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
               })
@@ -172,34 +171,6 @@ fun QrCodeScreen(
   }
 }
 
-@Composable
-fun MyQrCodeComposable(viewModel: MyQrCodeViewModel, modifier: Modifier) {
-  val uiState by viewModel.uiState.collectAsState()
-  Column(
-      modifier = modifier,
-      verticalArrangement = Arrangement.Center, // Vertically center the content
-      horizontalAlignment = Alignment.CenterHorizontally // Horizontally center the content
-      ) {
-        Text(
-            "@username {}", // uiState.qrCode
-            modifier = Modifier.testTag("username"),
-            fontSize = 36.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 0.36.sp,
-            fontFamily = FontFamily.Default,
-            color = MaterialTheme.colorScheme.onBackground // Set the color to black,
-            )
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data("https://cdn.britannica.com/17/155017-050-9AC96FC8/Example-QR-code.jpg") //uiState.qrCode (only works for jpg)
-                .crossfade(true)
-                .build(),
-            //error = painterResource(R.drawable.qr_code), // should be a error indicative
-            //placeholder = painterResource(R.drawable.placeholder), // should be loading image
-            contentDescription = stringResource(R.string.my_qr_code),
-            modifier = Modifier.size(width = 300.dp, height = 300.dp).testTag("QrCodeImage"))
-      }
-}
 
 // private val dummyQrCodeScanned: (String) -> Unit = { qrCode ->
 //  Log.d("QRCodeScanner", "QR Code Scanned: $qrCode")
