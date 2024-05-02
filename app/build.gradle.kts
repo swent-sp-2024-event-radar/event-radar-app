@@ -64,6 +64,7 @@ android {
     }
 
     testOptions {
+      unitTests.isReturnDefaultValues = true
         packagingOptions {
             jniLibs {
                 useLegacyPackaging = true
@@ -97,7 +98,8 @@ dependencies {
     // Jetpack Compose
     implementation(platform("androidx.compose:compose-bom:2024.02.02"))
     implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.02"))
+  implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+  androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.02"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
     debugImplementation("androidx.compose.ui:ui-tooling")
@@ -204,7 +206,6 @@ tasks.register("jacocoTestReport", JacocoReport::class) {
         "**/*Test*.*",
         "android/**/*.*",
         "**/SignatureChecks.*",
-        "**/*Preview*.*",
     )
     val debugTree = fileTree("${project.buildDir}/tmp/kotlin-classes/debug") {
         exclude(fileFilter)
