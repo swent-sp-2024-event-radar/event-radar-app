@@ -18,14 +18,21 @@ import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen.Companion.onComposeScreen
+import io.mockk.MockKAnnotations
+import io.mockk.Runs
+import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
+import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+
+// TODO test when camera denied
+// TODO fix navigation test
 
 @RunWith(AndroidJUnit4::class)
 class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -46,7 +53,6 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
     Log.d("QRCodeScanner", "QR Code Scanned: $qrCode")
     // You can perform any additional logic here for testing
   }
-
   private lateinit var viewModel: QrCodeFriendViewModel
   private lateinit var userRepository: IUserRepository
   private lateinit var qrCodeAnalyser: QrCodeAnalyser
@@ -54,7 +60,8 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
 
   @Before
   fun testSetup() {
-    //        MockKAnnotations.init(this)
+    MockKAnnotations.init(this)
+    every { mockNavActions.navigateTo(any()) } just Runs
     userRepository = MockUserRepository()
     (userRepository as MockUserRepository).updateCurrentUserId(myUID)
     qrCodeAnalyser = mockk<QrCodeAnalyser>(relaxed = true)
@@ -92,6 +99,15 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
     }
   }
 }
+
+// @Test
+// fun switchesScreenWhenNavigatedToNextScreen() = run {
+//  onComposeScreen<QrCodeScanFriendUiScreen>(composeTestRule) {
+//    viewModel.changeAction(QrCodeFriendViewModel.Action.NavigateToNextScreen)
+//    verify { mockNavActions.navigateTo(any()) }
+//  }
+// }
+// }
 
 //  @Test
 //  fun displaysAllComponentsCorrectly_CameraPermittedOnce(): Unit = run {

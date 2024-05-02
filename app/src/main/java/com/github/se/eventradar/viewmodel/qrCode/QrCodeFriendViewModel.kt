@@ -13,11 +13,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-// ViewModel & UI can be improved on by having a state where the UI reflects a loading icon if
+// TODO ViewModel & UI can be improved on by having a state where the UI reflects a loading icon if
 // firebase operations take a long time
-// would also need to handle the case where the updates really do fail within 1 minute's time.
-// personally gonna make this extra.
-// TODO what should be done if analyser returns a null ... how do we make it trey again
+// TODO ViewModel & UI can be improved to error message for each different type of Error ?
 
 @HiltViewModel
 class QrCodeFriendViewModel
@@ -59,37 +57,29 @@ constructor(
           myUID = (userRepository.getCurrentUserId() as Resource.Success<String>).data
         }
         is Resource.Failure -> {
-          _action.value = Action.CantGetMyUID
+          changeAction(Action.CantGetMyUID)
         }
       }
     }
     qrCodeAnalyser.onDecoded = { decodedString ->
       val result = decodedString ?: "Failed to decode QR Code"
       _decodedResult.value = result // Update state flow
-      println("I have been invoked with $decodedString")
       if (result != "Failed to decode QR Code") {
-        println("entered the if block")
         updateFriendList(result) // Directly call updateFriendList
       } else {
-        _action.value = Action.AnalyserError
+        changeAction(Action.AnalyserError)
       }
     }
-    println("ViewModel init block executed")
   }
 
-  fun updateFriendList(friendID: String) { // private
-    println("Entered updateFriendList with: $friendID")
+  private fun updateFriendList(friendID: String) { // private
+
     viewModelScope.launch {
       val friendUserDeferred = async { userRepository.getUser(friendID) }
       val currentUserDeferred = async { userRepository.getUser(myUID) }
 
       val friendUser = friendUserDeferred.await()
       val currentUser = currentUserDeferred.await()
-
-      println("Fetched user data from Firebase")
-
-      // TODO what should be done if firebase is down? notify UI to display a message, retry after
-      // some time, or just return?
 
       if (friendUser is Resource.Success && currentUser is Resource.Success) {
         val friendUpdatesDeferred = async { retryUpdate(friendUser.data!!, myUID) }
@@ -99,49 +89,36 @@ constructor(
         val friendUpdateResult = friendUpdatesDeferred.await()
         val userUpdateResult = userUpdatesDeferred.await()
 
-        println("I have called retryUpdate with $friendID and $myUID")
-
         // After successful updates, navigate to the next screen
         if (friendUpdateResult && userUpdateResult) {
-          _action.value = Action.NavigateToNextScreen
+          changeAction(Action.NavigateToNextScreen)
         } else {
-
-          _action.value = Action.FirebaseUpdateError
+          changeAction(Action.FirebaseUpdateError)
         }
       } else {
-        _action.value = Action.FirebaseFetchError
-        println("Failed to fetch user data from Firebase")
+        changeAction(Action.FirebaseFetchError)
         return@launch
       }
     }
   }
 
-  // need to change this based on coaches feedback, if i do while loop, should just return unit.
-  // Utility function to retry updates until successful
   private suspend fun retryUpdate(user: User, friendIDToAdd: String): Boolean {
-    println("entered retryUpdate with $friendIDToAdd")
-
+    var maxNumberOfRetries = 3
     var updateResult: Resource<Any>?
     do {
       updateResult =
-          if (!user.friendsSet.contains(friendIDToAdd)) {
+          if (user.friendsSet.contains(friendIDToAdd)) {
+            Resource.Success(Unit)
+          } else {
             user.friendsSet.add(friendIDToAdd)
             when (userRepository.updateUser(user)) {
-              is Resource.Success -> {
-                println("updated user")
-                Resource.Success(Unit)
-              }
-              is Resource.Failure -> {
-                println("failed to update user")
-                Resource.Failure(Exception("Failed to update user"))
-              }
+              is Resource.Success -> Resource.Success(Unit)
+              is Resource.Failure -> Resource.Failure(Exception("Failed to update user"))
             }
-          } else {
-            println("already friends")
-            Resource.Success(Unit) // No update needed, considers as success
           }
-    } while (updateResult !is Resource.Success)
-    return true
+    } while ((updateResult !is Resource.Success) && (maxNumberOfRetries-- > 0))
+
+    return updateResult is Resource.Success
   }
 
   fun resetNavigationEvent() {
@@ -150,5 +127,9 @@ constructor(
 
   fun changeTabState(tab: TAB) {
     _tabState.value = tab
+  }
+
+  fun changeAction(action: Action) {
+    _action.value = action
   }
 }

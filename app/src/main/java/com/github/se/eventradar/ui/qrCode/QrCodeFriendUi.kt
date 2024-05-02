@@ -38,6 +38,8 @@ import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.TopLevelDestination
 import com.github.se.eventradar.viewmodel.qrCode.QrCodeFriendViewModel
 
+// TODO cleaner code for Navigation and to correct screen
+
 @Composable
 fun QrCodeScreen(
     viewModel: QrCodeFriendViewModel = hiltViewModel(),
@@ -48,9 +50,10 @@ fun QrCodeScreen(
 
   // React to changes in navigation state
   LaunchedEffect(navigateState) {
+    println("launched")
     when (navigateState) {
       QrCodeFriendViewModel.Action.NavigateToNextScreen -> {
-        //          navigationActions.navigate({Route.MESSAGE})
+        println("entered state")
         navigationActions.navigateTo(
             TopLevelDestination( // TODO
                 route = Route.MESSAGE,
@@ -58,13 +61,11 @@ fun QrCodeScreen(
                 textId = R.string.message_chats,
             )) // Adjust according to your actual navigation logic
         viewModel.resetNavigationEvent() // Reset the navigation event in the ViewModel to prevent
-        // repeated navigations
       }
       else -> Unit // Do nothing if the state is None or any other non-navigational state
     }
   }
 
-  //  var selectedTabIndex by remember { mutableIntStateOf(0) }
   val context = LocalContext.current
 
   ConstraintLayout(

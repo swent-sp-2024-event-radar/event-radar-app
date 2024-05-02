@@ -20,6 +20,7 @@ import org.junit.Test
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
+// TODO stimulate event where update does not work on first few tries but eventually works
 @ExperimentalCoroutinesApi
 class QrCodeFriendViewModelTest {
 
@@ -125,24 +126,13 @@ class QrCodeFriendViewModelTest {
     assertEquals(testDecodedString, viewModel.decodedResult.value)
   }
 
-  //  @Test
-  //  fun testUpdateFriendListCalled() = runTest {
-  //      userRepository.addUser(mockUser1)
-  //      userRepository.addUser(mockUser2)
-  //    qrCodeAnalyser.onDecoded?.invoke("user2")
-  //    verify { viewModel.updateFriendList("user2") }
-  //  }
-  //
   @Test
   fun testDecodingFailure() = runTest {
     userRepository.addUser(mockUser1)
     userRepository.addUser(mockUser2)
     qrCodeAnalyser.onDecoded?.invoke(null)
     assertEquals("Failed to decode QR Code", viewModel.decodedResult.value)
-    //    assertEquals(listOf(QrCodeFriendViewModel.Action.None,
-    // QrCodeFriendViewModel.Action.AnalyserError),
-    //        viewModel.action.take(2).toList()
-    //        )
+    assertEquals(QrCodeFriendViewModel.Action.AnalyserError, viewModel.action.value)
   }
   // todo should i be testing thta it is reset to none ? isnt this Ui logic?
   @Test
@@ -168,12 +158,7 @@ class QrCodeFriendViewModelTest {
         println("User 2 not found or could not be fetched")
       }
     }
-    //    delay(3000L)
-    //    assertEquals(
-    //        viewModel.action.take(2).toList(),
-    //        listOf(
-    //            QrCodeFriendViewModel.Action.None,
-    // QrCodeFriendViewModel.Action.NavigateToNextScreen))
+    assertEquals(QrCodeFriendViewModel.Action.NavigateToNextScreen, viewModel.action.value)
   }
 
   @Test
@@ -199,38 +184,6 @@ class QrCodeFriendViewModelTest {
         println("User 2 not found or could not be fetched")
       }
     }
-    //    delay(3000L)
-    //    assertEquals(
-    //        listOf(
-    //            QrCodeFriendViewModel.Action.None,
-    // QrCodeFriendViewModel.Action.NavigateToNextScreen),
-    //        viewModel.action.take(2).toList()
-    //        )
+    assertEquals(QrCodeFriendViewModel.Action.NavigateToNextScreen, viewModel.action.value)
   }
-  //
-  //  // this case should provoke a timeout hence why i delayed the test before
-  //  // checking the navigation event
-  //  @Test
-  //  fun testInvokedWithFakeUID() = runTest {
-  //    userRepository.addUser(mockUser1)
-  //    userRepository.addUser(mockUser2)
-  //    qrCodeAnalyser.onDecoded?.invoke("user3")
-  //    delay(15000L)
-  //    assertEquals(listOf(QrCodeFriendViewModel.Action.None,
-  // QrCodeFriendViewModel.Action.FirebaseFetchError),
-  //        viewModel.action.take(2).toList()
-  //        )
-  //  }
-  //
-  //  @Test
-  //  fun changeTabTest() = runTest {
-  //      userRepository.addUser(mockUser1)
-  //      userRepository.addUser(mockUser2)
-  //    val expectedTabState = QrCodeFriendViewModel.TAB.ScanQR
-  //    viewModel.changeTabState(expectedTabState)
-  //    val actualTabState = viewModel.tabState.value
-  //    assertEquals(expectedTabState, actualTabState)
-  //  }
-  // TODO stimulate event where update does not work on first few tries but eventually works
-  // TODO stimulate event where update does not work and timeout occurs
 }
