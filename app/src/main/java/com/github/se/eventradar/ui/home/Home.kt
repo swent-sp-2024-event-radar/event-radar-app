@@ -199,7 +199,9 @@ fun HomeScreen(
                     top.linkTo(searchAndFilter.bottom, margin = 8.dp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                  })
+                  }) { eventId ->
+              navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+          }
         } else {
           EventMap(
               uiState.eventList.allEvents,
