@@ -10,9 +10,8 @@ import com.google.zxing.MultiFormatReader
 import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.common.HybridBinarizer
 import java.nio.ByteBuffer
-import javax.inject.Inject
 
-class QrCodeAnalyser @Inject constructor() : ImageAnalysis.Analyzer {
+class QrCodeAnalyser : ImageAnalysis.Analyzer {
 
   // list of supported Image Formats
   private val supportedImageFormats =

@@ -14,7 +14,6 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.NavigationActions
@@ -43,8 +43,8 @@ fun QrCodeScreen(
     viewModel: ScanFriendQrViewModel = hiltViewModel(),
     navigationActions: NavigationActions
 ) {
-  val navigateState by viewModel.action.collectAsState()
-  val activeTabState by viewModel.tabState.collectAsState()
+  val navigateState by viewModel.action.collectAsStateWithLifecycle()
+  val activeTabState by viewModel.tabState.collectAsStateWithLifecycle()
 
   // React to changes in navigation state
   LaunchedEffect(navigateState) {
@@ -53,7 +53,6 @@ fun QrCodeScreen(
         navigationActions.navigateTo(
             TOP_LEVEL_DESTINATIONS[
                 1]) // TODO change to private message screen with friend // Adjust according to your
-                    // actual navigation logic
         viewModel.resetNavigationEvent() // Reset the navigation event in the ViewModel to prevent
       }
       else -> Unit // Do nothing if the state is None or any other non-navigational state
