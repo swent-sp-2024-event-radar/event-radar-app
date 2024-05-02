@@ -15,6 +15,15 @@ plugins {
 android {
   namespace = "com.github.se.eventradar"
   compileSdk = 34
+  
+  signingConfigs{
+    create("release") {
+      storeFile = file("../keystore.jks")
+      storePassword = System.getenv("key_store_password")
+      keyAlias = System.getenv("alias")
+      keyPassword = System.getenv("key_password")
+    }
+  }
 
   defaultConfig {
     applicationId = "com.github.se.eventradar"
@@ -31,7 +40,7 @@ android {
     release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-      signingConfig = null
+      signingConfig = signingConfigs.getByName("release")
     }
     debug {
       enableUnitTestCoverage = true

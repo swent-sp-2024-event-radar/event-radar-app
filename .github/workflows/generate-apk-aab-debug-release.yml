@@ -46,10 +46,11 @@ jobs:
       # Create APK Release
       - name: Create the Keystore
         env:
-          ENCODED_STRING: ${{ secrets.SIGNING_KEY }}
+          encoded_string: ${{ secrets.SIGNING_KEY }}
         run: |
           # import keystore from secrets
-          echo $ENCODED_STRING | base64 -di > $keystore.jks
+          echo $encoded_string > keystore-b64.txt
+          base64 -d keystore-b64.txt > keystore.jks
 
       - name: Build Release apk
         env:
