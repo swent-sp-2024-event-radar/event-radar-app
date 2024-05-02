@@ -20,6 +20,7 @@ import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -197,6 +198,31 @@ class AuthenticationViewModelTest {
     verify { Log.d("LoginScreenViewModel", "User not logged in") }
 
     unmockkAll()
+  }
+
+  @Test
+  fun testImageUriAssignment() = runBlocking {
+    // Prepare the state with a null selectedImageUri
+    val state = MutableStateFlow(LoginUiState())
+    viewModel.onSelectedImageUriChanged(Uri.EMPTY, state)
+
+    // Call the addUser function
+    viewModel.addUser(state, user)
+
+    // Verify that the imageUri is the placeholder image
+    val expectedUri =
+        Uri.parse("android.resource://com.github.se.eventradar/drawable/place_holder.png")
+    assert(state.value.selectedImageUri == expectedUri)
+
+    // Prepare the state with a non-null selectedImageUri
+    val testUri = Uri.parse("android.resource://com.github.se.eventradar/drawable/test.png")
+    viewModel.onSelectedImageUriChanged(testUri, state)
+
+    // Call the addUser function
+    viewModel.addUser(state, user)
+
+    // Verify that the imageUri is the testUri
+    assert(state.value.selectedImageUri == testUri)
   }
 
   @Test
