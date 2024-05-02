@@ -420,6 +420,31 @@ class FirebaseUserRepositoryUnitTest {
     assert(result is Resource.Failure)
     assert((result as Resource.Failure).throwable.message == message)
   }
+
+  /*
+  @Test
+  fun `test uploadImage(Uri, String, String)`() = runTest {
+      val uri = Uri.parse("http://example.com/pic.jpg")
+      val folderName = "folder"
+
+      val result = firebaseUserRepository.uploadImage(uri, uid, folderName)
+
+      assert(result is Resource.Success)
+      assert((result as Resource.Success).data == "http://example.com/folder/pic.jpg")
+  }
+
+  @Test
+  fun `test uploadImage(Uri, String, String) exception`() = runTest {
+      val uri = Uri.parse("http://example.com/pic.jpg")
+      val folderName = "folder"
+
+      val message = "Exception"
+      val result = firebaseUserRepository.uploadImage(uri, uid, folderName)
+
+      assert(result is Resource.Failure)
+      assert((result as Resource.Failure).throwable.message == message)
+  }
+   */
 }
 
 /**

@@ -40,7 +40,7 @@ class EventDetailsViewmodelUnitTest {
 
   @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
-  val test: MutableSet<String> = mutableSetOf("Test Organiser", "Organiser2")
+  val test: MutableList<String> = mutableListOf("Test Organiser", "Organiser2")
 
   private val mockEvent =
       Event(
@@ -52,8 +52,8 @@ class EventDetailsViewmodelUnitTest {
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1),
           mainOrganiser = "1",
-          organiserSet = mutableSetOf("Test Organiser"),
-          attendeeSet = mutableSetOf("Test Attendee"),
+          organiserList = mutableListOf("Test Organiser"),
+          attendeeList = mutableListOf("Test Attendee"),
           category = EventCategory.COMMUNITY,
           fireBaseID = "1")
 
