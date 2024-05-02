@@ -4,10 +4,10 @@ import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.github.kakaocup.compose.node.element.KNode
 
-public class JoinEventScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
+class JoinEventScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
     ComposeScreen<JoinEventScreen>(
         semanticsProvider = semanticsProvider,
-        viewBuilderAction = { hasTestTag("eventDetailsScreen") }) {
+        viewBuilderAction = { hasTestTag("joinEventScreen") }) {
 
   val buyButton: KNode = onNode { hasTestTag("buyButton") }
   val goBackButton: KNode = onNode { hasTestTag("goBackButton") }
@@ -19,5 +19,4 @@ public class JoinEventScreen(semanticsProvider: SemanticsNodeInteractionsProvide
   val ticketInfo: KNode = ticketCard.child { hasTestTag("ticketInfo") }
   val ticketName: KNode = ticketInfo.child { hasTestTag("ticketName") }
   val ticketPrice: KNode = ticketInfo.child { hasTestTag("ticketPrice") }
-
 }

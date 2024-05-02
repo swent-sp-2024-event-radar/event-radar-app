@@ -82,12 +82,11 @@ class JoinEventUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
         assertTextContains("Debugging")
       }
       ticketsTitle { assertIsDisplayed() }
-      ticketCard {
-        assertIsDisplayed()
-      }
+      ticketCard { assertIsDisplayed() }
       /* Can't retrieve node at index '0' of '(hasParentThat(TestTag = 'ticketCard'))
        * && (TestTag = 'ticketInfo')'
        * There are no existing nodes for that selector.
+       *
       ticketInfo{
         assertIsDisplayed()
       }

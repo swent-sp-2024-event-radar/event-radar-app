@@ -76,6 +76,7 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
   @Test
   fun screenDisplaysContentElementsCorrectly() = run {
     ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
+      eventTitle { assertIsDisplayed() }
       eventImage { assertIsDisplayed() }
       descriptionTitle { assertIsDisplayed() }
       descriptionContent {
@@ -127,5 +128,4 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
     verify { mockNavActions.navController.navigate("${Route.EVENT_DETAILS_TICKETS}/$eventId") }
     confirmVerified(mockNavActions)
   }
-
 }

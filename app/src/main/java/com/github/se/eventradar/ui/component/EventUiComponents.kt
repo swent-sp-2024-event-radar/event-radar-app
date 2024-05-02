@@ -1,18 +1,27 @@
-package com.github.se.eventradar.ui.event
+package com.github.se.eventradar.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.event.EventUiState
@@ -54,6 +63,15 @@ data class EventComponentsStyle(
 fun formatDateTime(dateTime: LocalDateTime): String {
   val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy - HH:mm")
   return dateTime.format(formatter)
+}
+
+@Composable
+fun EventTitle(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
+  Text(
+      text = eventUiState.eventName,
+      style = style.titleStyle,
+      modifier = modifier.testTag("eventTitle"),
+      color = style.titleColor)
 }
 
 @Composable
@@ -124,5 +142,24 @@ fun EventDateTime(modifier: Modifier, eventUiState: EventUiState, style: EventCo
         style = style.contentStyle,
         color = style.contentColor,
         modifier = Modifier.testTag("timeEndContent"))
+  }
+}
+
+@Composable
+fun GoBackButton(modifier: Modifier, goBack: () -> Unit) {
+  Button(
+      onClick = { goBack() },
+      modifier = modifier.testTag("goBackButton"),
+      colors =
+          ButtonDefaults.buttonColors(
+              contentColor = Color.Transparent,
+              containerColor = Color.Transparent,
+          ),
+  ) {
+    Icon(
+        painter = painterResource(id = R.drawable.back_arrow),
+        contentDescription = "Back navigation arrow",
+        tint = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier.width(24.dp).height(24.dp).align(Alignment.CenterVertically))
   }
 }

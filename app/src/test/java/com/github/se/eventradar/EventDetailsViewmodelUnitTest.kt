@@ -126,6 +126,4 @@ class EventDetailsViewmodelUnitTest {
     viewModel.getEventData()
     assert(!viewModel.isTicketFree())
   }
-
-
 }
