@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
   id("com.android.application")
@@ -15,13 +17,19 @@ plugins {
 android {
   namespace = "com.github.se.eventradar"
   compileSdk = 34
-  
-  signingConfigs{
+
+  signingConfigs {
     create("release") {
-      storeFile = file("../keystore.jks")
-      storePassword = System.getenv("key_store_password")
-      keyAlias = System.getenv("alias")
-      keyPassword = System.getenv("key_password")
+      val propsFile = rootProject.file("keystore.properties")
+      val props = Properties()
+      props.load(FileInputStream(propsFile))
+      
+      storeFile =
+          if (file("../keystore.jks").exists()) file("../keystore.jks") else file(props["storeFile"]!!.toString())
+      storePassword =
+          if (System.getenv("key_store_password") != null) System.getenv("key_store_password") else props["storePassword"]!!.toString()
+      keyAlias = if (System.getenv("alias") != null) System.getenv("alias") else props["keyAlias"]!!.toString()
+      keyPassword = if (System.getenv("key_password") != null) System.getenv("key_password") else props["keyPassword"]!!.toString()
     }
   }
 
