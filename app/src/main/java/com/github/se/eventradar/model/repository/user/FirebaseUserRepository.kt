@@ -1,5 +1,6 @@
 package com.github.se.eventradar.model.repository.user
 
+import android.net.Uri
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.google.firebase.firestore.CollectionReference
@@ -135,6 +136,18 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
     } catch (e: Exception) {
       Resource.Failure(e)
     }
+  }
+
+  override suspend fun uploadImage(
+      selectedImageUri: Uri,
+      uid: String,
+      folderName: String
+  ): Resource<String> {
+    return Resource.Success("To Be Implemented")
+  }
+
+  override suspend fun getImage(uid: String, folderName: String): Resource<String> {
+    return Resource.Success("To Be Implemented")
   }
 }
 
