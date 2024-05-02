@@ -7,9 +7,10 @@ import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.event.EventUiState
-import com.github.se.eventradar.screens.JoinEventScreen
-import com.github.se.eventradar.ui.event.BuyTicket
+import com.github.se.eventradar.screens.EventDetailsScreen
+import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.Route
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -27,7 +28,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class JoinEventUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
+class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -54,56 +55,50 @@ class JoinEventUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
 
   private val eventId = "tdjWMT9Eon2ROTVakQb"
 
-  private val isTicketFree = true
-
   @Before
   fun testSetup() {
 
     every { mockViewModel.uiState } returns sampleEventDetailsUiState
-    every { mockViewModel.isTicketFree() } returns isTicketFree
+    every { mockViewModel.getEventId() } returns eventId
 
-    composeTestRule.setContent { BuyTicket(mockViewModel, navigationActions = mockNavActions) }
+    composeTestRule.setContent { EventDetails(mockViewModel, navigationActions = mockNavActions) }
   }
 
   @Test
   fun screenDisplaysNavigationElementsCorrectly() = run {
-    ComposeScreen.onComposeScreen<JoinEventScreen>(composeTestRule) {
-      buyButton { assertIsDisplayed() }
+    ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
+      ticketButton { assertIsDisplayed() }
       goBackButton { assertIsDisplayed() }
       bottomNav { assertIsDisplayed() }
     }
   }
 
   @Test
-  fun screenDisplaysContentElements() = run {
-    ComposeScreen.onComposeScreen<JoinEventScreen>(composeTestRule) {
-      eventTitle {
+  fun screenDisplaysContentElementsCorrectly() = run {
+    ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
+      eventTitle { assertIsDisplayed() }
+      eventImage { assertIsDisplayed() }
+      descriptionTitle { assertIsDisplayed() }
+      descriptionContent {
         assertIsDisplayed()
-        assertTextContains("Debugging")
+        assertTextContains("Let's debug some code together because we all enjoy kotlin !")
       }
-      ticketsTitle { assertIsDisplayed() }
-      ticketCard { assertIsDisplayed() }
-      /* Can't retrieve node at index '0' of '(hasParentThat(TestTag = 'ticketCard'))
-       * && (TestTag = 'ticketInfo')'
-       * There are no existing nodes for that selector.
-       *
-      ticketInfo{
+      distanceTitle { assertIsDisplayed() }
+      distanceContent { assertIsDisplayed() }
+      categoryTitle { assertIsDisplayed() }
+      categoryContent {
         assertIsDisplayed()
+        assertTextContains("Community")
       }
-      ticketName{
-        assertIsDisplayed()
-        assertTextContains(sampleEventDetailsUiState.value.ticket.name)
-      }
-      ticketPrice{
-        assertIsDisplayed()
-        assertTextContains("${sampleEventDetailsUiState.value.ticket.price}", substring = true)
-      }*/
+      dateTimeTitle { assertIsDisplayed() }
+      dateTimeStartContent { assertIsDisplayed() }
+      dateTimeEndContent { assertIsDisplayed() }
     }
   }
 
   @Test
   fun goBackButtonTriggersBackNavigation() = run {
-    ComposeScreen.onComposeScreen<JoinEventScreen>(composeTestRule) {
+    ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
       goBackButton {
         // arrange: verify the pre-conditions
         assertIsDisplayed()
@@ -115,6 +110,22 @@ class JoinEventUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
     }
     // assert: the nav action has been called
     verify { mockNavActions.goBack() }
+    confirmVerified(mockNavActions)
+  }
+
+  @Test
+  fun ticketButtonTriggersNavigation() = run {
+    ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
+      ticketButton {
+        // arrange: verify the pre-conditions
+        assertIsDisplayed()
+        assertIsEnabled()
+
+        performClick()
+      }
+    }
+    // assert: the nav action has been called
+    verify { mockNavActions.navController.navigate("${Route.EVENT_DETAILS_TICKETS}/$eventId") }
     confirmVerified(mockNavActions)
   }
 }

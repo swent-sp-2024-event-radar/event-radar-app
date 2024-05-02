@@ -4,8 +4,8 @@ import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.github.kakaocup.compose.node.element.KNode
 
-class JoinEventScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
-    ComposeScreen<JoinEventScreen>(
+class EventSelectTicketScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
+    ComposeScreen<EventSelectTicketScreen>(
         semanticsProvider = semanticsProvider,
         viewBuilderAction = { hasTestTag("joinEventScreen") }) {
 

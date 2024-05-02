@@ -9,8 +9,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.github.se.eventradar.model.event.EventDetailsViewModel
-import com.github.se.eventradar.ui.event.BuyTicket
 import com.github.se.eventradar.ui.event.EventDetails
+import com.github.se.eventradar.ui.event.SelectTicket
 import com.github.se.eventradar.ui.home.HomeScreen
 import com.github.se.eventradar.ui.hosting.HostingScreen
 import com.github.se.eventradar.ui.login.LoginScreen
@@ -44,7 +44,7 @@ fun NavGraph(
           val eventId = it.arguments!!.getString("eventId")!!
           val viewModel: EventDetailsViewModel = hiltViewModel()
           viewModel.saveEventId(eventId)
-          BuyTicket(viewModel = viewModel, navigationActions = navActions)
+          SelectTicket(viewModel = viewModel, navigationActions = navActions)
         }
 
     // TODO replace the Toast message with the corresponding screen function of the route

@@ -45,7 +45,7 @@ import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.util.toast
 
 @Composable
-fun BuyTicket(
+fun SelectTicket(
     viewModel: EventDetailsViewModel = hiltViewModel(),
     navigationActions: NavigationActions
 ) {

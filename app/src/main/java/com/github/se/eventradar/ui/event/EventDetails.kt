@@ -92,7 +92,10 @@ fun EventDetails(
         ConstraintLayout(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
           val (image, backButton, title, description, distance, category, dateAndTime) =
               createRefs()
-          val imagePainter: Painter = rememberImagePainter(eventUiState.eventPhoto)
+
+          // TODO uncomment when image are implemented
+          // val imagePainter: Painter = rememberImagePainter(eventUiState.eventPhoto)
+          val imagePainter: Painter = rememberImagePainter(R.drawable.placeholderbig)
           Image(
               painter = imagePainter,
               contentDescription = "Event banner image",

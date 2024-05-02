@@ -60,7 +60,7 @@ constructor(
   }
 
   fun isTicketFree(): Boolean {
-    return !(uiState.value.ticket.price > 0.0)
+    return !(_uiState.value.ticket.price > 0.0)
   }
 }
 
