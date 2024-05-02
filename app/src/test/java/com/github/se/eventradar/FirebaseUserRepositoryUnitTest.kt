@@ -1,6 +1,5 @@
 package com.github.se.eventradar
 
-import android.net.Uri
 import android.util.Log
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
@@ -425,7 +424,6 @@ class FirebaseUserRepositoryUnitTest {
     assert(result is Resource.Failure)
     assert((result as Resource.Failure).throwable.message == message)
   }
-
 }
 
 /**
