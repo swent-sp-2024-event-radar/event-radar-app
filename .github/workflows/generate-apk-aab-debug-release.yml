@@ -7,7 +7,7 @@ env:
   key_password: ${{ secrets.KEY_PASSWORD }}
   signing_key: ${{ secrets.SIGNING_KEY }}
   alias: ${{ secrets.ALIAS }}
-  signing_key_path: keystore.jks
+  signing_key_path: ../keystore.jks
 
 on:
 
