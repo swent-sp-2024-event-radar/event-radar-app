@@ -51,8 +51,7 @@ jobs:
           # import keystore from secrets
           TMP_KEYSTORE_FILE_PATH="${RUNNER_TEMP}"/keystore
           mkdir "${TMP_KEYSTORE_FILE_PATH}"
-          echo $ENCODED_STRING | base64 -di > "${TMP_KEYSTORE_FILE_PATH}"/keystore.jks
-#          echo $signing_key | base64 -di > keystore.jks
+          echo $ENCODED_STRING | base64 -di > "keystore/keystore.jks"
 
       - name: Build Release apk
         env:
