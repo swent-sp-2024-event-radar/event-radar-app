@@ -19,6 +19,7 @@ class SignupScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   val surnameTextField: KNode = surname.child { hasTestTag("signUpSurnameTextField") }
   private val phone: KNode = onNode { hasTestTag("signUpPhoneField") }
   val phoneTextField: KNode = phone.child { hasTestTag("signUpPhoneTextField") }
+  val countryCode: KNode = onNode { hasTestTag("signUpCountryCode") }
   private val birthdate: KNode = onNode { hasTestTag("signUpBirthDateField") }
   val birthDateTextField: KNode = birthdate.child { hasTestTag("signUpBirthDateTextField") }
   val signUpButton: KNode = onNode { hasTestTag("signUpLoginButton") }

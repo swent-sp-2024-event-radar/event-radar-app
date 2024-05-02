@@ -1,6 +1,6 @@
 package com.github.se.eventradar.model.event
 
-import com.github.se.eventradar.model.ConversionUtils.convertToMutableSetOfStrings
+import com.github.se.eventradar.model.ConversionUtils.convertToMutableListOfStrings
 import com.github.se.eventradar.model.Location
 import java.time.LocalDateTime
 
@@ -13,8 +13,8 @@ data class Event(
     var description: String,
     var ticket: EventTicket,
     var mainOrganiser: String,
-    val organiserSet: MutableSet<String>,
-    val attendeeSet: MutableSet<String>,
+    val organiserList: MutableList<String>,
+    val attendeeList: MutableList<String>,
     var category: EventCategory,
     val fireBaseID: String
 ) {
@@ -38,8 +38,8 @@ data class Event(
               price = (map["ticket_price"] as Long).toDouble(),
               capacity = (map["ticket_quantity"] as Long).toInt()),
       mainOrganiser = map["main_organiser"] as String,
-      organiserSet = convertToMutableSetOfStrings(map["organisers_list"]),
-      attendeeSet = convertToMutableSetOfStrings(map["attendees_list"]),
+      organiserList = convertToMutableListOfStrings(map["organisers_list"]),
+      attendeeList = convertToMutableListOfStrings(map["attendees_list"]),
       category = EventCategory.valueOf(map["category"] as String),
       fireBaseID = id)
 
@@ -57,8 +57,8 @@ data class Event(
     map["ticket_price"] = ticket.price
     map["ticket_quantity"] = ticket.capacity
     map["main_organiser"] = mainOrganiser
-    map["organisers_list"] = organiserSet.toList()
-    map["attendees_list"] = attendeeSet.toList()
+    map["organisers_list"] = organiserList.toList()
+    map["attendees_list"] = attendeeList.toList()
     map["category"] = category.name
     return map
   }

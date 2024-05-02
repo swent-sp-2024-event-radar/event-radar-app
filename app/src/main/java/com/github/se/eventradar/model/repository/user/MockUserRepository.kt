@@ -60,9 +60,9 @@ class MockUserRepository : IUserRepository {
       selectedImageUri: Uri,
       uid: String,
       folderName: String
-  ): Resource<Unit> {
+  ): Resource<String> {
     return try {
-      Resource.Success(Unit)
+      Resource.Success("http://example.com/$folderName/pic.jpg")
     } catch (e: Exception) {
       Resource.Failure(e)
     }

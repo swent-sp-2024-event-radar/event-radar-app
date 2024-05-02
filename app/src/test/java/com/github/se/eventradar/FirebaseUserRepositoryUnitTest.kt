@@ -1,5 +1,6 @@
 package com.github.se.eventradar
 
+import android.util.Log
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.FirebaseUserRepository
@@ -11,8 +12,10 @@ import com.google.firebase.firestore.QuerySnapshot
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.unmockkAll
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -38,9 +41,9 @@ class FirebaseUserRepositoryUnitTest {
           lastName = "",
           phoneNumber = "",
           accountStatus = "active",
-          eventsAttendeeSet = mutableSetOf(),
-          eventsHostSet = mutableSetOf(),
-          friendsSet = mutableSetOf(),
+          eventsAttendeeSet = mutableListOf(),
+          eventsHostSet = mutableListOf(),
+          friendsSet = mutableListOf(),
           profilePicUrl = "",
           qrCodeUrl = "",
           username = "",
@@ -126,9 +129,9 @@ class FirebaseUserRepositoryUnitTest {
     every { mockDocumentSnapshot.data } returns
         mapOf(
             "accountStatus" to "active",
-            "eventsAttendeeList" to mutableSetOf<String>(),
-            "eventsHostList" to mutableSetOf<String>(),
-            "friendsList" to mutableSetOf<String>(),
+            "eventsAttendeeList" to mutableListOf<String>(),
+            "eventsHostList" to mutableListOf<String>(),
+            "friendsList" to mutableListOf<String>(),
             "profilePicUrl" to "",
             "qrCodeUrl" to "",
             "username" to "",
@@ -163,6 +166,9 @@ class FirebaseUserRepositoryUnitTest {
 
   @Test
   fun `test addUser(User)`() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
     val user = expectedUser
 
     every { userRef.document().id } returns uid
@@ -182,9 +188,9 @@ class FirebaseUserRepositoryUnitTest {
         capturePublic.captured ==
             mapOf(
                 "accountStatus" to "active",
-                "eventsAttendeeList" to mutableSetOf<String>(),
-                "eventsHostList" to mutableSetOf<String>(),
-                "friendsList" to mutableSetOf<String>(),
+                "eventsAttendeeList" to mutableListOf<String>(),
+                "eventsHostList" to mutableListOf<String>(),
+                "friendsList" to mutableListOf<String>(),
                 "profilePicUrl" to "",
                 "qrCodeUrl" to "",
                 "username" to "",
@@ -198,6 +204,8 @@ class FirebaseUserRepositoryUnitTest {
                 "lastName" to "",
                 "phoneNumber" to "",
             ))
+
+    unmockkStatic(Log::class)
   }
 
   @Test
@@ -217,12 +225,15 @@ class FirebaseUserRepositoryUnitTest {
 
   @Test
   fun `test addUser(Map, String)`() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
     val map =
         mapOf(
             "accountStatus" to "active",
-            "eventsAttendeeList" to mutableSetOf<String>(),
-            "eventsHostList" to mutableSetOf<String>(),
-            "friendsList" to mutableSetOf<String>(),
+            "eventsAttendeeList" to mutableListOf<String>(),
+            "eventsHostList" to mutableListOf<String>(),
+            "friendsList" to mutableListOf<String>(),
             "profilePicUrl" to "",
             "qrCodeUrl" to "",
             "username" to "",
@@ -248,9 +259,9 @@ class FirebaseUserRepositoryUnitTest {
         capturePublic.captured ==
             mapOf(
                 "accountStatus" to "active",
-                "eventsAttendeeList" to mutableSetOf<String>(),
-                "eventsHostList" to mutableSetOf<String>(),
-                "friendsList" to mutableSetOf<String>(),
+                "eventsAttendeeList" to mutableListOf<String>(),
+                "eventsHostList" to mutableListOf<String>(),
+                "friendsList" to mutableListOf<String>(),
                 "profilePicUrl" to "",
                 "qrCodeUrl" to "",
                 "username" to "",
@@ -264,6 +275,8 @@ class FirebaseUserRepositoryUnitTest {
                 "lastName" to "",
                 "phoneNumber" to "",
             ))
+
+    unmockkStatic(Log::class)
   }
 
   @Test
@@ -271,9 +284,9 @@ class FirebaseUserRepositoryUnitTest {
     val map =
         mapOf(
             "accountStatus" to "active",
-            "eventsAttendeeList" to mutableSetOf<String>(),
-            "eventsHostList" to mutableSetOf<String>(),
-            "friendsList" to mutableSetOf<String>(),
+            "eventsAttendeeList" to mutableListOf<String>(),
+            "eventsHostList" to mutableListOf<String>(),
+            "friendsList" to mutableListOf<String>(),
             "profilePicUrl" to "",
             "qrCodeUrl" to "",
             "username" to "",
@@ -295,6 +308,9 @@ class FirebaseUserRepositoryUnitTest {
 
   @Test
   fun `test updateUser(User)`() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
     val user = expectedUser
 
     val capturePublic = slot<Map<String, Any>>()
@@ -316,9 +332,9 @@ class FirebaseUserRepositoryUnitTest {
         capturePublic.captured ==
             mapOf(
                 "accountStatus" to "active",
-                "eventsAttendeeList" to mutableSetOf<String>(),
-                "eventsHostList" to mutableSetOf<String>(),
-                "friendsList" to mutableSetOf<String>(),
+                "eventsAttendeeList" to mutableListOf<String>(),
+                "eventsHostList" to mutableListOf<String>(),
+                "friendsList" to mutableListOf<String>(),
                 "profilePicUrl" to "",
                 "qrCodeUrl" to "",
                 "username" to "",
@@ -332,6 +348,8 @@ class FirebaseUserRepositoryUnitTest {
                 "lastName" to "",
                 "phoneNumber" to "",
             ))
+
+    unmockkStatic(Log::class)
   }
 
   @Test

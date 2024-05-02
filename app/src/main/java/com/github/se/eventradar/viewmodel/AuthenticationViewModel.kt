@@ -32,26 +32,17 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
     }
 
     val profilePicFolder = "Profile_Pictures"
-    var uploadedPictureSuccessfully: Boolean
-    var profilePicUrl = ""
 
-    // runBlocking { uploadImageAsync(state.value.selectedImageUri, user.uid, profilePicFolder) }
-    // runBlocking { profilePicUrl = getImageAsync(user.uid, profilePicFolder) }
-    /*
-    runBlocking {
-      uploadedPictureSuccessfully =
-          uploadImageAsync(state.value.selectedImageUri, user.uid, profilePicFolder)
-      if (uploadedPictureSuccessfully) {
-        profilePicUrl = getImageAsync(user.uid, profilePicFolder)
-      }
-    }
+    val imageUri =
+        state.value.selectedImageUri
+            ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder.png")
 
+    val profilePicUrl = runBlocking { uploadImageAsync(imageUri, user.uid, profilePicFolder) }
 
-    if (!uploadedPictureSuccessfully) {
+    if (profilePicUrl.isEmpty()) {
+      Log.d("LoginScreenViewModel", "Error uploading image")
       return false
     }
-
-       */
 
     val userValues =
         hashMapOf(
@@ -92,17 +83,18 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
       selectedImageUri: Uri?,
       uid: String,
       folderName: String
-  ): Boolean {
+  ): String {
     if (selectedImageUri == null) {
-      return false
+      return ""
     }
-    return when (val result = userRepository.uploadImage(selectedImageUri, uid, folderName)) {
+    return when (val imageUrl = userRepository.uploadImage(selectedImageUri, uid, folderName)) {
       is Resource.Success -> {
-        true
+        Log.d("LoginScreenViewModel", "Image uploaded successfully: ${imageUrl.data}")
+        imageUrl.data
       }
       is Resource.Failure -> {
-        Log.d("LoginScreenViewModel", "Error uploading image: ${result.throwable.message}")
-        false
+        Log.d("LoginScreenViewModel", "Error uploading image: ${imageUrl.throwable.message}")
+        ""
       }
     }
   }

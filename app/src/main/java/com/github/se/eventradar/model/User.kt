@@ -1,6 +1,6 @@
 package com.github.se.eventradar.model
 
-import com.github.se.eventradar.model.ConversionUtils.convertToMutableSetOfStrings
+import com.github.se.eventradar.model.ConversionUtils.convertToMutableListOfStrings
 
 data class User(
     val userId: String,
@@ -10,9 +10,9 @@ data class User(
     val lastName: String,
     val phoneNumber: String,
     val accountStatus: String,
-    val eventsAttendeeSet: MutableSet<String>,
-    val eventsHostSet: MutableSet<String>,
-    val friendsSet: MutableSet<String>,
+    val eventsAttendeeSet: MutableList<String>,
+    val eventsHostSet: MutableList<String>,
+    val friendsSet: MutableList<String>,
     val profilePicUrl: String,
     val qrCodeUrl: String,
     val username: String,
@@ -28,9 +28,9 @@ data class User(
       lastName = map["private/lastName"] as String,
       phoneNumber = map["private/phoneNumber"] as String,
       accountStatus = map["accountStatus"] as String,
-      eventsAttendeeSet = convertToMutableSetOfStrings(map["eventsAttendeeList"]),
-      eventsHostSet = convertToMutableSetOfStrings(map["eventsHostList"]),
-      friendsSet = convertToMutableSetOfStrings(map["friendsList"]),
+      eventsAttendeeSet = convertToMutableListOfStrings(map["eventsAttendeeList"]),
+      eventsHostSet = convertToMutableListOfStrings(map["eventsHostList"]),
+      friendsSet = convertToMutableListOfStrings(map["friendsList"]),
       profilePicUrl = map["profilePicUrl"] as String,
       qrCodeUrl = map["qrCodeUrl"] as String,
       username = map["username"] as String)

@@ -15,6 +15,7 @@ import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
+import io.mockk.unmockkStatic
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -65,9 +66,9 @@ class AuthenticationViewModelTest {
           lastName = "Doe",
           phoneNumber = "1234567890",
           accountStatus = "active",
-          eventsAttendeeSet = mutableSetOf(),
-          eventsHostSet = mutableSetOf(),
-          friendsSet = mutableSetOf(),
+          eventsAttendeeSet = mutableListOf(),
+          eventsHostSet = mutableListOf(),
+          friendsSet = mutableListOf(),
           profilePicUrl = "",
           qrCodeUrl = "",
           username = "john_doe")
@@ -166,6 +167,9 @@ class AuthenticationViewModelTest {
 
   @Test
   fun testAddUser() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
     viewModel.onFirstNameChanged("John", mockUiState)
     viewModel.onLastNameChanged("Doe", mockUiState)
     viewModel.onUsernameChanged("john_doe", mockUiState)
@@ -178,6 +182,8 @@ class AuthenticationViewModelTest {
     assert(result)
 
     assert(userRepository.getUser("1") is Resource.Success)
+
+    unmockkStatic(Log::class)
   }
 
   @Test

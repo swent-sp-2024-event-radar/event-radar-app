@@ -300,9 +300,11 @@ fun PhoneNumberInput(
       shape = RoundedCornerShape(12.dp),
       leadingIcon = {
         Box {
-          TextButton(onClick = { isDropdownExpanded = true }) {
-            Text(selectedCountryCode.ext, color = MaterialTheme.colorScheme.primary)
-          }
+          TextButton(
+              onClick = { isDropdownExpanded = true },
+              modifier = Modifier.testTag("signUpCountryCodeButton")) {
+                Text(selectedCountryCode.ext, color = MaterialTheme.colorScheme.primary)
+              }
           DropdownMenu(
               expanded = isDropdownExpanded, onDismissRequest = { isDropdownExpanded = false }) {
                 val countryCodes = enumValues<CountryCode>()

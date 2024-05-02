@@ -61,8 +61,8 @@ class EventsOverviewViewModelTest {
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1),
           mainOrganiser = "1",
-          organiserSet = mutableSetOf("Test Organiser"),
-          attendeeSet = mutableSetOf("Test Attendee"),
+          organiserList = mutableListOf("Test Organiser"),
+          attendeeList = mutableListOf("Test Attendee"),
           category = EventCategory.COMMUNITY,
           fireBaseID = "1")
 
@@ -75,9 +75,9 @@ class EventsOverviewViewModelTest {
           lastName = "Doe",
           phoneNumber = "1234567890",
           accountStatus = "active",
-          eventsAttendeeSet = mutableSetOf("1", "2"),
-          eventsHostSet = mutableSetOf("3"),
-          friendsSet = mutableSetOf(),
+          eventsAttendeeSet = mutableListOf("1", "2"),
+          eventsHostSet = mutableListOf("3"),
+          friendsSet = mutableListOf(),
           profilePicUrl = "http://example.com/pic.jpg",
           qrCodeUrl = "http://example.com/qr.jpg",
           username = "john_doe")
@@ -174,7 +174,7 @@ class EventsOverviewViewModelTest {
   @Test
   fun testGetUpcomingEventsEmptyAttendeeList() = runTest {
     val userWithEmptyList =
-        mockUser.copy(userId = "userWithEmptyList", eventsAttendeeSet = mutableSetOf())
+        mockUser.copy(userId = "userWithEmptyList", eventsAttendeeSet = mutableListOf())
     userRepository.addUser(userWithEmptyList)
     viewModel.getUpcomingEvents("userWithEmptyList")
 
