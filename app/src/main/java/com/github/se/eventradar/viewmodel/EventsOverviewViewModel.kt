@@ -114,34 +114,20 @@ constructor(
     state.value = state.value.copy(viewList = !state.value.viewList)
   }
 
-  fun setFilterDialogOpen(isOpen: Boolean) {
-    _uiState.update { currentState -> currentState.copy(isFilterDialogOpen = isOpen) }
+  fun changeFilterDialogOpen() {
+    val current = _uiState.value.isFilterDialogOpen
+    _uiState.update { currentState -> currentState.copy(isFilterDialogOpen = !current) }
   }
 
   fun onSearchQueryChange(newQuery: String) {
     _uiState.update { currentState -> currentState.copy(searchQuery = newQuery) }
   }
-  /* TODO Christine
-  fun setRadiusInputFilter(radius: Double) {
-      _uiState.update { currentState ->
-          currentState.copy(radiusInputFilter = radius)
-      }
-  }
-  fun setFreeEventsFilter(isFree: Boolean) {
-      _uiState.update { currentState ->
-          currentState.copy(freeEventsFilter = isFree)
-      }
-  }
-
-   */
 }
 
 data class EventsOverviewUiState(
     val eventList: EventList = EventList(emptyList(), emptyList(), null),
     val searchQuery: String = "",
     val isFilterDialogOpen: Boolean = false,
-    // TODO: Christine, please update `radiusInputFilter` and `freeEventsFilter` to `val`.
-    // Note: This implies changes in ReusableComponents.kt.
     var radiusInputFilter: Double = -1.0,
     var freeEventsFilter: Boolean = false,
     val categorySelectionFilter: List<EventCategory> = emptyList(),

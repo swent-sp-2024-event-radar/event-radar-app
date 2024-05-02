@@ -5,7 +5,7 @@ import com.github.se.eventradar.model.User
 
 class MockUserRepository : IUserRepository {
   private val mockUsers = mutableListOf<User>()
-  var currentUserId: String? = null // Simulate current user ID
+  private var currentUserId: String? = null // Simulate current user ID
 
   override suspend fun getUsers(): Resource<List<User>> {
     return Resource.Success(mockUsers)

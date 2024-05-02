@@ -221,10 +221,11 @@ class EventsOverviewViewModelTest {
 
   @Test
   fun testSetFilterDialogOpen() = runTest {
-    viewModel.setFilterDialogOpen(true)
+    // init value is false
+    viewModel.changeFilterDialogOpen()
     assert(viewModel.uiState.value.isFilterDialogOpen)
 
-    viewModel.setFilterDialogOpen(false)
+    viewModel.changeFilterDialogOpen()
     assert(!viewModel.uiState.value.isFilterDialogOpen)
   }
 
