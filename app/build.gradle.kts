@@ -29,15 +29,7 @@ android {
   
   signingConfigs {
     create("release") {
-      val tmpFilePath = System.getProperty("user.home") + "/work/_temp/keystore/"
-      val allFilesFromDir = File(tmpFilePath).listFiles()
-      
-      if (allFilesFromDir != null) {
-        val keystoreFile = allFilesFromDir.first()
-        keystoreFile.renameTo(File("event_radar_release_keystore.jks"))
-      }
-      
-      storeFile = file("event_radar_release_keystore.jks")
+      storeFile = file("event_radar_release.keystore")
       storePassword = System.getenv("key_store_password")
       keyAlias = System.getenv("alias")
       keyPassword = System.getenv("key_password")
