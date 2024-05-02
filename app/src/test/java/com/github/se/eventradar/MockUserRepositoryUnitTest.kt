@@ -115,22 +115,117 @@ class MockUserRepositoryUnitTest {
   }
 
   @Test
-  fun testUploadImage() = runTest {
+  fun testUploadImageUserExistsFolderExistsSuccess() = runTest {
     val mockURI = mock(Uri::class.java)
+    // Add a User
+    userRepository.addUser(mockUser)
+    // Upload a user Image
     val result = userRepository.uploadImage(mockURI, "1", "Profile_Pictures")
     assert(result is Resource.Success)
   }
 
   @Test
-  fun testGetImage() = runTest {
+  fun testUploadImageUserDoesNotExistFailure() = runTest {
+    // Arrange
+    val mockURI = mock(Uri::class.java)
+    val userId = "non_existing_user"
+    val folderName = "Profile_Pictures"
+
+    // Act
+    val result = userRepository.uploadImage(mockURI, userId, folderName)
+
+    // Assert
+    assertTrue(result is Resource.Failure)
+    assertEquals("User with id $userId not found", (result as Resource.Failure).throwable.message)
+  }
+
+  @Test
+  fun testUploadImageInvalidFolderFailure() = runTest {
+    // Arrange
+    val mockURI = mock(Uri::class.java)
+    val userId = mockUser.userId
+    val folderName = "Invalid_Folder"
+    userRepository.addUser(mockUser)
+
+    // Act
+    val result = userRepository.uploadImage(mockURI, userId, folderName)
+
+    // Assert
+    assertTrue(result is Resource.Failure)
+    assertEquals(
+        "Folder $folderName does not exist", (result as Resource.Failure).throwable.message)
+  }
+
+  @Test
+  fun testGetImageUserExistsFolderExistsSuccess() = runTest {
     // Arrange
     val expectedUrl = "http://example.com/Profile_Pictures/pic.jpg"
-    val userId = "1"
+    val userId = mockUser.userId
+    userRepository.addUser(mockUser)
+    // Act
+    val result = userRepository.getImage(userId, "Profile_Pictures")
+    // Assert
+    assertTrue(result is Resource.Success)
+    assertEquals(expectedUrl, (result as Resource.Success).data)
+  }
+
+  @Test
+  fun testGetImageUserDoesNotExistFailure() = runTest {
+    // Arrange
+    val userId = "non_existing_user"
 
     // Act
     val result = userRepository.getImage(userId, "Profile_Pictures")
 
     // Assert
+    assertTrue(result is Resource.Failure)
+    assertEquals("User with id $userId not found", (result as Resource.Failure).throwable.message)
+  }
+
+  @Test
+  fun testGetImageInvalidFolderFailure() = runTest {
+    // Arrange
+    val userId = mockUser.userId
+    userRepository.addUser(mockUser)
+    userRepository.uploadImage(mock(Uri::class.java), userId, "Profile_Pictures")
+
+    // Act
+    val result = userRepository.getImage(userId, "Invalid_Folder")
+
+    // Assert
+    assertTrue(result is Resource.Failure)
+    assertEquals(
+        "Folder Invalid_Folder does not exist", (result as Resource.Failure).throwable.message)
+  }
+
+  @Test
+  fun testGetImageImageNotFoundFailure() = runTest {
+    // Arrange
+    val userId = mockUser.userId
+    val mockUserWithNoProfilePic = mockUser.copy(profilePicUrl = "")
+    userRepository.addUser(mockUserWithNoProfilePic)
+
+    // Act
+    val result = userRepository.getImage(userId, "Profile_Pictures")
+
+    // Assert
+    assertTrue(result is Resource.Failure)
+    assertEquals(
+        "Image from folder Profile_Pictures not found for user $userId",
+        (result as Resource.Failure).throwable.message)
+  }
+
+  @Test
+  fun testUploadAndGetImageSuccess() = runTest {
+    val expectedUrl = "http://example.com/Profile_Pictures/pic.jpg"
+    val userId = mockUser.userId
+    // initialize user with no mock
+    val mockUserWithNoProfilePic = mockUser.copy(profilePicUrl = "")
+    userRepository.addUser(mockUserWithNoProfilePic)
+    // Upload Image
+    userRepository.uploadImage(mock(Uri::class.java), userId, "Profile_Pictures")
+    // Get Image
+    val result = userRepository.getImage(userId, "Profile_Pictures")
     assertTrue(result is Resource.Success)
     assertEquals(expectedUrl, (result as Resource.Success).data)
   }

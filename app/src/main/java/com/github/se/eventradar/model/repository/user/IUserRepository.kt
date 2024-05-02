@@ -5,6 +5,7 @@ import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 
 interface IUserRepository {
+
   suspend fun getUsers(): Resource<List<User>>
 
   suspend fun getUser(uid: String): Resource<User?>
