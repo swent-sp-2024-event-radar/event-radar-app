@@ -1,5 +1,6 @@
 package com.github.se.eventradar.model.repository.user
 
+import android.net.Uri
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.google.firebase.auth.ktx.auth
@@ -138,6 +139,18 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
     }
   }
 
+  override suspend fun uploadImage(
+      selectedImageUri: Uri,
+      uid: String,
+      folderName: String
+  ): Resource<Unit> {
+    return Resource.Success(Unit)
+  }
+
+  override suspend fun getImage(uid: String, folderName: String): Resource<String> {
+    return Resource.Success("To Be Implemented")
+  }
+
   override suspend fun getCurrentUserId(): Resource<String> {
     val userId = Firebase.auth.currentUser?.uid
     return if (userId != null) {
@@ -146,28 +159,28 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
       Resource.Failure(Exception("No user currently signed in"))
     }
   }
-}
 
-private fun getMaps(user: User): Pair<Map<String, Any?>, Map<String, Any?>> {
-  val privateMap =
-      mutableMapOf(
-          "firstName" to user.firstName,
-          "lastName" to user.lastName,
-          "phoneNumber" to user.phoneNumber,
-          "birthDate" to user.birthDate,
-          "email" to user.email,
-      )
+  private fun getMaps(user: User): Pair<Map<String, Any?>, Map<String, Any?>> {
+    val privateMap =
+        mutableMapOf(
+            "firstName" to user.firstName,
+            "lastName" to user.lastName,
+            "phoneNumber" to user.phoneNumber,
+            "birthDate" to user.birthDate,
+            "email" to user.email,
+        )
 
-  val publicMap =
-      mutableMapOf(
-          "profilePicUrl" to user.profilePicUrl,
-          "qrCodeUrl" to user.qrCodeUrl,
-          "username" to user.username,
-          "accountStatus" to user.accountStatus,
-          "eventsAttendeeList" to user.eventsAttendeeSet,
-          "eventsHostList" to user.eventsHostSet,
-          "friendsList" to user.friendsSet,
-      )
+    val publicMap =
+        mutableMapOf(
+            "profilePicUrl" to user.profilePicUrl,
+            "qrCodeUrl" to user.qrCodeUrl,
+            "username" to user.username,
+            "accountStatus" to user.accountStatus,
+            "eventsAttendeeList" to user.eventsAttendeeSet,
+            "eventsHostList" to user.eventsHostSet,
+            "friendsList" to user.friendsSet,
+        )
 
-  return Pair(publicMap, privateMap)
+    return Pair(publicMap, privateMap)
+  }
 }
