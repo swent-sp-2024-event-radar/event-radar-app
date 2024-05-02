@@ -1,5 +1,6 @@
 package com.github.se.eventradar.viewmodel.qrCode
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
@@ -62,6 +63,7 @@ constructor(
       }
     }
     qrCodeAnalyser.onDecoded = { decodedString ->
+      Log.d("QrCodeFriendViewModel", "Decoded QR Code: $decodedString")
       val result = decodedString ?: "Failed to decode QR Code"
       _decodedResult.value = result // Update state flow
       if (result != "Failed to decode QR Code") {
@@ -72,7 +74,10 @@ constructor(
     }
   }
 
-  private fun updateFriendList(friendID: String) { // private
+  private fun updateFriendList(decodedString: String) { // private
+    val uidex = "AwOXI3dCWjfYKk7bnBQ0S94WxbD2"
+
+    val friendID = decodedString.take(uidex.length)
 
     viewModelScope.launch {
       val friendUserDeferred = async { userRepository.getUser(friendID) }
