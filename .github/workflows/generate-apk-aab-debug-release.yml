@@ -43,22 +43,6 @@ jobs:
       - name: Build Debug apk
         run: ./gradlew assembleDebug
 
-      # Create APK Release
-      - name: Create the Keystore
-        env:
-          encoded_string: ${{ secrets.SIGNING_KEY }}
-        run: |
-          # import keystore from secrets
-          echo $encoded_string > keystore-b64.txt
-          base64 -di keystore-b64.txt > keystore.jks
-
-      - name: Build Release apk
-        env:
-          key_store_password: ${{ secrets.KEY_STORE_PASSWORD }}
-          key_password: ${{ secrets.KEY_PASSWORD }}
-          alias: ${{ secrets.ALIAS }}
-        run: ./gradlew assembleRelease
-
       # Upload Artifact Build
       # Noted For Output [main_project_module]/build/outputs/apk/debug/
       - name: Upload APK Debug - ${{ env.repository_name }}
@@ -66,10 +50,3 @@ jobs:
         with:
           name: ${{ env.date_today }} - ${{ env.repository_name }} - APK(s) debug generated
           path: ${{ env.main_project_module }}/build/outputs/apk/debug/
-
-      # Noted For Output [main_project_module]/build/outputs/apk/release/
-      - name: Upload APK Release - ${{ env.repository_name }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ env.date_today }} - ${{ env.repository_name }} - APK(s) release generated
-          path: ${{ env.main_project_module }}/build/outputs/apk/release/

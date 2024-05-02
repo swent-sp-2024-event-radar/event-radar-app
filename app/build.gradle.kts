@@ -1,6 +1,5 @@
+
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
-import java.io.FileInputStream
-import java.util.Properties
 
 plugins {
   id("com.android.application")
@@ -18,21 +17,6 @@ android {
   namespace = "com.github.se.eventradar"
   compileSdk = 34
 
-  signingConfigs {
-    create("release") {
-      val propsFile = rootProject.file("keystore.properties")
-      val props = Properties()
-      props.load(FileInputStream(propsFile))
-      
-      storeFile =
-          if (file("../keystore.jks").exists()) file("../keystore.jks") else file(props["storeFile"]!!.toString())
-      storePassword =
-          if (System.getenv("key_store_password") != null) System.getenv("key_store_password") else props["storePassword"]!!.toString()
-      keyAlias = if (System.getenv("alias") != null) System.getenv("alias") else props["keyAlias"]!!.toString()
-      keyPassword = if (System.getenv("key_password") != null) System.getenv("key_password") else props["keyPassword"]!!.toString()
-    }
-  }
-
   defaultConfig {
     applicationId = "com.github.se.eventradar"
     minSdk = 29
@@ -48,7 +32,6 @@ android {
     release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-      signingConfig = signingConfigs.getByName("release")
     }
     debug {
       enableUnitTestCoverage = true
