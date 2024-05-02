@@ -37,7 +37,7 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
 
     val profilePicUrl =
         if (imageUri == null) {
-          Log.d("LoginScreenViewModel", "ImageUri is null, taking default Profile Picture")
+          Log.d("LoginScreenViewModel", "ImageUri is null, getting default Profile Picture")
           runBlocking { getImageAsync(user.uid, profilePicFolder) }
         } else {
           Log.d("LoginScreenViewModel", "ImageUri is not null, uploading Profile Picture")
