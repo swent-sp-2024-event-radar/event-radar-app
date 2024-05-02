@@ -152,7 +152,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       }
     }
     // Update the UI state to reflect the change
-    mockEventsOverviewViewModel.onTabChanged(Tab.UPCOMING, sampleEventList)
+    sampleEventList.value = sampleEventList.value.copy(tab = Tab.UPCOMING)
 
     // Verify if getEvents is called upon init
     verify { mockEventsOverviewViewModel.getEvents() }
@@ -173,24 +173,10 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
   @Test
   fun testDisplayUpcomingEventsList() = run {
     val upcomingEvents = listOf(mockEvent, mockEvent.copy(fireBaseID = "2"))
-    every { mockEventsOverviewViewModel.uiState } returns
-        MutableStateFlow(EventsOverviewUiState(viewList = true))
-    every { mockEventsOverviewViewModel.getUpcomingEvents() } answers
-        {
-          sampleEventList.value =
-              sampleEventList.value.copy(eventList = EventList(allEvents = upcomingEvents))
-        }
+    sampleEventList.value =
+        sampleEventList.value.copy(
+            eventList = EventList(allEvents = upcomingEvents), userLoggedIn = true)
 
-    onComposeScreen<HomeScreen>(composeTestRule) {
-      step("Select 'Upcoming' tab") {
-        upcomingTab.performClick()
-        eventList.assertIsDisplayed()
-      }
-    }
-  }
-
-  @Test
-  fun testDisplayUpcomingEventsMap() = run {
     onComposeScreen<HomeScreen>(composeTestRule) {
       step("Trigger loading of upcoming events") {
         upcomingTab {
@@ -198,19 +184,88 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
           performClick()
         }
       }
-      mockEventsOverviewViewModel.onTabChanged(Tab.UPCOMING, sampleEventList)
+      sampleEventList.value = sampleEventList.value.copy(tab = Tab.UPCOMING, viewList = true)
+      step("view list") { eventListUpcoming.assertIsDisplayed() }
+      // Verify that the tab change is handled correctly
+      verify(exactly = 1) { mockEventsOverviewViewModel.onTabChanged(Tab.UPCOMING, any()) }
+
+      // Verify that the upcoming events are fetched once
+      verify(exactly = 1) { mockEventsOverviewViewModel.getUpcomingEvents() }
     }
+  }
+
+  @Test
+  fun testDisplayUpcomingEventsMap() = run {
+    val upcomingEvents = listOf(mockEvent, mockEvent.copy(fireBaseID = "2"))
+    sampleEventList.value =
+        sampleEventList.value.copy(
+            eventList = EventList(allEvents = upcomingEvents), userLoggedIn = true)
+
     onComposeScreen<HomeScreen>(composeTestRule) {
-      step("Click on view toggle fab") {
-        viewToggleFab {
+      step("Trigger loading of upcoming events") {
+        upcomingTab {
           assertIsDisplayed()
           performClick()
         }
       }
+      sampleEventList.value = sampleEventList.value.copy(tab = Tab.UPCOMING, viewList = false)
+      step("view map") { mapUpcoming.assertIsDisplayed() }
+      // Verify that the tab change is handled correctly
+      verify(exactly = 1) { mockEventsOverviewViewModel.onTabChanged(Tab.UPCOMING, any()) }
 
-      // Update the UI state to reflect the change
-      sampleEventList.value = sampleEventList.value.copy(viewList = false)
-      step("Check if map is displayed") { map { assertIsDisplayed() } }
+      // Verify that the upcoming events are fetched once
+      verify(exactly = 1) { mockEventsOverviewViewModel.getUpcomingEvents() }
+    }
+  }
+
+  @Test
+  fun testPleaseLogInMessageDisplayed() = run {
+    val upcomingEvents = listOf(mockEvent, mockEvent.copy(fireBaseID = "2"))
+    sampleEventList.value =
+        sampleEventList.value.copy(
+            eventList = EventList(allEvents = upcomingEvents), userLoggedIn = false)
+
+    onComposeScreen<HomeScreen>(composeTestRule) {
+      step("Trigger loading of upcoming events") {
+        upcomingTab {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+      sampleEventList.value = sampleEventList.value.copy(tab = Tab.UPCOMING)
+      step("Verify that the 'Please Login' message is displayed") {
+        pleaseLogInText.assertIsDisplayed()
+      }
+      // Verify that the tab change is handled correctly
+      verify(exactly = 1) { mockEventsOverviewViewModel.onTabChanged(Tab.UPCOMING, any()) }
+
+      // Verify that the upcoming events are fetched once
+      verify(exactly = 1) { mockEventsOverviewViewModel.getUpcomingEvents() }
+    }
+  }
+
+  @Test
+  fun testNoUpcomingEventsMessageDisplayed() = run {
+    sampleEventList.value =
+        sampleEventList.value.copy(
+            eventList = EventList(emptyList(), emptyList(), null), userLoggedIn = true)
+
+    onComposeScreen<HomeScreen>(composeTestRule) {
+      step("Trigger loading of upcoming events") {
+        upcomingTab {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+      sampleEventList.value = sampleEventList.value.copy(tab = Tab.UPCOMING)
+      step("Verify that the 'No upcoming events' message is displayed") {
+        noUpcomingEventsText.assertIsDisplayed()
+      }
+      // Verify that the tab change is handled correctly
+      verify(exactly = 1) { mockEventsOverviewViewModel.onTabChanged(Tab.UPCOMING, any()) }
+
+      // Verify that the upcoming events are fetched once
+      verify(exactly = 1) { mockEventsOverviewViewModel.getUpcomingEvents() }
     }
   }
 }

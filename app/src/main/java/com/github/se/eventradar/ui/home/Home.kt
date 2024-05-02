@@ -195,7 +195,7 @@ fun HomeScreen(
           EventList(
               events = uiState.eventList.allEvents,
               modifier =
-                  Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
+                  Modifier.testTag("eventListUpcoming").fillMaxWidth().constrainAs(eventList) {
                     top.linkTo(searchAndFilter.bottom, margin = 8.dp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
@@ -206,7 +206,7 @@ fun HomeScreen(
           EventMap(
               uiState.eventList.allEvents,
               navigationActions,
-              Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
+              Modifier.testTag("mapUpcoming").fillMaxWidth().constrainAs(eventMap) {
                 top.linkTo(tabs.bottom, margin = 8.dp)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
