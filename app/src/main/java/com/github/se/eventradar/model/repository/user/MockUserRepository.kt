@@ -6,7 +6,6 @@ import com.github.se.eventradar.model.User
 
 class MockUserRepository : IUserRepository {
   private val mockUsers = mutableListOf<User>()
-  var currentUserId: String? = null // Simulate current user ID
   /*
   Map that associates a user to:
    String 1. profilePictureLink
@@ -14,6 +13,7 @@ class MockUserRepository : IUserRepository {
    */
   // associate folderName to
   private val mockImagesDatabase = mutableMapOf<User, MutableMap<String, String>>()
+  private var currentUserId: String? = null // Simulate current user ID
 
   override suspend fun getUsers(): Resource<List<User>> {
     return Resource.Success(mockUsers)
@@ -122,6 +122,4 @@ class MockUserRepository : IUserRepository {
   fun updateCurrentUserId(userId: String?) {
     currentUserId = userId
   }
-  }
-
-
+}
