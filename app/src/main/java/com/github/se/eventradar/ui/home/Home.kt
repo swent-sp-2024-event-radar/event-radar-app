@@ -1,6 +1,5 @@
 package com.github.se.eventradar.ui.home
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,10 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -36,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
+import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu
@@ -67,7 +65,8 @@ fun HomeScreen(
           viewModel.getEvents()
         }
       }
-  val context = LocalContext.current
+
+//  LaunchedEffect(Unit) { viewModel.getEvents() }
 
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("homeScreen")) {
     val (logo, tabs, searchAndFilter, filterPopUp, eventList, eventMap, bottomNav, viewToggle) =
@@ -100,7 +99,10 @@ fun HomeScreen(
         contentColor = MaterialTheme.colorScheme.primary) {
           Tab(
               selected = getTabIndexFromTabEnum(uiState.tab) == 0,
-              onClick = { viewModel.onTabChanged(Tab.BROWSE) },
+              onClick = {
+                viewModel.onTabChanged(Tab.BROWSE)
+                viewModel.getEvents()
+              },
               modifier = Modifier.testTag("browseTab"),
           ) {
             Text(
@@ -119,7 +121,10 @@ fun HomeScreen(
           }
           Tab(
               selected = getTabIndexFromTabEnum(uiState.tab) == 1,
-              onClick = { viewModel.onTabChanged(Tab.UPCOMING) },
+              onClick = {
+                viewModel.onTabChanged(Tab.UPCOMING)
+                viewModel.getUpcomingEvents()
+              },
               modifier = Modifier.testTag("upcomingTab")) {
                 Text(
                     text = "Upcoming",
@@ -151,55 +156,108 @@ fun HomeScreen(
                   end.linkTo(parent.end)
                 })
 
-    if (getTabIndexFromTabEnum(uiState.tab) == 0) {
-      if (uiState.viewList) {
-        if (uiState.isSearchActive || uiState.isFilterActive) {
-          EventList(
-              uiState.eventList.filteredEvents,
-              Modifier.testTag("filteredEventList").fillMaxWidth().constrainAs(eventList) {
-                top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-              }) { eventId ->
-                navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+    if (uiState.tab == Tab.BROWSE) {
+      when {
+        (uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
+            EventList(
+                uiState.eventList.filteredEvents,
+                Modifier.testTag("filteredEventList").fillMaxWidth().constrainAs(eventList) {
+                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                }) { eventId ->
+                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+                }
+          (uiState.viewList && !(uiState.isSearchActive || uiState.isFilterActive)) ->
+              EventList(
+                  uiState.eventList.allEvents,
+                  Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
+                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                  }) { eventId ->
+                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
               }
-        } else {
-          EventList(
-              uiState.eventList.allEvents,
-              Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
-                top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-              }) { eventId ->
-                navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-              }
-        }
-      } else {
-        if (uiState.isSearchActive || uiState.isFilterActive) {
-          EventMap(
-              uiState.eventList.filteredEvents,
-              navigationActions,
-              Modifier.testTag("filteredMap").fillMaxWidth().constrainAs(eventMap) {
-                top.linkTo(tabs.bottom, margin = 8.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-              })
-        } else {
-          EventMap(
-              uiState.eventList.allEvents,
-              navigationActions,
-              Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
-                top.linkTo(tabs.bottom, margin = 8.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-              })
-        }
+          (!uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
+              EventMap(
+                  uiState.eventList.filteredEvents,
+                  navigationActions,
+                  Modifier.testTag("filteredMap").fillMaxWidth().constrainAs(eventMap) {
+                      top.linkTo(tabs.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                  })
+        else ->
+            EventMap(
+                uiState.eventList.allEvents,
+                navigationActions,
+                Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
+                  top.linkTo(tabs.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                })
       }
     } else {
-      // "Upcoming" tab content
-      // TODO: Implement upcoming events
-      Toast.makeText(context, "Upcoming events not yet available", Toast.LENGTH_SHORT).show()
-      viewModel.onTabChanged(Tab.BROWSE)
+      when {
+        (!uiState.userLoggedIn) ->
+            Text(
+                "Please log in",
+                modifier =
+                    Modifier.testTag("pleaseLogInText").constrainAs(eventList) {
+                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                    })
+        (uiState.eventList.allEvents.isEmpty()) ->
+            Text(
+                "You have no upcoming events",
+                modifier =
+                    Modifier.testTag("noUpcomingEventsText").constrainAs(eventList) {
+                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                    })
+          (uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
+            EventList(
+                events = uiState.eventList.filteredEvents,
+                modifier =
+                    Modifier.testTag("filteredEventListUpcoming").fillMaxWidth().constrainAs(eventList) {
+                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                    }) { eventId ->
+                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+                }
+          (uiState.viewList && !(uiState.isSearchActive || uiState.isFilterActive)) ->
+              EventList(
+                  events = uiState.eventList.allEvents,
+                  modifier =
+                  Modifier.testTag("eventListUpcoming").fillMaxWidth().constrainAs(eventList) {
+                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                  }) { eventId ->
+                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+              }
+          (!uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
+              EventMap(
+                  uiState.eventList.filteredEvents,
+                  navigationActions,
+                  Modifier.testTag("filteredMapUpcoming").fillMaxWidth().constrainAs(eventMap) {
+                      top.linkTo(tabs.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                  })
+        else ->
+            EventMap(
+                uiState.eventList.allEvents,
+                navigationActions,
+                Modifier.testTag("mapUpcoming").fillMaxWidth().constrainAs(eventMap) {
+                  top.linkTo(tabs.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                })
+      }
     }
 
     if (uiState.isFilterDialogOpen) {
@@ -208,7 +266,8 @@ fun HomeScreen(
           onFilterApply = { viewModel.onFilterApply() },
           uiState = uiState,
           onRadiusQueryChanged = { viewModel.onRadiusQueryChanged(it) },
-          viewModel = viewModel,
+          onCategorySelectionChanged = { viewModel.onCategorySelectionChanged(it) },
+        viewModel = viewModel,
           modifier =
               Modifier.height(355.dp).width(230.dp).testTag("filterPopUp").constrainAs(
                   filterPopUp) {

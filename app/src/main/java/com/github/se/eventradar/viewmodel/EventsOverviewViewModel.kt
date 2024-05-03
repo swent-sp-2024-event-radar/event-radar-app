@@ -18,6 +18,8 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -28,7 +30,11 @@ constructor(
     private val userRepository: IUserRepository
 ) : ViewModel() {
   private val _uiState = MutableStateFlow(EventsOverviewUiState())
-  val uiState: StateFlow<EventsOverviewUiState> = _uiState
+  val uiState: StateFlow<EventsOverviewUiState> = _uiState.asStateFlow()
+
+  init {
+    checkUserLoginStatus()
+  }
 
   fun onSearchQueryChanged(query: String) {
     _uiState.value = _uiState.value.copy(searchQuery = query)
@@ -50,14 +56,28 @@ constructor(
     state.value = state.value.copy(isFreeSwitchOn = !state.value.isFreeSwitchOn)
   }
 
+    fun modifyCategoryChecked(category: EventCategory, newState: Boolean) {
+        val isCategoriesChecked = _uiState.value.isCategoriesChecked
+        isCategoriesChecked[category] = newState
+        Log.d("CategorySelection", "isCategoriesChecked $isCategoriesChecked")
+
+        _uiState.value = _uiState.value.copy(isCategoriesChecked = isCategoriesChecked)
+        Log.d("CategorySelection", "isCategoriesChecked vm ${_uiState.value.isCategoriesChecked}")
+
+    }
+
   fun onCategorySelectionChanged(category: EventCategory) {
     val categoriesCheckedList = _uiState.value.categoriesCheckedList
-    if (categoriesCheckedList.contains(category)) {
+    Log.d("CategorySelection", "categoriesCheckedList $categoriesCheckedList")
+
+      if (categoriesCheckedList.contains(category)) {
       categoriesCheckedList.remove(category)
     } else {
       categoriesCheckedList.add(category)
     }
     _uiState.value = _uiState.value.copy(categoriesCheckedList = categoriesCheckedList)
+      Log.d("CategorySelection", "Category vm ${_uiState.value.categoriesCheckedList}")
+
   }
 
   fun onFilterApply(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
@@ -154,38 +174,63 @@ constructor(
     }
   }
 
-  fun getUpcomingEvents(uid: String) {
+  fun getUpcomingEvents() {
     viewModelScope.launch {
-      when (val userResponse = userRepository.getUser(uid)) {
-        is Resource.Success -> {
-          val user = userResponse.data!!
-          val attendeeList = user.eventsAttendeeSet.toList()
-          if (attendeeList.isNotEmpty()) {
-            when (val events = eventRepository.getEventsByIds(attendeeList)) {
-              is Resource.Success -> {
-                _uiState.value =
-                    _uiState.value.copy(
-                        eventList =
-                            EventList(
-                                events.data, events.data, _uiState.value.eventList.selectedEvent))
-              }
-              is Resource.Failure -> {
-                Log.d("EventsOverviewViewModel", "Error getting events for $uid")
-                _uiState.value =
-                    _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
-              }
-            }
-          } else {
+      userRepository.getCurrentUserId().let { userIdResource ->
+        when (userIdResource) {
+          is Resource.Success -> {
+            val uid = userIdResource.data
+            getUserUpcomingEvents(uid)
+          }
+          is Resource.Failure -> {
+            Log.d(
+                "EventsOverviewViewModel",
+                "Error fetching user ID: ${userIdResource.throwable.message}")
             _uiState.value =
                 _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
           }
         }
-        is Resource.Failure -> {
-          Log.d("EventsOverviewViewModel", "Error fetching user document")
+      }
+    }
+  }
+
+  private suspend fun getUserUpcomingEvents(uid: String) {
+    when (val userResponse = userRepository.getUser(uid)) {
+      is Resource.Success -> {
+        val user = userResponse.data!!
+        val attendeeList = user.eventsAttendeeSet.toList()
+        if (attendeeList.isNotEmpty()) {
+          when (val events = eventRepository.getEventsByIds(attendeeList)) {
+            is Resource.Success -> {
+              _uiState.value =
+                  _uiState.value.copy(
+                      eventList =
+                          EventList(
+                              events.data, events.data, _uiState.value.eventList.selectedEvent))
+            }
+            is Resource.Failure -> {
+              Log.d("EventsOverviewViewModel", "Error getting events for $uid")
+              _uiState.value =
+                  _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+            }
+          }
+        } else {
           _uiState.value =
               _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
         }
       }
+      is Resource.Failure -> {
+        Log.d("EventsOverviewViewModel", "Error fetching user document")
+        _uiState.value = _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+      }
+    }
+  }
+
+  fun checkUserLoginStatus() {
+    viewModelScope.launch {
+      val userIdResource = userRepository.getCurrentUserId()
+      val isLoggedIn = userIdResource is Resource.Success
+      _uiState.update { currentState -> currentState.copy(userLoggedIn = isLoggedIn) }
     }
   }
 
@@ -195,6 +240,15 @@ constructor(
 
   fun onViewListStatusChanged(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
     state.value = state.value.copy(viewList = !state.value.viewList)
+  }
+
+  fun changeFilterDialogOpen() {
+    val current = _uiState.value.isFilterDialogOpen
+    _uiState.update { currentState -> currentState.copy(isFilterDialogOpen = !current) }
+  }
+
+  fun onSearchQueryChange(newQuery: String) {
+    _uiState.update { currentState -> currentState.copy(searchQuery = newQuery) }
   }
 }
 
@@ -206,10 +260,13 @@ data class EventsOverviewUiState(
     val isFilterActive: Boolean = false,
     val radiusQuery: String = "",
     val isFreeSwitchOn: Boolean = true,
+    val isCategoriesChecked: MutableMap<EventCategory, Boolean> =
+        EventCategory.entries.associateWith { true }.toMutableMap(),
     val categoriesCheckedList: MutableSet<EventCategory> =
         mutableSetOf(*enumValues<EventCategory>()),
     val viewList: Boolean = true,
     val tab: Tab = Tab.BROWSE,
+    val userLoggedIn: Boolean = false,
 )
 
 enum class Tab {

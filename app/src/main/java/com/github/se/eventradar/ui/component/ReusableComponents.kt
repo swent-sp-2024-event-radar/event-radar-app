@@ -1,5 +1,6 @@
 package com.github.se.eventradar.ui.component
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -97,9 +99,10 @@ fun EventCard(event: Event, onCardClick: (String) -> Unit) {
   // val context = LocalContext.current
   Card(
       modifier =
-          Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-              .height(IntrinsicSize.Min)
-              .testTag("eventCard"),
+      Modifier
+          .padding(horizontal = 16.dp, vertical = 8.dp)
+          .height(IntrinsicSize.Min)
+          .testTag("eventCard"),
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
       elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
       onClick = {
@@ -109,8 +112,9 @@ fun EventCard(event: Event, onCardClick: (String) -> Unit) {
         Row(modifier = Modifier.fillMaxSize()) {
           Column(
               modifier =
-                  Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 8.dp)
-                      .weight(1f),
+              Modifier
+                  .padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 8.dp)
+                  .weight(1f),
               verticalArrangement = Arrangement.Center) {
                 Text(
                     text = event.eventName,
@@ -137,7 +141,9 @@ fun EventCard(event: Event, onCardClick: (String) -> Unit) {
               painter = painterResource(id = R.drawable.placeholder),
               contentDescription = "Event Image",
               contentScale = ContentScale.FillBounds,
-              modifier = Modifier.weight(0.3f).fillMaxHeight())
+              modifier = Modifier
+                  .weight(0.3f)
+                  .fillMaxHeight())
         }
       }
 }
@@ -174,7 +180,9 @@ fun SearchBarAndFilter(
     // Filter button
     Button(
         onClick = { onFilterDialogOpen() },
-        modifier = Modifier.padding(start = 8.dp).testTag("filterButton")) {
+        modifier = Modifier
+            .padding(start = 8.dp)
+            .testTag("filterButton")) {
           Text(stringResource(id = R.string.filter))
         }
   }
@@ -186,6 +194,7 @@ fun FilterPopUp(
     onFilterApply: () -> Unit,
     uiState: EventsOverviewUiState,
     onRadiusQueryChanged: (String) -> Unit,
+    onCategorySelectionChanged: (EventCategory) -> Unit,
     viewModel: EventsOverviewViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -194,7 +203,9 @@ fun FilterPopUp(
         modifier = Modifier.padding(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
-      Column(modifier = Modifier.fillMaxSize().padding(12.dp)) {
+      Column(modifier = Modifier
+          .fillMaxSize()
+          .padding(12.dp)) {
         // Text input for radius
         Row(modifier = Modifier.fillMaxWidth()) {
           Box(modifier = Modifier.weight(1f)) {
@@ -208,13 +219,14 @@ fun FilterPopUp(
                 onValueChange = { onRadiusQueryChanged(it) },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            shape = RoundedCornerShape(10))
-                        .testTag("radiusInput"),
+                Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        shape = RoundedCornerShape(10)
+                    )
+                    .testTag("radiusInput"),
                 textStyle = TextStyle.Default.copy(fontSize = 16.sp),
                 singleLine = true)
           }
@@ -257,7 +269,10 @@ fun FilterPopUp(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start) {
               CategorySelection(
-                  onCategorySelectionChanged = { viewModel.onCategorySelectionChanged(it) },
+                  modifyCategoryChecked = { category, isChecked ->
+                      viewModel.modifyCategoryChecked(category, isChecked)
+                  },
+                  onCategorySelectionChanged = { onCategorySelectionChanged(it) },
                   uiState = uiState)
             }
 
@@ -279,20 +294,34 @@ fun FilterPopUp(
 
 @Composable
 fun CategorySelection(
+    modifyCategoryChecked: (EventCategory, Boolean) -> Unit,
     onCategorySelectionChanged: (EventCategory) -> Unit,
     uiState: EventsOverviewUiState,
 ) {
+    LaunchedEffect(Unit) {
+        Log.d("MyComposable", "Composable recomposed")
+    }
   LazyColumn {
     items(EventCategory.entries) { category ->
-      val isChecked = category in uiState.categoriesCheckedList
       Row(
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.Start,
           modifier = Modifier.padding(vertical = 0.dp)) {
             Checkbox(
-                checked = isChecked,
-                onCheckedChange = { onCategorySelectionChanged(category) },
-                modifier = Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp))
+                checked = uiState.isCategoriesChecked[category]!!,
+                onCheckedChange = {
+                    Log.d("modifyCategoryChecked", "checked ui b4 ${uiState.isCategoriesChecked[category]}")
+                    modifyCategoryChecked(category, !uiState.isCategoriesChecked[category]!!)
+                    Log.d("modifyCategoryChecked", "isCategoriesChecked ui ${uiState.isCategoriesChecked}")
+                    onCategorySelectionChanged(category)
+                    Log.d("CategorySelection", "Category ui ${uiState.categoriesCheckedList}")
+                    Log.d("modifyCategoryChecked", "checked ui af ${uiState.isCategoriesChecked[category]}")
+                    Log.d("modifyCategoryChecked", "isCategoriesChecked ui af ${uiState.isCategoriesChecked[category]!!}")
+                                  },
+                modifier = Modifier
+                    .scale(0.6f)
+                    .size(10.dp)
+                    .padding(start = 10.dp))
             Text(
                 text = category.displayName,
                 style =
