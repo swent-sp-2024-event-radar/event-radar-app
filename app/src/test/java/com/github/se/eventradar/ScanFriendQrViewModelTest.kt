@@ -1,11 +1,11 @@
 package com.github.se.eventradar
 
+import QrCodeAnalyser
+import ScanFriendQrViewModel
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
-//import com.github.se.eventradar.viewmodel.qrCode.
-import com.github.se.eventradar.viewmodel.qrCode.ScanQrCodeViewModel
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
