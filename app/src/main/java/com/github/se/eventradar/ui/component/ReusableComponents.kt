@@ -190,18 +190,19 @@ fun FilterPopUp(
 ) {
   Box(modifier = modifier) {
     Card(
-        modifier = Modifier.padding(12.dp),
+        modifier = Modifier.padding(12.dp).testTag("filterCard"),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
-      Column(modifier = Modifier.fillMaxSize().padding(12.dp)) {
+      Column(modifier = Modifier.fillMaxSize().padding(12.dp).testTag("filterCardColumn")) {
         // Text input for radius
-        Row(modifier = Modifier.fillMaxWidth()) {
-          Box(modifier = Modifier.weight(1f)) {
+        Row(modifier = Modifier.fillMaxWidth().testTag("filterCardColumnRow")) {
+          Box(modifier = Modifier.weight(1f).testTag("filterCardColumnRowRadius")) {
             Text(
                 text = stringResource(id = R.string.radius_label),
-                style = TextStyle(fontSize = 16.sp))
+                style = TextStyle(fontSize = 16.sp),
+                modifier = Modifier.testTag("radiusLabel"))
           }
-          Box(modifier = Modifier.weight(1f)) {
+          Box(modifier = Modifier.weight(1f).testTag("radiusInputBox")) {
             BasicTextField(
                 value = uiState.radiusQuery,
                 onValueChange = { onRadiusQueryChanged(it) },
@@ -216,10 +217,11 @@ fun FilterPopUp(
                 textStyle = TextStyle.Default.copy(fontSize = 16.sp),
                 singleLine = true)
           }
-          Box(modifier = Modifier.weight(1f)) {
+          Box(modifier = Modifier.weight(1f).testTag("filterCardColumnRowKm")) {
             Text(
                 text = stringResource(id = R.string.radius_km_label),
-                style = TextStyle(fontSize = 16.sp))
+                style = TextStyle(fontSize = 16.sp),
+                modifier = Modifier.testTag("kmLabel"))
           }
         }
 
@@ -228,13 +230,15 @@ fun FilterPopUp(
         // Slider for free selection
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start) {
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.testTag("freeSwitchRow")) {
               Text(
                   text = stringResource(id = R.string.free_events_label),
                   style =
                       TextStyle(
                           fontSize = 16.sp,
-                      ))
+                      ),
+                  modifier = Modifier.testTag("freeSwitchLabel"))
               Switch(
                   checked = uiState.isFreeSwitchOn,
                   onCheckedChange = { onFreeSwitchChanged() },
@@ -244,7 +248,7 @@ fun FilterPopUp(
         // Buttons for category selection
         Text(
             text = stringResource(id = R.string.category_label),
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).testTag("categoryLabel"),
             style =
                 TextStyle(
                     fontSize = 16.sp,
@@ -252,14 +256,19 @@ fun FilterPopUp(
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start) {
-              CategorySelection(uiState)
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.testTag("categoryRow"),
+            ) {
+              CategorySelection(
+                  uiState = uiState,
+                  modifier = Modifier.testTag("categoryOptionsColumn"),
+                  )
             }
 
         Spacer(modifier = Modifier.height(4.dp))
 
         // Button to apply filter
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+        Row(modifier = Modifier.fillMaxWidth().testTag("filterApplyRow"), horizontalArrangement = Arrangement.Center) {
           Button(onClick = { onFilterApply() }, modifier = Modifier.testTag("filterApplyButton")) {
             Text(stringResource(id = R.string.filter_apply))
           }
@@ -270,14 +279,16 @@ fun FilterPopUp(
 }
 
 @Composable
-fun CategorySelection(uiState: EventsOverviewUiState) {
-  LazyColumn {
+fun CategorySelection(uiState: EventsOverviewUiState, modifier: Modifier) {
+  LazyColumn(
+      modifier = modifier
+  ) {
     items(EventCategory.entries) { category ->
       var isChecked by remember { mutableStateOf(true) }
       Row(
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.Start,
-          modifier = Modifier.padding(vertical = 0.dp)) {
+          modifier = Modifier.padding(vertical = 0.dp).testTag("categoryRow")) {
             Checkbox(
                 checked = isChecked,
                 onCheckedChange = {
@@ -288,14 +299,14 @@ fun CategorySelection(uiState: EventsOverviewUiState) {
                     uiState.categoriesCheckedList.remove(category)
                   }
                 },
-                modifier = Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp))
+                modifier = Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp).testTag("checkbox"))
             Text(
                 text = category.displayName,
                 style =
                     TextStyle(
                         fontSize = 16.sp,
                     ),
-                modifier = Modifier.padding(start = 16.dp))
+                modifier = Modifier.padding(start = 16.dp).testTag("checkboxText"))
           }
     }
   }

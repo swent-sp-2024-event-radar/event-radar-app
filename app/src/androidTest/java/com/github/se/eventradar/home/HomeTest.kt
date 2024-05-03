@@ -174,36 +174,41 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       step("Check if filter pop up is displayed") { filterPopUp { assertIsDisplayed() } }
       verify { mockEventsOverviewViewModel.onFilterDialogOpen() }
 
-      //      radiusInput {
-      //        assertIsDisplayed()
-      //        performClick()
-      //        performTextInput("10")
-      //      }
-      //      verify { mockEventsOverviewViewModel.onRadiusQueryChanged("10") }
+      radiusLabel { assertIsDisplayed() }
+      radiusInput {
+        assertIsDisplayed()
+        performClick()
+        performTextInput("10")
+      }
+      verify { mockEventsOverviewViewModel.onRadiusQueryChanged("10") }
+      kmLabel { assertIsDisplayed() }
 
-      //      freeSwitch {
-      //        assertIsDisplayed()
-      //        performClick()
-      //      }
-      //      sampleEventList.value = sampleEventList.value.copy(isFreeSwitchOn = false)
-      //      verify { mockEventsOverviewViewModel.onFreeSwitchChanged() }
-      //
-      //      step("Click on filter apply button") {
-      //        filterApplyButton {
-      //          assertIsDisplayed()
-      //          performClick()
-      //        }
-      //      }
-      //
-      //      filteredEventList { assertIsDisplayed() }
-      //      eventCard { assertIsDisplayed() }
-      //
-      //      // Update the UI state to reflect the change
-      //      sampleEventList.value = sampleEventList.value.copy(isFilterActive = true)
-      //      verify { mockEventsOverviewViewModel.onFilterApply() }
-      //      verify { mockEventsOverviewViewModel.uiState }
-      //      verify { mockEventsOverviewViewModel.filterEvents() }
-      //      confirmVerified(mockEventsOverviewViewModel)
+      freeSwitchLabel { assertIsDisplayed() }
+      freeSwitch {
+        assertIsDisplayed()
+        performClick()
+      }
+      sampleEventList.value = sampleEventList.value.copy(isFreeSwitchOn = false)
+      verify { mockEventsOverviewViewModel.onFreeSwitchChanged() }
+
+      categoryLabel { assertIsDisplayed() }
+
+      step("Click on filter apply button") {
+        filterApplyButton {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+
+//      filteredEventList { assertIsDisplayed() }
+//      eventCard { assertIsDisplayed() }
+
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(isFilterActive = true)
+      verify { mockEventsOverviewViewModel.onFilterApply() }
+      verify { mockEventsOverviewViewModel.uiState }
+      verify { mockEventsOverviewViewModel.filterEvents() }
+      confirmVerified(mockEventsOverviewViewModel)
     }
   }
 

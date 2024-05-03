@@ -25,11 +25,28 @@ class HomeScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   val filteredEventListUpcoming: KNode = child { hasTestTag("eventListUpcoming") }
   val filteredMap: KNode = child { hasTestTag("filteredMap") }
   val filteredMapUpcoming: KNode = child { hasTestTag("filteredMap") }
-  val radiusInput: KNode = filterPopUp.child { hasTestTag("radiusInput") }
-  val freeSwitch: KNode = filterPopUp.child { hasTestTag("freeSwitch") }
-  val filterApplyButton: KNode = filterPopUp.child { hasTestTag("filterApplyButton") }
   val noUpcomingEventsText: KNode = child { hasTestTag("noUpcomingEventsText") }
   val pleaseLogInText: KNode = child { hasTestTag("pleaseLogInText") }
   val eventListUpcoming: KNode = child { hasTestTag("eventListUpcoming") }
   val mapUpcoming: KNode = child { hasTestTag("mapUpcoming") }
-}
+
+  private val filterCard: KNode = filterPopUp.child { hasTestTag("filterCard") }
+  private val filterCardColumn: KNode = filterCard.child { hasTestTag("filterCardColumn") }
+  private val filterCardColumnRow: KNode = filterCardColumn.child { hasTestTag("filterCardColumnRow") }
+  private val filterCardColumnRowRadius: KNode = filterCardColumnRow.child { hasTestTag("filterCardColumnRowRadius") }
+  val radiusLabel: KNode = filterCardColumnRowRadius.child { hasTestTag("radiusLabel") }
+  private val filterCardColumnRowKm: KNode = filterCardColumnRow.child { hasTestTag("filterCardColumnRowKm") }
+  val kmLabel: KNode = filterCardColumnRowKm.child { hasTestTag("kmLabel") }
+  private val radiusInputBox: KNode = filterCardColumnRow.child { hasTestTag("radiusInputBox") }
+  val radiusInput: KNode = radiusInputBox.child { hasTestTag("radiusInput") }
+  private val freeSwitchRow: KNode = filterCardColumn.child { hasTestTag("freeSwitchRow") }
+  val freeSwitchLabel: KNode = freeSwitchRow.child { hasTestTag("freeSwitchLabel") }
+  val freeSwitch: KNode = freeSwitchRow.child { hasTestTag("freeSwitch") }
+  val categoryLabel: KNode = filterCardColumn.child { hasTestTag("categoryLabel") }
+  private val filterApplyRow: KNode = filterCardColumn.child { hasTestTag("filterApplyRow") }
+  val filterApplyButton: KNode = filterApplyRow.child { hasTestTag("filterApplyButton") }
+  val categoryOptionsColumn: KNode = filterCardColumn.child { hasTestTag("categoryOptionsColumn") }
+  private val categoryRow: KNode = categoryOptionsColumn.child { hasTestTag("categoryRow") }
+  val checkbox: KNode = categoryRow.child { hasTestTag("checkbox") }
+  val checkboxText: KNode = categoryRow.child { hasTestTag("checkboxText") }
+    }
