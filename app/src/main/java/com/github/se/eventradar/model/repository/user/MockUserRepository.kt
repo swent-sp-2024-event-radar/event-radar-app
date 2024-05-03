@@ -80,7 +80,6 @@ class MockUserRepository : IUserRepository {
       uid: String,
       folderName: String
   ): Resource<Unit> {
-
     val userList = mockImagesDatabase.keys.filter { user -> user.userId == uid }
     return if (userList.isEmpty()) {
       Resource.Failure(Exception("User with id $uid not found"))

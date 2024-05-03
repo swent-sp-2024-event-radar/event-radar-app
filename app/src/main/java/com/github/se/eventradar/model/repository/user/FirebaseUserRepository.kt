@@ -86,13 +86,14 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
   override suspend fun addUser(map: Map<String, Any?>, documentId: String): Resource<Unit> {
     val user = User(map, documentId)
     val maps: Pair<Map<String, Any?>, Map<String, Any?>> = getMaps(user)
+
     return try {
-      userRef.document(documentId).update(maps.first).await()
+      userRef.document(documentId).set(maps.first).await()
       userRef
           .document(documentId)
           .collection("private")
           .document("private")
-          .update(maps.second)
+          .set(maps.second)
           .await()
       Resource.Success(Unit)
     } catch (e: Exception) {

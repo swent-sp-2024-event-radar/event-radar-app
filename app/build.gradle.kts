@@ -63,17 +63,17 @@ val activityComposeVersion = "1.9.0"
 val androidXCameraVersion = "1.3.3"
 val androidXEmulatorVersion = "2.3.0"
 dependencies {
-  implementation("androidx.core:core-ktx:1.13.0")
-  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-  implementation("androidx.activity:activity-compose:1.9.0")
+  implementation("androidx.core:core-ktx:1.7.0")
+  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
+  implementation("androidx.activity:activity-compose:1.8.2")
   implementation("androidx.compose.ui:ui-graphics")
-  implementation("androidx.compose.material:material:1.6.6")
-  implementation("androidx.compose.material3:material3:1.2.1")
+  implementation("androidx.compose.material:material:1.1.1")
+  implementation("androidx.compose.material3:material3:1.1.2")
   implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 
   // Navigation
-  implementation("androidx.navigation:navigation-compose:2.7.7")
-  implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+  implementation("androidx.navigation:navigation-compose:2.6.0-rc01")
+  implementation("androidx.navigation:navigation-ui-ktx:2.7.5")
 
   // Google Maps
   implementation("com.google.maps.android:maps-compose:4.3.3")
@@ -123,16 +123,21 @@ dependencies {
   testImplementation("androidx.arch.core:core-testing:2.2.0")
 
   testImplementation("org.json:json:20220924")
+    
+    // Mockk & Espresso
+    testImplementation("io.mockk:mockk:1.13.10")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
+    androidTestImplementation("com.kaspersky.android-components:kaspresso:1.4.3")
+    androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:1.4.1")
+    androidTestImplementation("io.mockk:mockk:1.13.10")
+    androidTestImplementation("io.mockk:mockk-android:1.13.10")
+    androidTestImplementation("io.mockk:mockk-agent:1.13.10")
+    androidTestImplementation ("androidx.test:runner:1.5.2")
+    androidTestImplementation ("androidx.test:rules:1.5.0")
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation ("androidx.test.espresso:espresso-intents:3.5.1")
 
-  // Mockk & Espresso
-  testImplementation("io.mockk:mockk:1.13.10")
-  androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-  androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
-  androidTestImplementation("com.kaspersky.android-components:kaspresso:1.4.3")
-  androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:1.4.1")
-  androidTestImplementation("io.mockk:mockk:1.13.10")
-  androidTestImplementation("io.mockk:mockk-android:1.13.10")
-  androidTestImplementation("io.mockk:mockk-agent:1.13.10")
 
   // Robolectric
   testImplementation("org.robolectric:robolectric:4.11.1")
@@ -151,7 +156,6 @@ dependencies {
     implementation ("androidx.camera:camera-view:$androidXCameraVersion")
 
     // Android Test
-
     androidTestImplementation ("androidx.test.uiautomator:uiautomator:$androidXEmulatorVersion")
 
 }
