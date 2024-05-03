@@ -53,6 +53,7 @@ fun QrCodeScreen(
             TOP_LEVEL_DESTINATIONS[
                 1]) // TODO change to private message screen with friend // Adjust according to your
         viewModel.resetNavigationEvent() // Reset the navigation event in the ViewModel to prevent
+        viewModel.changeTabState(ScanFriendQrViewModel.Tab.MyQR) // TODO add test for this
       }
       else -> Unit // Do nothing if the state is None or any other non-navigational state
     }
