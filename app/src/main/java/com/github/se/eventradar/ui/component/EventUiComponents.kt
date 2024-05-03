@@ -1,4 +1,4 @@
-package com.github.se.eventradar.ui.event
+package com.github.se.eventradar.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,7 +21,7 @@ import java.time.format.DateTimeFormatter
 
 data class EventComponentsStyle(
     val titleColor: Color,
-    val subTitleColor: Color,
+    val fieldTitleColor: Color,
     val contentColor: Color,
     val titleStyle: TextStyle =
         TextStyle(
@@ -31,6 +31,13 @@ data class EventComponentsStyle(
             lineHeight = 20.sp,
         ),
     val subTitleStyle: TextStyle =
+        TextStyle(
+            fontSize = 22.sp,
+            fontFamily = FontFamily(Font(R.font.roboto)),
+            fontWeight = FontWeight.Medium,
+            lineHeight = 20.sp,
+        ),
+    val fieldTitleStyle: TextStyle =
         TextStyle(
             fontSize = 14.sp,
             fontFamily = FontFamily(Font(R.font.roboto)),
@@ -50,12 +57,21 @@ fun formatDateTime(dateTime: LocalDateTime): String {
 }
 
 @Composable
+fun EventTitle(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
+  Text(
+      text = eventUiState.eventName,
+      style = style.titleStyle,
+      modifier = modifier.testTag("eventTitle"),
+      color = style.titleColor)
+}
+
+@Composable
 fun EventDescription(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
   Column(modifier = modifier) {
     Text(
         text = stringResource(id = R.string.event_description),
-        style = style.subTitleStyle,
-        color = style.subTitleColor,
+        style = style.fieldTitleStyle,
+        color = style.fieldTitleColor,
         modifier = Modifier.testTag("descriptionTitle"))
     Text(
         text = eventUiState.description,
@@ -70,8 +86,8 @@ fun EventDistance(modifier: Modifier, eventUiState: EventUiState, style: EventCo
   Column(modifier = modifier) {
     Text(
         text = stringResource(id = R.string.event_distance),
-        style = style.subTitleStyle,
-        color = style.subTitleColor,
+        style = style.fieldTitleStyle,
+        color = style.fieldTitleColor,
         modifier = Modifier.testTag("distanceTitle"))
     Text(
         // TODO the distance between the user and the event should be display instead
@@ -87,8 +103,8 @@ fun EventCategory(modifier: Modifier, eventUiState: EventUiState, style: EventCo
   Column(modifier = modifier, verticalArrangement = Arrangement.SpaceBetween) {
     Text(
         text = stringResource(id = R.string.event_categories),
-        style = style.subTitleStyle,
-        color = style.subTitleColor,
+        style = style.fieldTitleStyle,
+        color = style.fieldTitleColor,
         modifier = Modifier.testTag("categoryTitle"))
     Text(
         text = eventUiState.category.convertToResString(LocalContext.current),
@@ -103,7 +119,7 @@ fun EventDateTime(modifier: Modifier, eventUiState: EventUiState, style: EventCo
   Column(modifier = modifier) {
     Text(
         text = stringResource(id = R.string.event_date_and_time),
-        style = style.subTitleStyle,
+        style = style.fieldTitleStyle,
         color = style.titleColor,
         modifier = Modifier.testTag("timeTitle"))
     Text(

@@ -22,6 +22,8 @@
     <string name="free_events_label">Free Events Only:  </string>
     <string name="category_label">Category: </string>
     <string name="filter_apply">Apply</string>
+    <string name="tickets_title">Tickets</string>
+    <string name="ticket_currency">CHF</string>
 </resources>
 
 

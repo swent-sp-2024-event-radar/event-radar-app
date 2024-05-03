@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -331,5 +332,24 @@ fun CategorySelection(
                 modifier = Modifier.padding(start = 16.dp))
           }
     }
+  }
+}
+
+@Composable
+fun GoBackButton(modifier: Modifier, goBack: () -> Unit) {
+  Button(
+      onClick = { goBack() },
+      modifier = modifier.testTag("goBackButton"),
+      colors =
+          ButtonDefaults.buttonColors(
+              contentColor = Color.Transparent,
+              containerColor = Color.Transparent,
+          ),
+  ) {
+    Icon(
+        painter = painterResource(id = R.drawable.back_arrow),
+        contentDescription = "Back navigation arrow",
+        tint = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier.width(24.dp).height(24.dp).align(Alignment.CenterVertically))
   }
 }
