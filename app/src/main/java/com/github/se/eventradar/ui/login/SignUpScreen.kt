@@ -237,7 +237,6 @@ fun SignUpScreen(
                           unfocusedPrefixColor = MaterialTheme.colorScheme.primary),
               shape = RoundedCornerShape(12.dp),
               isError = uiState.birthDateIsError,
-              keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
           )
         }
     Row(

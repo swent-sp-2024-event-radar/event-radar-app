@@ -4,6 +4,10 @@ import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.FirebaseUserRepository
 import com.google.android.gms.tasks.Task
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -11,8 +15,10 @@ import com.google.firebase.firestore.QuerySnapshot
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.unmockkAll
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -401,6 +407,46 @@ class FirebaseUserRepositoryUnitTest {
 
     assert(result is Resource.Failure)
     assert((result as Resource.Failure).throwable.message == message)
+  }
+
+  @Test
+  fun `test GetCurrentUserId Success`() = runTest {
+    mockkStatic("com.google.firebase.Firebase")
+    mockkStatic("com.google.firebase.auth.FirebaseAuth")
+
+    val mockFirebaseAuth = mockk<FirebaseAuth>()
+    val mockFirebaseUser = mockk<FirebaseUser>()
+
+    every { Firebase.auth } returns mockFirebaseAuth
+    every { mockFirebaseAuth.currentUser } returns mockFirebaseUser
+    every { mockFirebaseUser.uid } returns "1"
+
+    val result = firebaseUserRepository.getCurrentUserId()
+    assert(result is Resource.Success)
+    assert((result as Resource.Success).data == "1")
+
+    unmockkStatic("com.google.firebase.Firebase")
+    unmockkStatic("com.google.firebase.auth.FirebaseAuth")
+  }
+
+  @Test
+  fun `test GetCurrentUserId Failure`() = runTest {
+    mockkStatic("com.google.firebase.Firebase")
+    mockkStatic("com.google.firebase.auth.FirebaseAuth")
+
+    val mockFirebaseAuth = mockk<FirebaseAuth>()
+
+    every { Firebase.auth } returns mockFirebaseAuth
+    every { mockFirebaseAuth.currentUser } returns null
+
+    val result = firebaseUserRepository.getCurrentUserId()
+    assert(result is Resource.Failure)
+    val failureResult = result as Resource.Failure
+    assert(failureResult.throwable is Exception)
+    assert(failureResult.throwable.message == "No user currently signed in")
+
+    unmockkStatic("com.google.firebase.Firebase")
+    unmockkStatic("com.google.firebase.auth.FirebaseAuth")
   }
 }
 
