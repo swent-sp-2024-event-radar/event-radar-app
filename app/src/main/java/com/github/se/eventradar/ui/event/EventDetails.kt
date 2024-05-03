@@ -6,20 +6,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
@@ -28,12 +22,19 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.ui.BottomNavigationMenu
+import com.github.se.eventradar.ui.component.EventCategory
+import com.github.se.eventradar.ui.component.EventComponentsStyle
+import com.github.se.eventradar.ui.component.EventDateTime
+import com.github.se.eventradar.ui.component.EventDescription
+import com.github.se.eventradar.ui.component.EventDistance
+import com.github.se.eventradar.ui.component.EventTitle
+import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 
 // Temporary sizes. Needs to be responsive...
@@ -61,7 +62,7 @@ fun EventDetails(
       )
 
   Scaffold(
-      modifier = Modifier.testTag("EventDetailsScreen"),
+      modifier = Modifier.testTag("eventDetailsScreen"),
       topBar = {},
       bottomBar = {
         BottomNavigationMenu(
@@ -71,24 +72,30 @@ fun EventDetails(
             modifier = Modifier.testTag("bottomNavMenu"))
       },
       floatingActionButton = {
-        // register button
+        // view ticket button
         FloatingActionButton(
-            onClick = { /*TODO*/},
+            onClick = {
+              navigationActions.navController.navigate(
+                  "${Route.EVENT_DETAILS_TICKETS}/${viewModel.getEventId()}")
+            },
             modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("ticketButton"),
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
         ) {
           Icon(
               painter = painterResource(id = R.drawable.ticket),
-              contentDescription = "register to event button",
+              contentDescription = "view tickets button",
               modifier = Modifier.size(32.dp),
-              tint = MaterialTheme.colorScheme.primary,
+              tint = MaterialTheme.colorScheme.onPrimaryContainer,
           )
         }
       }) { innerPadding ->
         ConstraintLayout(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
           val (image, backButton, title, description, distance, category, dateAndTime) =
               createRefs()
-          val imagePainter: Painter = rememberImagePainter(eventUiState.eventPhoto)
+
+          // TODO uncomment when image are implemented
+          // val imagePainter: Painter = rememberImagePainter(eventUiState.eventPhoto)
+          val imagePainter: Painter = rememberImagePainter(R.drawable.placeholderbig)
           Image(
               painter = imagePainter,
               contentDescription = "Event banner image",
@@ -103,39 +110,24 @@ fun EventDetails(
               contentScale = ContentScale.FillWidth)
 
           // Go back button
-          Button(
-              onClick = { navigationActions.goBack() },
+          GoBackButton(
               modifier =
-                  Modifier.wrapContentSize()
-                      .constrainAs(backButton) {
-                        top.linkTo(image.bottom, margin = 8.dp)
-                        start.linkTo(image.start, margin = 4.dp)
-                      }
-                      .testTag("goBackButton"),
-              colors =
-                  ButtonDefaults.buttonColors(
-                      contentColor = Color.Transparent,
-                      containerColor = Color.Transparent,
-                  ),
-          ) {
-            Icon(
-                painter = painterResource(id = R.drawable.back_arrow),
-                contentDescription = "Back navigation arrow",
-                tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.width(24.dp).height(24.dp).align(Alignment.CenterVertically))
-          }
+                  Modifier.wrapContentSize().constrainAs(backButton) {
+                    top.linkTo(image.bottom, margin = 8.dp)
+                    start.linkTo(image.start, margin = 4.dp)
+                  }) {
+                navigationActions.goBack()
+              }
 
-          Text(
-              text = eventUiState.eventName,
-              style = componentStyle.titleStyle,
+          EventTitle(
               modifier =
                   Modifier.constrainAs(title) {
-                        top.linkTo(image.bottom, margin = 32.dp)
-                        start.linkTo(image.start)
-                        end.linkTo(image.end)
-                      }
-                      .testTag("eventTitle"),
-              color = MaterialTheme.colorScheme.onSurface)
+                    top.linkTo(image.bottom, margin = 32.dp)
+                    start.linkTo(image.start)
+                    end.linkTo(image.end)
+                  },
+              eventUiState = eventUiState,
+              style = componentStyle)
 
           EventDescription(
               modifier =
