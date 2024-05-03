@@ -197,7 +197,6 @@ fun FilterPopUp(
     onFilterApply: () -> Unit,
     uiState: EventsOverviewUiState,
     onRadiusQueryChanged: (String) -> Unit,
-    viewModel: EventsOverviewViewModel,
     modifier: Modifier = Modifier,
 ) {
   Box(modifier = modifier) {
@@ -270,9 +269,7 @@ fun FilterPopUp(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start) {
-              CategorySelection(
-                  onCategorySelectionChanged = { viewModel.onCategorySelectionChanged(it, true) }
-              )
+              CategorySelection(uiState)
             }
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -293,7 +290,7 @@ fun FilterPopUp(
 
 @Composable
 fun CategorySelection(
-    onCategorySelectionChanged: (EventCategory, Boolean) -> Unit,
+    uiState: EventsOverviewUiState
 ) {
     LazyColumn {
         items(EventCategory.entries) { category ->
@@ -306,8 +303,16 @@ fun CategorySelection(
                     checked = isChecked,
                     onCheckedChange = {
                         isChecked = it
-                        onCategorySelectionChanged(category, isChecked)},
-                    modifier = Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp))
+                        if (isChecked) {
+                            uiState.categoriesCheckedList.add(category)
+                        } else {
+                            uiState.categoriesCheckedList.remove(category)
+                        }
+                    },
+                    modifier = Modifier
+                        .scale(0.6f)
+                        .size(10.dp)
+                        .padding(start = 10.dp))
                 Text(
                     text = category.displayName,
                     style =
