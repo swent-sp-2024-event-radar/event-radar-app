@@ -1,6 +1,7 @@
 package com.github.se.eventradar.viewmodel.qrCode
 
 import android.graphics.ImageFormat
+import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.google.zxing.BarcodeFormat
@@ -42,6 +43,8 @@ class QrCodeAnalyser @Inject constructor() : ImageAnalysis.Analyzer {
                       mapOf(DecodeHintType.POSSIBLE_FORMATS to arrayListOf(BarcodeFormat.QR_CODE)))
                 }
                 .decode(binaryBitmap)
+        // Log the decoded string
+        Log.d("QrCodeAnalyser", "Decoded string: ${result.text}")
         // if onDecoded is null (has not been initialised b Viewmodel) will simply return Null
         onDecoded?.invoke(result.toString())
       } catch (e: Exception) {

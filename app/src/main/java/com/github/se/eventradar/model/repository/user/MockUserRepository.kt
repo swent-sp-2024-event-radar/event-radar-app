@@ -110,6 +110,7 @@ class MockUserRepository : IUserRepository {
       }
     }
   }
+
   override suspend fun getCurrentUserId(): Resource<String> {
     return if (currentUserId != null) {
       Resource.Success(currentUserId!!)

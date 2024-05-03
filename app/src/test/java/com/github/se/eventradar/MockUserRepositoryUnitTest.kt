@@ -228,7 +228,7 @@ class MockUserRepositoryUnitTest {
     val result = userRepository.getImage(userId, "Profile_Pictures")
     assertTrue(result is Resource.Success)
     assertEquals(expectedUrl, (result as Resource.Success).data)
-    }
+  }
 
   fun testGetCurrentUserIdSuccess() = runTest {
     (userRepository as MockUserRepository).updateCurrentUserId("1")

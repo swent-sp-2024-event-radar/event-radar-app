@@ -25,20 +25,23 @@ import com.github.se.eventradar.R
 import com.github.se.eventradar.viewmodel.MyQrCodeViewModel
 
 @Composable
-fun MyQrCodeScreen(viewModel: MyQrCodeViewModel, modifier: Modifier = Modifier.testTag("myQrCodeScreen")) {
+fun MyQrCodeScreen(
+    viewModel: MyQrCodeViewModel,
+    modifier: Modifier = Modifier.testTag("myQrCodeScreen")
+) {
 
-    LaunchedEffect(Unit){
-        viewModel.getUsername()
-        viewModel.getQRCodeLink()
-    }
+  LaunchedEffect(Unit) {
+    viewModel.getUsername()
+    viewModel.getQRCodeLink()
+  }
 
-    val uiState by viewModel.uiState.collectAsState()
+  val uiState by viewModel.uiState.collectAsState()
 
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.Center, // Vertically center the content
-        horizontalAlignment = Alignment.CenterHorizontally // Horizontally center the content
-    ) {
+  Column(
+      modifier = modifier,
+      verticalArrangement = Arrangement.Center, // Vertically center the content
+      horizontalAlignment = Alignment.CenterHorizontally // Horizontally center the content
+      ) {
         Text(
             "@${uiState.username}", // uiState.qrCode @username
             modifier = Modifier.testTag("username"),
@@ -47,15 +50,16 @@ fun MyQrCodeScreen(viewModel: MyQrCodeViewModel, modifier: Modifier = Modifier.t
             letterSpacing = 0.36.sp,
             fontFamily = FontFamily.Default,
             color = MaterialTheme.colorScheme.onBackground // Set the color to black,
-        )
+            )
         AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(uiState.qrCodeLink) //uiState.qrCode (only works for jpg)
-                .crossfade(true)
-                .build(),
+            model =
+                ImageRequest.Builder(LocalContext.current)
+                    .data(uiState.qrCodeLink) // uiState.qrCode (only works for jpg)
+                    .crossfade(true)
+                    .build(),
             error = painterResource(R.drawable.qr_code), // should be a error indicative
             placeholder = painterResource(R.drawable.placeholder), // should be loading image
             contentDescription = stringResource(R.string.my_qr_code),
             modifier = Modifier.size(width = 300.dp, height = 300.dp).testTag("myQrCodeImage"))
-    }
+      }
 }

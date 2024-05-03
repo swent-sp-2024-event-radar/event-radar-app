@@ -1,4 +1,3 @@
-
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 
 plugins {
@@ -60,19 +59,21 @@ android {
     packagingOptions { jniLibs { useLegacyPackaging = true } }
   }
 }
-
+val activityComposeVersion = "1.9.0"
+val androidXCameraVersion = "1.3.3"
+val androidXEmulatorVersion = "2.3.0"
 dependencies {
-  implementation("androidx.core:core-ktx:1.7.0")
-  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
-  implementation("androidx.activity:activity-compose:1.8.2")
+  implementation("androidx.core:core-ktx:1.13.0")
+  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+  implementation("androidx.activity:activity-compose:1.9.0")
   implementation("androidx.compose.ui:ui-graphics")
-  implementation("androidx.compose.material:material:1.1.1")
-  implementation("androidx.compose.material3:material3:1.1.2")
+  implementation("androidx.compose.material:material:1.6.6")
+  implementation("androidx.compose.material3:material3:1.2.1")
   implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 
   // Navigation
-  implementation("androidx.navigation:navigation-compose:2.6.0-rc01")
-  implementation("androidx.navigation:navigation-ui-ktx:2.7.5")
+  implementation("androidx.navigation:navigation-compose:2.7.7")
+  implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
 
   // Google Maps
   implementation("com.google.maps.android:maps-compose:4.3.3")
@@ -141,22 +142,19 @@ dependencies {
   implementation("com.squareup.okhttp3:okhttp")
   implementation("com.squareup.okhttp3:logging-interceptor")
 
-  //QR CODE (Zxing)
-  implementation ("com.google.zxing:core:3.4.1")
+    //QR CODE (Zxing)
+    implementation ("com.google.zxing:core:3.4.1")
 
-  implementation ("androidx.activity:activity-compose:1.9.0")
+    // CameraX
+    implementation ("androidx.camera:camera-camera2:$androidXCameraVersion")
+    implementation ("androidx.camera:camera-lifecycle:$androidXCameraVersion")
+    implementation ("androidx.camera:camera-view:$androidXCameraVersion")
 
-  // CameraX
-  implementation ("androidx.camera:camera-camera2:1.3.3")
-  implementation ("androidx.camera:camera-lifecycle:1.3.3")
-  implementation ("androidx.camera:camera-view:1.3.3")
+    // Android Test
 
-  // Android Test
+    androidTestImplementation ("androidx.test.uiautomator:uiautomator:$androidXEmulatorVersion")
 
-  androidTestImplementation ("androidx.test.uiautomator:uiautomator:2.2.0")
 }
-
-
 
 secrets {
   // Optionally specify a different file name containing your secrets.

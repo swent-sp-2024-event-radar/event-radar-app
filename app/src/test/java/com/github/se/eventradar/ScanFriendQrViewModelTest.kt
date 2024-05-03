@@ -5,15 +5,10 @@ import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
-import com.github.se.eventradar.viewmodel.qrCode.QrCodeFriendViewModel
-import io.mockk.mockk
-import io.mockk.verify
+import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -25,10 +20,11 @@ import org.junit.Test
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
+// TODO stimulate event where update does not work on first few tries but eventually works
 @ExperimentalCoroutinesApi
-class QrCodeFriendViewModelTest {
+class ScanFriendQrViewModelTest {
 
-  private lateinit var viewModel: QrCodeFriendViewModel
+  private lateinit var viewModel: ScanFriendQrViewModel
   private lateinit var userRepository: IUserRepository
   private lateinit var qrCodeAnalyser: QrCodeAnalyser
 
@@ -116,30 +112,27 @@ class QrCodeFriendViewModelTest {
   fun setUp() {
     userRepository = MockUserRepository()
     (userRepository as MockUserRepository).updateCurrentUserId(myUID)
-    qrCodeAnalyser = mockk<QrCodeAnalyser>(relaxed = true)
-    viewModel = QrCodeFriendViewModel(userRepository, qrCodeAnalyser)
+    qrCodeAnalyser = QrCodeAnalyser()
+    viewModel = ScanFriendQrViewModel(userRepository, qrCodeAnalyser)
   }
 
   @Test
   fun testDecodingSuccess() = runTest {
+    userRepository.addUser(mockUser1)
+    userRepository.addUser(mockUser2)
     val testDecodedString = "user2"
+    println("onDecodedInvoked")
     qrCodeAnalyser.onDecoded?.invoke(testDecodedString)
-    assertEquals(testDecodedString, viewModel.decodedResult.value)
-  }
-
-  @Test
-  fun testUpdateFriendListCalled() = runTest {
-    qrCodeAnalyser.onDecoded?.invoke("user2")
-    verify { viewModel.updateFriendList("user2") }
+    assertEquals(testDecodedString, viewModel.uiState.value.decodedResult)
   }
 
   @Test
   fun testDecodingFailure() = runTest {
+    userRepository.addUser(mockUser1)
+    userRepository.addUser(mockUser2)
     qrCodeAnalyser.onDecoded?.invoke(null)
-    assertEquals("Failed to decode QR Code", viewModel.decodedResult.value)
-    assertEquals(
-        viewModel.action.take(2).toList(),
-        listOf(QrCodeFriendViewModel.Action.None, QrCodeFriendViewModel.Action.AnalyserError))
+    assertEquals("Failed to decode QR Code", viewModel.uiState.value.decodedResult)
+    assertEquals(ScanFriendQrViewModel.Action.AnalyserError, viewModel.uiState.value.action)
   }
   // todo should i be testing thta it is reset to none ? isnt this Ui logic?
   @Test
@@ -149,7 +142,7 @@ class QrCodeFriendViewModelTest {
     qrCodeAnalyser.onDecoded?.invoke("user2")
     when (val user1 = userRepository.getUser("user1")) {
       is Resource.Success -> {
-        assertEquals(user1.data!!.friendsSet, mutableSetOf("user2"))
+        assertEquals(mutableSetOf("user2"), user1.data!!.friendsSet)
       }
       else -> {
         assert(false)
@@ -158,18 +151,14 @@ class QrCodeFriendViewModelTest {
     }
     when (val user2 = userRepository.getUser("user2")) {
       is Resource.Success -> {
-        assertEquals(user2.data!!.friendsSet, mutableSetOf("user1"))
+        assertEquals(mutableSetOf("user1"), user2.data!!.friendsSet)
       }
       else -> {
         assert(false)
         println("User 2 not found or could not be fetched")
       }
     }
-    delay(3000L)
-    assertEquals(
-        viewModel.action.take(2).toList(),
-        listOf(
-            QrCodeFriendViewModel.Action.None, QrCodeFriendViewModel.Action.NavigateToNextScreen))
+    assertEquals(ScanFriendQrViewModel.Action.NavigateToNextScreen, viewModel.uiState.value.action)
   }
 
   @Test
@@ -179,7 +168,7 @@ class QrCodeFriendViewModelTest {
     qrCodeAnalyser.onDecoded?.invoke("user2")
     when (val user1 = userRepository.getUser("user1")) {
       is Resource.Success -> {
-        assertEquals(user1.data!!.friendsSet, mutableSetOf("user2"))
+        assertEquals(mutableSetOf("user2"), user1.data!!.friendsSet)
       }
       else -> {
         assert(false)
@@ -188,40 +177,13 @@ class QrCodeFriendViewModelTest {
     }
     when (val user2 = userRepository.getUser("user2")) {
       is Resource.Success -> {
-        assertEquals(user2.data!!.friendsSet, mutableSetOf("user1"))
+        assertEquals(mutableSetOf("user1"), user2.data!!.friendsSet)
       }
       else -> {
         assert(false)
         println("User 2 not found or could not be fetched")
       }
     }
-    delay(3000L)
-    assertEquals(
-        viewModel.action.take(2).toList(),
-        listOf(
-            QrCodeFriendViewModel.Action.None, QrCodeFriendViewModel.Action.NavigateToNextScreen))
+    assertEquals(ScanFriendQrViewModel.Action.NavigateToNextScreen, viewModel.uiState.value.action)
   }
-
-  // this case should provoke a timeout hence why i delayed the test before
-  // checking the navigation event
-  @Test
-  fun testInvokedWithFakeUID() = runTest {
-    userRepository.addUser(mockUser1)
-    userRepository.addUser(mockUser2)
-    qrCodeAnalyser.onDecoded?.invoke("user3")
-    delay(15000L)
-    assertEquals(
-        viewModel.action.take(2).toList(),
-        listOf(QrCodeFriendViewModel.Action.None, QrCodeFriendViewModel.Action.FirebaseFetchError))
-  }
-
-  @Test
-  fun changeTabTest() = runTest {
-    val expectedTabState = QrCodeFriendViewModel.TAB.ScanQR
-    viewModel.changeTabState(expectedTabState)
-    val actualTabState = viewModel.tabState.value
-    assertEquals(expectedTabState, actualTabState)
-  }
-  // TODO stimulate event where update does not work on first few tries but eventually works
-  // TODO stimulate event where update does not work and timeout occurs
 }

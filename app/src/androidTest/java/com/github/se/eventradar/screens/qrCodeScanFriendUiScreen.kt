@@ -13,8 +13,8 @@ class QrCodeScanFriendUiScreen(semanticsProvider: SemanticsNodeInteractionsProvi
   val myQrTab: KNode = tabs.child { hasTestTag("My QR Code") }
   val scanQrTab: KNode = tabs.child { hasTestTag("Scan QR Code") }
   val qrScanner: KNode = child { hasTestTag("QrScanner") }
-    val myQrScreen : KNode = child { hasTestTag("myQrCodeScreen")}
+  val myQrScreen: KNode = child { hasTestTag("myQrCodeScreen") }
   val bottomNavMenu: KNode = child { hasTestTag("bottomNavMenu") }
-    val myQrCodeImage : KNode = myQrScreen.child { hasTestTag("myQrCodeImage")}
-    val username : KNode = myQrScreen.child { hasTestTag("username")}
+  val myQrCodeImage: KNode = myQrScreen.child { hasTestTag("myQrCodeImage") }
+  val username: KNode = myQrScreen.child { hasTestTag("username") }
 }
