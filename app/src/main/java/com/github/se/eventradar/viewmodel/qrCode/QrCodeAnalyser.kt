@@ -48,7 +48,11 @@ class QrCodeAnalyser @Inject constructor() : ImageAnalysis.Analyzer {
         // if onDecoded is null (has not been initialised b Viewmodel) will simply return Null
         onDecoded?.invoke(result.toString())
       } catch (e: Exception) {
-        e.printStackTrace()
+<<<<<<< HEAD
+        Log.d("QrCodeAnalyser", "Failed to decode QR Code")
+=======
+        Log.d("QrCodeAnalyser", "Error decoding QR Code: ${e.message}")
+>>>>>>> 1b9892bf5df8b080a723ea236cffd2c098a30c72
       } finally { // close image once scanning process done
         image.close()
       }
