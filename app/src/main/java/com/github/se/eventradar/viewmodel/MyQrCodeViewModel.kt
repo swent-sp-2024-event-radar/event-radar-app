@@ -12,40 +12,38 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @HiltViewModel
 class MyQrCodeViewModel @Inject constructor(private val userRepository: IUserRepository) :
     ViewModel() {
   private val _uiState = MutableStateFlow(MyQrCodeUiState())
   val uiState: StateFlow<MyQrCodeUiState> = _uiState
-  val qrCodesFolder = Folders.QR_Codes.folderName
+  val qrCodesFolder = "QR_Codes"
 
-  fun getUserDetails(uid: String? = Firebase.auth.currentUser?.uid){
+  fun getUsername(uid: String? = Firebase.auth.currentUser?.uid) {
     viewModelScope.launch {
-      when (val result = userRepository.getUser(uid!!)){
+      when (val result = userRepository.getUser(uid!!)) {
         is Resource.Success -> {
-          _uiState.value = _uiState.value.copy(username = result.data!!.username, qrCodeLink = getImageAsync(uid, qrCodesFolder))
+          _uiState.value = _uiState.value.copy(username = result.data!!.username)
         }
         is Resource.Failure -> {
           Log.d("LoginScreenViewModel", "Error adding user: ${result.throwable.message}")
           false
         }
       }
-
     }
   }
 
-
-  private suspend fun getImageAsync(uid: String, folderName: String): String {
-    return when (val result = userRepository.getImage(uid, folderName)) {
-      is Resource.Success -> {
-        Log.d("MyQrCodeViewModel", "Image URL: ${result.data}")
-        result.data
-      }
-      is Resource.Failure -> {
-        Log.d("MyQrCodeViewModel", "Error getting image: ${result.throwable.message}")
-        ""
+  fun getQRCodeLink(uid: String? = Firebase.auth.currentUser?.uid) {
+    viewModelScope.launch {
+      when (val result = userRepository.getImage(uid!!, qrCodesFolder)) {
+        is Resource.Success -> {
+          _uiState.value = _uiState.value.copy(qrCodeLink = result.data)
+          Log.d("MyQrCodeViewModel", "Image URL: ${result.data}")
+        }
+        is Resource.Failure -> {
+          Log.d("MyQrCodeViewModel", "Error getting image: ${result.throwable.message}")
+        }
       }
     }
   }

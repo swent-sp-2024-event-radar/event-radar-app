@@ -27,7 +27,8 @@ import com.github.se.eventradar.viewmodel.MyQrCodeViewModel
 fun MyQrCodeScreen(viewModel: MyQrCodeViewModel, modifier: Modifier = Modifier.testTag("myQrCodeScreen")) {
 
     LaunchedEffect(Unit){
-        viewModel.getUserDetails()
+        viewModel.getUsername()
+        viewModel.getQRCodeLink()
     }
 
     val uiState by viewModel.uiState.collectAsState()

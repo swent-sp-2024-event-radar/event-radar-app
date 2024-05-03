@@ -1,11 +1,16 @@
 package com.github.se.eventradar
 
+import android.util.Log
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.viewmodel.MyQrCodeViewModel
+import io.mockk.every
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -17,6 +22,7 @@ import org.junit.Test
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
+@ExperimentalCoroutinesApi
 class MyQrCodeViewModelUnitTest {
 
     private lateinit var userRepository: IUserRepository
@@ -59,15 +65,24 @@ class MyQrCodeViewModelUnitTest {
     }
 
     @Test
-    fun testGetUserDetailsSuccess() = runTest {
+    fun testGetUserNameSuccess() = runTest {
         // Given
         val userId = mockUser.userId
-        val username = mockUser.userId
+        val username = mockUser.username
+        // initialize user with no mock
+        userRepository.addUser(mockUser)
+        viewModel.getUsername(userId)
+        assertEquals(username, viewModel.uiState.value.username)
+    }
+
+    @Test
+    fun testGetUserQrCodeSuccess() = runTest {
+        // Given
+        val userId = mockUser.userId
         val expectedQrCodeLink = "http://example.com/QR_Codes/qr.jpg"
         // initialize user with no mock
         userRepository.addUser(mockUser)
-        viewModel.getUserDetails(userId)
-        assertEquals(username, viewModel.uiState.value.username)
+        viewModel.getQRCodeLink(userId)
         assertEquals(expectedQrCodeLink, viewModel.uiState.value.qrCodeLink)
     }
 
