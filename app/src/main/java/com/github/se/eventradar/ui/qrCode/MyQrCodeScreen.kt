@@ -30,6 +30,8 @@ fun MyQrCodeScreen(
     modifier: Modifier = Modifier.testTag("myQrCodeScreen")
 ) {
 
+    val link = "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/QR_Codes%2FAwOXI3dCWjfYKk7bnBQ0S94WxbD2.png?alt=media&token=8c803d0a-baa9-423e-b4ae-193cf46e4f4f"
+    val uid = "AwOXI3dCWjfYKk7bnBQ0S94WxbD2"
   LaunchedEffect(Unit) {
     viewModel.getUsername()
     viewModel.getQRCodeLink()
@@ -42,6 +44,7 @@ fun MyQrCodeScreen(
       verticalArrangement = Arrangement.Center, // Vertically center the content
       horizontalAlignment = Alignment.CenterHorizontally // Horizontally center the content
       ) {
+
         Text(
             "@${uiState.username}", // uiState.qrCode @username
             modifier = Modifier.testTag("username"),
@@ -51,10 +54,11 @@ fun MyQrCodeScreen(
             fontFamily = FontFamily.Default,
             color = MaterialTheme.colorScheme.onBackground // Set the color to black,
             )
+
         AsyncImage(
             model =
                 ImageRequest.Builder(LocalContext.current)
-                    .data(uiState.qrCodeLink) // uiState.qrCode (only works for jpg)
+                    .data(uiState.qrCodeLink) // uiState.qrCodeLink (only works for jpg)
                     .crossfade(true)
                     .build(),
             error = painterResource(R.drawable.qr_code), // should be a error indicative

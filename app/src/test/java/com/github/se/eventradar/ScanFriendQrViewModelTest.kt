@@ -39,9 +39,9 @@ class ScanFriendQrViewModelTest {
           lastName = "Doe",
           phoneNumber = "1234567890",
           accountStatus = "active",
-          eventsAttendeeSet = mutableSetOf("1", "2"),
-          eventsHostSet = mutableSetOf("3"),
-          friendsSet = mutableSetOf(),
+          eventsAttendeeList = mutableListOf("1", "2"),
+          eventsHostList = mutableListOf("3"),
+          friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/pic.jpg",
           qrCodeUrl = "http://example.com/qr.jpg",
           username = "john_doe")
@@ -55,9 +55,9 @@ class ScanFriendQrViewModelTest {
           lastName = "Doe2",
           phoneNumber = "12345678902",
           accountStatus = "active2",
-          eventsAttendeeSet = mutableSetOf("12", "22"),
-          eventsHostSet = mutableSetOf("32"),
-          friendsSet = mutableSetOf(),
+          eventsAttendeeList = mutableListOf("12", "22"),
+          eventsHostList = mutableListOf("32"),
+          friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/pic.jpg2",
           qrCodeUrl = "http://example.com/qr.jpg2",
           username = "john_doe2")
@@ -71,9 +71,9 @@ class ScanFriendQrViewModelTest {
           lastName = "Doe",
           phoneNumber = "1234567890",
           accountStatus = "active",
-          eventsAttendeeSet = mutableSetOf("1", "2"),
-          eventsHostSet = mutableSetOf("3"),
-          friendsSet = mutableSetOf("user2"),
+          eventsAttendeeList = mutableListOf("1", "2"),
+          eventsHostList = mutableListOf("3"),
+          friendsList = mutableListOf("user2"),
           profilePicUrl = "http://example.com/pic.jpg",
           qrCodeUrl = "http://example.com/qr.jpg",
           username = "john_doe")
@@ -87,9 +87,9 @@ class ScanFriendQrViewModelTest {
           lastName = "Doe2",
           phoneNumber = "12345678902",
           accountStatus = "active2",
-          eventsAttendeeSet = mutableSetOf("12", "22"),
-          eventsHostSet = mutableSetOf("32"),
-          friendsSet = mutableSetOf("user1"),
+          eventsAttendeeList = mutableListOf("12", "22"),
+          eventsHostList = mutableListOf("32"),
+          friendsList = mutableListOf("user1"),
           profilePicUrl = "http://example.com/pic.jpg2",
           qrCodeUrl = "http://example.com/qr.jpg2",
           username = "john_doe2")
@@ -142,7 +142,7 @@ class ScanFriendQrViewModelTest {
     qrCodeAnalyser.onDecoded?.invoke("user2")
     when (val user1 = userRepository.getUser("user1")) {
       is Resource.Success -> {
-        assertEquals(mutableSetOf("user2"), user1.data!!.friendsSet)
+        assertEquals(mutableListOf("user2"), user1.data!!.friendsList)
       }
       else -> {
         assert(false)
@@ -151,7 +151,7 @@ class ScanFriendQrViewModelTest {
     }
     when (val user2 = userRepository.getUser("user2")) {
       is Resource.Success -> {
-        assertEquals(mutableSetOf("user1"), user2.data!!.friendsSet)
+        assertEquals(mutableListOf("user1"), user2.data!!.friendsList)
       }
       else -> {
         assert(false)
@@ -168,7 +168,7 @@ class ScanFriendQrViewModelTest {
     qrCodeAnalyser.onDecoded?.invoke("user2")
     when (val user1 = userRepository.getUser("user1")) {
       is Resource.Success -> {
-        assertEquals(mutableSetOf("user2"), user1.data!!.friendsSet)
+        assertEquals(mutableListOf("user2"), user1.data!!.friendsList)
       }
       else -> {
         assert(false)
@@ -177,7 +177,7 @@ class ScanFriendQrViewModelTest {
     }
     when (val user2 = userRepository.getUser("user2")) {
       is Resource.Success -> {
-        assertEquals(mutableSetOf("user1"), user2.data!!.friendsSet)
+        assertEquals(mutableListOf("user1"), user2.data!!.friendsList)
       }
       else -> {
         assert(false)

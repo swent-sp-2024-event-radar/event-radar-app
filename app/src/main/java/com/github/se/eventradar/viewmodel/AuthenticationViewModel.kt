@@ -1,20 +1,31 @@
 package com.github.se.eventradar.viewmodel
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
+import com.google.firebase.storage.FirebaseStorage
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.qrcode.QRCodeWriter
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(private val userRepository: IUserRepository) :
@@ -22,59 +33,50 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
   private val _uiState = MutableStateFlow(LoginUiState())
   val uiState: StateFlow<LoginUiState> = _uiState
 
-  fun addUser(
-      state: MutableStateFlow<LoginUiState> = _uiState,
-      user: FirebaseUser? = Firebase.auth.currentUser
-  ): Boolean {
-    if (user == null) {
-      Log.d("LoginScreenViewModel", "User not logged in")
-      return false
+    fun addUser(
+        state: MutableStateFlow<LoginUiState> = _uiState,
+        user: FirebaseUser? = Firebase.auth.currentUser
+    ): Boolean {
+        if (user == null) {
+            Log.d("LoginScreenViewModel", "User not logged in")
+            return false
+        }
+
+        // If no image is selected, use a placeholder image
+        val imageURI =
+            state.value.selectedImageUri
+                ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder")
+
+        var qrCodeUrl: String = ""
+        viewModelScope.launch(Dispatchers.IO) {
+            qrCodeUrl = generateQRCode(user.uid)
+            // Use the result on the main thread, if needed
+            withContext(Dispatchers.Main) {
+                // Update UI with qrCodeUrl
+            }
+        }
+
+        val userValues =
+            hashMapOf(
+                "private/firstName" to state.value.firstName,
+                "private/lastName" to state.value.lastName,
+                "private/phoneNumber" to state.value.phoneNumber,
+                "private/birthDate" to state.value.birthDate,
+                "private/email" to user.email,
+                "profilePicUrl" to imageURI.toString(),
+                "qrCodeUrl" to qrCodeUrl,
+                "username" to state.value.username,
+                "accountStatus" to "active",
+                "eventsAttendeeList" to emptyList<String>(),
+                "eventsHostList" to emptyList<String>(),
+            )
+
+        // Add a new document with a generated ID into collection "users"
+        val success: Boolean
+        runBlocking { success = addUserAsync(userValues, user.uid) }
+
+        return success
     }
-
-    val profilePicFolder = Folders.PROFILE_PICTURES.folderName
-    var uploadedPictureSuccessfully: Boolean
-    var profilePicUrl = ""
-
-    // runBlocking { uploadImageAsync(state.value.selectedImageUri, user.uid, profilePicFolder) }
-    // runBlocking { profilePicUrl = getImageAsync(user.uid, profilePicFolder) }
-    /*
-    runBlocking {
-      uploadedPictureSuccessfully =
-          uploadImageAsync(state.value.selectedImageUri, user.uid, profilePicFolder)
-      if (uploadedPictureSuccessfully) {
-        profilePicUrl = getImageAsync(user.uid, profilePicFolder)
-      }
-    }
-
-
-    if (!uploadedPictureSuccessfully) {
-      return false
-    }
-
-       */
-
-    val userValues =
-        hashMapOf(
-            "private/firstName" to state.value.firstName,
-            "private/lastName" to state.value.lastName,
-            "private/phoneNumber" to
-                state.value.selectedCountryCode.ext.plus(state.value.phoneNumber),
-            "private/birthDate" to state.value.birthDate,
-            "private/email" to user.email,
-            "profilePicUrl" to profilePicUrl,
-            "qrCodeUrl" to "", // TODO: generate QR code here
-            "username" to state.value.username,
-            "accountStatus" to "active",
-            "eventsAttendeeList" to mutableListOf<String>(),
-            "eventsHostList" to mutableListOf<String>(),
-        )
-
-    // Add a new document with a generated ID into collection "users"
-    val success: Boolean
-    runBlocking { success = addUserAsync(userValues, user.uid) }
-
-    return success
-  }
 
   private suspend fun addUserAsync(userValues: Map<String, Any?>, userId: String): Boolean {
     return when (val result = userRepository.addUser(userValues, userId)) {
@@ -119,6 +121,40 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
       }
     }
   }
+    private suspend fun generateQRCode(userId: String): String {
+        val qrCodeWriter = QRCodeWriter()
+        val bitMatrix = qrCodeWriter.encode(userId, BarcodeFormat.QR_CODE, 200, 200)
+        val bitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.RGB_565)
+        for (x in 0 until 200) {
+            for (y in 0 until 200) {
+                bitmap.setPixel(x, y, if (bitMatrix[x, y]) Color(0xFF000000).hashCode() else Color(0xFFFFFFFF).hashCode())
+            }
+        }
+
+        // Convert the bitmap to a byte array
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
+        val data = baos.toByteArray()
+
+        // Create a reference to the file in Firebase Storage
+        val storageRef = FirebaseStorage.getInstance().reference
+        val qrCodesRef = storageRef.child("QR_Codes/$userId.png")
+
+        // Upload the file to Firebase Storage
+        val uploadTask = qrCodesRef.putBytes(data)
+
+        // Get the download URL of the image
+        val urlTask = uploadTask.continueWithTask { task ->
+            if (!task.isSuccessful) {
+                task.exception?.let {
+                    throw it
+                }
+            }
+            qrCodesRef.downloadUrl
+        }.await()
+
+        return urlTask.toString()
+    }
 
   fun doesUserExist(userId: String): Boolean {
     var userExists: Boolean

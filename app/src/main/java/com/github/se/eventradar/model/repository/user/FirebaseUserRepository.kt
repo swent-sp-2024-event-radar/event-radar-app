@@ -189,9 +189,9 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
             "qrCodeUrl" to user.qrCodeUrl,
             "username" to user.username,
             "accountStatus" to user.accountStatus,
-            "eventsAttendeeList" to user.eventsAttendeeSet,
-            "eventsHostList" to user.eventsHostSet,
-            "friendsList" to user.friendsSet,
+            "eventsAttendeeList" to user.eventsAttendeeList,
+            "eventsHostList" to user.eventsHostList,
+            "friendsList" to user.friendsList,
         )
 
     return Pair(publicMap, privateMap)

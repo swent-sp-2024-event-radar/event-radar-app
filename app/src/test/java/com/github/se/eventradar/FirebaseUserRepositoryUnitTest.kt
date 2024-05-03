@@ -44,9 +44,9 @@ class FirebaseUserRepositoryUnitTest {
           lastName = "",
           phoneNumber = "",
           accountStatus = "active",
-          eventsAttendeeSet = mutableSetOf(),
-          eventsHostSet = mutableSetOf(),
-          friendsSet = mutableSetOf(),
+          eventsAttendeeList = mutableListOf(),
+          eventsHostList = mutableListOf(),
+          friendsList = mutableListOf(),
           profilePicUrl = "",
           qrCodeUrl = "",
           username = "",
@@ -132,9 +132,9 @@ class FirebaseUserRepositoryUnitTest {
     every { mockDocumentSnapshot.data } returns
         mapOf(
             "accountStatus" to "active",
-            "eventsAttendeeList" to mutableSetOf<String>(),
-            "eventsHostList" to mutableSetOf<String>(),
-            "friendsList" to mutableSetOf<String>(),
+            "eventsAttendeeList" to mutableListOf<String>(),
+            "eventsHostList" to mutableListOf<String>(),
+            "friendsList" to mutableListOf<String>(),
             "profilePicUrl" to "",
             "qrCodeUrl" to "",
             "username" to "",
@@ -188,9 +188,9 @@ class FirebaseUserRepositoryUnitTest {
         capturePublic.captured ==
             mapOf(
                 "accountStatus" to "active",
-                "eventsAttendeeList" to mutableSetOf<String>(),
-                "eventsHostList" to mutableSetOf<String>(),
-                "friendsList" to mutableSetOf<String>(),
+                "eventsAttendeeList" to mutableListOf<String>(),
+                "eventsHostList" to mutableListOf<String>(),
+                "friendsList" to mutableListOf<String>(),
                 "profilePicUrl" to "",
                 "qrCodeUrl" to "",
                 "username" to "",
@@ -226,9 +226,9 @@ class FirebaseUserRepositoryUnitTest {
     val map =
         mapOf(
             "accountStatus" to "active",
-            "eventsAttendeeList" to mutableSetOf<String>(),
-            "eventsHostList" to mutableSetOf<String>(),
-            "friendsList" to mutableSetOf<String>(),
+            "eventsAttendeeList" to mutableListOf<String>(),
+            "eventsHostList" to mutableListOf<String>(),
+            "friendsList" to mutableListOf<String>(),
             "profilePicUrl" to "",
             "qrCodeUrl" to "",
             "username" to "",
@@ -254,9 +254,9 @@ class FirebaseUserRepositoryUnitTest {
         capturePublic.captured ==
             mapOf(
                 "accountStatus" to "active",
-                "eventsAttendeeList" to mutableSetOf<String>(),
-                "eventsHostList" to mutableSetOf<String>(),
-                "friendsList" to mutableSetOf<String>(),
+                "eventsAttendeeList" to mutableListOf<String>(),
+                "eventsHostList" to mutableListOf<String>(),
+                "friendsList" to mutableListOf<String>(),
                 "profilePicUrl" to "",
                 "qrCodeUrl" to "",
                 "username" to "",
@@ -277,9 +277,9 @@ class FirebaseUserRepositoryUnitTest {
     val map =
         mapOf(
             "accountStatus" to "active",
-            "eventsAttendeeList" to mutableSetOf<String>(),
-            "eventsHostList" to mutableSetOf<String>(),
-            "friendsList" to mutableSetOf<String>(),
+            "eventsAttendeeList" to mutableListOf<String>(),
+            "eventsHostList" to mutableListOf<String>(),
+            "friendsList" to mutableListOf<String>(),
             "profilePicUrl" to "",
             "qrCodeUrl" to "",
             "username" to "",
@@ -322,9 +322,9 @@ class FirebaseUserRepositoryUnitTest {
         capturePublic.captured ==
             mapOf(
                 "accountStatus" to "active",
-                "eventsAttendeeList" to mutableSetOf<String>(),
-                "eventsHostList" to mutableSetOf<String>(),
-                "friendsList" to mutableSetOf<String>(),
+                "eventsAttendeeList" to mutableListOf<String>(),
+                "eventsHostList" to mutableListOf<String>(),
+                "friendsList" to mutableListOf<String>(),
                 "profilePicUrl" to "",
                 "qrCodeUrl" to "",
                 "username" to "",

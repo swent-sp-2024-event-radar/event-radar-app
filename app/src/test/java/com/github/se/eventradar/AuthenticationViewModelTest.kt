@@ -65,9 +65,9 @@ class AuthenticationViewModelTest {
           lastName = "Doe",
           phoneNumber = "1234567890",
           accountStatus = "active",
-          eventsAttendeeSet = mutableSetOf(),
-          eventsHostSet = mutableSetOf(),
-          friendsSet = mutableSetOf(),
+          eventsAttendeeList = mutableListOf(),
+          eventsHostList = mutableListOf(),
+          friendsList = mutableListOf(),
           profilePicUrl = "",
           qrCodeUrl = "",
           username = "john_doe")
@@ -75,7 +75,7 @@ class AuthenticationViewModelTest {
   @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
   @Before
-  fun setUp() {
+  fun ListUp() {
     userRepository = MockUserRepository()
     viewModel = LoginViewModel(userRepository)
     mockUiState = MutableStateFlow(LoginUiState())
