@@ -29,6 +29,7 @@ class ScanFriendQrViewModelTest {
   private lateinit var qrCodeAnalyser: QrCodeAnalyser
 
   private val myUID = "user1"
+  // mock user id
 
   private val mockUser1 =
       User(
