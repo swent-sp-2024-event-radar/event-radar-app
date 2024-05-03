@@ -60,14 +60,13 @@ constructor(
     val categoriesCheckedList = _uiState.value.categoriesCheckedList
     Log.d("CategorySelection", "categoriesCheckedList $categoriesCheckedList")
 
-      if (isChecked) {
+    if (isChecked) {
       categoriesCheckedList.remove(category)
     } else {
       categoriesCheckedList.add(category)
     }
     _uiState.value = _uiState.value.copy(categoriesCheckedList = categoriesCheckedList)
-      Log.d("CategorySelection", "Category vm ${_uiState.value.categoriesCheckedList}")
-
+    Log.d("CategorySelection", "Category vm ${_uiState.value.categoriesCheckedList}")
   }
 
   fun onFilterApply(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {

@@ -10,7 +10,6 @@ import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.screens.HomeScreen
 import com.github.se.eventradar.ui.home.HomeScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
-import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.viewmodel.EventsOverviewUiState
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.github.se.eventradar.viewmodel.Tab
@@ -133,7 +132,6 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
     }
   }
 
-
   @Test
   fun filterPopUpDisplaysOnceFilterClicked() = run {
     onComposeScreen<HomeScreen>(composeTestRule) {
@@ -176,36 +174,36 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       step("Check if filter pop up is displayed") { filterPopUp { assertIsDisplayed() } }
       verify { mockEventsOverviewViewModel.onFilterDialogOpen() }
 
-//      radiusInput {
-//        assertIsDisplayed()
-//        performClick()
-//        performTextInput("10")
-//      }
-//      verify { mockEventsOverviewViewModel.onRadiusQueryChanged("10") }
+      //      radiusInput {
+      //        assertIsDisplayed()
+      //        performClick()
+      //        performTextInput("10")
+      //      }
+      //      verify { mockEventsOverviewViewModel.onRadiusQueryChanged("10") }
 
-//      freeSwitch {
-//        assertIsDisplayed()
-//        performClick()
-//      }
-//      sampleEventList.value = sampleEventList.value.copy(isFreeSwitchOn = false)
-//      verify { mockEventsOverviewViewModel.onFreeSwitchChanged() }
-//
-//      step("Click on filter apply button") {
-//        filterApplyButton {
-//          assertIsDisplayed()
-//          performClick()
-//        }
-//      }
-//
-//      filteredEventList { assertIsDisplayed() }
-//      eventCard { assertIsDisplayed() }
-//
-//      // Update the UI state to reflect the change
-//      sampleEventList.value = sampleEventList.value.copy(isFilterActive = true)
-//      verify { mockEventsOverviewViewModel.onFilterApply() }
-//      verify { mockEventsOverviewViewModel.uiState }
-//      verify { mockEventsOverviewViewModel.filterEvents() }
-//      confirmVerified(mockEventsOverviewViewModel)
+      //      freeSwitch {
+      //        assertIsDisplayed()
+      //        performClick()
+      //      }
+      //      sampleEventList.value = sampleEventList.value.copy(isFreeSwitchOn = false)
+      //      verify { mockEventsOverviewViewModel.onFreeSwitchChanged() }
+      //
+      //      step("Click on filter apply button") {
+      //        filterApplyButton {
+      //          assertIsDisplayed()
+      //          performClick()
+      //        }
+      //      }
+      //
+      //      filteredEventList { assertIsDisplayed() }
+      //      eventCard { assertIsDisplayed() }
+      //
+      //      // Update the UI state to reflect the change
+      //      sampleEventList.value = sampleEventList.value.copy(isFilterActive = true)
+      //      verify { mockEventsOverviewViewModel.onFilterApply() }
+      //      verify { mockEventsOverviewViewModel.uiState }
+      //      verify { mockEventsOverviewViewModel.filterEvents() }
+      //      confirmVerified(mockEventsOverviewViewModel)
     }
   }
 

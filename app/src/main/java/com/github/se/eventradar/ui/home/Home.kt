@@ -33,7 +33,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
-import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu
@@ -66,7 +65,7 @@ fun HomeScreen(
         }
       }
 
-//  LaunchedEffect(Unit) { viewModel.getEvents() }
+  //  LaunchedEffect(Unit) { viewModel.getEvents() }
 
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("homeScreen")) {
     val (logo, tabs, searchAndFilter, filterPopUp, eventList, eventMap, bottomNav, viewToggle) =
@@ -168,25 +167,25 @@ fun HomeScreen(
                 }) { eventId ->
                   navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
                 }
-          (uiState.viewList && !(uiState.isSearchActive || uiState.isFilterActive)) ->
-              EventList(
-                  uiState.eventList.allEvents,
-                  Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
-                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                      start.linkTo(parent.start)
-                      end.linkTo(parent.end)
-                  }) { eventId ->
+        (uiState.viewList && !(uiState.isSearchActive || uiState.isFilterActive)) ->
+            EventList(
+                uiState.eventList.allEvents,
+                Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
+                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                }) { eventId ->
                   navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-              }
-          (!uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
-              EventMap(
-                  uiState.eventList.filteredEvents,
-                  navigationActions,
-                  Modifier.testTag("filteredMap").fillMaxWidth().constrainAs(eventMap) {
-                      top.linkTo(tabs.bottom, margin = 8.dp)
-                      start.linkTo(parent.start)
-                      end.linkTo(parent.end)
-                  })
+                }
+        (!uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
+            EventMap(
+                uiState.eventList.filteredEvents,
+                navigationActions,
+                Modifier.testTag("filteredMap").fillMaxWidth().constrainAs(eventMap) {
+                  top.linkTo(tabs.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                })
         else ->
             EventMap(
                 uiState.eventList.allEvents,
@@ -217,37 +216,38 @@ fun HomeScreen(
                       start.linkTo(parent.start)
                       end.linkTo(parent.end)
                     })
-          (uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
+        (uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
             EventList(
                 events = uiState.eventList.filteredEvents,
                 modifier =
-                    Modifier.testTag("filteredEventListUpcoming").fillMaxWidth().constrainAs(eventList) {
+                    Modifier.testTag("filteredEventListUpcoming").fillMaxWidth().constrainAs(
+                        eventList) {
+                          top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                          start.linkTo(parent.start)
+                          end.linkTo(parent.end)
+                        }) { eventId ->
+                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+                }
+        (uiState.viewList && !(uiState.isSearchActive || uiState.isFilterActive)) ->
+            EventList(
+                events = uiState.eventList.allEvents,
+                modifier =
+                    Modifier.testTag("eventListUpcoming").fillMaxWidth().constrainAs(eventList) {
                       top.linkTo(searchAndFilter.bottom, margin = 8.dp)
                       start.linkTo(parent.start)
                       end.linkTo(parent.end)
                     }) { eventId ->
                   navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
                 }
-          (uiState.viewList && !(uiState.isSearchActive || uiState.isFilterActive)) ->
-              EventList(
-                  events = uiState.eventList.allEvents,
-                  modifier =
-                  Modifier.testTag("eventListUpcoming").fillMaxWidth().constrainAs(eventList) {
-                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                      start.linkTo(parent.start)
-                      end.linkTo(parent.end)
-                  }) { eventId ->
-                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-              }
-          (!uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
-              EventMap(
-                  uiState.eventList.filteredEvents,
-                  navigationActions,
-                  Modifier.testTag("filteredMapUpcoming").fillMaxWidth().constrainAs(eventMap) {
-                      top.linkTo(tabs.bottom, margin = 8.dp)
-                      start.linkTo(parent.start)
-                      end.linkTo(parent.end)
-                  })
+        (!uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
+            EventMap(
+                uiState.eventList.filteredEvents,
+                navigationActions,
+                Modifier.testTag("filteredMapUpcoming").fillMaxWidth().constrainAs(eventMap) {
+                  top.linkTo(tabs.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                })
         else ->
             EventMap(
                 uiState.eventList.allEvents,

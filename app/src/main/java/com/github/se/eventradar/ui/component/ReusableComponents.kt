@@ -1,6 +1,5 @@
 package com.github.se.eventradar.ui.component
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -39,7 +38,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,7 +63,6 @@ import com.github.se.eventradar.R
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.viewmodel.EventsOverviewUiState
-import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 
 fun getIconFromViewListBool(viewList: Boolean): ImageVector {
   return if (viewList) {
@@ -102,10 +99,9 @@ fun EventCard(event: Event, onCardClick: (String) -> Unit) {
   // val context = LocalContext.current
   Card(
       modifier =
-      Modifier
-          .padding(horizontal = 16.dp, vertical = 8.dp)
-          .height(IntrinsicSize.Min)
-          .testTag("eventCard"),
+          Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+              .height(IntrinsicSize.Min)
+              .testTag("eventCard"),
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
       elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
       onClick = {
@@ -115,9 +111,8 @@ fun EventCard(event: Event, onCardClick: (String) -> Unit) {
         Row(modifier = Modifier.fillMaxSize()) {
           Column(
               modifier =
-              Modifier
-                  .padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 8.dp)
-                  .weight(1f),
+                  Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 8.dp)
+                      .weight(1f),
               verticalArrangement = Arrangement.Center) {
                 Text(
                     text = event.eventName,
@@ -144,9 +139,7 @@ fun EventCard(event: Event, onCardClick: (String) -> Unit) {
               painter = painterResource(id = R.drawable.placeholder),
               contentDescription = "Event Image",
               contentScale = ContentScale.FillBounds,
-              modifier = Modifier
-                  .weight(0.3f)
-                  .fillMaxHeight())
+              modifier = Modifier.weight(0.3f).fillMaxHeight())
         }
       }
 }
@@ -167,9 +160,7 @@ fun SearchBarAndFilter(
           onSearchQueryChanged(it)
           if (it == "") onSearchActiveChanged(false) else onSearchActiveChanged(true)
         },
-        modifier = Modifier
-            .weight(1f)
-            .testTag("searchBar"),
+        modifier = Modifier.weight(1f).testTag("searchBar"),
         maxLines = 1,
         shape = RoundedCornerShape(32.dp),
         colors =
@@ -183,9 +174,7 @@ fun SearchBarAndFilter(
     // Filter button
     Button(
         onClick = { onFilterDialogOpen() },
-        modifier = Modifier
-            .padding(start = 8.dp)
-            .testTag("filterButton")) {
+        modifier = Modifier.padding(start = 8.dp).testTag("filterButton")) {
           Text(stringResource(id = R.string.filter))
         }
   }
@@ -204,9 +193,7 @@ fun FilterPopUp(
         modifier = Modifier.padding(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
-      Column(modifier = Modifier
-          .fillMaxSize()
-          .padding(12.dp)) {
+      Column(modifier = Modifier.fillMaxSize().padding(12.dp)) {
         // Text input for radius
         Row(modifier = Modifier.fillMaxWidth()) {
           Box(modifier = Modifier.weight(1f)) {
@@ -220,14 +207,12 @@ fun FilterPopUp(
                 onValueChange = { onRadiusQueryChanged(it) },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        shape = RoundedCornerShape(10)
-                    )
-                    .testTag("radiusInput"),
+                    Modifier.fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            shape = RoundedCornerShape(10))
+                        .testTag("radiusInput"),
                 textStyle = TextStyle.Default.copy(fontSize = 16.sp),
                 singleLine = true)
           }
@@ -253,8 +238,7 @@ fun FilterPopUp(
               Switch(
                   checked = uiState.isFreeSwitchOn,
                   onCheckedChange = { onFreeSwitchChanged() },
-                  modifier = Modifier.testTag("freeSwitch")
-              )
+                  modifier = Modifier.testTag("freeSwitch"))
             }
 
         // Buttons for category selection
@@ -276,12 +260,9 @@ fun FilterPopUp(
 
         // Button to apply filter
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-          Button(
-              onClick = { onFilterApply() },
-              modifier =  Modifier.testTag("filterApplyButton")
-          ) {
-              Text(stringResource(id = R.string.filter_apply))
-        }
+          Button(onClick = { onFilterApply() }, modifier = Modifier.testTag("filterApplyButton")) {
+            Text(stringResource(id = R.string.filter_apply))
+          }
         }
       }
     }
@@ -289,40 +270,35 @@ fun FilterPopUp(
 }
 
 @Composable
-fun CategorySelection(
-    uiState: EventsOverviewUiState
-) {
-    LazyColumn {
-        items(EventCategory.entries) { category ->
-            var isChecked by remember { mutableStateOf(true) }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier.padding(vertical = 0.dp)) {
-                Checkbox(
-                    checked = isChecked,
-                    onCheckedChange = {
-                        isChecked = it
-                        if (isChecked) {
-                            uiState.categoriesCheckedList.add(category)
-                        } else {
-                            uiState.categoriesCheckedList.remove(category)
-                        }
-                    },
-                    modifier = Modifier
-                        .scale(0.6f)
-                        .size(10.dp)
-                        .padding(start = 10.dp))
-                Text(
-                    text = category.displayName,
-                    style =
+fun CategorySelection(uiState: EventsOverviewUiState) {
+  LazyColumn {
+    items(EventCategory.entries) { category ->
+      var isChecked by remember { mutableStateOf(true) }
+      Row(
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.Start,
+          modifier = Modifier.padding(vertical = 0.dp)) {
+            Checkbox(
+                checked = isChecked,
+                onCheckedChange = {
+                  isChecked = it
+                  if (isChecked) {
+                    uiState.categoriesCheckedList.add(category)
+                  } else {
+                    uiState.categoriesCheckedList.remove(category)
+                  }
+                },
+                modifier = Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp))
+            Text(
+                text = category.displayName,
+                style =
                     TextStyle(
                         fontSize = 16.sp,
                     ),
-                    modifier = Modifier.padding(start = 16.dp))
-            }
-        }
+                modifier = Modifier.padding(start = 16.dp))
+          }
     }
+  }
 }
 
 @Composable
