@@ -143,8 +143,6 @@ fun SelectTicket(
               onClick = {
                 context.toast("Multiple ticket types is not part of V1")
                 // Would select ticket type the user wants to buy. Not in V1
-                // Toast.makeText(context, "Event details not yet available",
-                // Toast.LENGTH_SHORT).show()
               }) {
                 Row(
                     modifier =
