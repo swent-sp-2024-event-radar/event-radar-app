@@ -48,12 +48,10 @@ fun NavGraph(
         }
 
     // TODO replace the Toast message with the corresponding screen function of the route
-    // TODO replace the Toast message with the corresponding screen function of the route
     composable(Route.SCANNER) {
       HomeScreen(navigationActions = navActions)
       context.toast("Scanner screen needs to be implemented")
     }
-
     composable(Route.MESSAGE) {
       HomeScreen(navigationActions = navActions)
       context.toast("Message main screen needs to be implemented")
