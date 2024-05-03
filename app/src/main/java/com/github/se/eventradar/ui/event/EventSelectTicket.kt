@@ -35,7 +35,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.se.eventradar.R
-import com.github.se.eventradar.model.event.EventDetailsViewModel
+import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.EventComponentsStyle
 import com.github.se.eventradar.ui.component.EventTitle
@@ -46,8 +46,8 @@ import com.github.se.eventradar.util.toast
 
 @Composable
 fun SelectTicket(
-    viewModel: EventDetailsViewModel = hiltViewModel(),
-    navigationActions: NavigationActions
+  viewModel: EventDetailsViewModel = hiltViewModel(),
+  navigationActions: NavigationActions
 ) {
 
   // TODO to be moved in viewModel init
@@ -80,8 +80,8 @@ fun SelectTicket(
         // buy ticket button
         FloatingActionButton(
             onClick = {
-              context.toast("Buy ticket needs to be implemented")
-              /*TODO launch action when buying a ticket */
+              viewModel.buyTicketForEvent()
+              context.toast("You registered to the event !")
             },
             modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("buyButton"),
             containerColor = MaterialTheme.colorScheme.primaryContainer,

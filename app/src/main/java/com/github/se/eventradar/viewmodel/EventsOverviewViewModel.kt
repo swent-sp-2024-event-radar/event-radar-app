@@ -92,7 +92,7 @@ constructor(
         }
       }
       is Resource.Failure -> {
-        Log.d("EventsOverviewViewModel", "Error fetching user document")
+        Log.d("EventsOverviewViewModel", "Error fetching user document: ${userResponse.throwable.message}")
         _uiState.value = _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
       }
     }

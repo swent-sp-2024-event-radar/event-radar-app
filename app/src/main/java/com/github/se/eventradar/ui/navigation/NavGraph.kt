@@ -8,7 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.github.se.eventradar.model.event.EventDetailsViewModel
+import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.event.SelectTicket
 import com.github.se.eventradar.ui.home.HomeScreen
