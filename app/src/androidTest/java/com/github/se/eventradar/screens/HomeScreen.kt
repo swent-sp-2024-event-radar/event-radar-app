@@ -21,7 +21,6 @@ class HomeScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   val searchBarAndFilter: KNode = child { hasTestTag("searchBarAndFilter") }
   val filterButton: KNode = searchBarAndFilter.child { hasTestTag("filterButton") }
   val searchBar: KNode = searchBarAndFilter.child { hasTestTag("searchBar") }
-  val eventSearch: KNode = searchBar.child { hasSetTextAction() }
   val filterPopUp: KNode = child { hasTestTag("filterPopUp") }
   val filteredEventList: KNode = child { hasTestTag("filteredEventList") }
   val filteredMap: KNode = child { hasTestTag("filteredMap") }

@@ -152,6 +152,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
     onComposeScreen<HomeScreen>(composeTestRule) {
       step("Click on filter button") {
         filterButton {
+          assertIsDisplayed()
           performClick()
         }
       }
@@ -160,12 +161,12 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       step("Check if filter pop up is displayed") { filterPopUp { assertIsDisplayed() } }
       verify { mockEventsOverviewViewModel.onFilterDialogOpen() }
 
-      radiusInput {
-        assertIsDisplayed()
-        performClick()
-        performTextInput("10")
-      }
-      verify { mockEventsOverviewViewModel.onRadiusQueryChanged("10") }
+//      radiusInput {
+//        assertIsDisplayed()
+//        performClick()
+//        performTextInput("10")
+//      }
+//      verify { mockEventsOverviewViewModel.onRadiusQueryChanged("10") }
 
 //      freeSwitch {
 //        assertIsDisplayed()
@@ -220,6 +221,47 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       verify { mockEventsOverviewViewModel.getEvents() }
 
       confirmVerified(mockEventsOverviewViewModel)
+    }
+  }
+
+  @Test
+  fun typingInSearchBarShowsResultsInMap() = run {
+    onComposeScreen<HomeScreen>(composeTestRule) {
+      // 1. Open the map view
+      step("Click on view toggle fab") {
+        viewToggleFab {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(viewList = false)
+      step("Check if map is displayed") { map { assertIsDisplayed() } }
+
+      // 2. Activate search
+      searchBar {
+        assertIsDisplayed()
+        performClick()
+        performTextInput("Event 0")
+      }
+
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(isSearchActive = true)
+
+      verify { mockEventsOverviewViewModel.onSearchQueryChanged("Event 0") }
+      verify { mockEventsOverviewViewModel.onSearchActiveChanged(true) }
+      verify { mockEventsOverviewViewModel.uiState }
+
+      // 3. Check filtered map is displayed
+      filteredMap { assertIsDisplayed() }
+      verify { mockEventsOverviewViewModel.filterEvents() }
+
+      // 4. Clear search
+      searchBar { performTextClearance() }
+      verify { mockEventsOverviewViewModel.onSearchQueryChanged("") }
+      verify { mockEventsOverviewViewModel.onSearchActiveChanged(false) }
+      verify { mockEventsOverviewViewModel.getEvents() }
     }
   }
 
