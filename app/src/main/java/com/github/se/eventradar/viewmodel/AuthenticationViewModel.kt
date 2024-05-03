@@ -23,6 +23,7 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
   val uiState: StateFlow<LoginUiState> = _uiState
 
   fun addUser(
+      qrCodeUri: Uri,
       state: MutableStateFlow<LoginUiState> = _uiState,
       user: FirebaseUser? = Firebase.auth.currentUser
   ): Boolean {
@@ -44,6 +45,10 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
           runBlocking { uploadImageAsync(imageUri, user.uid, profilePicFolder) }
         }
 
+        // Upload QR code
+        val qrCodeFolder = "QR_Codes"
+        val qrCodeUrl = runBlocking { uploadImageAsync(qrCodeUri, user.uid, qrCodeFolder) }
+
     if (profilePicUrl.isEmpty()) {
       Log.d("LoginScreenViewModel", "Error uploading image")
       return false
@@ -58,7 +63,7 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
             "private/birthDate" to state.value.birthDate,
             "private/email" to user.email,
             "profilePicUrl" to profilePicUrl,
-            "qrCodeUrl" to "", // TODO: generate QR code here
+            "qrCodeUrl" to qrCodeUrl,
             "username" to state.value.username,
             "accountStatus" to "active",
             "eventsAttendeeList" to mutableListOf<String>(),

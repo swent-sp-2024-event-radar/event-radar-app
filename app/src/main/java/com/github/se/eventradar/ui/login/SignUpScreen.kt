@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -60,6 +61,7 @@ import com.github.se.eventradar.R
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
+import com.github.se.eventradar.util.QRCodeUtil.generateAndSaveQRCode
 import com.github.se.eventradar.viewmodel.CountryCode
 import com.github.se.eventradar.viewmodel.LoginViewModel
 
@@ -77,7 +79,8 @@ fun SignUpScreen(
           contract = FirebaseAuthUIActivityResultContract(),
           onResult = { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-              val addUserError = viewModel.addUser()
+                val qrCodeUri = generateAndSaveQRCode(LocalContext.current)
+              val addUserError = viewModel.addUser(qrCodeUri)
               if (addUserError) {
                 Throwable("Error adding user")
               }
