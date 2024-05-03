@@ -56,16 +56,13 @@ fun HomeScreen(
 ) {
   // Ui States handled by viewModel
   val uiState by viewModel.uiState.collectAsState()
-  LaunchedEffect(
-      key1 = uiState.eventList, key2 = uiState.isSearchActive, key3 = uiState.isFilterActive) {
-        if (uiState.isSearchActive || uiState.isFilterActive) {
-          viewModel.filterEvents()
-        } else {
-          viewModel.getEvents()
-        }
-      }
+  LaunchedEffect(key1 = uiState.isSearchActive, key2 = uiState.isFilterActive) {
+    if (uiState.isSearchActive || uiState.isFilterActive) {
+      viewModel.filterEvents()
+    }
+  }
 
-  //  LaunchedEffect(Unit) { viewModel.getEvents() }
+  LaunchedEffect(Unit) { viewModel.getEvents() }
 
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("homeScreen")) {
     val (logo, tabs, searchAndFilter, filterPopUp, eventList, eventMap, bottomNav, viewToggle) =
