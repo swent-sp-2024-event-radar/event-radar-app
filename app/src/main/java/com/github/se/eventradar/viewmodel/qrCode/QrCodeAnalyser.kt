@@ -44,16 +44,12 @@ class QrCodeAnalyser @Inject constructor() : ImageAnalysis.Analyzer {
                 }
                 .decode(binaryBitmap)
         // Log the decoded string
-        Log.d(
-            "com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser",
-            "Decoded string: ${result.text}")
+        Log.d("QrCodeAnalyser", "Decoded string: ${result.text}")
         // if onDecoded is null (has not been initialised b Viewmodel) will simply return Null
         onDecoded?.invoke(result.toString())
       } catch (e: Exception) {
 
-        Log.d(
-            "com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser",
-            "Error decoding QR Code: ${e.message}")
+        Log.d("QrCodeAnalyser", "Error decoding QR Code: ${e.message}")
       } finally { // close image once scanning process done
         image.close()
       }
