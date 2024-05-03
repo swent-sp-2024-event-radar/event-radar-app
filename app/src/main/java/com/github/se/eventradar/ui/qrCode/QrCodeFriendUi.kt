@@ -43,11 +43,11 @@ fun QrCodeScreen(
     navigationActions: NavigationActions
 ) {
 
-  val qrScanUiState = viewModel.uiState.collectAsStateWithLifecycle().value
+  val qrScanUiState = viewModel.uiState.collectAsStateWithLifecycle()
 
   // React to changes in navigation state
-  LaunchedEffect(qrScanUiState.action) {
-    when (qrScanUiState.action) {
+  LaunchedEffect(qrScanUiState.value.action) {
+    when (qrScanUiState.value.action) {
       ScanFriendQrViewModel.Action.NavigateToNextScreen -> {
         navigationActions.navigateTo(
             TOP_LEVEL_DESTINATIONS[
@@ -81,7 +81,7 @@ fun QrCodeScreen(
         }
     TabRow(
         //
-        selectedTabIndex = qrScanUiState.tabState.ordinal,
+        selectedTabIndex = qrScanUiState.value.tabState.ordinal,
         modifier =
             Modifier.fillMaxWidth()
                 .padding(top = 8.dp)
@@ -93,7 +93,7 @@ fun QrCodeScreen(
                 .testTag("tabs"),
         contentColor = MaterialTheme.colorScheme.primary) {
           Tab(
-              selected = qrScanUiState.tabState == ScanFriendQrViewModel.Tab.MyQR,
+              selected = qrScanUiState.value.tabState == ScanFriendQrViewModel.Tab.MyQR,
               onClick = { viewModel.changeTabState(ScanFriendQrViewModel.Tab.MyQR) },
               modifier = Modifier.testTag("My QR Code"),
           ) {
@@ -112,7 +112,7 @@ fun QrCodeScreen(
                 modifier = Modifier.padding(bottom = 8.dp))
           }
           Tab(
-              selected = qrScanUiState.tabState == ScanFriendQrViewModel.Tab.ScanQR,
+              selected = qrScanUiState.value.tabState == ScanFriendQrViewModel.Tab.ScanQR,
               onClick = {
                 viewModel.changeTabState(ScanFriendQrViewModel.Tab.ScanQR)
               }, // selectedTabIndex = 1
@@ -133,7 +133,7 @@ fun QrCodeScreen(
               }
         }
 
-    if (qrScanUiState.tabState == ScanFriendQrViewModel.Tab.MyQR) {
+    if (qrScanUiState.value.tabState == ScanFriendQrViewModel.Tab.MyQR) {
       Toast.makeText(context, "My Qr Code not yet available", Toast.LENGTH_SHORT).show()
     } else {
       Column(modifier = Modifier.testTag("QrScanner")) {

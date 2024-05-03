@@ -27,7 +27,13 @@ replay_pid*
 
 .DS_store
 
+# Ignore misc.xml
+app/.idea/misc.xml
+
+
+
 # secret files
 local.properties
 secrets.properties
 app/local.properties
+app/.gradle/config.properties
