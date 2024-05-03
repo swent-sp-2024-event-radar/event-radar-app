@@ -109,7 +109,7 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
     onComposeScreen<QrCodeScanFriendUiScreen>(composeTestRule) {
       myQrTab.performClick()
       myQrScreen.assertIsDisplayed()
-      //myQrCodeImage.assertIsDisplayed() - mock the image somehow wtf
+      myQrCodeImage.assertIsDisplayed()
       username.assertIsDisplayed()
       assertEquals("test_user",sampleMyQrCodeUiState.value.username)
     }

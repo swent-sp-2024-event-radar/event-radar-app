@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -52,8 +53,8 @@ fun MyQrCodeScreen(viewModel: MyQrCodeViewModel, modifier: Modifier = Modifier.t
                 .data(uiState.qrCodeLink) //uiState.qrCode (only works for jpg)
                 .crossfade(true)
                 .build(),
-            //error = painterResource(R.drawable.qr_code), // should be a error indicative
-            //placeholder = painterResource(R.drawable.placeholder), // should be loading image
+            error = painterResource(R.drawable.qr_code), // should be a error indicative
+            placeholder = painterResource(R.drawable.placeholder), // should be loading image
             contentDescription = stringResource(R.string.my_qr_code),
             modifier = Modifier.size(width = 300.dp, height = 300.dp).testTag("myQrCodeImage"))
     }
