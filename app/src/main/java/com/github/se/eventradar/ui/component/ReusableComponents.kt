@@ -41,6 +41,8 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -195,7 +197,6 @@ fun FilterPopUp(
     onFilterApply: () -> Unit,
     uiState: EventsOverviewUiState,
     onRadiusQueryChanged: (String) -> Unit,
-    onCategorySelectionChanged: (EventCategory) -> Unit,
     viewModel: EventsOverviewViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -270,11 +271,8 @@ fun FilterPopUp(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start) {
               CategorySelection(
-                  modifyCategoryChecked = { category, isChecked ->
-                      viewModel.modifyCategoryChecked(category, isChecked)
-                  },
-                  onCategorySelectionChanged = { onCategorySelectionChanged(it) },
-                  uiState = uiState)
+                  onCategorySelectionChanged = { viewModel.onCategorySelectionChanged(it, true) }
+              )
             }
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -295,44 +293,31 @@ fun FilterPopUp(
 
 @Composable
 fun CategorySelection(
-    modifyCategoryChecked: (EventCategory, Boolean) -> Unit,
-    onCategorySelectionChanged: (EventCategory) -> Unit,
-    uiState: EventsOverviewUiState,
+    onCategorySelectionChanged: (EventCategory, Boolean) -> Unit,
 ) {
-    LaunchedEffect(Unit) {
-        Log.d("MyComposable", "Composable recomposed")
-    }
-  LazyColumn {
-    items(EventCategory.entries) { category ->
-      Row(
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.Start,
-          modifier = Modifier.padding(vertical = 0.dp)) {
-            Checkbox(
-                checked = uiState.isCategoriesChecked[category]!!,
-                onCheckedChange = {
-                    Log.d("modifyCategoryChecked", "checked ui b4 ${uiState.isCategoriesChecked[category]}")
-                    modifyCategoryChecked(category, !uiState.isCategoriesChecked[category]!!)
-                    Log.d("modifyCategoryChecked", "isCategoriesChecked ui ${uiState.isCategoriesChecked}")
-                    onCategorySelectionChanged(category)
-                    Log.d("CategorySelection", "Category ui ${uiState.categoriesCheckedList}")
-                    Log.d("modifyCategoryChecked", "checked ui af ${uiState.isCategoriesChecked[category]}")
-                    Log.d("modifyCategoryChecked", "isCategoriesChecked ui af ${uiState.isCategoriesChecked[category]!!}")
-                                  },
-                modifier = Modifier
-                    .scale(0.6f)
-                    .size(10.dp)
-                    .padding(start = 10.dp))
-            Text(
-                text = category.displayName,
-                style =
+    LazyColumn {
+        items(EventCategory.entries) { category ->
+            var isChecked by remember { mutableStateOf(true) }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start,
+                modifier = Modifier.padding(vertical = 0.dp)) {
+                Checkbox(
+                    checked = isChecked,
+                    onCheckedChange = {
+                        isChecked = it
+                        onCategorySelectionChanged(category, isChecked)},
+                    modifier = Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp))
+                Text(
+                    text = category.displayName,
+                    style =
                     TextStyle(
                         fontSize = 16.sp,
                     ),
-                modifier = Modifier.padding(start = 16.dp))
-          }
+                    modifier = Modifier.padding(start = 16.dp))
+            }
+        }
     }
-  }
 }
 
 @Composable

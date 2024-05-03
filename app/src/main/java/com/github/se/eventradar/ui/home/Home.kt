@@ -266,8 +266,7 @@ fun HomeScreen(
           onFilterApply = { viewModel.onFilterApply() },
           uiState = uiState,
           onRadiusQueryChanged = { viewModel.onRadiusQueryChanged(it) },
-          onCategorySelectionChanged = { viewModel.onCategorySelectionChanged(it) },
-        viewModel = viewModel,
+          viewModel = viewModel,
           modifier =
               Modifier.height(355.dp).width(230.dp).testTag("filterPopUp").constrainAs(
                   filterPopUp) {

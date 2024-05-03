@@ -56,21 +56,11 @@ constructor(
     state.value = state.value.copy(isFreeSwitchOn = !state.value.isFreeSwitchOn)
   }
 
-    fun modifyCategoryChecked(category: EventCategory, newState: Boolean) {
-        val isCategoriesChecked = _uiState.value.isCategoriesChecked
-        isCategoriesChecked[category] = newState
-        Log.d("CategorySelection", "isCategoriesChecked $isCategoriesChecked")
-
-        _uiState.value = _uiState.value.copy(isCategoriesChecked = isCategoriesChecked)
-        Log.d("CategorySelection", "isCategoriesChecked vm ${_uiState.value.isCategoriesChecked}")
-
-    }
-
-  fun onCategorySelectionChanged(category: EventCategory) {
+  fun onCategorySelectionChanged(category: EventCategory, isChecked: Boolean) {
     val categoriesCheckedList = _uiState.value.categoriesCheckedList
     Log.d("CategorySelection", "categoriesCheckedList $categoriesCheckedList")
 
-      if (categoriesCheckedList.contains(category)) {
+      if (isChecked) {
       categoriesCheckedList.remove(category)
     } else {
       categoriesCheckedList.add(category)
@@ -260,8 +250,6 @@ data class EventsOverviewUiState(
     val isFilterActive: Boolean = false,
     val radiusQuery: String = "",
     val isFreeSwitchOn: Boolean = true,
-    val isCategoriesChecked: MutableMap<EventCategory, Boolean> =
-        EventCategory.entries.associateWith { true }.toMutableMap(),
     val categoriesCheckedList: MutableSet<EventCategory> =
         mutableSetOf(*enumValues<EventCategory>()),
     val viewList: Boolean = true,
