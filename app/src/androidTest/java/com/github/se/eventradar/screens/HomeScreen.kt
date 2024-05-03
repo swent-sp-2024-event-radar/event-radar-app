@@ -32,10 +32,13 @@ class HomeScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
 
   private val filterCard: KNode = filterPopUp.child { hasTestTag("filterCard") }
   private val filterCardColumn: KNode = filterCard.child { hasTestTag("filterCardColumn") }
-  private val filterCardColumnRow: KNode = filterCardColumn.child { hasTestTag("filterCardColumnRow") }
-  private val filterCardColumnRowRadius: KNode = filterCardColumnRow.child { hasTestTag("filterCardColumnRowRadius") }
+  private val filterCardColumnRow: KNode =
+      filterCardColumn.child { hasTestTag("filterCardColumnRow") }
+  private val filterCardColumnRowRadius: KNode =
+      filterCardColumnRow.child { hasTestTag("filterCardColumnRowRadius") }
   val radiusLabel: KNode = filterCardColumnRowRadius.child { hasTestTag("radiusLabel") }
-  private val filterCardColumnRowKm: KNode = filterCardColumnRow.child { hasTestTag("filterCardColumnRowKm") }
+  private val filterCardColumnRowKm: KNode =
+      filterCardColumnRow.child { hasTestTag("filterCardColumnRowKm") }
   val kmLabel: KNode = filterCardColumnRowKm.child { hasTestTag("kmLabel") }
   private val radiusInputBox: KNode = filterCardColumnRow.child { hasTestTag("radiusInputBox") }
   val radiusInput: KNode = radiusInputBox.child { hasTestTag("radiusInput") }
@@ -49,4 +52,4 @@ class HomeScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   private val categoryRow: KNode = categoryOptionsColumn.child { hasTestTag("categoryRow") }
   val checkbox: KNode = categoryRow.child { hasTestTag("checkbox") }
   val checkboxText: KNode = categoryRow.child { hasTestTag("checkboxText") }
-    }
+}

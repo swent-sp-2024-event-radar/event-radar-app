@@ -258,21 +258,24 @@ fun FilterPopUp(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier.testTag("categoryRow"),
-            ) {
-              CategorySelection(
-                  uiState = uiState,
-                  modifier = Modifier.testTag("categoryOptionsColumn"),
-                  )
-            }
+        ) {
+          CategorySelection(
+              uiState = uiState,
+              modifier = Modifier.testTag("categoryOptionsColumn"),
+          )
+        }
 
         Spacer(modifier = Modifier.height(4.dp))
 
         // Button to apply filter
-        Row(modifier = Modifier.fillMaxWidth().testTag("filterApplyRow"), horizontalArrangement = Arrangement.Center) {
-          Button(onClick = { onFilterApply() }, modifier = Modifier.testTag("filterApplyButton")) {
-            Text(stringResource(id = R.string.filter_apply))
-          }
-        }
+        Row(
+            modifier = Modifier.fillMaxWidth().testTag("filterApplyRow"),
+            horizontalArrangement = Arrangement.Center) {
+              Button(
+                  onClick = { onFilterApply() }, modifier = Modifier.testTag("filterApplyButton")) {
+                    Text(stringResource(id = R.string.filter_apply))
+                  }
+            }
       }
     }
   }
@@ -280,9 +283,7 @@ fun FilterPopUp(
 
 @Composable
 fun CategorySelection(uiState: EventsOverviewUiState, modifier: Modifier) {
-  LazyColumn(
-      modifier = modifier
-  ) {
+  LazyColumn(modifier = modifier) {
     items(EventCategory.entries) { category ->
       var isChecked by remember { mutableStateOf(true) }
       Row(
@@ -299,7 +300,8 @@ fun CategorySelection(uiState: EventsOverviewUiState, modifier: Modifier) {
                     uiState.categoriesCheckedList.remove(category)
                   }
                 },
-                modifier = Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp).testTag("checkbox"))
+                modifier =
+                    Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp).testTag("checkbox"))
             Text(
                 text = category.displayName,
                 style =
