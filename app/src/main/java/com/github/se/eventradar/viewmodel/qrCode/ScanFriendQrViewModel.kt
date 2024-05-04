@@ -56,7 +56,7 @@ constructor(
       }
     }
 
-    qrCodeAnalyser.onDecoded = { decodedString ->
+    qrCodeAnalyser.onFriendDecoded = { decodedString ->
       Log.d("QrCodeFriendViewModel", "Decoded QR Code: $decodedString")
       val result = decodedString ?: "Failed to decode QR Code"
       _uiState.value = _uiState.value.copy(decodedResult = result) // Update state flow

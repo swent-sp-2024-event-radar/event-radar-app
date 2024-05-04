@@ -19,7 +19,8 @@ class QrCodeAnalyser @Inject constructor() : ImageAnalysis.Analyzer {
   private val supportedImageFormats =
       listOf(ImageFormat.YUV_420_888, ImageFormat.YUV_422_888, ImageFormat.YUV_444_888)
 
-  var onDecoded: ((String?) -> Unit)? = null //
+  var onFriendDecoded: ((String?) -> Unit)? = null
+  var onTicketDecoded: ((String?) -> Unit)? = null
 
   override fun analyze(image: ImageProxy) {
 
@@ -46,7 +47,8 @@ class QrCodeAnalyser @Inject constructor() : ImageAnalysis.Analyzer {
         // Log the decoded string
         Log.d("QrCodeAnalyser", "Decoded string: ${result.text}")
         // if onDecoded is null (has not been initialised b Viewmodel) will simply return Null
-        onDecoded?.invoke(result.toString())
+        onFriendDecoded?.invoke(result.toString())
+        onFriendDecoded = null;  //TODO RESET IT
       } catch (e: Exception) {
 
         Log.d("QrCodeAnalyser", "Error decoding QR Code: ${e.message}")
