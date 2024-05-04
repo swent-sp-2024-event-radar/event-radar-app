@@ -10,11 +10,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.ui.event.EventDetails
+import com.github.se.eventradar.ui.event.SelectTicket
 import com.github.se.eventradar.ui.home.HomeScreen
 import com.github.se.eventradar.ui.hosting.HostingScreen
 import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.login.SignUpScreen
 import com.github.se.eventradar.ui.messages.MessagesScreen
+import com.github.se.eventradar.ui.qrCode.QrCodeScreen
 import com.github.se.eventradar.util.toast
 
 @Composable
@@ -38,13 +40,18 @@ fun NavGraph(
 
           EventDetails(viewModel = viewModel, navigationActions = navActions)
         }
+    composable(
+        "${Route.EVENT_DETAILS_TICKETS}/{eventId}",
+        arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
+          val eventId = it.arguments!!.getString("eventId")!!
+          val viewModel: EventDetailsViewModel = hiltViewModel()
+          viewModel.saveEventId(eventId)
+          SelectTicket(viewModel = viewModel, navigationActions = navActions)
+        }
 
     // TODO replace the Toast message with the corresponding screen function of the route
-    composable(Route.SCANNER) {
-      HomeScreen(navigationActions = navActions)
-      context.toast("Scanner screen needs to be implemented")
-    }
     composable(Route.MESSAGE) { MessagesScreen(navigationActions = navActions) }
+    composable(Route.SCANNER) { QrCodeScreen(navigationActions = navActions) }
     composable(Route.PROFILE) {
       HomeScreen(navigationActions = navActions)
       context.toast("Profile screen needs to be implemented")
