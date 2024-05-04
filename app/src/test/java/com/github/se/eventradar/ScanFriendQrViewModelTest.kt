@@ -2,6 +2,7 @@ package com.github.se.eventradar
 
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
+import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
@@ -121,7 +122,6 @@ class ScanFriendQrViewModelTest {
     userRepository.addUser(mockUser1)
     userRepository.addUser(mockUser2)
     val testDecodedString = "user2"
-    println("onDecodedInvoked")
     qrCodeAnalyser.onFriendDecoded?.invoke(testDecodedString)
     assertEquals(testDecodedString, viewModel.uiState.value.decodedResult)
   }
