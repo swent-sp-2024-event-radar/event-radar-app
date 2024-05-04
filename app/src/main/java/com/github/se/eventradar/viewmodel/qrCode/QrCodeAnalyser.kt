@@ -44,13 +44,13 @@ class QrCodeAnalyser @Inject constructor() : ImageAnalysis.Analyzer {
                       mapOf(DecodeHintType.POSSIBLE_FORMATS to arrayListOf(BarcodeFormat.QR_CODE)))
                 }
                 .decode(binaryBitmap)
-        if(onTicketDecoded != null) {
-            onTicketDecoded?.invoke(result.toString())
-//            onTicketDecoded = null  TODO RESET IT to null when respective  viewmodel dies
-        }
-            else if (onFriendDecoded != null) {
-            onFriendDecoded?.invoke(result.toString())
-//            onFriendDecoded = null TODO RESET IT to null when respective  viewmodel dies
+        if (onTicketDecoded != null) {
+          onTicketDecoded?.invoke(result.toString())
+          //            onTicketDecoded = null  TODO RESET IT to null when respective  viewmodel
+          // dies
+        } else if (onFriendDecoded != null) {
+          onFriendDecoded?.invoke(result.toString())
+          //            onFriendDecoded = null TODO RESET IT to null when respective  viewmodel dies
         }
       } catch (e: Exception) {
 

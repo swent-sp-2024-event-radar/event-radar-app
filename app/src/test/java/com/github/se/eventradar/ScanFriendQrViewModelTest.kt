@@ -2,7 +2,6 @@ package com.github.se.eventradar
 
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
-import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser

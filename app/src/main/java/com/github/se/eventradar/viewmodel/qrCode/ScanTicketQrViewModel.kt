@@ -43,21 +43,24 @@ constructor(
 
   private var myEventID = "1"
 
-
-
   init {
     qrCodeAnalyser.onTicketDecoded = { decodedString ->
       val result = decodedString ?: "Failed to decode QR Code"
       updateDecodedString(result) // Update state flow
+      println("checkpoint1")
       if (result != "Failed to decode QR Code") {
+        println("correctly decoded")
         updatePermissions(result) // Directly call updateFriendList
       } else {
+        println("wrongly decoded")
         changeAction(Action.AnalyserError)
+        println("checkpoint 2")
       }
     }
   }
+
   private fun updatePermissions(decodedString: String) {
-      println("entered updatePermissions")
+    println("entered updatePermissions")
     val uiLength = 28
     val attendeeID = decodedString.take(uiLength)
     Log.d("QrCodeFriendViewModel", "Ticket User ID: $attendeeID")
@@ -77,43 +80,47 @@ constructor(
       }
     }
   }
-  private suspend fun retryUpdate(user: User, event: Event): Unit {
-      println("entered retryUpdate")
-      var maxNumberOfRetries = 3
-      var updateResult: Resource<Any>?
-      if (user.eventsAttendeeSet.contains(myEventID) && event.attendeeSet.contains(user.userId)) {
-          println("both contain one another")
-          user.eventsAttendeeSet.remove(myEventID)
-          val userUpdateResult = userRepository.updateUser(user)
-          event.attendeeSet.remove(user.userId)
-          val eventUpdateResult = eventRepository.updateEvent(event)
 
-          do {
-              // Check if both updates were successful
-              updateResult =
-                  if (userUpdateResult is Resource.Success && eventUpdateResult is Resource.Success) {
-                      println("updtaes successful")
-                      changeAction(Action.ApproveEntry)
-                      Resource.Success(Unit)
-                  } else {
-                      changeAction(Action.FirebaseUpdateError)
-                      Resource.Failure(Exception("Failed to update user and event"))
-                  }
-          } while ((updateResult !is Resource.Success) && (maxNumberOfRetries-- > 0))
-      } else {
-          changeAction(Action.DenyEntry)
-      }
+  private suspend fun retryUpdate(user: User, event: Event): Unit {
+    println("entered retryUpdate")
+    var maxNumberOfRetries = 3
+    var updateResult: Resource<Any>?
+    if (user.eventsAttendeeSet.contains(myEventID) && event.attendeeSet.contains(user.userId)) {
+      println("both contain one another")
+      user.eventsAttendeeSet.remove(myEventID)
+      val userUpdateResult = userRepository.updateUser(user)
+      event.attendeeSet.remove(user.userId)
+      val eventUpdateResult = eventRepository.updateEvent(event)
+
+      do {
+        // Check if both updates were successful
+        updateResult =
+            if (userUpdateResult is Resource.Success && eventUpdateResult is Resource.Success) {
+              changeAction(Action.ApproveEntry)
+              Resource.Success(Unit)
+            } else {
+              changeAction(Action.FirebaseUpdateError)
+              Resource.Failure(Exception("Failed to update user and event"))
+            }
+      } while ((updateResult !is Resource.Success) && (maxNumberOfRetries-- > 0))
+    } else {
+      println("one does not contain the other")
+      changeAction(Action.DenyEntry)
+    }
   }
 
   fun updateDecodedString(result: String) {
     _uiState.value = _uiState.value.copy(decodedResult = result)
   }
-fun saveEventID(eventID: String) {
+
+  fun saveEventID(eventID: String) {
     myEventID = eventID
-}
+  }
+
   fun changeAction(action: Action) {
     _uiState.value = _uiState.value.copy(action = action)
   }
+
   data class QrCodeScanTicketState(
       val decodedResult: String = "",
       val action: Action = Action.ScanTicket,
