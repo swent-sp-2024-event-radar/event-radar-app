@@ -21,7 +21,7 @@ class ScanTicketQrViewModel
 constructor(
     private val userRepository: IUserRepository,
     private val eventRepository: IEventRepository,
-    qrCodeAnalyser: QrCodeAnalyser,
+    val qrCodeAnalyser: QrCodeAnalyser,
 ) : ViewModel() {
 
   private val _uiState = MutableStateFlow(QrCodeScanTicketState())
@@ -116,9 +116,17 @@ constructor(
   fun saveEventID(eventID: String) {
     myEventID = eventID
   }
+  fun changeTabState(tab: ScanTicketQrViewModel.Tab) {
+    _uiState.value = _uiState.value.copy(tabState = tab)
+  }
 
   fun changeAction(action: Action) {
     _uiState.value = _uiState.value.copy(action = action)
+  }
+
+  fun resetConditions () {
+  changeAction(Action.ScanTicket)
+  qrCodeAnalyser.onTicketDecoded = null
   }
 
   data class QrCodeScanTicketState(

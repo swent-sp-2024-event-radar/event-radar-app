@@ -2,12 +2,18 @@ package com.github.se.eventradar.ui.qrCode
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -16,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -26,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -33,7 +41,6 @@ import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
 import com.github.se.eventradar.viewmodel.qrCode.ScanTicketQrViewModel
 
 @Composable
@@ -45,18 +52,18 @@ fun QrCodeTicketUi(
     val qrScanUiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     // React to changes in navigation state
-    LaunchedEffect(qrScanUiState.value.action) {
-        when (qrScanUiState.value.action) {
-            ScanFriendQrViewModel.Action.NavigateToNextScreen -> {
-                navigationActions.navigateTo(
-                    TOP_LEVEL_DESTINATIONS[
-                        1]) // TODO change to private message screen with friend // Adjust according to your
-                viewModel.resetNavigationEvent() // Reset the navigation event in the ViewModel to prevent
-                viewModel.changeTabState(ScanFriendQrViewModel.Tab.MyQR) // TODO add test for this
-            }
-            else -> Unit // Do nothing if the state is None or any other non-navigational state
-        }
-    }
+//    LaunchedEffect(qrScanUiState.value.action) {
+//        when (qrScanUiState.value.action) {
+//            ScanFriendQrViewModel.Action.NavigateToNextScreen -> {
+//                navigationActions.navigateTo(
+//                    TOP_LEVEL_DESTINATIONS[
+//                        1]) // TODO change to private message screen with friend // Adjust according to your
+//                viewModel.resetNavigationEvent() // Reset the navigation event in the ViewModel to prevent
+//                viewModel.changeTabState(ScanFriendQrViewModel.Tab.MyQR) // TODO add test for this
+//            }
+//            else -> Unit // Do nothing if the state is None or any other non-navigational state
+//        }
+//    }
 
     val context = LocalContext.current
 
@@ -93,12 +100,12 @@ fun QrCodeTicketUi(
                 .testTag("tabs"),
             contentColor = MaterialTheme.colorScheme.primary) {
             Tab(
-                selected = qrScanUiState.value.tabState == ScanFriendQrViewModel.Tab.MyQR,
-                onClick = { viewModel.changeTabState(ScanFriendQrViewModel.Tab.MyQR) },
+                selected = qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent,
+                onClick = { viewModel.changeTabState(ScanTicketQrViewModel.Tab.MyEvent) },
                 modifier = Modifier.testTag("My QR Code"),
             ) {
                 Text(
-                    text = "My QR Code",
+                    text = "My Event",
                     style =
                     TextStyle(
                         fontSize = 19.sp,
@@ -112,13 +119,13 @@ fun QrCodeTicketUi(
                     modifier = Modifier.padding(bottom = 8.dp))
             }
             Tab(
-                selected = qrScanUiState.value.tabState == ScanFriendQrViewModel.Tab.ScanQR,
+                selected = qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.ScanQr,
                 onClick = {
-                    viewModel.changeTabState(ScanFriendQrViewModel.Tab.ScanQR)
+                    viewModel.changeTabState(ScanTicketQrViewModel.Tab.ScanQr)
                 }, // selectedTabIndex = 1
                 modifier = Modifier.testTag("Scan QR Code")) {
                 Text(
-                    text = "Scan QR Code",
+                    text = "Scan Ticket",
                     style =
                     TextStyle(
                         fontSize = 19.sp,
@@ -133,15 +140,35 @@ fun QrCodeTicketUi(
             }
         }
 
-        if (qrScanUiState.value.tabState == ScanFriendQrViewModel.Tab.MyQR) {
-            Toast.makeText(context, "My Qr Code not yet available", Toast.LENGTH_SHORT).show()
+        if (qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent) {
+            Toast.makeText(context, "My Host Event Details not available yet", Toast.LENGTH_SHORT).show()
         } else {
+            when (qrScanUiState.value.action) {
+                ScanTicketQrViewModel.Action.ScanTicket -> {
+                    Column(modifier = Modifier.testTag("QrScanner")) {
+                        QrCodeScanner(analyser = viewModel.qrCodeAnalyser)
+                    }
+                }
+                ScanTicketQrViewModel.Action.ApproveEntry -> {
+                    EntryDialog(0, viewModel)
+                }
+                ScanTicketQrViewModel.Action.DenyEntry -> {
+                    EntryDialog(1, viewModel)
+                }
+                ScanTicketQrViewModel.Action.FirebaseUpdateError,
+                ScanTicketQrViewModel.Action.FirebaseFetchError,
+                ScanTicketQrViewModel.Action.AnalyserError -> {
+                    EntryDialog(2, viewModel)
+                }
+            }
             Column(modifier = Modifier.testTag("QrScanner")) {
                 QrCodeScanner(analyser = viewModel.qrCodeAnalyser)
             }
         }
         BottomNavigationMenu(
-            onTabSelected = { tab -> navigationActions.navigateTo(tab) },
+            onTabSelected = {
+                tab -> navigationActions.navigateTo(tab)
+                            viewModel.resetConditions()},
             tabList = TOP_LEVEL_DESTINATIONS,
             selectedItem = TOP_LEVEL_DESTINATIONS[0],
             modifier =
@@ -150,5 +177,36 @@ fun QrCodeTicketUi(
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
             })
+    }
+
+}
+
+@Composable
+fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
+    Dialog(onDismissRequest = { viewModel.changeAction(ScanTicketQrViewModel.Action.ScanTicket) }) {
+        Box(
+            modifier = Modifier
+                .size(300.dp)
+                .background(
+                    when (edr) {
+                        0 -> Color.Green
+                        1 -> Color.Red
+                        else -> Color.Yellow
+                    }
+                )
+                .padding(10.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            IconButton(onClick = { viewModel.changeAction(ScanTicketQrViewModel.Action.ScanTicket) }) {
+                Icon(Icons.Default.Close, contentDescription = "Close")
+            }
+            Text(
+                text = when (edr) {
+                    0 -> "Entry Approved"
+                    1 -> "Entry Denied"
+                    else -> "Error, Please Retry"
+                }
+            )
+        }
     }
 }
