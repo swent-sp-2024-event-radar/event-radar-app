@@ -41,25 +41,27 @@ constructor(
     ScanQr
   }
 
-  private var myEventID = "1"
+  private var myEventID: String? = null
 
   init {
     qrCodeAnalyser.onTicketDecoded = { decodedString ->
       val result = decodedString ?: "Failed to decode QR Code"
       updateDecodedString(result) // Update state flow
-      println("checkpoint1")
       if (result != "Failed to decode QR Code") {
-        println("correctly decoded")
+        //        println("correctly decoded")
         updatePermissions(result) // Directly call updateFriendList
       } else {
-        println("wrongly decoded")
+        //      println("wrongly decoded")
         changeAction(Action.AnalyserError)
-        println("checkpoint 2")
+        //        println("checkpoint 2")
       }
     }
   }
 
   private fun updatePermissions(decodedString: String) {
+    while (myEventID == null) {
+      // Wait until myEventID is not null
+    }
     println("entered updatePermissions")
     val uiLength = 28
     val attendeeID = decodedString.take(uiLength)
@@ -67,7 +69,7 @@ constructor(
 
     viewModelScope.launch {
       val attendeeUserDeferred = async { userRepository.getUser(attendeeID) }
-      val currentEventDeferred = async { eventRepository.getEvent(myEventID) }
+      val currentEventDeferred = async { eventRepository.getEvent(myEventID!!) }
 
       val attendeeUser = attendeeUserDeferred.await()
       val currentEvent = currentEventDeferred.await()
