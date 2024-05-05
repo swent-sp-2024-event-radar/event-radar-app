@@ -19,7 +19,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,64 +48,50 @@ fun QrCodeTicketUi(
     navigationActions: NavigationActions
 ) {
 
-    val qrScanUiState = viewModel.uiState.collectAsStateWithLifecycle()
+  val qrScanUiState = viewModel.uiState.collectAsStateWithLifecycle()
 
-    // React to changes in navigation state
-//    LaunchedEffect(qrScanUiState.value.action) {
-//        when (qrScanUiState.value.action) {
-//            ScanFriendQrViewModel.Action.NavigateToNextScreen -> {
-//                navigationActions.navigateTo(
-//                    TOP_LEVEL_DESTINATIONS[
-//                        1]) // TODO change to private message screen with friend // Adjust according to your
-//                viewModel.resetNavigationEvent() // Reset the navigation event in the ViewModel to prevent
-//                viewModel.changeTabState(ScanFriendQrViewModel.Tab.MyQR) // TODO add test for this
-//            }
-//            else -> Unit // Do nothing if the state is None or any other non-navigational state
-//        }
-//    }
+  val context = LocalContext.current
 
-    val context = LocalContext.current
-
-    ConstraintLayout(
-        modifier = Modifier.fillMaxSize().testTag("qrCodeScannerScreen"),
-    ) {
-        val (logo, tabs, bottomNav) = createRefs()
-        Row(
-            modifier =
+  ConstraintLayout(
+      modifier = Modifier.fillMaxSize().testTag("qrCodeScannerScreen"),
+  ) {
+    val (logo, tabs, bottomNav) = createRefs()
+    Row(
+        modifier =
             Modifier.fillMaxWidth()
                 .fillMaxWidth()
                 .constrainAs(logo) {
-                    top.linkTo(parent.top, margin = 32.dp)
-                    start.linkTo(parent.start, margin = 16.dp)
+                  top.linkTo(parent.top, margin = 32.dp)
+                  start.linkTo(parent.start, margin = 16.dp)
                 }
                 .testTag("logo"),
-            verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(id = R.drawable.event_logo),
-                contentDescription = "Event Radar Logo",
-                modifier = Modifier.size(width = 186.dp, height = 50.dp))
+        verticalAlignment = Alignment.CenterVertically) {
+          Image(
+              painter = painterResource(id = R.drawable.event_logo),
+              contentDescription = "Event Radar Logo",
+              modifier = Modifier.size(width = 186.dp, height = 50.dp))
         }
-        TabRow(
-            //
-            selectedTabIndex = qrScanUiState.value.tabState.ordinal,
-            modifier =
+    TabRow(
+        //
+        selectedTabIndex = qrScanUiState.value.tabState.ordinal,
+        modifier =
             Modifier.fillMaxWidth()
                 .padding(top = 8.dp)
                 .constrainAs(tabs) {
-                    top.linkTo(logo.bottom, margin = 16.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
+                  top.linkTo(logo.bottom, margin = 16.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
                 }
                 .testTag("tabs"),
-            contentColor = MaterialTheme.colorScheme.primary) {
-            Tab(
-                selected = qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent,
-                onClick = { viewModel.changeTabState(ScanTicketQrViewModel.Tab.MyEvent) },
-                modifier = Modifier.testTag("My QR Code"),
-            ) {
-                Text(
-                    text = "My Event",
-                    style =
+        contentColor = MaterialTheme.colorScheme.primary) {
+          Tab(
+              selected = qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent,
+              onClick = { viewModel.changeTabState(ScanTicketQrViewModel.Tab.MyEvent) },
+              modifier = Modifier.testTag("My QR Code"),
+          ) {
+            Text(
+                text = "My Event",
+                style =
                     TextStyle(
                         fontSize = 19.sp,
                         lineHeight = 17.sp,
@@ -116,97 +101,96 @@ fun QrCodeTicketUi(
                         textAlign = TextAlign.Center,
                         letterSpacing = 0.25.sp,
                     ),
-                    modifier = Modifier.padding(bottom = 8.dp))
-            }
-            Tab(
-                selected = qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.ScanQr,
-                onClick = {
-                    viewModel.changeTabState(ScanTicketQrViewModel.Tab.ScanQr)
-                }, // selectedTabIndex = 1
-                modifier = Modifier.testTag("Scan QR Code")) {
+                modifier = Modifier.padding(bottom = 8.dp))
+          }
+          Tab(
+              selected = qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.ScanQr,
+              onClick = {
+                viewModel.changeTabState(ScanTicketQrViewModel.Tab.ScanQr)
+              }, // selectedTabIndex = 1
+              modifier = Modifier.testTag("Scan QR Code")) {
                 Text(
                     text = "Scan Ticket",
                     style =
-                    TextStyle(
-                        fontSize = 19.sp,
-                        lineHeight = 17.sp,
-                        fontFamily = FontFamily(Font(R.font.roboto)),
-                        fontWeight = FontWeight(500),
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        textAlign = TextAlign.Center,
-                        letterSpacing = 0.25.sp,
-                    ),
+                        TextStyle(
+                            fontSize = 19.sp,
+                            lineHeight = 17.sp,
+                            fontFamily = FontFamily(Font(R.font.roboto)),
+                            fontWeight = FontWeight(500),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            textAlign = TextAlign.Center,
+                            letterSpacing = 0.25.sp,
+                        ),
                     modifier = Modifier.padding(bottom = 8.dp))
-            }
+              }
         }
 
-        if (qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent) {
-            Toast.makeText(context, "My Host Event Details not available yet", Toast.LENGTH_SHORT).show()
-        } else {
-            when (qrScanUiState.value.action) {
-                ScanTicketQrViewModel.Action.ScanTicket -> {
-                    Column(modifier = Modifier.testTag("QrScanner")) {
-                        QrCodeScanner(analyser = viewModel.qrCodeAnalyser)
-                    }
-                }
-                ScanTicketQrViewModel.Action.ApproveEntry -> {
-                    EntryDialog(0, viewModel)
-                }
-                ScanTicketQrViewModel.Action.DenyEntry -> {
-                    EntryDialog(1, viewModel)
-                }
-                ScanTicketQrViewModel.Action.FirebaseUpdateError,
-                ScanTicketQrViewModel.Action.FirebaseFetchError,
-                ScanTicketQrViewModel.Action.AnalyserError -> {
-                    EntryDialog(2, viewModel)
-                }
-            }
-            Column(modifier = Modifier.testTag("QrScanner")) {
-                QrCodeScanner(analyser = viewModel.qrCodeAnalyser)
-            }
+    if (qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent) {
+      Toast.makeText(context, "My Host Event Details not available yet", Toast.LENGTH_SHORT).show()
+    } else {
+      when (qrScanUiState.value.action) {
+        ScanTicketQrViewModel.Action.ScanTicket -> {
+          Column(modifier = Modifier.testTag("QrScanner")) {
+            QrCodeScanner(analyser = viewModel.qrCodeAnalyser)
+          }
         }
-        BottomNavigationMenu(
-            onTabSelected = {
-                tab -> navigationActions.navigateTo(tab)
-                            viewModel.resetConditions()},
-            tabList = TOP_LEVEL_DESTINATIONS,
-            selectedItem = TOP_LEVEL_DESTINATIONS[0],
-            modifier =
-            Modifier.testTag("bottomNavMenu").constrainAs(bottomNav) {
-                bottom.linkTo(parent.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            })
+        ScanTicketQrViewModel.Action.ApproveEntry -> {
+          EntryDialog(0, viewModel)
+        }
+        ScanTicketQrViewModel.Action.DenyEntry -> {
+          EntryDialog(1, viewModel)
+        }
+        ScanTicketQrViewModel.Action.FirebaseUpdateError,
+        ScanTicketQrViewModel.Action.FirebaseFetchError,
+        ScanTicketQrViewModel.Action.AnalyserError -> {
+          EntryDialog(2, viewModel)
+        }
+      }
+      Column(modifier = Modifier.testTag("QrScanner")) {
+        QrCodeScanner(analyser = viewModel.qrCodeAnalyser)
+      }
     }
-
+    BottomNavigationMenu(
+        onTabSelected = { tab ->
+          navigationActions.navigateTo(tab)
+          viewModel.resetConditions()
+        },
+        tabList = TOP_LEVEL_DESTINATIONS,
+        selectedItem = TOP_LEVEL_DESTINATIONS[0],
+        modifier =
+            Modifier.testTag("bottomNavMenu").constrainAs(bottomNav) {
+              bottom.linkTo(parent.bottom)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
+            })
+  }
 }
 
 @Composable
 fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
-    Dialog(onDismissRequest = { viewModel.changeAction(ScanTicketQrViewModel.Action.ScanTicket) }) {
-        Box(
-            modifier = Modifier
-                .size(300.dp)
+  Dialog(onDismissRequest = { viewModel.changeAction(ScanTicketQrViewModel.Action.ScanTicket) }) {
+    Box(
+        modifier =
+            Modifier.size(300.dp)
                 .background(
                     when (edr) {
-                        0 -> Color.Green
-                        1 -> Color.Red
-                        else -> Color.Yellow
-                    }
-                )
+                      0 -> Color.Green
+                      1 -> Color.Red
+                      else -> Color.Yellow
+                    })
                 .padding(10.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            IconButton(onClick = { viewModel.changeAction(ScanTicketQrViewModel.Action.ScanTicket) }) {
+        contentAlignment = Alignment.Center) {
+          IconButton(
+              onClick = { viewModel.changeAction(ScanTicketQrViewModel.Action.ScanTicket) }) {
                 Icon(Icons.Default.Close, contentDescription = "Close")
-            }
-            Text(
-                text = when (edr) {
+              }
+          Text(
+              text =
+                  when (edr) {
                     0 -> "Entry Approved"
                     1 -> "Entry Denied"
                     else -> "Error, Please Retry"
-                }
-            )
+                  })
         }
-    }
+  }
 }

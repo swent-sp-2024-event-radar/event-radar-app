@@ -116,6 +116,7 @@ constructor(
   fun saveEventID(eventID: String) {
     myEventID = eventID
   }
+
   fun changeTabState(tab: ScanTicketQrViewModel.Tab) {
     _uiState.value = _uiState.value.copy(tabState = tab)
   }
@@ -124,9 +125,9 @@ constructor(
     _uiState.value = _uiState.value.copy(action = action)
   }
 
-  fun resetConditions () {
-  changeAction(Action.ScanTicket)
-  qrCodeAnalyser.onTicketDecoded = null
+  fun resetConditions() {
+    changeAction(Action.ScanTicket)
+    qrCodeAnalyser.onTicketDecoded = null
   }
 
   data class QrCodeScanTicketState(
