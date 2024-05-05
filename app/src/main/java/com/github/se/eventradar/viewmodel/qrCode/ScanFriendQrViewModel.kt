@@ -121,16 +121,19 @@ constructor(
     return updateResult is Resource.Success
   }
 
-  fun resetNavigationEvent() {
-    _uiState.value = _uiState.value.copy(action = Action.None)
-  }
-
   fun changeTabState(tab: Tab) {
     _uiState.value = _uiState.value.copy(tabState = tab)
   }
 
   fun changeAction(action: Action) {
     _uiState.value = _uiState.value.copy(action = action)
+  }
+
+  fun resetConditions() {
+    _uiState.value = _uiState.value.copy(decodedResult = "")
+    _uiState.value = _uiState.value.copy(action = Action.None)
+    changeTabState(Tab.MyQR)
+    qrCodeAnalyser.onDecoded = null
   }
 
   data class QrCodeScanFriendState(

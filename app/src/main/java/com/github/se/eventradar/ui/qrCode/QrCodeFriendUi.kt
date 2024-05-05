@@ -52,8 +52,7 @@ fun QrCodeScreen(
         navigationActions.navigateTo(
             TOP_LEVEL_DESTINATIONS[
                 1]) // TODO change to private message screen with friend // Adjust according to your
-        viewModel.resetNavigationEvent() // Reset the navigation event in the ViewModel to prevent
-        viewModel.changeTabState(ScanFriendQrViewModel.Tab.MyQR) // TODO add test for this
+        viewModel.resetConditions() // TODO add test for this
       }
       else -> Unit // Do nothing if the state is None or any other non-navigational state
     }
@@ -142,7 +141,10 @@ fun QrCodeScreen(
       }
     }
     BottomNavigationMenu(
-        onTabSelected = { tab -> navigationActions.navigateTo(tab) },
+        onTabSelected = { tab ->
+          navigationActions.navigateTo(tab)
+          viewModel.resetConditions()
+        },
         tabList = TOP_LEVEL_DESTINATIONS,
         selectedItem = TOP_LEVEL_DESTINATIONS[0],
         modifier =
