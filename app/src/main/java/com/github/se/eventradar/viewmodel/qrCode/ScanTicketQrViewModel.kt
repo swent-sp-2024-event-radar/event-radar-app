@@ -81,7 +81,7 @@ constructor(
     }
   }
 
-  private suspend fun retryUpdate(user: User, event: Event): Unit {
+  private suspend fun retryUpdate(user: User, event: Event) {
     println("entered retryUpdate")
     var maxNumberOfRetries = 3
     var updateResult: Resource<Any>?
@@ -109,7 +109,7 @@ constructor(
     }
   }
 
-  fun updateDecodedString(result: String) {
+  private fun updateDecodedString(result: String) {
     _uiState.value = _uiState.value.copy(decodedResult = result)
   }
 
@@ -117,7 +117,7 @@ constructor(
     myEventID = eventID
   }
 
-  fun changeTabState(tab: ScanTicketQrViewModel.Tab) {
+  fun changeTabState(tab: Tab) {
     _uiState.value = _uiState.value.copy(tabState = tab)
   }
 
@@ -128,7 +128,10 @@ constructor(
   fun resetConditions() {
     changeAction(Action.ScanTicket)
     qrCodeAnalyser.onTicketDecoded = null
-  }
+      _uiState.value = _uiState.value.copy(decodedResult = "")
+      _uiState.value = _uiState.value.copy(action = Action.ScanTicket)
+      changeTabState(Tab.MyEvent)
+    }
 
   data class QrCodeScanTicketState(
       val decodedResult: String = "",
