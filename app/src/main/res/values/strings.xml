@@ -26,8 +26,6 @@
     <string name="homeScreen_events">Home</string>
     <string name="user_profile">Profile</string>
     <string name="hosting">Hosting</string>
-    <string name="profile_pics_folder">Profile_Pictures</string>
-    <string name="qr_codes_folder">QR_Codes</string>
     <string name="my_qr_code">My Qr Code</string>
 </resources>
 
