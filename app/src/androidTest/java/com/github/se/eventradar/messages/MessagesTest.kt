@@ -49,6 +49,7 @@ class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
 
     mockUserRepository.updateCurrentUserId("1")
 
+    // Starting at 2 to avoid conflicts with the current user
     for (i in 2..9) {
       mockUserRepository.addUser(
           User(
@@ -65,9 +66,7 @@ class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
               profilePicUrl = "",
               qrCodeUrl = "",
               username = "Test$i"))
-    }
-
-    for (i in 2..9) {
+      
       val mh = mockMessageRepository.createNewMessageHistory("1", "$i")
 
       mockMessageRepository.addMessage(
