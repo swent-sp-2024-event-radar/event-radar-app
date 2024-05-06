@@ -14,8 +14,8 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
-import kotlinx.coroutines.tasks.await
 import java.io.ByteArrayOutputStream
+import kotlinx.coroutines.tasks.await
 
 class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUserRepository {
   private val userRef: CollectionReference = db.collection("users")
@@ -179,46 +179,47 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
       Resource.Failure(Exception("No user currently signed in"))
     }
   }
-    override suspend fun generateQRCode(userId: String): Resource<String> { // upload this in firebase
-        return try{
-            val qrCodeWriter = QRCodeWriter()
-            val bitMatrix = qrCodeWriter.encode(userId, BarcodeFormat.QR_CODE, 200, 200)
-            val bitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.RGB_565)
-            for (x in 0 until 200) {
-                for (y in 0 until 200) {
-                    bitmap.setPixel(
-                        x,
-                        y,
-                        if (bitMatrix[x, y]) Color(0xFF000000).hashCode() else Color(0xFFFFFFFF).hashCode())
-                }
-            }
-            // Convert the bitmap to a byte array
-            val baos = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
-            val data = baos.toByteArray()
 
-            // Create a reference to the file in Firebase Storage
-            val storageRef = FirebaseStorage.getInstance().reference
-            val qrCodesRef = storageRef.child("QR_Codes/$userId.png")
-
-            // Upload the file to Firebase Storage
-            val uploadTask = qrCodesRef.putBytes(data)
-            // Get the download URL of the image
-
-            val urlTask =
-                uploadTask
-                    .continueWithTask { task ->
-                        if (!task.isSuccessful) {
-                            task.exception?.let { throw it }
-                        }
-                        qrCodesRef.downloadUrl
-                    }
-                    .await()
-            Resource.Success(urlTask.toString())
-        } catch (e:Exception){
-            Resource.Failure(e)
+  override suspend fun generateQRCode(userId: String): Resource<String> { // upload this in firebase
+    return try {
+      val qrCodeWriter = QRCodeWriter()
+      val bitMatrix = qrCodeWriter.encode(userId, BarcodeFormat.QR_CODE, 200, 200)
+      val bitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.RGB_565)
+      for (x in 0 until 200) {
+        for (y in 0 until 200) {
+          bitmap.setPixel(
+              x,
+              y,
+              if (bitMatrix[x, y]) Color(0xFF000000).hashCode() else Color(0xFFFFFFFF).hashCode())
         }
+      }
+      // Convert the bitmap to a byte array
+      val baos = ByteArrayOutputStream()
+      bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
+      val data = baos.toByteArray()
+
+      // Create a reference to the file in Firebase Storage
+      val storageRef = FirebaseStorage.getInstance().reference
+      val qrCodesRef = storageRef.child("QR_Codes/$userId.png")
+
+      // Upload the file to Firebase Storage
+      val uploadTask = qrCodesRef.putBytes(data)
+      // Get the download URL of the image
+
+      val urlTask =
+          uploadTask
+              .continueWithTask { task ->
+                if (!task.isSuccessful) {
+                  task.exception?.let { throw it }
+                }
+                qrCodesRef.downloadUrl
+              }
+              .await()
+      Resource.Success(urlTask.toString())
+    } catch (e: Exception) {
+      Resource.Failure(e)
     }
+  }
 
   private fun getMaps(user: User): Pair<Map<String, Any?>, Map<String, Any?>> {
     val privateMap =

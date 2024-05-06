@@ -1,23 +1,15 @@
 package com.github.se.eventradar.viewmodel
 
-import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
-import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
-import com.google.firebase.storage.FirebaseStorage
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.qrcode.QRCodeWriter
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CompletableDeferred
-import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
@@ -26,9 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(private val userRepository: IUserRepository) :
@@ -36,29 +26,31 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
   private val _uiState = MutableStateFlow(LoginUiState())
   val uiState: StateFlow<LoginUiState> = _uiState
 
-    fun addUser(
-        state: MutableStateFlow<LoginUiState> = _uiState,
-        user: FirebaseUser? = Firebase.auth.currentUser
-    ): Boolean {
-        if (user == null) {
-            Log.d("LoginScreenViewModel", "User not logged in")
-            return false
-        }
-        val imageURI = state.value.selectedImageUri
+  fun addUser(
+      state: MutableStateFlow<LoginUiState> = _uiState,
+      user: FirebaseUser? = Firebase.auth.currentUser
+  ): Boolean {
+    if (user == null) {
+      Log.d("LoginScreenViewModel", "User not logged in")
+      return false
+    }
+    val imageURI =
+        state.value.selectedImageUri
             ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder")
-        var qrCodeUrl: String = ""
-        viewModelScope.launch(Dispatchers.IO) {
-            qrCodeUrl =
-                when (val resource = userRepository.generateQRCode(user.uid)){
-                    is Resource.Success -> resource.data
-                    is Resource.Failure -> ""
-                }
-            // Use the result on the main thread, if needed
-            withContext(Dispatchers.Main) {
-                // Update UI with qrCodeUrl
-            }
-        }
-        val userValues = hashMapOf(
+    var qrCodeUrl: String = ""
+    viewModelScope.launch(Dispatchers.IO) {
+      qrCodeUrl =
+          when (val resource = userRepository.generateQRCode(user.uid)) {
+            is Resource.Success -> resource.data
+            is Resource.Failure -> ""
+          }
+      // Use the result on the main thread, if needed
+      withContext(Dispatchers.Main) {
+        // Update UI with qrCodeUrl
+      }
+    }
+    val userValues =
+        hashMapOf(
             "private/firstName" to state.value.firstName,
             "private/lastName" to state.value.lastName,
             "private/phoneNumber" to state.value.phoneNumber,
@@ -69,10 +61,10 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
             "username" to state.value.username,
             "accountStatus" to "active",
             "eventsAttendeeList" to emptyList<String>(),
-            "eventsHostList" to emptyList<String>()
-        )
-        return runBlocking { addUserAsync(userValues, user.uid) }
-    }
+            "eventsHostList" to emptyList<String>())
+    return runBlocking { addUserAsync(userValues, user.uid) }
+  }
+
   private suspend fun addUserAsync(userValues: Map<String, Any?>, userId: String): Boolean {
     return when (val result = userRepository.addUser(userValues, userId)) {
       is Resource.Success -> {
