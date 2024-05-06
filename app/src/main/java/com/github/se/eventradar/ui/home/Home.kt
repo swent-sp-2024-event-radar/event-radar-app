@@ -57,7 +57,10 @@ fun HomeScreen(
   // Ui States handled by viewModel
   val uiState by viewModel.uiState.collectAsState()
 
-  LaunchedEffect(Unit) { viewModel.getEvents() }
+  LaunchedEffect(Unit) { when{
+      (uiState.tab == Tab.BROWSE) -> viewModel.getEvents()
+      else -> viewModel.getUpcomingEvents()
+  }  }
 
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("homeScreen")) {
     val (logo, tabs, searchAndFilter, filterPopUp, eventList, eventMap, bottomNav, viewToggle) =

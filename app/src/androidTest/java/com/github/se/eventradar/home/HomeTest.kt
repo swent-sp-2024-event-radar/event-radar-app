@@ -134,6 +134,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
 
   @Test
   fun getEventsIsCalledOnLaunch() = run {
+      sampleEventList.value = sampleEventList.value.copy(tab = Tab.BROWSE)
     onComposeScreen<HomeScreen>(composeTestRule) {
       verify(exactly = 1) { mockEventsOverviewViewModel.getEvents() }
       verify(exactly = 1) { mockEventsOverviewViewModel.uiState }
