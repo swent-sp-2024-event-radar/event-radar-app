@@ -1,4 +1,4 @@
-package com.github.se.eventradar.ui.messages
+package com.github.se.eventradar.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -8,11 +8,11 @@ import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.model.repository.message.IMessageRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -27,17 +27,59 @@ constructor(
   val uiState: StateFlow<MessagesUiState> = _uiState
 
   init {
-    getMessages(_uiState.value.userId)
+    viewModelScope.launch {
+      _uiState.update {
+        val userId = userRepository.getCurrentUserId()
+
+        if (userId is Resource.Success) {
+          it.copy(userId = userId.data)
+        } else {
+          Log.d(
+              "MessagesViewModel",
+              "Error getting user ID: ${(userId as Resource.Failure).throwable.message}")
+          it.copy(userId = null)
+        }
+      }
+
+      if (_uiState.value.userId != null) {
+        getMessages()
+        getFriends()
+      }
+    }
   }
 
-  private fun getMessages(uid: String) {
+  private fun getMessages() {
     viewModelScope.launch {
-      when (val response = messagesRepository.getMessages(uid)) {
+      when (val response = messagesRepository.getMessages(_uiState.value.userId!!)) {
         is Resource.Success -> {
           _uiState.value = _uiState.value.copy(messageList = response.data)
         }
         is Resource.Failure -> {
           Log.d("MessagesViewModel", "Error getting messages: ${response.throwable.message}")
+        }
+      }
+    }
+  }
+
+  fun getFriends() {
+    viewModelScope.launch {
+      when (val response = userRepository.getUser(_uiState.value.userId!!)) {
+        is Resource.Success -> {
+          val friendsList = mutableListOf<User>()
+          for (friendId in response.data!!.friendsSet) {
+            val friend = userRepository.getUser(friendId)
+            if (friend is Resource.Success) {
+              friendsList.add(friend.data!!)
+            } else {
+              Log.d(
+                  "MessagesViewModel",
+                  "Error getting friend: ${(friend as Resource.Failure).throwable.message}")
+            }
+          }
+          _uiState.value = _uiState.value.copy(friendsList = friendsList)
+        }
+        is Resource.Failure -> {
+          Log.d("MessagesViewModel", "Error getting friends: ${response.throwable.message}")
         }
       }
     }
@@ -73,8 +115,9 @@ constructor(
 }
 
 data class MessagesUiState(
-    val userId: String = FirebaseAuth.getInstance().currentUser!!.uid,
+    val userId: String? = null,
     val messageList: List<MessageHistory> = emptyList(),
     val searchQuery: String = "",
     val selectedTabIndex: Int = 0,
+    val friendsList: List<User> = emptyList(),
 )
