@@ -249,7 +249,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
   fun testNoUpcomingEventsMessageDisplayed() = run {
     sampleEventList.value =
         sampleEventList.value.copy(
-            eventList = EventList(emptyList(), emptyList(), null), userLoggedIn = true)
+            eventList = EventList(emptyList(), emptyList(), null), viewList = true, userLoggedIn = true)
 
     onComposeScreen<HomeScreen>(composeTestRule) {
       step("Trigger loading of upcoming events") {

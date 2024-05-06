@@ -186,7 +186,7 @@ fun HomeScreen(
                       start.linkTo(parent.start)
                       end.linkTo(parent.end)
                     })
-        (uiState.eventList.allEvents.isEmpty()) ->
+        (uiState.viewList && uiState.eventList.allEvents.isEmpty()) ->
             Text(
                 "You have no upcoming events",
                 modifier =
