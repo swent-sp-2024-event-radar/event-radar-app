@@ -66,7 +66,7 @@ class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
               profilePicUrl = "",
               qrCodeUrl = "",
               username = "Test$i"))
-      
+
       val mh = mockMessageRepository.createNewMessageHistory("1", "$i")
 
       mockMessageRepository.addMessage(
