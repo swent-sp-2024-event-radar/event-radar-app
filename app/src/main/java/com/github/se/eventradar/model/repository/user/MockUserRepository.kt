@@ -110,6 +110,10 @@ class MockUserRepository : IUserRepository {
     }
   }
 
+  override suspend fun generateQRCode(userId: String): Resource<String> {
+    return Resource.Success("Qrcodelink")
+  }
+
   override suspend fun getCurrentUserId(): Resource<String> {
     return if (currentUserId != null) {
       Resource.Success(currentUserId!!)

@@ -25,5 +25,7 @@ interface IUserRepository {
 
   suspend fun getImage(uid: String, folderName: String): Resource<String>
 
+  suspend fun generateQRCode(userId: String): Resource<String>
+
   suspend fun getCurrentUserId(): Resource<String>
 }
