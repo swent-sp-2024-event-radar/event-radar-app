@@ -222,10 +222,10 @@ class EventsOverviewViewModelTest {
   @Test
   fun testSetFilterDialogOpen() = runTest {
     // init value is false
-    viewModel.changeFilterDialogOpen()
+    viewModel.onFilterDialogOpen()
     assert(viewModel.uiState.value.isFilterDialogOpen)
 
-    viewModel.changeFilterDialogOpen()
+    viewModel.onFilterDialogOpen()
     assert(!viewModel.uiState.value.isFilterDialogOpen)
   }
 
@@ -239,6 +239,83 @@ class EventsOverviewViewModelTest {
     viewModel.onSearchQueryChange(anotherQuery)
     assert(anotherQuery == viewModel.uiState.value.searchQuery)
   }
+
+  @Test
+  fun testOnSearchActiveChange() = runTest {
+    val newQuery = "sample search"
+    viewModel.onSearchActiveChanged(true)
+    assert(viewModel.uiState.value.isSearchActive)
+
+    val anotherQuery = ""
+    viewModel.onSearchActiveChanged(false)
+    assert(!viewModel.uiState.value.isSearchActive)
+  }
+
+  @Test
+  fun testOnRadiusQueryChange() = runTest {
+    val newQuery = "10"
+    viewModel.onRadiusQueryChanged(newQuery)
+    assert(newQuery == viewModel.uiState.value.radiusQuery)
+
+    val anotherQuery = "5"
+    viewModel.onRadiusQueryChanged(anotherQuery)
+    assert(anotherQuery == viewModel.uiState.value.radiusQuery)
+  }
+
+  @Test
+  fun testOnFreeSwitchChange() = runTest {
+    // init value is true
+    viewModel.onFreeSwitchChanged()
+    assert(!viewModel.uiState.value.isFreeSwitchOn)
+
+    viewModel.onFreeSwitchChanged()
+    assert(viewModel.uiState.value.isFreeSwitchOn)
+  }
+
+  @Test
+  fun testOnFilterApply() = runTest {
+    // init value is false
+    viewModel.onFilterApply()
+    assert(viewModel.uiState.value.isFilterActive)
+
+    viewModel.onFilterApply()
+    assert(viewModel.uiState.value.isFilterActive)
+
+//    viewModel.filterEvents()
+
+//    assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
+//    assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
+//    assertNull(viewModel.uiState.value.eventList.selectedEvent)
+  }
+
+//  @Test
+//  fun testFilterEventsSuccess() = runTest {
+//    val events =
+//      listOf(
+//        mockEvent.copy(fireBaseID = "1"),
+//        mockEvent.copy(fireBaseID = "2"),
+//        mockEvent.copy(fireBaseID = "3"))
+//
+//    events.forEach { event -> eventRepository.addEvent(event) }
+//
+//    val newQuery = "Event"
+//    viewModel.onSearchQueryChange(newQuery)
+//    assert(newQuery == viewModel.uiState.value.searchQuery)
+//
+//    viewModel.filterEvents()
+//    assert(viewModel.uiState.value.eventList.filteredEvents.isNotEmpty())
+//    assert(viewModel.uiState.value.eventList.filteredEvents.size == 3)
+//    assert(viewModel.uiState.value.eventList.filteredEvents == events)
+//
+//    val anotherQuery = "Event 1"
+//    viewModel.onSearchQueryChange(anotherQuery)
+//    assert(anotherQuery == viewModel.uiState.value.searchQuery)
+//
+//    viewModel.filterEvents()
+//    assert(viewModel.uiState.value.eventList.filteredEvents.isNotEmpty())
+//    assert(viewModel.uiState.value.eventList.filteredEvents.size == 1)
+//    assert(viewModel.uiState.value.eventList.filteredEvents == listOf(mockEvent.copy(fireBaseID = "1")))
+//  }
 
   @Test
   fun testUserLoggedIn() = runTest {
