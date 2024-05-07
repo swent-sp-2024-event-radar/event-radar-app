@@ -281,41 +281,42 @@ class EventsOverviewViewModelTest {
     viewModel.onFilterApply()
     assert(viewModel.uiState.value.isFilterActive)
 
-//    viewModel.filterEvents()
+    //    viewModel.filterEvents()
 
-//    assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
-//    assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
-//    assertNull(viewModel.uiState.value.eventList.selectedEvent)
+    //    assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
+    //    assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
+    //    assertNull(viewModel.uiState.value.eventList.selectedEvent)
   }
 
-//  @Test
-//  fun testFilterEventsSuccess() = runTest {
-//    val events =
-//      listOf(
-//        mockEvent.copy(fireBaseID = "1"),
-//        mockEvent.copy(fireBaseID = "2"),
-//        mockEvent.copy(fireBaseID = "3"))
-//
-//    events.forEach { event -> eventRepository.addEvent(event) }
-//
-//    val newQuery = "Event"
-//    viewModel.onSearchQueryChange(newQuery)
-//    assert(newQuery == viewModel.uiState.value.searchQuery)
-//
-//    viewModel.filterEvents()
-//    assert(viewModel.uiState.value.eventList.filteredEvents.isNotEmpty())
-//    assert(viewModel.uiState.value.eventList.filteredEvents.size == 3)
-//    assert(viewModel.uiState.value.eventList.filteredEvents == events)
-//
-//    val anotherQuery = "Event 1"
-//    viewModel.onSearchQueryChange(anotherQuery)
-//    assert(anotherQuery == viewModel.uiState.value.searchQuery)
-//
-//    viewModel.filterEvents()
-//    assert(viewModel.uiState.value.eventList.filteredEvents.isNotEmpty())
-//    assert(viewModel.uiState.value.eventList.filteredEvents.size == 1)
-//    assert(viewModel.uiState.value.eventList.filteredEvents == listOf(mockEvent.copy(fireBaseID = "1")))
-//  }
+  //  @Test
+  //  fun testFilterEventsSuccess() = runTest {
+  //    val events =
+  //      listOf(
+  //        mockEvent.copy(fireBaseID = "1"),
+  //        mockEvent.copy(fireBaseID = "2"),
+  //        mockEvent.copy(fireBaseID = "3"))
+  //
+  //    events.forEach { event -> eventRepository.addEvent(event) }
+  //
+  //    val newQuery = "Event"
+  //    viewModel.onSearchQueryChange(newQuery)
+  //    assert(newQuery == viewModel.uiState.value.searchQuery)
+  //
+  //    viewModel.filterEvents()
+  //    assert(viewModel.uiState.value.eventList.filteredEvents.isNotEmpty())
+  //    assert(viewModel.uiState.value.eventList.filteredEvents.size == 3)
+  //    assert(viewModel.uiState.value.eventList.filteredEvents == events)
+  //
+  //    val anotherQuery = "Event 1"
+  //    viewModel.onSearchQueryChange(anotherQuery)
+  //    assert(anotherQuery == viewModel.uiState.value.searchQuery)
+  //
+  //    viewModel.filterEvents()
+  //    assert(viewModel.uiState.value.eventList.filteredEvents.isNotEmpty())
+  //    assert(viewModel.uiState.value.eventList.filteredEvents.size == 1)
+  //    assert(viewModel.uiState.value.eventList.filteredEvents == listOf(mockEvent.copy(fireBaseID
+  // = "1")))
+  //  }
 
   @Test
   fun testUserLoggedIn() = runTest {

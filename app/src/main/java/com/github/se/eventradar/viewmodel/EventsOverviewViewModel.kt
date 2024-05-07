@@ -56,19 +56,19 @@ constructor(
     state.value = state.value.copy(isFreeSwitchOn = !state.value.isFreeSwitchOn)
   }
 
-// TO DO: Function used to convert category selection to MVVM
-//  fun onCategorySelectionChanged(category: EventCategory, isChecked: Boolean) {
-//    val categoriesCheckedList = _uiState.value.categoriesCheckedList
-//    Log.d("CategorySelection", "categoriesCheckedList $categoriesCheckedList")
-//
-//    if (isChecked) {
-//      categoriesCheckedList.remove(category)
-//    } else {
-//      categoriesCheckedList.add(category)
-//    }
-//    _uiState.value = _uiState.value.copy(categoriesCheckedList = categoriesCheckedList)
-//    Log.d("CategorySelection", "Category vm ${_uiState.value.categoriesCheckedList}")
-//  }
+  // TO DO: Function used to convert category selection to MVVM
+  //  fun onCategorySelectionChanged(category: EventCategory, isChecked: Boolean) {
+  //    val categoriesCheckedList = _uiState.value.categoriesCheckedList
+  //    Log.d("CategorySelection", "categoriesCheckedList $categoriesCheckedList")
+  //
+  //    if (isChecked) {
+  //      categoriesCheckedList.remove(category)
+  //    } else {
+  //      categoriesCheckedList.add(category)
+  //    }
+  //    _uiState.value = _uiState.value.copy(categoriesCheckedList = categoriesCheckedList)
+  //    Log.d("CategorySelection", "Category vm ${_uiState.value.categoriesCheckedList}")
+  //  }
 
   fun onFilterApply(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
     state.value = state.value.copy(isFilterActive = true)
