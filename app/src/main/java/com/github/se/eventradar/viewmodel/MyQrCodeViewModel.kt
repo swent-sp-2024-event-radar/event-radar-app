@@ -5,8 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.repository.user.IUserRepository
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,29 +18,45 @@ class MyQrCodeViewModel @Inject constructor(private val userRepository: IUserRep
   val uiState: StateFlow<MyQrCodeUiState> = _uiState
   val qrCodesFolder = "QR_Codes"
 
-  fun getUsername(uid: String? = Firebase.auth.currentUser?.uid) {
+  fun getUsername() {
     viewModelScope.launch {
-      when (val result = userRepository.getUser(uid!!)) {
+      when (val userIdResource = userRepository.getCurrentUserId()) {
         is Resource.Success -> {
-          _uiState.value = _uiState.value.copy(username = result.data!!.username)
+          val userId = userIdResource.data
+          // Now fetch the user data using the fetched user ID
+          when (val userResult = userRepository.getUser(userId)) {
+            is Resource.Success -> {
+              _uiState.value = _uiState.value.copy(username = userResult.data!!.username)
+            }
+            is Resource.Failure -> {
+              Log.d("MyQrCodeViewModel", "Error fetching username: ${userResult.throwable.message}")
+            }
+          }
         }
         is Resource.Failure -> {
-          Log.d("LoginScreenViewModel", "Error adding user: ${result.throwable.message}")
-          false
+          Log.d("MyQrCodeViewModel", "Error fetching user ID: ${userIdResource.throwable.message}")
         }
       }
     }
   }
 
-  fun getQRCodeLink(uid: String? = Firebase.auth.currentUser?.uid) {
+  fun getQRCodeLink() {
     viewModelScope.launch {
-      when (val result = userRepository.getImage(uid!!, qrCodesFolder)) {
+      when (val userIdResource = userRepository.getCurrentUserId()) {
         is Resource.Success -> {
-          _uiState.value = _uiState.value.copy(qrCodeLink = result.data)
-          Log.d("MyQrCodeViewModel", "Image URL: ${result.data}")
+          val userId = userIdResource.data
+          // Now fetch the user data using the fetched user ID
+          when (val result = userRepository.getImage(userId, qrCodesFolder)) {
+            is Resource.Success -> {
+              _uiState.value = _uiState.value.copy(qrCodeLink = result.data)
+            }
+            is Resource.Failure -> {
+              Log.d("MyQrCodeViewModel", "Error fetching image: ${result.throwable.message}")
+            }
+          }
         }
         is Resource.Failure -> {
-          Log.d("MyQrCodeViewModel", "Error getting image: ${result.throwable.message}")
+          Log.d("MyQrCodeViewModel", "Error fetching user ID: ${userIdResource.throwable.message}")
         }
       }
     }

@@ -77,38 +77,6 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
     }
   }
 
-  private suspend fun uploadImageAsync(
-      selectedImageUri: Uri?,
-      uid: String,
-      folderName: String
-  ): Boolean {
-    if (selectedImageUri == null) {
-      return false
-    }
-    return when (val result = userRepository.uploadImage(selectedImageUri, uid, folderName)) {
-      is Resource.Success -> {
-        true
-      }
-      is Resource.Failure -> {
-        Log.d("LoginScreenViewModel", "Error uploading image: ${result.throwable.message}")
-        false
-      }
-    }
-  }
-
-  private suspend fun getImageAsync(uid: String, folderName: String): String {
-    return when (val result = userRepository.getImage(uid, folderName)) {
-      is Resource.Success -> {
-        Log.d("LoginScreenViewModel", "Image URL: ${result.data}")
-        result.data
-      }
-      is Resource.Failure -> {
-        Log.d("LoginScreenViewModel", "Error getting image: ${result.throwable.message}")
-        ""
-      }
-    }
-  }
-
   fun doesUserExist(userId: String): Boolean {
     var userExists: Boolean
 
