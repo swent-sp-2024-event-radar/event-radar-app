@@ -1,5 +1,6 @@
 package com.github.se.eventradar.ui.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -154,6 +155,7 @@ fun HomeScreen(
 
     if (uiState.tab == Tab.BROWSE) {
       when {
+        // In list view + search or filter is active
         (uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
             EventList(
                 uiState.eventList.filteredEvents,
@@ -164,7 +166,8 @@ fun HomeScreen(
                 }) { eventId ->
                   navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
                 }
-        (uiState.viewList && !(uiState.isSearchActive || uiState.isFilterActive)) ->
+        // In list view + neither search nor filter are active
+        (uiState.viewList) ->
             EventList(
                 uiState.eventList.allEvents,
                 Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
@@ -174,7 +177,8 @@ fun HomeScreen(
                 }) { eventId ->
                   navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
                 }
-        (!uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
+        // In map view + search or filter is active
+        (uiState.isSearchActive || uiState.isFilterActive) ->
             EventMap(
                 uiState.eventList.filteredEvents,
                 navigationActions,
@@ -183,6 +187,7 @@ fun HomeScreen(
                   start.linkTo(parent.start)
                   end.linkTo(parent.end)
                 })
+        // In map view + neither search nor filter are active
         else ->
             EventMap(
                 uiState.eventList.allEvents,
@@ -213,7 +218,8 @@ fun HomeScreen(
                       start.linkTo(parent.start)
                       end.linkTo(parent.end)
                     })
-        (uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
+          // In list view + search or filter is active
+          (uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
             EventList(
                 events = uiState.eventList.filteredEvents,
                 modifier =
@@ -225,7 +231,8 @@ fun HomeScreen(
                         }) { eventId ->
                   navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
                 }
-        (uiState.viewList && !(uiState.isSearchActive || uiState.isFilterActive)) ->
+          // In list view + neither search nor filter are active
+          (uiState.viewList) ->
             EventList(
                 events = uiState.eventList.allEvents,
                 modifier =
@@ -236,7 +243,9 @@ fun HomeScreen(
                     }) { eventId ->
                   navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
                 }
-        (!uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
+          // In map view + search or filter is active
+          (uiState.isSearchActive || uiState.isFilterActive) -> {
+              Log.d("HomeScreen", "Filtered event list: ${uiState.eventList.filteredEvents}")
             EventMap(
                 uiState.eventList.filteredEvents,
                 navigationActions,
@@ -244,8 +253,9 @@ fun HomeScreen(
                   top.linkTo(tabs.bottom, margin = 8.dp)
                   start.linkTo(parent.start)
                   end.linkTo(parent.end)
-                })
-        else ->
+                })}
+          // In map view + neither search nor filter are active
+          else ->
             EventMap(
                 uiState.eventList.allEvents,
                 navigationActions,

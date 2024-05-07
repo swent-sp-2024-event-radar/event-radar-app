@@ -22,9 +22,9 @@ class HomeScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   val searchBar: KNode = searchBarAndFilter.child { hasTestTag("searchBar") }
   val filterPopUp: KNode = child { hasTestTag("filterPopUp") }
   val filteredEventList: KNode = child { hasTestTag("filteredEventList") }
-  val filteredEventListUpcoming: KNode = child { hasTestTag("eventListUpcoming") }
+  val filteredEventListUpcoming: KNode = child { hasTestTag("filteredEventListUpcoming") }
   val filteredMap: KNode = child { hasTestTag("filteredMap") }
-  val filteredMapUpcoming: KNode = child { hasTestTag("filteredMap") }
+  val filteredMapUpcoming: KNode = child { hasTestTag("filteredMapUpcoming") }
   val noUpcomingEventsText: KNode = child { hasTestTag("noUpcomingEventsText") }
   val pleaseLogInText: KNode = child { hasTestTag("pleaseLogInText") }
   val eventListUpcoming: KNode = child { hasTestTag("eventListUpcoming") }
@@ -48,8 +48,6 @@ class HomeScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   val categoryLabel: KNode = filterCardColumn.child { hasTestTag("categoryLabel") }
   private val filterApplyRow: KNode = filterCardColumn.child { hasTestTag("filterApplyRow") }
   val filterApplyButton: KNode = filterApplyRow.child { hasTestTag("filterApplyButton") }
-  val categoryOptionsColumn: KNode = filterCardColumn.child { hasTestTag("categoryOptionsColumn") }
+  private val categoryOptionsColumn: KNode = filterCardColumn.child { hasTestTag("categoryOptionsColumn") }
   private val categoryRow: KNode = categoryOptionsColumn.child { hasTestTag("categoryRow") }
-  val checkbox: KNode = categoryRow.child { hasTestTag("checkbox") }
-  val checkboxText: KNode = categoryRow.child { hasTestTag("checkboxText") }
 }

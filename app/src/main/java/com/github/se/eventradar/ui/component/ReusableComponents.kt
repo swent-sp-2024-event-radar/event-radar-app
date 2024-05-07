@@ -281,6 +281,7 @@ fun FilterPopUp(
   }
 }
 
+// TO DO: Need to convert category selection to MVVM and test
 @Composable
 fun CategorySelection(uiState: EventsOverviewUiState, modifier: Modifier) {
   LazyColumn(modifier = modifier) {

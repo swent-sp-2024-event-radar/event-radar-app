@@ -231,15 +231,6 @@ constructor(
   fun onViewListStatusChanged(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
     state.value = state.value.copy(viewList = !state.value.viewList)
   }
-
-  fun changeFilterDialogOpen() {
-    val current = _uiState.value.isFilterDialogOpen
-    _uiState.update { currentState -> currentState.copy(isFilterDialogOpen = !current) }
-  }
-
-  fun onSearchQueryChange(newQuery: String) {
-    _uiState.update { currentState -> currentState.copy(searchQuery = newQuery) }
-  }
 }
 
 data class EventsOverviewUiState(
@@ -249,7 +240,7 @@ data class EventsOverviewUiState(
     val isFilterDialogOpen: Boolean = false,
     val isFilterActive: Boolean = false,
     val radiusQuery: String = "",
-    val isFreeSwitchOn: Boolean = true,
+    val isFreeSwitchOn: Boolean = false,
     val categoriesCheckedList: MutableSet<EventCategory> =
         mutableSetOf(*enumValues<EventCategory>()),
     val viewList: Boolean = true,
