@@ -5,7 +5,7 @@ env:
   main_project_module: app
 
 on:
-  push:
+  pull_request:
     branches:
       - 'M*'
 
