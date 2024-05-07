@@ -48,6 +48,7 @@ class HomeScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   val categoryLabel: KNode = filterCardColumn.child { hasTestTag("categoryLabel") }
   private val filterApplyRow: KNode = filterCardColumn.child { hasTestTag("filterApplyRow") }
   val filterApplyButton: KNode = filterApplyRow.child { hasTestTag("filterApplyButton") }
-  private val categoryOptionsColumn: KNode = filterCardColumn.child { hasTestTag("categoryOptionsColumn") }
+  private val categoryOptionsColumn: KNode =
+      filterCardColumn.child { hasTestTag("categoryOptionsColumn") }
   private val categoryRow: KNode = categoryOptionsColumn.child { hasTestTag("categoryRow") }
 }

@@ -316,18 +316,16 @@ class EventsOverviewViewModelTest {
   @Test
   fun testFilterEventsRadiusSuccess() = runTest {
     val events =
-      listOf(
-        mockEvent.copy(
-          eventName = "Event 1",
-          fireBaseID = "1"),
-        mockEvent.copy(
-          eventName = "Event 2",
-          location = Location(38.92, 78.78, "Test Location near user"),
-          fireBaseID = "2"),
-        mockEvent.copy(
-          eventName = "Event 3",
-          location = Location(38.8, 78.7, "Test Location near user 2"),
-          fireBaseID = "3"))
+        listOf(
+            mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
+            mockEvent.copy(
+                eventName = "Event 2",
+                location = Location(38.92, 78.78, "Test Location near user"),
+                fireBaseID = "2"),
+            mockEvent.copy(
+                eventName = "Event 3",
+                location = Location(38.8, 78.7, "Test Location near user 2"),
+                fireBaseID = "3"))
 
     events.forEach { event -> eventRepository.addEvent(event) }
 
@@ -338,15 +336,15 @@ class EventsOverviewViewModelTest {
     assert(newQuery == viewModel.uiState.value.radiusQuery)
 
     val correctFilterEvents =
-      listOf(
-        mockEvent.copy(
-          eventName = "Event 2",
-          location = Location(38.92, 78.78, "Test Location near user"),
-          fireBaseID = "2"),
-        mockEvent.copy(
-          eventName = "Event 3",
-          location = Location(38.8, 78.7, "Test Location near user 2"),
-          fireBaseID = "3"))
+        listOf(
+            mockEvent.copy(
+                eventName = "Event 2",
+                location = Location(38.92, 78.78, "Test Location near user"),
+                fireBaseID = "2"),
+            mockEvent.copy(
+                eventName = "Event 3",
+                location = Location(38.8, 78.7, "Test Location near user 2"),
+                fireBaseID = "3"))
 
     viewModel.filterEvents()
     assert(viewModel.uiState.value.eventList.filteredEvents.isNotEmpty())
@@ -357,17 +355,13 @@ class EventsOverviewViewModelTest {
   @Test
   fun testFilterEventsFreeSuccess() = runTest {
     val events =
-      listOf(
-        mockEvent.copy(
-          eventName = "Event 1",
-          fireBaseID = "1"),
-        mockEvent.copy(
-          eventName = "Event 2",
-          ticket = EventTicket("Test Ticket", 5.0, 1),
-          fireBaseID = "2"),
-        mockEvent.copy(
-          eventName = "Event 3",
-          fireBaseID = "3"))
+        listOf(
+            mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
+            mockEvent.copy(
+                eventName = "Event 2",
+                ticket = EventTicket("Test Ticket", 5.0, 1),
+                fireBaseID = "2"),
+            mockEvent.copy(eventName = "Event 3", fireBaseID = "3"))
 
     events.forEach { event -> eventRepository.addEvent(event) }
 
@@ -377,13 +371,9 @@ class EventsOverviewViewModelTest {
     assert(viewModel.uiState.value.isFreeSwitchOn)
 
     val correctFilterEvents =
-      listOf(
-        mockEvent.copy(
-          eventName = "Event 1",
-          fireBaseID = "1"),
-        mockEvent.copy(
-          eventName = "Event 3",
-          fireBaseID = "3"))
+        listOf(
+            mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
+            mockEvent.copy(eventName = "Event 3", fireBaseID = "3"))
 
     viewModel.filterEvents()
     assert(viewModel.uiState.value.eventList.filteredEvents.isNotEmpty())

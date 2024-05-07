@@ -153,7 +153,9 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       }
 
       step("Check if category checkbox text is displayed") {
-        composeTestRule.onAllNodesWithTag("checkboxText").assertCountEquals(EventCategory.entries.size)
+        composeTestRule
+            .onAllNodesWithTag("checkboxText")
+            .assertCountEquals(EventCategory.entries.size)
       }
 
       step("Click on filter button again") {
@@ -210,8 +212,8 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
         }
       }
 
-//      filteredEventList { assertIsDisplayed() }
-//      eventCard { assertIsDisplayed() }
+      //      filteredEventList { assertIsDisplayed() }
+      //      eventCard { assertIsDisplayed() }
 
       // Update the UI state to reflect the change
       sampleEventList.value = sampleEventList.value.copy(isFilterActive = true)
@@ -357,12 +359,10 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
 
   @Test
   fun testDisplayUpcomingEventsListFiltered() = run {
-    val upcomingEvents = listOf(
-      mockEvent,
-      mockEvent.copy(eventName = "Event 2", fireBaseID = "2"))
+    val upcomingEvents = listOf(mockEvent, mockEvent.copy(eventName = "Event 2", fireBaseID = "2"))
     sampleEventList.value =
-      sampleEventList.value.copy(
-        eventList = EventList(allEvents = upcomingEvents), userLoggedIn = true)
+        sampleEventList.value.copy(
+            eventList = EventList(allEvents = upcomingEvents), userLoggedIn = true)
 
     onComposeScreen<HomeScreen>(composeTestRule) {
       // 1. Open the upcoming tab
@@ -410,12 +410,10 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
 
   @Test
   fun testDisplayUpcomingEventsMapFiltered() = run {
-    val upcomingEvents = listOf(
-      mockEvent,
-      mockEvent.copy(eventName = "Event 2", fireBaseID = "2"))
+    val upcomingEvents = listOf(mockEvent, mockEvent.copy(eventName = "Event 2", fireBaseID = "2"))
     sampleEventList.value =
-      sampleEventList.value.copy(
-        eventList = EventList(allEvents = upcomingEvents), userLoggedIn = true)
+        sampleEventList.value.copy(
+            eventList = EventList(allEvents = upcomingEvents), userLoggedIn = true)
 
     onComposeScreen<HomeScreen>(composeTestRule) {
       // 1. Open the upcoming tab

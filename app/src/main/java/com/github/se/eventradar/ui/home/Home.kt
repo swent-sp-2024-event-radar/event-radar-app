@@ -218,8 +218,8 @@ fun HomeScreen(
                       start.linkTo(parent.start)
                       end.linkTo(parent.end)
                     })
-          // In list view + search or filter is active
-          (uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
+        // In list view + search or filter is active
+        (uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
             EventList(
                 events = uiState.eventList.filteredEvents,
                 modifier =
@@ -231,8 +231,8 @@ fun HomeScreen(
                         }) { eventId ->
                   navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
                 }
-          // In list view + neither search nor filter are active
-          (uiState.viewList) ->
+        // In list view + neither search nor filter are active
+        (uiState.viewList) ->
             EventList(
                 events = uiState.eventList.allEvents,
                 modifier =
@@ -243,19 +243,20 @@ fun HomeScreen(
                     }) { eventId ->
                   navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
                 }
-          // In map view + search or filter is active
-          (uiState.isSearchActive || uiState.isFilterActive) -> {
-              Log.d("HomeScreen", "Filtered event list: ${uiState.eventList.filteredEvents}")
-            EventMap(
-                uiState.eventList.filteredEvents,
-                navigationActions,
-                Modifier.testTag("filteredMapUpcoming").fillMaxWidth().constrainAs(eventMap) {
-                  top.linkTo(tabs.bottom, margin = 8.dp)
-                  start.linkTo(parent.start)
-                  end.linkTo(parent.end)
-                })}
-          // In map view + neither search nor filter are active
-          else ->
+        // In map view + search or filter is active
+        (uiState.isSearchActive || uiState.isFilterActive) -> {
+          Log.d("HomeScreen", "Filtered event list: ${uiState.eventList.filteredEvents}")
+          EventMap(
+              uiState.eventList.filteredEvents,
+              navigationActions,
+              Modifier.testTag("filteredMapUpcoming").fillMaxWidth().constrainAs(eventMap) {
+                top.linkTo(tabs.bottom, margin = 8.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+              })
+        }
+        // In map view + neither search nor filter are active
+        else ->
             EventMap(
                 uiState.eventList.allEvents,
                 navigationActions,
