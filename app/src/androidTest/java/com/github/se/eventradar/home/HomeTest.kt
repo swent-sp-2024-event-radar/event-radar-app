@@ -175,6 +175,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
   @Test
   fun filterClickedShowsResults() = run {
     onComposeScreen<HomeScreen>(composeTestRule) {
+      // 1. Open filter pop up
       step("Click on filter button") {
         filterButton {
           assertIsDisplayed()
@@ -186,41 +187,44 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       step("Check if filter pop up is displayed") { filterPopUp { assertIsDisplayed() } }
       verify { mockEventsOverviewViewModel.onFilterDialogOpen() }
 
+      // 2. Enter radius filter
       radiusLabel { assertIsDisplayed() }
       radiusInput {
         assertIsDisplayed()
         performClick()
-        performTextInput("10")
+        performTextInput("100000000")
       }
-      verify { mockEventsOverviewViewModel.onRadiusQueryChanged("10") }
+      verify { mockEventsOverviewViewModel.onRadiusQueryChanged("100000000") }
       kmLabel { assertIsDisplayed() }
 
+      // 3. Change free event filter
       freeSwitchLabel { assertIsDisplayed() }
       freeSwitch {
         assertIsDisplayed()
         performClick()
       }
-      sampleEventList.value = sampleEventList.value.copy(isFreeSwitchOn = false)
+      sampleEventList.value = sampleEventList.value.copy(isFreeSwitchOn = true)
       verify { mockEventsOverviewViewModel.onFreeSwitchChanged() }
 
+      // 4. Check category filter
       categoryLabel { assertIsDisplayed() }
 
+      // 5. Apply filter
       step("Click on filter apply button") {
         filterApplyButton {
           assertIsDisplayed()
           performClick()
         }
       }
-
-      //      filteredEventList { assertIsDisplayed() }
-      //      eventCard { assertIsDisplayed() }
-
       // Update the UI state to reflect the change
       sampleEventList.value = sampleEventList.value.copy(isFilterActive = true)
       verify { mockEventsOverviewViewModel.onFilterApply() }
+
+      // 6. Check filtered events are displayed
+      filteredEventList { assertIsDisplayed() }
+      eventCard { assertIsDisplayed() }
       verify { mockEventsOverviewViewModel.uiState }
-      //      verify { mockEventsOverviewViewModel.filterEvents() }
-      //      confirmVerified(mockEventsOverviewViewModel)
+      verify { mockEventsOverviewViewModel.filterEvents() }
     }
   }
 
