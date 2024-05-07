@@ -124,19 +124,20 @@ constructor(
   }
 
   fun changeAction(action: Action) {
+    println("Changing action to $action")
     _uiState.value = _uiState.value.copy(action = action)
   }
 
   fun resetConditions() {
     changeAction(Action.ScanTicket)
     qrCodeAnalyser.onTicketDecoded = null
-      _uiState.value = _uiState.value.copy(decodedResult = "")
-      _uiState.value = _uiState.value.copy(action = Action.ScanTicket)
-      changeTabState(Tab.MyEvent)
-    }
+    _uiState.value = _uiState.value.copy(decodedResult = "")
+    _uiState.value = _uiState.value.copy(action = Action.ScanTicket)
+    changeTabState(Tab.MyEvent)
+  }
 
   data class QrCodeScanTicketState(
-      val decodedResult: String = "",
+      val decodedResult: String = "uuu",
       val action: Action = Action.ScanTicket,
       val tabState: Tab = Tab.MyEvent
   )
