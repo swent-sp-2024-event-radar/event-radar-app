@@ -51,6 +51,8 @@ import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.TopLevelDestination
+import com.github.se.eventradar.viewmodel.MessagesUiState
+import com.github.se.eventradar.viewmodel.MessagesViewModel
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -146,7 +148,7 @@ fun MessagesScreenUi(
           if (uiState.selectedTabIndex == 0) {
             MessagesList(
                 messageList = uiState.messageList,
-                userId = uiState.userId,
+                userId = uiState.userId!!,
                 searchQuery = uiState.searchQuery,
                 onChatClicked = onChatClicked,
                 getUser = getUser,

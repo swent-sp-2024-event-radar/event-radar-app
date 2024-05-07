@@ -6,11 +6,9 @@ import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.message.Message
 import com.github.se.eventradar.model.repository.message.IMessageRepository
 import com.github.se.eventradar.model.repository.message.MockMessageRepository
-import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
-import com.github.se.eventradar.ui.messages.MessagesUiState
-import com.github.se.eventradar.ui.messages.MessagesViewModel
-import com.google.firebase.auth.FirebaseAuth
+import com.github.se.eventradar.viewmodel.MessagesUiState
+import com.github.se.eventradar.viewmodel.MessagesViewModel
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockkStatic
@@ -41,7 +39,7 @@ class MessagesViewModelTest {
 
   @RelaxedMockK lateinit var viewModel: MessagesViewModel
 
-  private lateinit var userRepository: IUserRepository
+  private lateinit var userRepository: MockUserRepository
   private lateinit var messagesRepository: IMessageRepository
   private lateinit var mockUiState: MutableStateFlow<MessagesUiState>
 
@@ -63,14 +61,9 @@ class MessagesViewModelTest {
   fun setUp() {
     userRepository = MockUserRepository()
     messagesRepository = MockMessageRepository()
-    mockUiState =
-        MutableStateFlow(
-            MessagesUiState(
-                userId = "1",
-            ))
+    mockUiState = MutableStateFlow(MessagesUiState())
 
-    mockkStatic(FirebaseAuth::class)
-    every { FirebaseAuth.getInstance().currentUser!!.uid } returns "1"
+    userRepository.updateCurrentUserId("1")
 
     viewModel = MessagesViewModel(messagesRepository, userRepository)
   }
@@ -151,5 +144,168 @@ class MessagesViewModelTest {
       return@runTest
     }
     fail("Expected exception to be thrown")
+  }
+
+  @Test
+  fun testGetFriends() = runTest {
+    val user =
+        User(
+            userId = "1",
+            birthDate = "01/01/2000",
+            email = "",
+            firstName = "",
+            lastName = "",
+            phoneNumber = "",
+            accountStatus = "",
+            eventsAttendeeSet = mutableSetOf(),
+            eventsHostSet = mutableSetOf(),
+            friendsSet = mutableSetOf(),
+            profilePicUrl = "",
+            qrCodeUrl = "",
+            username = "")
+
+    val addUser = userRepository.addUser(user)
+
+    assert(addUser is Resource.Success)
+
+    val addUser2 = userRepository.addUser(user.copy(userId = "2"))
+
+    assert(addUser2 is Resource.Success)
+
+    val addUser3 = userRepository.addUser(user.copy(userId = "3"))
+
+    assert(addUser3 is Resource.Success)
+
+    val addUser4 = userRepository.addUser(user.copy(userId = "4"))
+
+    assert(addUser4 is Resource.Success)
+
+    val addUser5 = userRepository.addUser(user.copy(userId = "5"))
+
+    assert(addUser5 is Resource.Success)
+
+    userRepository.updateUser(user.copy(friendsSet = mutableSetOf("2", "3", "4", "5")))
+
+    viewModel.getFriends()
+
+    assert(viewModel.uiState.value.friendsList.size == 4)
+  }
+
+  @Test
+  fun testGetFriendsWithNoFriends() = runTest {
+    val user =
+        User(
+            userId = "1",
+            birthDate = "01/01/2000",
+            email = "",
+            firstName = "",
+            lastName = "",
+            phoneNumber = "",
+            accountStatus = "",
+            eventsAttendeeSet = mutableSetOf(),
+            eventsHostSet = mutableSetOf(),
+            friendsSet = mutableSetOf(),
+            profilePicUrl = "",
+            qrCodeUrl = "",
+            username = "")
+
+    val addUser = userRepository.addUser(user)
+
+    assert(addUser is Resource.Success)
+
+    viewModel.getFriends()
+
+    assert(viewModel.uiState.value.friendsList.isEmpty())
+  }
+
+  @Test
+  fun testGetFriendsWithUserNotInDatabase() = runTest {
+    // this will never be the case, but it is a good test to have
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    userRepository.updateCurrentUserId("2")
+
+    viewModel.getFriends()
+
+    verify { Log.d("MessagesViewModel", "Error getting friends: User with id 1 not found") }
+  }
+
+  @Test
+  fun testNotAllFriendsInDatabase() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    val user =
+        User(
+            userId = "1",
+            birthDate = "01/01/2000",
+            email = "",
+            firstName = "",
+            lastName = "",
+            phoneNumber = "",
+            accountStatus = "",
+            eventsAttendeeSet = mutableSetOf(),
+            eventsHostSet = mutableSetOf(),
+            friendsSet = mutableSetOf(),
+            profilePicUrl = "",
+            qrCodeUrl = "",
+            username = "")
+
+    val addUser = userRepository.addUser(user)
+
+    assert(addUser is Resource.Success)
+
+    val addUser2 = userRepository.addUser(user.copy(userId = "2"))
+
+    assert(addUser2 is Resource.Success)
+
+    val addUser3 = userRepository.addUser(user.copy(userId = "3"))
+
+    assert(addUser3 is Resource.Success)
+
+    val addUser4 = userRepository.addUser(user.copy(userId = "4"))
+
+    assert(addUser4 is Resource.Success)
+
+    val addUser5 = userRepository.addUser(user.copy(userId = "5"))
+
+    assert(addUser5 is Resource.Success)
+
+    userRepository.updateUser(user.copy(friendsSet = mutableSetOf("2", "3", "4", "5")))
+
+    userRepository.deleteUser(user.copy(userId = "4"))
+
+    viewModel.getFriends()
+
+    verify { Log.d("MessagesViewModel", "Error getting friend: User with id 4 not found") }
+    assert(viewModel.uiState.value.friendsList.size == 3)
+  }
+
+  @Test
+  fun testGetMessagesWithNoUserId() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    userRepository.updateCurrentUserId(null)
+
+    viewModel = MessagesViewModel(messagesRepository, userRepository)
+
+    verify { Log.d("MessagesViewModel", "Error getting user ID: No user currently signed in") }
+    assert(viewModel.uiState.value.userId == null)
+  }
+
+  @Test
+  fun testOnSearchQueryChanged() = runTest {
+    viewModel.onSearchQueryChange("Hello", mockUiState)
+
+    assert(mockUiState.value.searchQuery == "Hello")
+  }
+
+  @Test
+  fun testOnSelectedTabIndexChanged() = runTest {
+    viewModel.onSelectedTabIndexChange(1, mockUiState)
+
+    assert(mockUiState.value.selectedTabIndex == 1)
   }
 }
