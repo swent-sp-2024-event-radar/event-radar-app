@@ -5,9 +5,9 @@ env:
   main_project_module: app
 
 on:
-  push:
+  pull_request:
     branches:
-      - 'M*'
+      - 'M[0-9]'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
