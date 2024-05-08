@@ -37,17 +37,8 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
     val imageURI =
         state.value.selectedImageUri
             ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder")
-    var qrCodeUrl: String = ""
-    viewModelScope.launch(Dispatchers.IO) {
-      qrCodeUrl =
-          when (val resource = userRepository.generateQRCode(user.uid)) {
-            is Resource.Success -> resource.data
-            is Resource.Failure -> ""
-          }
-      // Use the result on the main thread, if needed
-      withContext(Dispatchers.Main) {
-        // Update UI with qrCodeUrl
-      }
+    viewModelScope.launch {
+          userRepository.generateQRCode(user.uid)
     }
     val userValues =
         hashMapOf(
@@ -57,7 +48,7 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
             "private/birthDate" to state.value.birthDate,
             "private/email" to user.email,
             "profilePicUrl" to imageURI.toString(),
-            "qrCodeUrl" to qrCodeUrl,
+            "qrCodeUrl" to "",
             "username" to state.value.username,
             "accountStatus" to "active",
             "eventsAttendeeList" to emptyList<String>(),
