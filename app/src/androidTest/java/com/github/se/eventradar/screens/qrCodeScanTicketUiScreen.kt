@@ -14,11 +14,11 @@ class QrCodeScanTicketUiScreen(semanticsProvider: SemanticsNodeInteractionsProvi
   val scanQrTab: KNode = tabs.child { hasTestTag("Scan QR Code") }
   val qrScanner: KNode = child { hasTestTag("QrScanner") }
   val bottomNavMenu: KNode = child { hasTestTag("bottomNavMenu") }
-  val approvedBox: KNode = child { hasTestTag("ApprovedBox") }
-  val deniedBox: KNode = child { hasTestTag("DeniedBox") }
-  val errorBox: KNode = child { hasTestTag("ErrorBox") }
-  val closeButton: KNode = child { hasTestTag("closeButton") }
-  val approvedText: KNode = child { hasTestTag("EntryApprovedText") }
-  val deniedText: KNode = child { hasTestTag("EntryDeniedText") }
-  val errorText: KNode = child { hasTestTag("ErrorText") }
+  val approvedBox: KNode = onNode { hasTestTag("ApprovedBox") }
+  val deniedBox: KNode = onNode { hasTestTag("DeniedBox") }
+  val errorBox: KNode = onNode { hasTestTag("ErrorBox") }
+  val closeButton: KNode = onNode { hasTestTag("closeButton") }
+  val approvedText: KNode = onNode { hasTestTag("EntryApprovedText") }
+  val deniedText: KNode = onNode { hasTestTag("EntryDeniedText") }
+  val errorText: KNode = onNode { hasTestTag("ErrorText") }
 }

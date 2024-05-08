@@ -146,7 +146,7 @@ fun QrCodeTicketUi(
           }
         }
         ScanTicketQrViewModel.Action.ApproveEntry -> {
-            println("ApprovedBox should now be displayed")
+          println("ApprovedBox should now be displayed")
           EntryDialog(0, viewModel)
         }
         ScanTicketQrViewModel.Action.DenyEntry -> {
