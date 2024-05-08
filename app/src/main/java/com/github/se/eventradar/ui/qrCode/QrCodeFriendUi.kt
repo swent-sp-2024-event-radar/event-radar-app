@@ -136,18 +136,18 @@ fun QrCodeScreen(
         }
 
     if (qrScanUiState.value.tabState == ScanFriendQrViewModel.Tab.MyQR) {
-        Column(
-            modifier =
-            Modifier.testTag("myQrCodeScreen").constrainAs(myqrcode) {
+      Column(
+          modifier =
+              Modifier.testTag("myQrCodeScreen").constrainAs(myqrcode) {
                 top.linkTo(tabs.bottom, margin = 74.dp)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-            },
-            verticalArrangement = Arrangement.Center, // Vertically center the content
-            horizontalAlignment = Alignment.CenterHorizontally // Horizontally center the content
-        ) {
+              },
+          verticalArrangement = Arrangement.Center, // Vertically center the content
+          horizontalAlignment = Alignment.CenterHorizontally // Horizontally center the content
+          ) {
             MyQrCodeScreen(myQrCodeViewModel)
-        }
+          }
     } else {
       Column(modifier = Modifier.testTag("QrScanner")) {
         QrCodeScanner(analyser = viewModel.qrCodeAnalyser)

@@ -13,12 +13,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(private val userRepository: IUserRepository) :
@@ -37,9 +35,7 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
     val imageURI =
         state.value.selectedImageUri
             ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder")
-    viewModelScope.launch {
-          userRepository.generateQRCode(user.uid)
-    }
+    viewModelScope.launch { userRepository.generateQRCode(user.uid) }
     val userValues =
         hashMapOf(
             "private/firstName" to state.value.firstName,

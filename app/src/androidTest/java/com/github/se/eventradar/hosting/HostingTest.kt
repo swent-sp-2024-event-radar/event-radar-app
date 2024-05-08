@@ -61,7 +61,7 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
 
   @Before
   fun testSetup() {
-    every { mockHostedEventsViewModel.getHostedEvents(any()) } returns Unit
+    every { mockHostedEventsViewModel.getHostedEvents() } returns Unit
     every { mockHostedEventsViewModel.uiState } returns sampleEventList
     composeTestRule.setContent {
       HostingScreen(viewModel = mockHostedEventsViewModel, navigationActions = mockNavActions)
@@ -116,7 +116,7 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
   @Test
   fun getHostedEventsIsCalledOnLaunch() = run {
     onComposeScreen<HostingScreen>(composeTestRule) {
-      verify(exactly = 1) { mockHostedEventsViewModel.getHostedEvents(any()) }
+      verify(exactly = 1) { mockHostedEventsViewModel.getHostedEvents() }
       verify(exactly = 1) { mockHostedEventsViewModel.uiState }
       confirmVerified(mockHostedEventsViewModel)
     }
