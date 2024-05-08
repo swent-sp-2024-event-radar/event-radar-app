@@ -19,7 +19,6 @@ import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen.Companion.onComposeScreen
-import io.github.kakaocup.compose.node.element.KNode
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.every
@@ -68,15 +67,14 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
   fun displaysAllComponentsCorrectly_CameraPermittedAlways(): Unit = run {
     onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
       viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser)
-      scanQrTab.performClick()
       composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
+      scanQrTab.performClick()
       logo.assertIsDisplayed()
       tabs.assertIsDisplayed()
       myQrTab.assertIsDisplayed()
       scanQrTab.assertIsDisplayed()
       qrScanner.assertIsDisplayed()
       bottomNavMenu.assertIsDisplayed()
-
     }
   }
 
@@ -100,24 +98,25 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       bottomNavMenu.assertIsDisplayed()
       approvedBox.assertIsDisplayed()
       approvedText.assertIsDisplayed()
+      closeButton.assertIsDisplayed()
     }
   }
 
-
-@Test
-fun displaysAllComponentsCorrectly_Denied(): Unit = run {
-  val viewModel = setupViewModelWithState(ScanTicketQrViewModel.Action.DenyEntry)
-  onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-    composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
-    scanQrTab.performClick()
-    logo.assertIsDisplayed()
-    tabs.assertIsDisplayed()
-    myQrTab.assertIsDisplayed()
-    bottomNavMenu.assertIsDisplayed()
-    deniedBox.assertIsDisplayed()
-    deniedText.assertIsDisplayed()
+  @Test
+  fun displaysAllComponentsCorrectly_Denied(): Unit = run {
+    val viewModel = setupViewModelWithState(ScanTicketQrViewModel.Action.DenyEntry)
+    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
+      composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
+      scanQrTab.performClick()
+      logo.assertIsDisplayed()
+      tabs.assertIsDisplayed()
+      myQrTab.assertIsDisplayed()
+      bottomNavMenu.assertIsDisplayed()
+      deniedBox.assertIsDisplayed()
+      deniedText.assertIsDisplayed()
+      closeButton.assertIsDisplayed()
+    }
   }
-}
 
   @Test
   fun displaysAllComponentsCorrectly_Error1(): Unit = run {
@@ -130,8 +129,9 @@ fun displaysAllComponentsCorrectly_Denied(): Unit = run {
       myQrTab.assertIsDisplayed()
       scanQrTab.assertIsDisplayed()
       bottomNavMenu.assertIsDisplayed()
-        errorBox.assertIsDisplayed()
-        errorText.assertIsDisplayed()
+      errorBox.assertIsDisplayed()
+      errorText.assertIsDisplayed()
+      closeButton.assertIsDisplayed()
     }
   }
 
@@ -148,6 +148,7 @@ fun displaysAllComponentsCorrectly_Denied(): Unit = run {
       bottomNavMenu.assertIsDisplayed()
       errorBox.assertIsDisplayed()
       errorText.assertIsDisplayed()
+      closeButton.assertIsDisplayed()
     }
   }
 
@@ -164,8 +165,7 @@ fun displaysAllComponentsCorrectly_Denied(): Unit = run {
       bottomNavMenu.assertIsDisplayed()
       errorBox.assertIsDisplayed()
       errorText.assertIsDisplayed()
+      closeButton.assertIsDisplayed()
     }
   }
 }
-
-

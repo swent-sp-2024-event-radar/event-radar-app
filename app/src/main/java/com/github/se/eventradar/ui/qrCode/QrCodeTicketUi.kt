@@ -227,7 +227,7 @@ fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
         IconButton(
             onClick = { viewModel.changeAction(ScanTicketQrViewModel.Action.ScanTicket) },
             modifier =
-                Modifier.semantics { testTag = "CloseButton" } // Adding testTag to the IconButton
+                Modifier.semantics { testTag = "closeButton" } // Adding testTag to the IconButton
             ) {
               Icon(Icons.Default.Close, contentDescription = "Close")
             }
