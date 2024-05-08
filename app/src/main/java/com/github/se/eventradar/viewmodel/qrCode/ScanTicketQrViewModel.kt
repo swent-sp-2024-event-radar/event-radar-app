@@ -41,7 +41,7 @@ constructor(
     ScanQr
   }
 
-  private var myEventID: String? = null
+  private var myEventID: String? = "1" //TODO MUst be chaNged to NUll and initialized by navigation via saveEventID()
 
   init {
     qrCodeAnalyser.onTicketDecoded = { decodedString ->
