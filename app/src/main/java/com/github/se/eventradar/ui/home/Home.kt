@@ -57,10 +57,12 @@ fun HomeScreen(
   // Ui States handled by viewModel
   val uiState by viewModel.uiState.collectAsState()
 
-  LaunchedEffect(Unit) { when{
+  LaunchedEffect(Unit) {
+    when {
       (uiState.tab == Tab.BROWSE) -> viewModel.getEvents()
       else -> viewModel.getUpcomingEvents()
-  }  }
+    }
+  }
 
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("homeScreen")) {
     val (logo, tabs, searchAndFilter, filterPopUp, eventList, eventMap, bottomNav, viewToggle) =
@@ -186,7 +188,7 @@ fun HomeScreen(
                       start.linkTo(parent.start)
                       end.linkTo(parent.end)
                     })
-        (uiState.viewList && uiState.eventList.allEvents.isEmpty()) ->
+        (uiState.viewList && uiState.upcomingEvents.isEmpty()) ->
             Text(
                 "You have no upcoming events",
                 modifier =
@@ -197,7 +199,7 @@ fun HomeScreen(
                     })
         (uiState.viewList) ->
             EventList(
-                events = uiState.eventList.allEvents,
+                events = uiState.upcomingEvents,
                 modifier =
                     Modifier.testTag("eventListUpcoming").fillMaxWidth().constrainAs(eventList) {
                       top.linkTo(searchAndFilter.bottom, margin = 8.dp)
@@ -208,7 +210,7 @@ fun HomeScreen(
                 }
         else ->
             EventMap(
-                uiState.eventList.allEvents,
+                uiState.upcomingEvents,
                 navigationActions,
                 Modifier.testTag("mapUpcoming").fillMaxWidth().constrainAs(eventMap) {
                   top.linkTo(tabs.bottom, margin = 8.dp)

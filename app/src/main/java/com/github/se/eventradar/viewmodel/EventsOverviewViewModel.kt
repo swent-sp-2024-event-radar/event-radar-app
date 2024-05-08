@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
+import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.repository.event.IEventRepository
@@ -58,8 +59,7 @@ constructor(
             Log.d(
                 "EventsOverviewViewModel",
                 "Error fetching user ID: ${userIdResource.throwable.message}")
-            _uiState.value =
-                _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+            _uiState.value = _uiState.value.copy(upcomingEvents = emptyList())
           }
         }
       }
@@ -74,26 +74,20 @@ constructor(
         if (attendeeList.isNotEmpty()) {
           when (val events = eventRepository.getEventsByIds(attendeeList)) {
             is Resource.Success -> {
-              _uiState.value =
-                  _uiState.value.copy(
-                      eventList =
-                          EventList(
-                              events.data, events.data, _uiState.value.eventList.selectedEvent))
+              _uiState.value = _uiState.value.copy(upcomingEvents = events.data)
             }
             is Resource.Failure -> {
               Log.d("EventsOverviewViewModel", "Error getting events for $uid")
-              _uiState.value =
-                  _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+              _uiState.value = _uiState.value.copy(upcomingEvents = emptyList())
             }
           }
         } else {
-          _uiState.value =
-              _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+          _uiState.value = _uiState.value.copy(upcomingEvents = emptyList())
         }
       }
       is Resource.Failure -> {
         Log.d("EventsOverviewViewModel", "Error fetching user document")
-        _uiState.value = _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+        _uiState.value = _uiState.value.copy(upcomingEvents = emptyList())
       }
     }
   }
@@ -126,6 +120,7 @@ constructor(
 
 data class EventsOverviewUiState(
     val eventList: EventList = EventList(emptyList(), emptyList(), null),
+    val upcomingEvents: List<Event> = emptyList(),
     val searchQuery: String = "",
     val isFilterDialogOpen: Boolean = false,
     var radiusInputFilter: Double = -1.0,
