@@ -26,6 +26,7 @@
     <string name="homeScreen_events">Home</string>
     <string name="user_profile">Profile</string>
     <string name="hosting">Hosting</string>
+    <string name="message_bar_placeholder">Type here...</string>
 </resources>
 
 
