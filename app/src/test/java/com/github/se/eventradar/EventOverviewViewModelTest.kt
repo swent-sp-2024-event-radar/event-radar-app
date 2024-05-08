@@ -134,8 +134,11 @@ class EventsOverviewViewModelTest {
     (userRepository as MockUserRepository).updateCurrentUserId("user1")
     viewModel.getUpcomingEvents()
 
-    assert(viewModel.uiState.value.upcomingEvents.size == 2)
-    assert(viewModel.uiState.value.upcomingEvents == listOf(event1, event2))
+    assert(viewModel.uiState.value.upcomingEventList.allEvents.size == 2)
+    assert(viewModel.uiState.value.upcomingEventList.allEvents == listOf(event1, event2))
+    assert(viewModel.uiState.value.upcomingEventList.filteredEvents.size == 2)
+    assert(viewModel.uiState.value.upcomingEventList.filteredEvents == listOf(event1, event2))
+    assertNull(viewModel.uiState.value.eventList.selectedEvent)
   }
 
   @Test
@@ -148,7 +151,9 @@ class EventsOverviewViewModelTest {
     (userRepository as MockUserRepository).updateCurrentUserId("user2")
     viewModel.getUpcomingEvents()
 
-    assert(viewModel.uiState.value.upcomingEvents.isEmpty())
+    assert(viewModel.uiState.value.upcomingEventList.allEvents.isEmpty())
+    assert(viewModel.uiState.value.upcomingEventList.filteredEvents.isEmpty())
+    assertNull(viewModel.uiState.value.upcomingEventList.selectedEvent)
 
     verify { Log.d("EventsOverviewViewModel", "Error getting events for user2") }
     unmockkAll()
@@ -162,7 +167,9 @@ class EventsOverviewViewModelTest {
     (userRepository as MockUserRepository).updateCurrentUserId(userId)
     viewModel.getUpcomingEvents()
 
-    assert(viewModel.uiState.value.upcomingEvents.isEmpty())
+    assert(viewModel.uiState.value.upcomingEventList.allEvents.isEmpty())
+    assert(viewModel.uiState.value.upcomingEventList.filteredEvents.isEmpty())
+    assertNull(viewModel.uiState.value.upcomingEventList.selectedEvent)
 
     verify { Log.d("EventsOverviewViewModel", "Error fetching user document") }
     unmockkAll()
@@ -176,7 +183,9 @@ class EventsOverviewViewModelTest {
     (userRepository as MockUserRepository).updateCurrentUserId("userWithEmptyList")
     viewModel.getUpcomingEvents()
 
-    assert(viewModel.uiState.value.upcomingEvents.isEmpty())
+    assert(viewModel.uiState.value.upcomingEventList.allEvents.isEmpty())
+    assert(viewModel.uiState.value.upcomingEventList.filteredEvents.isEmpty())
+    assertNull(viewModel.uiState.value.upcomingEventList.selectedEvent)
   }
 
   @Test
@@ -187,7 +196,10 @@ class EventsOverviewViewModelTest {
 
     viewModel.getUpcomingEvents()
 
-    assert(viewModel.uiState.value.upcomingEvents.isEmpty())
+    assert(viewModel.uiState.value.upcomingEventList.allEvents.isEmpty())
+    assert(viewModel.uiState.value.upcomingEventList.filteredEvents.isEmpty())
+    assertNull(viewModel.uiState.value.upcomingEventList.selectedEvent)
+
     verify {
       Log.d("EventsOverviewViewModel", "Error fetching user ID: No user currently signed in")
     }

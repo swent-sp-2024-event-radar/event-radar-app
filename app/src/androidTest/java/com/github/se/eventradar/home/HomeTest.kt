@@ -175,7 +175,8 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
   fun testDisplayUpcomingEventsList() = run {
     val upcomingEvents = listOf(mockEvent, mockEvent.copy(fireBaseID = "2"))
     sampleEventList.value =
-        sampleEventList.value.copy(upcomingEvents = upcomingEvents, userLoggedIn = true)
+        sampleEventList.value.copy(
+            upcomingEventList = EventList(allEvents = upcomingEvents), userLoggedIn = true)
 
     onComposeScreen<HomeScreen>(composeTestRule) {
       step("Trigger loading of upcoming events") {
@@ -198,7 +199,8 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
   fun testDisplayUpcomingEventsMap() = run {
     val upcomingEvents = listOf(mockEvent, mockEvent.copy(fireBaseID = "2"))
     sampleEventList.value =
-        sampleEventList.value.copy(upcomingEvents = upcomingEvents, userLoggedIn = true)
+        sampleEventList.value.copy(
+            upcomingEventList = EventList(allEvents = upcomingEvents), userLoggedIn = true)
 
     onComposeScreen<HomeScreen>(composeTestRule) {
       step("Trigger loading of upcoming events") {
@@ -221,7 +223,8 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
   fun testPleaseLogInMessageDisplayed() = run {
     val upcomingEvents = listOf(mockEvent, mockEvent.copy(fireBaseID = "2"))
     sampleEventList.value =
-        sampleEventList.value.copy(upcomingEvents = upcomingEvents, userLoggedIn = false)
+        sampleEventList.value.copy(
+            upcomingEventList = EventList(allEvents = upcomingEvents), userLoggedIn = false)
 
     onComposeScreen<HomeScreen>(composeTestRule) {
       step("Trigger loading of upcoming events") {
@@ -246,7 +249,9 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
   fun testNoUpcomingEventsMessageDisplayed() = run {
     sampleEventList.value =
         sampleEventList.value.copy(
-            upcomingEvents = emptyList(), viewList = true, userLoggedIn = true)
+            upcomingEventList = EventList(emptyList(), emptyList(), null),
+            viewList = true,
+            userLoggedIn = true)
 
     onComposeScreen<HomeScreen>(composeTestRule) {
       step("Trigger loading of upcoming events") {

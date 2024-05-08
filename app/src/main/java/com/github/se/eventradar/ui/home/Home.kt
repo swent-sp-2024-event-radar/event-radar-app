@@ -188,7 +188,7 @@ fun HomeScreen(
                       start.linkTo(parent.start)
                       end.linkTo(parent.end)
                     })
-        (uiState.viewList && uiState.upcomingEvents.isEmpty()) ->
+        (uiState.viewList && uiState.upcomingEventList.allEvents.isEmpty()) ->
             Text(
                 "You have no upcoming events",
                 modifier =
@@ -199,7 +199,7 @@ fun HomeScreen(
                     })
         (uiState.viewList) ->
             EventList(
-                events = uiState.upcomingEvents,
+                events = uiState.upcomingEventList.allEvents,
                 modifier =
                     Modifier.testTag("eventListUpcoming").fillMaxWidth().constrainAs(eventList) {
                       top.linkTo(searchAndFilter.bottom, margin = 8.dp)
@@ -210,7 +210,7 @@ fun HomeScreen(
                 }
         else ->
             EventMap(
-                uiState.upcomingEvents,
+                uiState.upcomingEventList.allEvents,
                 navigationActions,
                 Modifier.testTag("mapUpcoming").fillMaxWidth().constrainAs(eventMap) {
                   top.linkTo(tabs.bottom, margin = 8.dp)
