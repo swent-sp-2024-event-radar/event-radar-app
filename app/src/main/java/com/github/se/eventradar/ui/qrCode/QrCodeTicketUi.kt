@@ -260,7 +260,7 @@ fun PreviewQrCodeTicketGranted() {
   viewModel.changeAction(ScanTicketQrViewModel.Action.ApproveEntry)
   QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
 }
-
+// s
 @Preview(showBackground = true)
 @Composable
 fun PreviewQrCodeTicketDeny() {
