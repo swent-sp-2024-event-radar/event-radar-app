@@ -286,7 +286,7 @@ fun FilterPopUp(
 fun CategorySelection(uiState: EventsOverviewUiState, modifier: Modifier) {
   LazyColumn(modifier = modifier) {
     items(EventCategory.entries) { category ->
-      var isChecked by remember { mutableStateOf(true) }
+      var isChecked by remember { mutableStateOf(uiState.categoriesCheckedList.contains(category)) }
       Row(
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.Start,

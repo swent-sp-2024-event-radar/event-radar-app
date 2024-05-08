@@ -183,7 +183,7 @@ fun HomeScreen(
                 uiState.eventList.filteredEvents,
                 navigationActions,
                 Modifier.testTag("filteredMap").fillMaxWidth().constrainAs(eventMap) {
-                  top.linkTo(tabs.bottom, margin = 8.dp)
+                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
                   start.linkTo(parent.start)
                   end.linkTo(parent.end)
                 })
@@ -193,7 +193,7 @@ fun HomeScreen(
                 uiState.eventList.allEvents,
                 navigationActions,
                 Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
-                  top.linkTo(tabs.bottom, margin = 8.dp)
+                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
                   start.linkTo(parent.start)
                   end.linkTo(parent.end)
                 })
@@ -250,7 +250,7 @@ fun HomeScreen(
               uiState.eventList.filteredEvents,
               navigationActions,
               Modifier.testTag("filteredMapUpcoming").fillMaxWidth().constrainAs(eventMap) {
-                top.linkTo(tabs.bottom, margin = 8.dp)
+                top.linkTo(searchAndFilter.bottom, margin = 8.dp)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
               })
@@ -261,7 +261,7 @@ fun HomeScreen(
                 uiState.eventList.allEvents,
                 navigationActions,
                 Modifier.testTag("mapUpcoming").fillMaxWidth().constrainAs(eventMap) {
-                  top.linkTo(tabs.bottom, margin = 8.dp)
+                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
                   start.linkTo(parent.start)
                   end.linkTo(parent.end)
                 })
