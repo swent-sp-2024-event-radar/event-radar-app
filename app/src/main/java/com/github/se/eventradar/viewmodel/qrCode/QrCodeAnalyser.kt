@@ -19,8 +19,8 @@ class QrCodeAnalyser @Inject constructor() : ImageAnalysis.Analyzer {
   private val supportedImageFormats =
       listOf(ImageFormat.YUV_420_888, ImageFormat.YUV_422_888, ImageFormat.YUV_444_888)
 
-  var onFriendDecoded: ((String?) -> Unit)? = null
-  var onTicketDecoded: ((String?) -> Unit)? = null
+  var onDecoded: ((String?) -> Unit)? = null
+
 
   override fun analyze(image: ImageProxy) {
 
@@ -44,14 +44,7 @@ class QrCodeAnalyser @Inject constructor() : ImageAnalysis.Analyzer {
                       mapOf(DecodeHintType.POSSIBLE_FORMATS to arrayListOf(BarcodeFormat.QR_CODE)))
                 }
                 .decode(binaryBitmap)
-        if (onTicketDecoded != null) {
-          onTicketDecoded?.invoke(result.toString())
-          //            onTicketDecoded = null  TODO RESET IT to null when respective  viewmodel
-          // dies
-        } else if (onFriendDecoded != null) {
-          onFriendDecoded?.invoke(result.toString())
-          //            onFriendDecoded = null TODO RESET IT to null when respective  viewmodel dies
-        }
+          onDecoded?.invoke(result.toString()) //TODO RESET IT to null when respective  viewmodel
       } catch (e: Exception) {
 
         Log.d("QrCodeAnalyser", "Error decoding QR Code: ${e.message}")

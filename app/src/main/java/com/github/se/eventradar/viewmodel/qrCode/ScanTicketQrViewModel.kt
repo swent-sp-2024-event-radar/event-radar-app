@@ -46,7 +46,7 @@ constructor(
       "1" // TODO MUst be chaNged to NUll and initialized by navigation via saveEventID()
 
   init {
-    qrCodeAnalyser.onTicketDecoded = { decodedString ->
+    qrCodeAnalyser.onDecoded = { decodedString ->
       val result = decodedString ?: "Failed to decode QR Code"
       updateDecodedString(result) // Update state flow
       if (result != "Failed to decode QR Code") {
