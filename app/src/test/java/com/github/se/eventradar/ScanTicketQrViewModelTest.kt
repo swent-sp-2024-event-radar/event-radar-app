@@ -14,6 +14,7 @@ import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
 import com.github.se.eventradar.viewmodel.qrCode.ScanTicketQrViewModel
 import java.time.LocalDateTime
 import junit.framework.TestCase
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestDispatcher
@@ -166,6 +167,6 @@ class ScanFriendTicketViewModelTest {
     eventRepository.addEvent(mockEvent1)
     qrCodeAnalyser.onTicketDecoded?.invoke("user2")
     advanceUntilIdle()
-    TestCase.assertEquals(ScanTicketQrViewModel.Action.DenyEntry, viewModel.uiState.value.action)
+    assertEquals(ScanTicketQrViewModel.Action.DenyEntry, viewModel.uiState.value.action)
   }
 }

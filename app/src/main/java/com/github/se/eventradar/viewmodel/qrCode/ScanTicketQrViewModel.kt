@@ -13,6 +13,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -41,10 +42,11 @@ constructor(
     ScanQr
   }
 
-  private var myEventID: String? = null
+  private var myEventID: String? =
+      "1" // TODO MUst be chaNged to NUll and initialized by navigation via saveEventID()
 
   init {
-    qrCodeAnalyser.onTicketDecoded = { decodedString ->
+    qrCodeAnalyser.onDecoded = { decodedString ->
       val result = decodedString ?: "Failed to decode QR Code"
       updateDecodedString(result) // Update state flow
       if (result != "Failed to decode QR Code") {
@@ -65,7 +67,7 @@ constructor(
     println("entered updatePermissions")
     val uiLength = 28
     val attendeeID = decodedString.take(uiLength)
-    Log.d("QrCodeFriendViewModel", "Ticket User ID: $attendeeID")
+    Log.d("QrCodeTicketViewModel", "Ticket User ID: $attendeeID")
 
     viewModelScope.launch {
       val attendeeUserDeferred = async { userRepository.getUser(attendeeID) }
@@ -112,7 +114,7 @@ constructor(
   }
 
   private fun updateDecodedString(result: String) {
-    _uiState.value = _uiState.value.copy(decodedResult = result)
+    _uiState.update { it.copy(decodedResult = result) }
   }
 
   fun saveEventID(eventID: String) {
@@ -120,19 +122,19 @@ constructor(
   }
 
   fun changeTabState(tab: Tab) {
-    _uiState.value = _uiState.value.copy(tabState = tab)
+    _uiState.update { it.copy(tabState = tab) }
   }
 
   fun changeAction(action: Action) {
-    println("Changing action to $action")
-    _uiState.value = _uiState.value.copy(action = action)
+    _uiState.update { it.copy(action = action) }
+
   }
 
   fun resetConditions() {
     changeAction(Action.ScanTicket)
     qrCodeAnalyser.onDecoded = null
-    uiState.update { it.copy(decodedResult = "") }
-    uiState.update { it.copy(action = Action.ScanTicket) }
+    _uiState.update { it.copy(decodedResult = "") }
+    _uiState.update { it.copy(action = Action.ScanTicket) }
     changeTabState(Tab.MyEvent)
   }
 
