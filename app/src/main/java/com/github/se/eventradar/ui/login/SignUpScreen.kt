@@ -5,6 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +24,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
@@ -78,11 +80,30 @@ fun SignUpScreen(
           onResult = { result ->
             if (result.resultCode == Activity.RESULT_OK) {
               viewModel.addUser()
-              navigationActions.navController.navigate(Route.HOME)
             } else {
               openErrorDialog.value = true
             }
           })
+  if (uiState.isSignUpStarted && !uiState.isSignUpCompleted) {
+      Box(
+          modifier = Modifier
+              .fillMaxSize()
+              .background(Color.Black.copy(alpha = 0.5f))
+      ) {
+          // Show CircularProgressIndicator in the center
+          CircularProgressIndicator(
+              modifier = Modifier
+                  .align(Alignment.Center)
+                  .size(45.dp), // Size should be specified correctly
+              color = MaterialTheme.colorScheme.secondary,
+              trackColor = MaterialTheme.colorScheme.surfaceVariant,
+          )
+      }
+  } else if (uiState.isSignUpStarted && uiState.isSignUpSuccessful) {
+    navigationActions.navController.navigate(Route.HOME)
+  } else  if (uiState.isSignUpStarted){
+    openErrorDialog.value = true
+  }
 
   ErrorDialogBox(openErrorDialog, modifier = Modifier.testTag("signUpErrorDialog"))
 
@@ -247,6 +268,7 @@ fun SignUpScreen(
               onClick = {
                 if (viewModel.validateFields()) {
                   launcher.launch(intent)
+                    viewModel.onSignUpStarted()
                 }
               },
               modifier = Modifier.wrapContentSize().width(250.dp).testTag("signUpLoginButton"),

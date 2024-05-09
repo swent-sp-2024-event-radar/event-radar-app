@@ -5,12 +5,14 @@ import android.net.Uri
 import androidx.compose.ui.graphics.Color
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.ktx.storage
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
@@ -152,23 +154,45 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
       folderName: String
   ): Resource<Unit> {
     val storageRef = Firebase.storage.reference.child("$folderName/$uid")
-    return try {
-      storageRef.putFile(selectedImageUri).await()
-      Resource.Success(Unit)
+    try {
+      val result = storageRef.putFile(selectedImageUri).await()
+      return if (result.task.isSuccessful) {
+        Resource.Success(Unit)
+      } else {
+        val error = result.task.exception
+        Resource.Failure(error ?: Exception("Upload failed without a specific error"))
+      }
+    } catch (e: FirebaseNetworkException) {
+        return Resource.Failure(Exception("Network error while trying to upload image", e))
+    } catch (e: StorageException) {
+       return if (e.message == StorageException.ERROR_OBJECT_NOT_FOUND.toString()) {
+           Resource.Failure(Exception("File not found during upload", e))
+        } else {
+            Resource.Failure(Exception("Storage error during upload: ${e.message}", e))
+        }
     } catch (e: Exception) {
-      Resource.Failure(e)
+        return Resource.Failure(Exception("Unknown error occurred during upload: ${e.message}", e))
     }
   }
 
   override suspend fun getImage(uid: String, folderName: String): Resource<String> {
-    val storageRef =
-        Firebase.storage.reference.child("$folderName/$uid.png") // Maybe add a parameter?
+
+    val storageRef =Firebase.storage.reference.child("$folderName/$uid")
     return try {
-      val url = storageRef.downloadUrl.await().toString()
+      val result = storageRef.downloadUrl.await()
+      val url = result.toString()
       Resource.Success(url)
-    } catch (e: Exception) {
-      Resource.Failure(e)
-    }
+    } catch (e: FirebaseNetworkException) {
+          Resource.Failure(Exception("Network error while trying to get image", e))
+      } catch (e: StorageException) {
+          if (e.message == StorageException.ERROR_OBJECT_NOT_FOUND.toString()) {
+              Resource.Failure(Exception("Image file not found", e))
+          } else {
+              Resource.Failure(Exception("Storage error: ${e.message}", e))
+          }
+      } catch (e: Exception) {
+          Resource.Failure(Exception("Unknown error occurred", e))
+      }
   }
 
   override suspend fun getCurrentUserId(): Resource<String> {
@@ -200,22 +224,25 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
 
       // Create a reference to the file in Firebase Storage
       val storageRef = FirebaseStorage.getInstance().reference
-      val qrCodesRef = storageRef.child("QR_Codes/$userId.png")
+      val qrCodesRef = storageRef.child("QR_Codes/$userId")
 
       // Upload the file to Firebase Storage
-      val uploadTask = qrCodesRef.putBytes(data)
+      val uploadTask = qrCodesRef.putBytes(data).await()
       // Get the download URL of the image
-
-      val urlTask =
-          uploadTask
-              .continueWithTask { task ->
-                if (!task.isSuccessful) {
-                  task.exception?.let { throw it }
-                }
-                qrCodesRef.downloadUrl
-              }
-              .await()
-      Resource.Success(urlTask.toString())
+      if (uploadTask.task.isSuccessful) {
+        Resource.Success(qrCodesRef.path) // Return the reference to the uploaded QR Code's path
+      } else {
+        val error = uploadTask.task.exception
+        Resource.Failure(error ?: Exception("Upload failed without a specific error"))
+      }
+    } catch (e: com.google.zxing.WriterException) {
+      Resource.Failure(Exception("QR Code generation failed", e))
+    } catch (e: java.io.IOException) {
+      Resource.Failure(Exception("IO error during QR code generation", e))
+    } catch (e: FirebaseNetworkException) {
+      Resource.Failure(Exception("Network error while trying to get image", e))
+    } catch (e: StorageException) {
+      Resource.Failure(Exception("Firebase Upload Storage operation failed", e))
     } catch (e: Exception) {
       Resource.Failure(e)
     }

@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
+import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseUser
@@ -25,50 +26,84 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
   val uiState: StateFlow<LoginUiState> = _uiState
 
   fun addUser(
-      state: MutableStateFlow<LoginUiState> = _uiState,
-      user: FirebaseUser? = Firebase.auth.currentUser
-  ): Boolean {
-    if (user == null) {
-      Log.d("LoginScreenViewModel", "User not logged in")
-      return false
+      state: MutableStateFlow<LoginUiState> = _uiState
+  ) {
+    viewModelScope.launch{
+        when (val userIdResource = userRepository.getCurrentUserId()){
+            is Resource.Success -> {
+                val uid = userIdResource.data
+                // Upload Profile Pic Image to Firestore
+                val imageURI =
+                    state.value.selectedImageUri
+                        ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder")
+                userRepository.uploadImage(imageURI, uid, "Profile_Pictures")
+                val qrCodeUrl =
+                    when (val result = userRepository.getImage(uid, "QR_Codes")) {
+                        is Resource.Success -> {
+                            result.data
+                        }
+                        is Resource.Failure -> {
+                            Log.d("LoginScreenViewModel","Fetching QR Code Error")
+                            ""
+                        }
+                    }
+                val profilePicUrl =
+                    when (val result = userRepository.getImage(uid, "Profile_Pictures")) {
+                        is Resource.Success -> {
+                            result.data
+                        }
+                        is Resource.Failure -> {
+                            Log.d("LoginScreenViewModel","Fetching Profile Picture Error")
+                            ""
+                        }
+                    }
+                val userEmail =
+                    when (val result = userRepository.getUser(uid)) {
+                        is Resource.Success -> {
+                            result.data!!.email
+                        }
+                        is Resource.Failure -> {
+                            Log.d("LoginScreenViewModel","Fetching Profile Picture Error")
+                            ""
+                        }
+                    }
+                val userValues =
+                    hashMapOf(
+                        "private/firstName" to state.value.firstName,
+                        "private/lastName" to state.value.lastName,
+                        "private/phoneNumber" to state.value.phoneNumber,
+                        "private/birthDate" to state.value.birthDate,
+                        "private/email" to userEmail,
+                        "profilePicUrl" to profilePicUrl,
+                        "qrCodeUrl" to qrCodeUrl,
+                        "username" to state.value.username,
+                        "accountStatus" to "active",
+                        "eventsAttendeeList" to emptyList<String>(),
+                        "eventsHostList" to emptyList<String>())
+                addUserAsync(userValues, uid)
+            }
+            is Resource.Failure -> {
+                Log.d("LoginScreenViewModel", "User not logged in")
+            }
+        }
     }
-    val imageURI =
-        state.value.selectedImageUri
-            ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder")
-    viewModelScope.launch { userRepository.generateQRCode(user.uid) }
-    val userValues =
-        hashMapOf(
-            "private/firstName" to state.value.firstName,
-            "private/lastName" to state.value.lastName,
-            "private/phoneNumber" to state.value.phoneNumber,
-            "private/birthDate" to state.value.birthDate,
-            "private/email" to user.email,
-            "profilePicUrl" to imageURI.toString(),
-            "qrCodeUrl" to "",
-            "username" to state.value.username,
-            "accountStatus" to "active",
-            "eventsAttendeeList" to emptyList<String>(),
-            "eventsHostList" to emptyList<String>())
-    return runBlocking { addUserAsync(userValues, user.uid) }
   }
 
-  private suspend fun addUserAsync(userValues: Map<String, Any?>, userId: String): Boolean {
-    return when (val result = userRepository.addUser(userValues, userId)) {
+  private suspend fun addUserAsync(userValues: Map<String, Any?>, userId: String) {
+    when (val result = userRepository.addUser(userValues, userId)) {
       is Resource.Success -> {
-        true
+        _uiState.value = _uiState.value.copy(isSignUpCompleted = true, isSignUpSuccessful = true)
       }
       is Resource.Failure -> {
         Log.d("LoginScreenViewModel", "Error adding user: ${result.throwable.message}")
-        false
+          _uiState.value = _uiState.value.copy(isSignUpCompleted = true, isSignUpSuccessful = false)
       }
     }
   }
 
   fun doesUserExist(userId: String): Boolean {
     var userExists: Boolean
-
     runBlocking { userExists = doesUserExistAsync(userId) }
-
     return userExists
   }
 
@@ -83,6 +118,9 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
       }
     }
   }
+    fun onSignUpStarted(state: MutableStateFlow<LoginUiState> = _uiState) {
+        state.value = state.value.copy(isSignUpStarted = true)
+    }
 
   fun onSelectedImageUriChanged(uri: Uri?, state: MutableStateFlow<LoginUiState> = _uiState) {
     state.value = state.value.copy(selectedImageUri = uri)
@@ -161,6 +199,9 @@ data class LoginUiState(
     val lastNameIsError: Boolean = false,
     val phoneNumberIsError: Boolean = false,
     val birthDateIsError: Boolean = false,
+    val isSignUpStarted : Boolean = false,
+    val isSignUpCompleted : Boolean = false,
+    val isSignUpSuccessful : Boolean = false,
 )
 
 enum class CountryCode(val ext: String, val country: String, val numberLength: Int) {

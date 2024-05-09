@@ -26,10 +26,10 @@ class MyQrCodeViewModel @Inject constructor(private val userRepository: IUserRep
           // Now fetch the user data using the fetched user ID
           when (val userResult = userRepository.getUser(userId)) {
             is Resource.Success -> {
-              _uiState.value = _uiState.value.copy(username = userResult.data!!.username)
+              _uiState.value = _uiState.value.copy(username = userResult.data!!.username, qrCodeLink = userResult.data!!.qrCodeUrl)
             }
             is Resource.Failure -> {
-              Log.d("MyQrCodeViewModel", "Error fetching username: ${userResult.throwable.message}")
+              Log.d("MyQrCodeViewModel", "Error fetching username: ${userResult.throwable.message}?alt=media&token=bffb6ae0-45bd-455b-8e27-8920734779f3")
             }
           }
         }
@@ -39,7 +39,7 @@ class MyQrCodeViewModel @Inject constructor(private val userRepository: IUserRep
       }
     }
   }
-
+  /*
   fun getQRCodeLink() {
     viewModelScope.launch {
       when (val userIdResource = userRepository.getCurrentUserId()) {
@@ -61,6 +61,7 @@ class MyQrCodeViewModel @Inject constructor(private val userRepository: IUserRep
       }
     }
   }
+   */
 }
 
 data class MyQrCodeUiState(
