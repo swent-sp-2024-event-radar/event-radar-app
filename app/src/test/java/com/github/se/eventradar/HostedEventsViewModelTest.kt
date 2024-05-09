@@ -92,15 +92,20 @@ class HostedEventsViewModelTest {
   fun testAddUserFalseCase() = runTest {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
-    viewModel.getHostedEvents(null)
-    verify { Log.d("HostedEventsViewModel", "User not logged in") }
+    (userRepository as MockUserRepository).updateCurrentUserId(null)
+    viewModel.getHostedEvents()
+    verify { Log.d("HostedEventsViewModel", "User not logged in or error fetching user ID") }
+    assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
+    assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
+    Assert.assertNull(viewModel.uiState.value.eventList.selectedEvent)
     unmockkAll()
   }
 
   @Test
   fun testGetHostedEventsEmpty() = runTest {
     userRepository.addUser(mockUser)
-    viewModel.getHostedEvents(mockUser.userId)
+    (userRepository as MockUserRepository).updateCurrentUserId(mockUser.userId)
+    viewModel.getHostedEvents()
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
     Assert.assertNull(viewModel.uiState.value.eventList.selectedEvent)
@@ -118,8 +123,8 @@ class HostedEventsViewModelTest {
     val setOfEventIds = events.map { event -> event.fireBaseID }.toMutableSet()
     val userWithHostedEvent = mockUser.copy(eventsHostSet = setOfEventIds)
     userRepository.addUser(userWithHostedEvent)
-
-    viewModel.getHostedEvents(userWithHostedEvent.userId)
+    (userRepository as MockUserRepository).updateCurrentUserId(userWithHostedEvent.userId)
+    viewModel.getHostedEvents()
     assert(viewModel.uiState.value.eventList.allEvents.isNotEmpty())
     assert(viewModel.uiState.value.eventList.allEvents.size == 3)
     assert(viewModel.uiState.value.eventList.allEvents.containsAll(events))
@@ -141,7 +146,8 @@ class HostedEventsViewModelTest {
     val setOfEventIds = events.map { event -> event.fireBaseID }.toMutableSet()
     val userWithHostedEvent = mockUser.copy(eventsHostSet = setOfEventIds)
     userRepository.addUser(userWithHostedEvent)
-    viewModel.getHostedEvents(userWithHostedEvent.userId)
+    (userRepository as MockUserRepository).updateCurrentUserId(userWithHostedEvent.userId)
+    viewModel.getHostedEvents()
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
     Assert.assertNull(viewModel.uiState.value.eventList.selectedEvent)
@@ -157,7 +163,8 @@ class HostedEventsViewModelTest {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
     val userId = "userNotFound"
-    viewModel.getHostedEvents(userId)
+    (userRepository as MockUserRepository).updateCurrentUserId(userId)
+    viewModel.getHostedEvents()
     assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
     assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
     Assert.assertNull(viewModel.uiState.value.eventList.selectedEvent)
@@ -168,8 +175,8 @@ class HostedEventsViewModelTest {
   @Test
   fun testViewListChange() = runTest {
     viewModel.onViewListStatusChanged()
-    assert(viewModel.uiState.value.viewList.equals(false))
+    assert(!viewModel.uiState.value.viewList)
     viewModel.onViewListStatusChanged()
-    assert(viewModel.uiState.value.viewList.equals(true))
+    assert(viewModel.uiState.value.viewList)
   }
 }
