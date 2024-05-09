@@ -29,6 +29,8 @@ constructor(
     fun onMessageBarInputChange(newInput: String) {
         _uiState.update { currentState -> currentState.copy(messageBarInput = newInput) }
     }
+
+    // TO DO: Complete VM functions for chat screen
 /**
     // TO DO: Copied from MessagesViewModel.kt
     init {

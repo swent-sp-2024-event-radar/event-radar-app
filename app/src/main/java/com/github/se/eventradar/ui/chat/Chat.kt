@@ -150,7 +150,7 @@ fun ChatScreenUi(
     val context = LocalContext.current // only needed until view profile is implemented
 
     Scaffold(
-        modifier = Modifier.testTag(""),
+        modifier = Modifier.testTag("chatScreen"),
         topBar = {
             ChatAppBar(
                 title = "$opponentName $opponentSurname",
@@ -175,11 +175,13 @@ fun ChatScreenUi(
                 .focusable()
                 .wrapContentHeight()
                 .imePadding()
+                .testTag("chatScreenColumn")
         ) {
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .testTag("chatScreenMessagesList"),
                 state = scrollState
             ) {
                 items(messages) { message ->
@@ -205,6 +207,7 @@ fun ChatScreenUi(
                 }
             }
             ChatInput(
+                modifier = Modifier.testTag("chatInput"),
                 uiState = uiState,
                 onMessageChange = { viewModel.onMessageBarInputChange(it) },
 //            onMessageSend = { viewModel.onMessageSend() }
@@ -225,11 +228,14 @@ fun ChatAppBar(
         modifier = Modifier
             .height(64.dp)
             .fillMaxWidth()
-            .padding(top = 16.dp),
+            .padding(top = 16.dp)
+            .testTag("chatAppBar"),
         title = {
-            Row {
+            Row (
+                modifier = Modifier.testTag("chatAppBarTitle")
+            ){
                 Surface(
-                    modifier = Modifier.size(50.dp),
+                    modifier = Modifier.size(50.dp).testTag("chatAppBarTitleSurface"),
                     shape = CircleShape,
                 ) {
                     if (pictureUrl != null) {
@@ -240,21 +246,24 @@ fun ChatAppBar(
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .fillMaxHeight()
-                                .aspectRatio(1f))
+                                .aspectRatio(1f)
+                                .testTag("chatAppBarTitleImage"))
                     } else {
                         Icon(
                             imageVector = Icons.Filled.Person,
                             contentDescription = null,
                             modifier = Modifier
                                 .fillMaxHeight()
-                                .aspectRatio(1f))
+                                .aspectRatio(1f)
+                                .testTag("chatAppBarTitleIcon"))
                     }
                 }
                 Column(
                     modifier = Modifier
                         .clickable {
                             onUserNameClick?.invoke()
-                        },
+                        }
+                        .testTag("chatAppBarTitleColumn"),
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
@@ -264,16 +273,20 @@ fun ChatAppBar(
                         fontSize = 22.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(top = 12.dp, start = 8.dp)
+                        modifier = Modifier.padding(top = 12.dp, start = 8.dp).testTag("chatAppBarTitleText")
                     )
                 }
             }
         },
         navigationIcon = {
-            IconButton(onClick = { onBackArrowClick?.invoke() }) {
+            IconButton(
+                onClick = { onBackArrowClick?.invoke() },
+                modifier = Modifier.testTag("chatAppBarBackArrow")
+            ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Localized description"
+                    contentDescription = "Localized description",
+                    modifier = Modifier.testTag("chatAppBarBackArrowIcon")
                 )
             }
         }
@@ -299,7 +312,8 @@ fun ChatInput(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.extraLarge)
                 .weight(1f)
-                .focusable(true),
+                .focusable(true)
+                .testTag("chatInputField"),
             value = uiState.messageBarInput,
             onValueChange = { onMessageChange(it) },
             colors = TextFieldDefaults.textFieldColors(
@@ -308,22 +322,26 @@ fun ChatInput(
                 disabledIndicatorColor = Color.Transparent
             ),
             placeholder = {
-                Text(text = stringResource(R.string.message_bar_placeholder))
+                Text(
+                    text = stringResource(R.string.message_bar_placeholder),
+                    modifier = Modifier.testTag("chatInputPlaceholder"))
             },
             trailingIcon = {
                 Row(
-                    modifier = Modifier.padding(end = 8.dp),
+                    modifier = Modifier.padding(end = 8.dp).testTag("chatInputTrailingIcon"),
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(
                         // TO DO: Implement onMessageSend
 //                        onClick = { onMessageSend() }
-                        onClick = { null }
+                        onClick = { null },
+                        modifier = Modifier.testTag("chatInputSendButton")
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Send,
-                            contentDescription = "Send")
+                            contentDescription = "Send",
+                        modifier = Modifier.testTag("chatInputSendButtonIcon"))
                     }
                     IconButton(
                         onClick = {
@@ -332,11 +350,12 @@ fun ChatInput(
                                 "Insert image not available yet",
                                 Toast.LENGTH_SHORT
                             ).show()
-                        }
+                        },
+                        modifier = Modifier.testTag("chatInputCameraButton")
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.photo_camera),
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(24.dp).testTag("chatInputCameraButtonIcon"),
                             contentDescription = "Camera")
                     }
                 }

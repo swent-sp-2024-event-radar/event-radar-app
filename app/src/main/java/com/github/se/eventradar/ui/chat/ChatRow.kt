@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -52,21 +53,24 @@ fun SentMessageRow(
                 top = 10.dp,
                 bottom = 10.dp
             )
+            .testTag("sentColumn")
     ) {
         // This is chat bubble
         ChatBubbleConstraints(
             modifier = Modifier
                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 16.dp))
                 .background(MaterialTheme.colorScheme.primaryContainer)
-                .clickable { },
+                .clickable { }
+                .testTag("sentChatBubble"),
             content = {
                 TextMessageInsideBubble(
-                    modifier = Modifier.padding(
-                        start = 10.dp,
-                        end = 10.dp,
-                        top = 10.dp,
-                        bottom = 10.dp
-                    ),
+                    modifier = Modifier
+                        .padding(
+                            start = 10.dp,
+                            end = 10.dp,
+                            top = 10.dp,
+                            bottom = 10.dp)
+                        .testTag("sentChatBubbleText"),
                     text = text,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = MaterialTheme.typography.bodyLarge,
@@ -90,19 +94,20 @@ fun MessageTimeText(
     messageRead: Boolean
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.testTag("sentChatBubbleTimeRow"),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = messageTime,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
-        )
+            modifier = modifier.testTag("messageTimeRowText"))
 
         Icon(
             modifier = Modifier
                 .size(18.dp)
-                .padding(start = 4.dp),
+                .padding(start = 4.dp)
+                .testTag("messageTimeRowIcon"),
             imageVector = Icons.Default.Done,
             // TO DO: Change color based on messageRead
             tint = if (messageRead) Color.Blue
@@ -129,13 +134,15 @@ fun ReceivedMessageRow(
                 top = 10.dp,
                 bottom = 10.dp
             )
+            .testTag("receivedColumn")
     ) {
         //ChatBubble
         ChatBubbleConstraints(
             modifier = Modifier
                 .clip(RoundedCornerShape(bottomEnd = 16.dp, topEnd = 16.dp, bottomStart = 16.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
-                .clickable { },
+                .clickable { }
+                .testTag("receivedChatBubble"),
             content = {
                 TextMessageInsideBubble(
                     modifier = Modifier.padding(
@@ -143,13 +150,14 @@ fun ReceivedMessageRow(
                         end = 10.dp,
                         top = 10.dp,
                         bottom = 10.dp
-                    ),
+                    )
+                        .testTag("receivedChatBubbleText"),
                     text = text,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyLarge,
                     messageStat = {
                         Text(
-                            modifier = Modifier.padding(end = 10.dp),
+                            modifier = Modifier.padding(end = 10.dp).testTag("receivedMessageText"),
                             text = messageTime,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
