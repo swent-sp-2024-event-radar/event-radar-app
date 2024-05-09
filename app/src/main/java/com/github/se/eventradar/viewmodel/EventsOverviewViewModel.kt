@@ -100,7 +100,7 @@ constructor(
     }
   }
 
-  private fun observeEvents() {
+  private fun observeEvents() { // to be tested
     viewModelScope.launch {
       eventRepository.observeEvents().collect { resource ->
         when (resource) {
