@@ -21,7 +21,6 @@ class QrCodeAnalyser @Inject constructor() : ImageAnalysis.Analyzer {
 
   var onDecoded: ((String?) -> Unit)? = null
 
-
   override fun analyze(image: ImageProxy) {
 
     // only want to scan if it is a QR Code
@@ -44,7 +43,7 @@ class QrCodeAnalyser @Inject constructor() : ImageAnalysis.Analyzer {
                       mapOf(DecodeHintType.POSSIBLE_FORMATS to arrayListOf(BarcodeFormat.QR_CODE)))
                 }
                 .decode(binaryBitmap)
-          onDecoded?.invoke(result.toString())
+        onDecoded?.invoke(result.toString())
       } catch (e: Exception) {
 
         Log.d("QrCodeAnalyser", "Error decoding QR Code: ${e.message}")

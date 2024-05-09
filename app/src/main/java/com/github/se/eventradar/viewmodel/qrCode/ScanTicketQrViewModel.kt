@@ -127,7 +127,6 @@ constructor(
 
   fun changeAction(action: Action) {
     _uiState.update { it.copy(action = action) }
-
   }
 
   fun resetConditions() {
