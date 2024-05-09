@@ -26,6 +26,7 @@ import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.just
 import io.mockk.mockk
+import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -166,6 +167,17 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       errorBox.assertIsDisplayed()
       errorText.assertIsDisplayed()
       closeButton.assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun resetsTabState(): Unit = run {
+    val viewModel = setupViewModelWithState(ScanTicketQrViewModel.Action.ScanTicket)
+    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
+      composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
+      scanQrTab.performClick()
+      myQrTab.performClick()
+      assertEquals(ScanTicketQrViewModel.Tab.MyEvent, viewModel.uiState.value.tabState)
     }
   }
 }

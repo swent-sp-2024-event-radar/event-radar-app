@@ -248,41 +248,41 @@ fun PreviewQrCodeTicketUi() {
   QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewQrCodeTicketGranted() {
-  // Create a mock NavigationActions to pass into the function
-  val userRepository = MockUserRepository()
-  (userRepository as MockUserRepository).updateCurrentUserId("user1")
-  val eventRepository = MockEventRepository()
-  val qrCodeAnalyser = QrCodeAnalyser()
-  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser)
-  viewModel.changeAction(ScanTicketQrViewModel.Action.ApproveEntry)
-  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
-}
-// s
-@Preview(showBackground = true)
-@Composable
-fun PreviewQrCodeTicketDeny() {
-  // Create a mock NavigationActions to pass into the function
-  val userRepository = MockUserRepository()
-  (userRepository as MockUserRepository).updateCurrentUserId("user1")
-  val eventRepository = MockEventRepository()
-  val qrCodeAnalyser = QrCodeAnalyser()
-  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser)
-  viewModel.changeAction(ScanTicketQrViewModel.Action.DenyEntry)
-  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewQrCodeTicketError() {
-  // Create a mock NavigationActions to pass into the function
-  val userRepository = MockUserRepository()
-  (userRepository as MockUserRepository).updateCurrentUserId("user1")
-  val eventRepository = MockEventRepository()
-  val qrCodeAnalyser = QrCodeAnalyser()
-  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser)
-  viewModel.changeAction(ScanTicketQrViewModel.Action.FirebaseUpdateError)
-  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
-}
+// @Preview(showBackground = true)
+// @Composable
+// fun PreviewQrCodeTicketGranted() {
+//  // Create a mock NavigationActions to pass into the function
+//  val userRepository = MockUserRepository()
+//  (userRepository as MockUserRepository).updateCurrentUserId("user1")
+//  val eventRepository = MockEventRepository()
+//  val qrCodeAnalyser = QrCodeAnalyser()
+//  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser)
+//  viewModel.changeAction(ScanTicketQrViewModel.Action.ApproveEntry)
+//  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
+// }
+//// s
+// @Preview(showBackground = true)
+// @Composable
+// fun PreviewQrCodeTicketDeny() {
+//  // Create a mock NavigationActions to pass into the function
+//  val userRepository = MockUserRepository()
+//  (userRepository as MockUserRepository).updateCurrentUserId("user1")
+//  val eventRepository = MockEventRepository()
+//  val qrCodeAnalyser = QrCodeAnalyser()
+//  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser)
+//  viewModel.changeAction(ScanTicketQrViewModel.Action.DenyEntry)
+//  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
+// }
+//
+// @Preview(showBackground = true)
+// @Composable
+// fun PreviewQrCodeTicketError() {
+//  // Create a mock NavigationActions to pass into the function
+//  val userRepository = MockUserRepository()
+//  (userRepository as MockUserRepository).updateCurrentUserId("user1")
+//  val eventRepository = MockEventRepository()
+//  val qrCodeAnalyser = QrCodeAnalyser()
+//  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser)
+//  viewModel.changeAction(ScanTicketQrViewModel.Action.FirebaseUpdateError)
+//  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
+// }
