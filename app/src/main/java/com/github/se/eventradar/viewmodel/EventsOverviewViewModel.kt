@@ -73,10 +73,17 @@ constructor(
   }
 
   fun filterEvents() {
+      val eventList = if (_uiState.value.tab == Tab.BROWSE) {
+          _uiState.value.eventList
+      } else {
+          uiState.value.upcomingEventList
+      }
+
     // Filter based on search query
     val query = _uiState.value.searchQuery
+
     val filteredEventsSearch =
-        _uiState.value.eventList.allEvents.filter {
+        eventList.allEvents.filter {
           it.eventName.contains(query, ignoreCase = true)
         }
 
@@ -88,9 +95,9 @@ constructor(
     val userLocation = Location(latitude = 38.92, longitude = 78.78, address = "Ecublens")
     val filteredEventsRadius =
         if (radiusQuery == "") {
-          _uiState.value.eventList.allEvents
+          eventList.allEvents
         } else {
-          _uiState.value.eventList.allEvents.filter { event ->
+          eventList.allEvents.filter { event ->
             val distance = calculateDistance(userLocation, event.location)
             distance <= radiusQuery.toDouble()
           }
@@ -99,7 +106,7 @@ constructor(
     // Filter based on free switch
     val isFreeSwitchOn = _uiState.value.isFreeSwitchOn
     val filteredEventsFree =
-        _uiState.value.eventList.allEvents.filter {
+        eventList.allEvents.filter {
           if (isFreeSwitchOn) {
             it.ticket.price == 0.0
           } else {
@@ -111,9 +118,9 @@ constructor(
     val categoriesCheckedList = _uiState.value.categoriesCheckedList
     val filteredEventsCategory =
         if (categoriesCheckedList.isEmpty()) {
-          _uiState.value.eventList.allEvents
+          eventList.allEvents
         } else {
-          _uiState.value.eventList.allEvents.filter { event ->
+          eventList.allEvents.filter { event ->
             categoriesCheckedList.any { it == event.category }
           }
         }
@@ -124,9 +131,15 @@ constructor(
             .intersect(filteredEventsFree.toSet())
             .intersect(filteredEventsCategory.toSet())
 
-    _uiState.value =
-        _uiState.value.copy(
-            eventList = _uiState.value.eventList.copy(filteredEvents = filteredEvents.toList()))
+      if (_uiState.value.tab == Tab.BROWSE) {
+          _uiState.value =
+              _uiState.value.copy(
+                  eventList = _uiState.value.eventList.copy(filteredEvents = filteredEvents.toList()))
+      } else {
+          _uiState.value =
+              _uiState.value.copy(
+                  upcomingEventList = _uiState.value.upcomingEventList.copy(filteredEvents = filteredEvents.toList()))
+      }
   }
 
   // Calculates distance between 2 coordinate points based on Haversine formula

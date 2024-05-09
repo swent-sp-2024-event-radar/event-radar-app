@@ -226,7 +226,7 @@ fun HomeScreen(
         // In list view + search or filter is active
         (uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
             EventList(
-                events = uiState.eventList.filteredEvents,
+                events = uiState.upcomingEventList.filteredEvents,
                 modifier =
                     Modifier.testTag("filteredEventListUpcoming").fillMaxWidth().constrainAs(
                         eventList) {
@@ -250,9 +250,9 @@ fun HomeScreen(
                 }
         // In map view + search or filter is active
         (uiState.isSearchActive || uiState.isFilterActive) -> {
-          Log.d("HomeScreen", "Filtered event list: ${uiState.eventList.filteredEvents}")
+          Log.d("HomeScreen", "Filtered event list: ${uiState.upcomingEventList.filteredEvents}")
           EventMap(
-              uiState.eventList.filteredEvents,
+              uiState.upcomingEventList.filteredEvents,
               navigationActions,
               Modifier.testTag("filteredMapUpcoming").fillMaxWidth().constrainAs(eventMap) {
                 top.linkTo(searchAndFilter.bottom, margin = 8.dp)

@@ -138,7 +138,7 @@ class EventsOverviewViewModelTest {
     assert(viewModel.uiState.value.upcomingEventList.allEvents == listOf(event1, event2))
     assert(viewModel.uiState.value.upcomingEventList.filteredEvents.size == 2)
     assert(viewModel.uiState.value.upcomingEventList.filteredEvents == listOf(event1, event2))
-    assertNull(viewModel.uiState.value.eventList.selectedEvent)
+    assertNull(viewModel.uiState.value.upcomingEventList.selectedEvent)
   }
 
   @Test
@@ -161,17 +161,17 @@ class EventsOverviewViewModelTest {
     assert(anotherQuery == viewModel.uiState.value.searchQuery)
 
     viewModel.filterEvents()
-    assert(viewModel.uiState.value.eventList.allEvents.size == 2)
+    assert(viewModel.uiState.value.upcomingEventList.allEvents.size == 2)
     assert(
-        viewModel.uiState.value.eventList.allEvents ==
+        viewModel.uiState.value.upcomingEventList.allEvents ==
             listOf(
                 mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
                 mockEvent.copy(eventName = "Event 2", fireBaseID = "2")))
-    assert(viewModel.uiState.value.eventList.filteredEvents.size == 1)
+    assert(viewModel.uiState.value.upcomingEventList.filteredEvents.size == 1)
     assert(
-        viewModel.uiState.value.eventList.filteredEvents ==
+        viewModel.uiState.value.upcomingEventList.filteredEvents ==
             listOf(mockEvent.copy(eventName = "Event 1", fireBaseID = "1")))
-    assertNull(viewModel.uiState.value.eventList.selectedEvent)
+    assertNull(viewModel.uiState.value.upcomingEventList.selectedEvent)
   }
 
   @Test
