@@ -13,6 +13,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -66,7 +67,7 @@ constructor(
     println("entered updatePermissions")
     val uiLength = 28
     val attendeeID = decodedString.take(uiLength)
-    Log.d("QrCodeFriendViewModel", "Ticket User ID: $attendeeID")
+    Log.d("QrCodeTicketViewModel", "Ticket User ID: $attendeeID")
 
     viewModelScope.launch {
       val attendeeUserDeferred = async { userRepository.getUser(attendeeID) }
@@ -113,7 +114,7 @@ constructor(
   }
 
   private fun updateDecodedString(result: String) {
-    _uiState.value = _uiState.value.copy(decodedResult = result)
+    _uiState.update { it.copy(decodedResult = result) }
   }
 
   fun saveEventID(eventID: String) {
@@ -121,7 +122,7 @@ constructor(
   }
 
   fun changeAction(action: Action) {
-    _uiState.value = _uiState.value.copy(action = action)
+    _uiState.update { it.copy(action = action) }
   }
 
   data class QrCodeScanTicketState(
