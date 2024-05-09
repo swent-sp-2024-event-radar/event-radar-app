@@ -11,8 +11,6 @@ import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.screens.QrCodeScanFriendUiScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.qrCode.QrCodeScreen
-import com.github.se.eventradar.viewmodel.MyQrCodeUiState
-import com.github.se.eventradar.viewmodel.MyQrCodeViewModel
 import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
 import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -52,15 +50,10 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
 
   private lateinit var mDevice: UiDevice
 
-  private lateinit var viewModel: ScanFriendQrViewModel
+  @RelaxedMockK lateinit var viewModel: ScanFriendQrViewModel
   private lateinit var userRepository: IUserRepository
   private lateinit var qrCodeAnalyser: QrCodeAnalyser
-  @RelaxedMockK lateinit var mockMyQrCodeViewModel: MyQrCodeViewModel
 
-  private var sampleMyQrCodeUiState =
-      MutableStateFlow(
-          MyQrCodeUiState(
-              username = "test_user", qrCodeLink = "http://example.com/QR_Codes/qr.jpg"))
   private val myUID = "user1"
 
   @Before
@@ -68,14 +61,24 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
 
     MockKAnnotations.init(this)
     every { mockNavActions.navigateTo(any()) } just Runs
-    every { mockMyQrCodeViewModel.uiState } returns sampleMyQrCodeUiState
     userRepository = MockUserRepository()
     (userRepository as MockUserRepository).updateCurrentUserId(myUID)
     qrCodeAnalyser = mockk<QrCodeAnalyser>(relaxed = true)
     viewModel = ScanFriendQrViewModel(userRepository, qrCodeAnalyser)
-    composeTestRule.setContent { QrCodeScreen(mockMyQrCodeViewModel, viewModel, mockNavActions) }
+    composeTestRule.setContent { QrCodeScreen(viewModel, mockNavActions) }
     mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
   }
+
+  @Test
+  fun myQrCodeComponentsDisplayedCorrectly(): Unit = run {
+    onComposeScreen<QrCodeScanFriendUiScreen>(composeTestRule) {
+      myQrTab.performClick()
+      myQrScreen.assertIsDisplayed()
+      myQrCodeImage.assertIsDisplayed()
+      username.assertIsDisplayed()
+    }
+  }
+
 
   @Test
   fun displaysAllComponentsCorrectly_CameraPermittedAlways(): Unit = run {
@@ -105,17 +108,6 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       viewModel.changeAction(ScanFriendQrViewModel.Action.NavigateToNextScreen)
       composeTestRule.waitForIdle()
       verify { mockNavActions.navigateTo(any()) }
-    }
-  }
-
-  @Test
-  fun myQrCodeComponentsDisplayedCorrectly(): Unit = run {
-    onComposeScreen<QrCodeScanFriendUiScreen>(composeTestRule) {
-      myQrTab.performClick()
-      myQrScreen.assertIsDisplayed()
-      myQrCodeImage.assertIsDisplayed()
-      username.assertIsDisplayed()
-      assertEquals("test_user", sampleMyQrCodeUiState.value.username)
     }
   }
 }

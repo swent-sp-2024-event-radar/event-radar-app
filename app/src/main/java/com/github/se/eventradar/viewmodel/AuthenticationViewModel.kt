@@ -37,6 +37,8 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
                     state.value.selectedImageUri
                         ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder")
                 userRepository.uploadImage(imageURI, uid, "Profile_Pictures")
+                //Generate QR Code Image and Upload it to Firestore
+                userRepository.generateQRCode(uid)
                 val qrCodeUrl =
                     when (val result = userRepository.getImage(uid, "QR_Codes")) {
                         is Resource.Success -> {
@@ -80,7 +82,7 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
                         "accountStatus" to "active",
                         "eventsAttendeeList" to emptyList<String>(),
                         "eventsHostList" to emptyList<String>())
-                addUserAsync(userValues, uid)
+                addUserAsync(userValues, uid, state)
             }
             is Resource.Failure -> {
                 Log.d("LoginScreenViewModel", "User not logged in")
@@ -89,14 +91,14 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
     }
   }
 
-  private suspend fun addUserAsync(userValues: Map<String, Any?>, userId: String) {
+  private suspend fun addUserAsync(userValues: Map<String, Any?>, userId: String, state: MutableStateFlow<LoginUiState>) {
     when (val result = userRepository.addUser(userValues, userId)) {
       is Resource.Success -> {
-        _uiState.value = _uiState.value.copy(isSignUpCompleted = true, isSignUpSuccessful = true)
+        state.value = state.value.copy(isSignUpCompleted = true, isSignUpSuccessful = true)
       }
       is Resource.Failure -> {
         Log.d("LoginScreenViewModel", "Error adding user: ${result.throwable.message}")
-          _uiState.value = _uiState.value.copy(isSignUpCompleted = true, isSignUpSuccessful = false)
+          state.value = state.value.copy(isSignUpCompleted = true, isSignUpSuccessful = false)
       }
     }
   }

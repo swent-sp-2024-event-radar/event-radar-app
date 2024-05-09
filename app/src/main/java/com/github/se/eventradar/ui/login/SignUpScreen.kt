@@ -84,15 +84,18 @@ fun SignUpScreen(
               openErrorDialog.value = true
             }
           })
+
   if (uiState.isSignUpStarted && !uiState.isSignUpCompleted) {
       Box(
           modifier = Modifier
+              .testTag("signUpLoadingBox")
               .fillMaxSize()
               .background(Color.Black.copy(alpha = 0.5f))
       ) {
           // Show CircularProgressIndicator in the center
           CircularProgressIndicator(
               modifier = Modifier
+                  .testTag("signUpCircularLoadingIndicator")
                   .align(Alignment.Center)
                   .size(45.dp), // Size should be specified correctly
               color = MaterialTheme.colorScheme.secondary,
@@ -267,8 +270,8 @@ fun SignUpScreen(
           Button(
               onClick = {
                 if (viewModel.validateFields()) {
-                  launcher.launch(intent)
                     viewModel.onSignUpStarted()
+                  launcher.launch(intent)
                 }
               },
               modifier = Modifier.wrapContentSize().width(250.dp).testTag("signUpLoginButton"),

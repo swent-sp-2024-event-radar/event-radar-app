@@ -20,12 +20,12 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.github.se.eventradar.R
-import com.github.se.eventradar.viewmodel.MyQrCodeViewModel
+import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
 
 @Composable
-fun MyQrCodeScreen(viewModel: MyQrCodeViewModel) {
+fun MyQrCodeScreen(viewModel: ScanFriendQrViewModel) {
   LaunchedEffect(Unit) {
-    viewModel.getUsername()
+    viewModel.getUserDetails()
   }
 
   val uiState by viewModel.uiState.collectAsState()

@@ -120,8 +120,8 @@ class HostedEventsViewModelTest {
             mockEvent.copy(fireBaseID = "eventId3"))
     events.forEach { event -> eventRepository.addEvent(event) }
 
-    val ListOfEventIds = events.map { event -> event.fireBaseID }.toMutableList()
-    val userWithHostedEvent = mockUser.copy(eventsHostList = ListOfEventIds)
+    val listOfEventIds = events.map { event -> event.fireBaseID }.toMutableList()
+    val userWithHostedEvent = mockUser.copy(eventsHostList = listOfEventIds)
     userRepository.addUser(userWithHostedEvent)
     (userRepository as MockUserRepository).updateCurrentUserId(userWithHostedEvent.userId)
     viewModel.getHostedEvents()
@@ -143,8 +143,8 @@ class HostedEventsViewModelTest {
             mockEvent.copy(fireBaseID = "eventId2"),
             mockEvent.copy(fireBaseID = "eventId3"))
     // event is not added to repo.
-    val ListOfEventIds = events.map { event -> event.fireBaseID }.toMutableList()
-    val userWithHostedEvent = mockUser.copy(eventsHostList = ListOfEventIds)
+    val listOfEventIds = events.map { event -> event.fireBaseID }.toMutableList()
+    val userWithHostedEvent = mockUser.copy(eventsHostList = listOfEventIds)
     userRepository.addUser(userWithHostedEvent)
     (userRepository as MockUserRepository).updateCurrentUserId(userWithHostedEvent.userId)
     viewModel.getHostedEvents()

@@ -33,14 +33,12 @@ import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.eventradar.viewmodel.MyQrCodeViewModel
 import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
 
 // TODO cleaner code for Navigation and to correct screen
 
 @Composable
 fun QrCodeScreen(
-    myQrCodeViewModel: MyQrCodeViewModel = hiltViewModel(),
     viewModel: ScanFriendQrViewModel = hiltViewModel(),
     navigationActions: NavigationActions
 ) {
@@ -146,7 +144,7 @@ fun QrCodeScreen(
           verticalArrangement = Arrangement.Center, // Vertically center the content
           horizontalAlignment = Alignment.CenterHorizontally // Horizontally center the content
           ) {
-            MyQrCodeScreen(myQrCodeViewModel)
+            MyQrCodeScreen(viewModel)
           }
     } else {
       Column(modifier = Modifier.testTag("QrScanner")) {
