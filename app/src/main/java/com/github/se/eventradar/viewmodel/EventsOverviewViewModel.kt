@@ -179,7 +179,7 @@ constructor(
                 "EventsOverviewViewModel",
                 "Error fetching user ID: ${userIdResource.throwable.message}")
             _uiState.value =
-                _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+                _uiState.value.copy(upcomingEventList = EventList(emptyList(), emptyList(), null))
           }
         }
       }
@@ -196,7 +196,7 @@ constructor(
             is Resource.Success -> {
               _uiState.value =
                   _uiState.value.copy(
-                      eventList =
+                      upcomingEventList =
                           EventList(
                               events.data, events.data, _uiState.value.eventList.selectedEvent))
               filterEvents()
@@ -204,17 +204,18 @@ constructor(
             is Resource.Failure -> {
               Log.d("EventsOverviewViewModel", "Error getting events for $uid")
               _uiState.value =
-                  _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+                  _uiState.value.copy(upcomingEventList = EventList(emptyList(), emptyList(), null))
             }
           }
         } else {
           _uiState.value =
-              _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+              _uiState.value.copy(upcomingEventList = EventList(emptyList(), emptyList(), null))
         }
       }
       is Resource.Failure -> {
         Log.d("EventsOverviewViewModel", "Error fetching user document")
-        _uiState.value = _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+        _uiState.value =
+            _uiState.value.copy(upcomingEventList = EventList(emptyList(), emptyList(), null))
       }
     }
   }
@@ -248,6 +249,7 @@ constructor(
 
 data class EventsOverviewUiState(
     val eventList: EventList = EventList(emptyList(), emptyList(), null),
+    val upcomingEventList: EventList = EventList(emptyList(), emptyList(), null),
     val searchQuery: String = "",
     val isSearchActive: Boolean = false,
     val isFilterDialogOpen: Boolean = false,
