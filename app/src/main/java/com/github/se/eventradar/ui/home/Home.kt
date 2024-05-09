@@ -157,8 +157,6 @@ fun HomeScreen(
       when {
         // In list view + search or filter is active
         (uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
-        {Log.d("HomeScreen", "Filtered event list: ${uiState.eventList.filteredEvents}")
-            Log.d("HomeScreen", "IsSearchActive out: ${uiState.isSearchActive}")
             EventList(
                 uiState.eventList.filteredEvents,
                 Modifier.testTag("filteredEventList").fillMaxWidth().constrainAs(eventList) {
@@ -167,7 +165,7 @@ fun HomeScreen(
                   end.linkTo(parent.end)
                 }) { eventId ->
                   navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-                }}
+                }
         // In list view + neither search nor filter are active
         (uiState.viewList) ->
             EventList(
