@@ -47,10 +47,10 @@ fun EventDetails(
     navigationActions: NavigationActions
 ) {
 
-  // TODO to be moved in viewModel init
+  /*// TODO to be moved in viewModel init
   LaunchedEffect(Unit) { // Using `Unit` as a key to run only once
     viewModel.getEventData()
-  }
+  }*/
 
   val eventUiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
@@ -76,7 +76,7 @@ fun EventDetails(
         FloatingActionButton(
             onClick = {
               navigationActions.navController.navigate(
-                  "${Route.EVENT_DETAILS_TICKETS}/${viewModel.getEventId()}")
+                  "${Route.EVENT_DETAILS_TICKETS}/${viewModel.eventId}")
             },
             modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("ticketButton"),
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -169,3 +169,4 @@ fun EventDetails(
         }
       }
 }
+

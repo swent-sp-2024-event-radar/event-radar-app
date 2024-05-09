@@ -50,10 +50,10 @@ fun SelectTicket(
     navigationActions: NavigationActions
 ) {
 
-  // TODO to be moved in viewModel init
+  /*// TODO to be moved in viewModel init
   LaunchedEffect(Unit) { // Using `Unit` as a key to run only once
     viewModel.getEventData()
-  }
+  }*/
 
   val eventUiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
