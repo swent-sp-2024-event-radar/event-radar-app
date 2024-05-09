@@ -1,5 +1,6 @@
 package com.github.se.eventradar.ui.component
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -158,7 +159,9 @@ fun SearchBarAndFilter(
         value = uiState.searchQuery,
         onValueChange = {
           onSearchQueryChanged(it)
+          Log.d("SearchBarAndFilter", "Search query: ${uiState.searchQuery}")
           if (it == "") onSearchActiveChanged(false) else onSearchActiveChanged(true)
+            Log.d("isSearchActive", uiState.isSearchActive.toString())
         },
         modifier = Modifier.weight(1f).testTag("searchBar"),
         maxLines = 1,

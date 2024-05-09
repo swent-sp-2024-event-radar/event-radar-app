@@ -36,51 +36,32 @@ constructor(
     checkUserLoginStatus()
   }
 
-  fun onSearchQueryChanged(
-      query: String,
-      state: MutableStateFlow<EventsOverviewUiState> = _uiState
-  ) {
-    state.value = state.value.copy(searchQuery = query)
+  fun onSearchQueryChanged(query: String) {
+    _uiState.value = _uiState.value.copy(searchQuery = query)
   }
 
-  fun onSearchActiveChanged(
-      isSearchActive: Boolean,
-      state: MutableStateFlow<EventsOverviewUiState> = _uiState
-  ) {
-    state.value = state.value.copy(isFilterDialogOpen = false, isSearchActive = isSearchActive)
+  fun onSearchActiveChanged(isSearchActive: Boolean) {
+    _uiState.value = _uiState.value.copy(isFilterDialogOpen = false)
+    _uiState.value = _uiState.value.copy(isSearchActive = isSearchActive)
   }
 
   fun onFilterDialogOpen(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
     state.value = state.value.copy(isFilterDialogOpen = !state.value.isFilterDialogOpen)
   }
 
-  fun onRadiusQueryChanged(
-      radius: String,
-      state: MutableStateFlow<EventsOverviewUiState> = _uiState
-  ) {
-    state.value = state.value.copy(radiusQuery = radius)
+  fun onRadiusQueryChanged(radius: String) {
+    _uiState.value = _uiState.value.copy(radiusQuery = radius)
   }
 
   fun onFreeSwitchChanged(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
     state.value = state.value.copy(isFreeSwitchOn = !state.value.isFreeSwitchOn)
   }
 
-  // TO DO: Function used to convert category selection to MVVM
-  fun onCategorySelectionChanged(category: EventCategory, isChecked: Boolean) {
-    val categoriesCheckedList = _uiState.value.categoriesCheckedList
-    Log.d("CategorySelection", "categoriesCheckedList $categoriesCheckedList")
-
-    if (isChecked) {
-      categoriesCheckedList.remove(category)
-    } else {
-      categoriesCheckedList.add(category)
-    }
-    _uiState.value = _uiState.value.copy(categoriesCheckedList = categoriesCheckedList)
-    Log.d("CategorySelection", "Category vm ${_uiState.value.categoriesCheckedList}")
-  }
-
   fun onFilterApply(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
     state.value = state.value.copy(isFilterActive = true)
+    if (state.value.categoriesCheckedList.isEmpty()) {
+      state.value = state.value.copy(categoriesCheckedList = mutableSetOf(*enumValues<EventCategory>()))
+    }
     filterEvents()
   }
 
@@ -234,17 +215,17 @@ constructor(
   }
 
   fun onTabChanged(tab: Tab, state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
-    // Reset search and filter when tab is changed
-    state.value =
-        state.value.copy(
-            searchQuery = "",
-            isSearchActive = false,
-            isFilterDialogOpen = false,
-            isFilterActive = false,
-            radiusQuery = "",
-            isFreeSwitchOn = false,
-            categoriesCheckedList = mutableSetOf(),
-            tab = tab)
+      // Reset search and filter when tab is changed
+    state.value = state.value.copy(
+//        searchQuery = "",
+//        isSearchActive = false,
+//        isFilterDialogOpen = false,
+//        isFilterActive = false,
+//        radiusQuery = "",
+//        isFreeSwitchOn = false,
+//        categoriesCheckedList = mutableSetOf(),
+        tab = tab
+        )
   }
 
   fun onViewListStatusChanged(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
