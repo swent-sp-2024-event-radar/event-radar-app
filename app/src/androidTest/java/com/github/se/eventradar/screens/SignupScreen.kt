@@ -20,8 +20,9 @@ class SignupScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   private val phone: KNode = onNode { hasTestTag("signUpPhoneField") }
   val phoneTextField: KNode = phone.child { hasTestTag("signUpPhoneTextField") }
   private val birthdate: KNode = onNode { hasTestTag("signUpBirthDateField") }
-  val signUpLoadingBox : KNode = onNode{ hasTestTag("signUpLoadingBox")}
-  val signUpCircularLoadingIndicator : KNode = signUpLoadingBox.child{hasTestTag("signUpCircularLoadingIndicator")}
+  val signUpLoadingBox: KNode = onNode { hasTestTag("signUpLoadingBox") }
+  val signUpCircularLoadingIndicator: KNode =
+      signUpLoadingBox.child { hasTestTag("signUpCircularLoadingIndicator") }
   val birthDateTextField: KNode = birthdate.child { hasTestTag("signUpBirthDateTextField") }
   val signUpButton: KNode = onNode { hasTestTag("signUpLoginButton") }
   val profileSelectedPicture: KNode = onNode { hasTestTag("signUpProfilePicture") }

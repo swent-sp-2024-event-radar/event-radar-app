@@ -229,6 +229,7 @@ class MockUserRepositoryUnitTest {
     assertTrue(result is Resource.Success)
     assertEquals(expectedUrl, (result as Resource.Success).data)
   }
+
   @Test
   fun testGetCurrentUserIdSuccess() = runTest {
     (userRepository as MockUserRepository).updateCurrentUserId("1")
@@ -254,10 +255,8 @@ class MockUserRepositoryUnitTest {
     assert(result is Resource.Success)
     assert((result as Resource.Success).data == "/QR_Codes/$userId")
 
-    val imageLink = userRepository.getImage(userId,"QR_Codes")
+    val imageLink = userRepository.getImage(userId, "QR_Codes")
     assert(imageLink is Resource.Success)
     assert((imageLink as Resource.Success).data == "http://example.com/QR_Codes/$userId")
   }
-
-
 }

@@ -36,21 +36,21 @@ class ScanFriendQrViewModelTest {
 
   private val myUID = "user1"
 
-    private val mockUser =
-        User(
-            userId = "1",
-            birthDate = "01/01/2000",
-            email = "test@example.com",
-            firstName = "John",
-            lastName = "Doe",
-            phoneNumber = "1234567890",
-            accountStatus = "active",
-            eventsAttendeeList = mutableListOf("event1", "event2"),
-            eventsHostList = mutableListOf("event3"),
-            friendsList = mutableListOf(),
-            profilePicUrl = "http://example.com/Profile_Pics/1",
-            qrCodeUrl = "http://example.com/QR_Codes/1",
-            username = "johndoe")
+  private val mockUser =
+      User(
+          userId = "1",
+          birthDate = "01/01/2000",
+          email = "test@example.com",
+          firstName = "John",
+          lastName = "Doe",
+          phoneNumber = "1234567890",
+          accountStatus = "active",
+          eventsAttendeeList = mutableListOf("event1", "event2"),
+          eventsHostList = mutableListOf("event3"),
+          friendsList = mutableListOf(),
+          profilePicUrl = "http://example.com/Profile_Pics/1",
+          qrCodeUrl = "http://example.com/QR_Codes/1",
+          username = "johndoe")
 
   private val mockUser1 =
       User(
@@ -208,94 +208,99 @@ class ScanFriendQrViewModelTest {
     }
     assertEquals(ScanFriendQrViewModel.Action.NavigateToNextScreen, viewModel.uiState.value.action)
   }
-    @Test
-    fun testGetUserNameFailNoUserId() = runTest {
-        mockkStatic(Log::class)
-        every { Log.d(any(), any()) } returns 0
-        // Given
-        // initialize user with no mock
-        (userRepository as MockUserRepository).updateCurrentUserId(null)
-        userRepository.addUser(mockUser) // user in database, but no currentUserId
-        viewModel.getUserDetails()
-        verify { Log.d("ScanFriendQrViewModel", "Error fetching user ID: No user currently signed in") }
-        unmockkAll()
+
+  @Test
+  fun testGetUserNameFailNoUserId() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+    // Given
+    // initialize user with no mock
+    (userRepository as MockUserRepository).updateCurrentUserId(null)
+    userRepository.addUser(mockUser) // user in database, but no currentUserId
+    viewModel.getUserDetails()
+    verify { Log.d("ScanFriendQrViewModel", "Error fetching user ID: No user currently signed in") }
+    unmockkAll()
+  }
+
+  @Test
+  fun testGetUserNameNoUserFail() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+    // Given
+    // initialize user with no mock
+    val userId = mockUser.userId
+    (userRepository as MockUserRepository).updateCurrentUserId(userId)
+    viewModel.getUserDetails() // "User with id $uid not found
+    verify {
+      Log.d(
+          "ScanFriendQrViewModel", "Error fetching user details: User with id ${userId} not found")
     }
 
-    @Test
-    fun testGetUserNameNoUserFail() = runTest {
-        mockkStatic(Log::class)
-        every { Log.d(any(), any()) } returns 0
-        // Given
-        // initialize user with no mock
-        val userId = mockUser.userId
-        (userRepository as MockUserRepository).updateCurrentUserId(userId)
-        viewModel.getUserDetails() // "User with id $uid not found
-        verify {
-            Log.d("ScanFriendQrViewModel", "Error fetching user details: User with id ${userId} not found")
-        }
+    unmockkAll()
+  }
 
-        unmockkAll()
-    }
+  @Test
+  fun testGetUserNameSuccess() = runTest {
+    // Given
+    val userId = mockUser.userId
+    val username = mockUser.username
+    // initialize user with no mock
+    userRepository.addUser(mockUser)
+    (userRepository as MockUserRepository).updateCurrentUserId(userId)
 
-    @Test
-    fun testGetUserNameSuccess() = runTest {
-        // Given
-        val userId = mockUser.userId
-        val username = mockUser.username
-        // initialize user with no mock
-        userRepository.addUser(mockUser)
-        (userRepository as MockUserRepository).updateCurrentUserId(userId)
+    viewModel.getUserDetails()
+    assertEquals(username, viewModel.uiState.value.username)
+  }
 
-        viewModel.getUserDetails()
-        assertEquals(username, viewModel.uiState.value.username)
-    }
+  @Test
+  fun testGetUserQrCodeSuccess() = runTest {
+    // Given
+    val userId = mockUser.userId
+    val expectedQrCodeLink = "http://example.com/QR_Codes/$userId"
+    // initialize user with no mock
+    (userRepository as MockUserRepository).updateCurrentUserId(userId)
+    // Mocking what happens when you add a user
+    userRepository.addUser(mockUser)
+    val result = userRepository.getImage(userId, "QR_Codes")
+    Assert.assertTrue(result is Resource.Success)
+    Assert.assertEquals(expectedQrCodeLink, (result as Resource.Success).data)
 
-    @Test
-    fun testGetUserQrCodeSuccess() = runTest {
-        // Given
-        val userId = mockUser.userId
-        val expectedQrCodeLink = "http://example.com/QR_Codes/$userId"
-        // initialize user with no mock
-        (userRepository as MockUserRepository).updateCurrentUserId(userId)
-        //Mocking what happens when you add a user
-        userRepository.addUser(mockUser)
-        val result = userRepository.getImage(userId, "QR_Codes")
-        Assert.assertTrue(result is Resource.Success)
-        Assert.assertEquals(expectedQrCodeLink, (result as Resource.Success).data)
+    // add use
+    viewModel.getUserDetails()
+    assertEquals(expectedQrCodeLink, viewModel.uiState.value.qrCodeLink)
+  }
 
-        //add use
-        viewModel.getUserDetails()
-        assertEquals(expectedQrCodeLink, viewModel.uiState.value.qrCodeLink)
-    }
+  @Test
+  fun testGetQrCodeNoUserIdFail() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+    userRepository.addUser(mockUser)
+    (userRepository as MockUserRepository).updateCurrentUserId(null)
+    viewModel.getUserDetails()
+    verify { Log.d("ScanFriendQrViewModel", "Error fetching user ID: No user currently signed in") }
+    unmockkAll()
+  }
 
-    @Test
-    fun testGetQrCodeNoUserIdFail() = runTest {
-        mockkStatic(Log::class)
-        every { Log.d(any(), any()) } returns 0
-        userRepository.addUser(mockUser)
-        (userRepository as MockUserRepository).updateCurrentUserId(null)
-        viewModel.getUserDetails()
-        verify { Log.d("ScanFriendQrViewModel", "Error fetching user ID: No user currently signed in") }
-        unmockkAll()
-    }
-
-    @Test
-    fun testGetQrCodeNoImageFail() = runTest {
-        mockkStatic(Log::class)
-        every { Log.d(any(), any()) } returns 0
-        // Given
-        val userId = mockUser.userId
-        val folderName = "QR_Codes"
-        // initialize user with no mock
-        val newUser = mockUser.copy(qrCodeUrl = "")
-        (userRepository as MockUserRepository).updateCurrentUserId(userId)
-        userRepository.addUser(newUser)
-        viewModel.getUserDetails()
-        assertEquals(viewModel.uiState.value.qrCodeLink, "")
-        val result = userRepository.getImage(userId, "QR_Codes")
-        Assert.assertTrue(result is Resource.Failure)
-        assert((result as Resource.Failure).throwable.message == "Image from folder $folderName not found for user $userId")
-        //Get user does not automatically return this error, should i call getQrCode in getUser? I mean in theory im just getting all the user fields, but it should double check!
-        unmockkAll()
-    }
+  @Test
+  fun testGetQrCodeNoImageFail() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+    // Given
+    val userId = mockUser.userId
+    val folderName = "QR_Codes"
+    // initialize user with no mock
+    val newUser = mockUser.copy(qrCodeUrl = "")
+    (userRepository as MockUserRepository).updateCurrentUserId(userId)
+    userRepository.addUser(newUser)
+    viewModel.getUserDetails()
+    assertEquals(viewModel.uiState.value.qrCodeLink, "")
+    val result = userRepository.getImage(userId, "QR_Codes")
+    Assert.assertTrue(result is Resource.Failure)
+    assert(
+        (result as Resource.Failure).throwable.message ==
+            "Image from folder $folderName not found for user $userId")
+    // Get user does not automatically return this error, should i call getQrCode in getUser? I mean
+    // in theory im just getting all the user fields, but it should double check!
+    unmockkAll()
+  }
 }

@@ -117,7 +117,7 @@ class MockUserRepository : IUserRepository {
       val user = userList[0]
       mockImagesDatabase[user]?.replace("QR_Codes", "http://example.com/QR_Codes/$userId")
       Resource.Success("/QR_Codes/$userId")
-    } else{
+    } else {
       Resource.Failure(Exception("User with id $userId not found"))
     }
   }

@@ -163,36 +163,36 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
         Resource.Failure(error ?: Exception("Upload failed without a specific error"))
       }
     } catch (e: FirebaseNetworkException) {
-        return Resource.Failure(Exception("Network error while trying to upload image", e))
+      return Resource.Failure(Exception("Network error while trying to upload image", e))
     } catch (e: StorageException) {
-       return if (e.message == StorageException.ERROR_OBJECT_NOT_FOUND.toString()) {
-           Resource.Failure(Exception("File not found during upload", e))
-        } else {
-            Resource.Failure(Exception("Storage error during upload: ${e.message}", e))
-        }
+      return if (e.message == StorageException.ERROR_OBJECT_NOT_FOUND.toString()) {
+        Resource.Failure(Exception("File not found during upload", e))
+      } else {
+        Resource.Failure(Exception("Storage error during upload: ${e.message}", e))
+      }
     } catch (e: Exception) {
-        return Resource.Failure(Exception("Unknown error occurred during upload: ${e.message}", e))
+      return Resource.Failure(Exception("Unknown error occurred during upload: ${e.message}", e))
     }
   }
 
   override suspend fun getImage(uid: String, folderName: String): Resource<String> {
 
-    val storageRef =Firebase.storage.reference.child("$folderName/$uid")
+    val storageRef = Firebase.storage.reference.child("$folderName/$uid")
     return try {
       val result = storageRef.downloadUrl.await()
       val url = result.toString()
       Resource.Success(url)
     } catch (e: FirebaseNetworkException) {
-          Resource.Failure(Exception("Network error while trying to get image", e))
-      } catch (e: StorageException) {
-          if (e.message == StorageException.ERROR_OBJECT_NOT_FOUND.toString()) {
-              Resource.Failure(Exception("Image file not found", e))
-          } else {
-              Resource.Failure(Exception("Storage error: ${e.message}", e))
-          }
-      } catch (e: Exception) {
-          Resource.Failure(Exception("Unknown error occurred", e))
+      Resource.Failure(Exception("Network error while trying to get image", e))
+    } catch (e: StorageException) {
+      if (e.message == StorageException.ERROR_OBJECT_NOT_FOUND.toString()) {
+        Resource.Failure(Exception("Image file not found", e))
+      } else {
+        Resource.Failure(Exception("Storage error: ${e.message}", e))
       }
+    } catch (e: Exception) {
+      Resource.Failure(Exception("Unknown error occurred", e))
+    }
   }
 
   override suspend fun getCurrentUserId(): Resource<String> {

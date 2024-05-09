@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -175,11 +174,11 @@ class AuthenticationViewModelTest {
     viewModel.onCountryCodeChanged(CountryCode.AU, mockUiState)
     viewModel.onPhoneNumberChanged("1234567890", mockUiState)
     viewModel.onSelectedImageUriChanged(uri, mockUiState)
-    //Mocks Sign In From Google, which sets the userId
+    // Mocks Sign In From Google, which sets the userId
     (userRepository as MockUserRepository).updateCurrentUserId(mockUser.userId)
     viewModel.onSignUpStarted(mockUiState)
-    //Adds the User Information for Sign Up after Sign In is Successful
-    runBlocking{viewModel.addUser(mockUiState)}
+    // Adds the User Information for Sign Up after Sign In is Successful
+    runBlocking { viewModel.addUser(mockUiState) }
     assert(mockUiState.value.isSignUpStarted)
     assert(mockUiState.value.isSignUpCompleted)
     assert(mockUiState.value.isSignUpSuccessful)
@@ -192,7 +191,7 @@ class AuthenticationViewModelTest {
     every { Log.d(any(), any()) } returns 0
     (userRepository as MockUserRepository).updateCurrentUserId(null)
     viewModel.onSignUpStarted(mockUiState)
-    runBlocking{viewModel.addUser(mockUiState)}
+    runBlocking { viewModel.addUser(mockUiState) }
     assert(mockUiState.value.isSignUpStarted)
     assert(!mockUiState.value.isSignUpCompleted)
     assert(!mockUiState.value.isSignUpSuccessful)

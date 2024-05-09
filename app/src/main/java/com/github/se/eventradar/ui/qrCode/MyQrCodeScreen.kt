@@ -24,9 +24,7 @@ import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
 
 @Composable
 fun MyQrCodeScreen(viewModel: ScanFriendQrViewModel) {
-  LaunchedEffect(Unit) {
-    viewModel.getUserDetails()
-  }
+  LaunchedEffect(Unit) { viewModel.getUserDetails() }
 
   val uiState by viewModel.uiState.collectAsState()
 

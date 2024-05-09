@@ -26,7 +26,6 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -78,7 +77,6 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       username.assertIsDisplayed()
     }
   }
-
 
   @Test
   fun displaysAllComponentsCorrectly_CameraPermittedAlways(): Unit = run {

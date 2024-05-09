@@ -86,25 +86,24 @@ fun SignUpScreen(
           })
 
   if (uiState.isSignUpStarted && !uiState.isSignUpCompleted) {
-      Box(
-          modifier = Modifier
-              .testTag("signUpLoadingBox")
-              .fillMaxSize()
-              .background(Color.Black.copy(alpha = 0.5f))
-      ) {
+    Box(
+        modifier =
+            Modifier.testTag("signUpLoadingBox")
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f))) {
           // Show CircularProgressIndicator in the center
           CircularProgressIndicator(
-              modifier = Modifier
-                  .testTag("signUpCircularLoadingIndicator")
-                  .align(Alignment.Center)
-                  .size(45.dp), // Size should be specified correctly
+              modifier =
+                  Modifier.testTag("signUpCircularLoadingIndicator")
+                      .align(Alignment.Center)
+                      .size(45.dp), // Size should be specified correctly
               color = MaterialTheme.colorScheme.secondary,
               trackColor = MaterialTheme.colorScheme.surfaceVariant,
           )
-      }
+        }
   } else if (uiState.isSignUpStarted && uiState.isSignUpSuccessful) {
     navigationActions.navController.navigate(Route.HOME)
-  } else  if (uiState.isSignUpStarted){
+  } else if (uiState.isSignUpStarted) {
     openErrorDialog.value = true
   }
 
@@ -270,7 +269,7 @@ fun SignUpScreen(
           Button(
               onClick = {
                 if (viewModel.validateFields()) {
-                    viewModel.onSignUpStarted()
+                  viewModel.onSignUpStarted()
                   launcher.launch(intent)
                 }
               },

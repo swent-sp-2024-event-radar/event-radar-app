@@ -141,15 +141,21 @@ constructor(
           // Now fetch the user data using the fetched user ID
           when (val userResult = userRepository.getUser(userId)) {
             is Resource.Success -> {
-              _uiState.value = _uiState.value.copy(username = userResult.data!!.username, qrCodeLink = userResult.data.qrCodeUrl)
+              _uiState.value =
+                  _uiState.value.copy(
+                      username = userResult.data!!.username, qrCodeLink = userResult.data.qrCodeUrl)
             }
             is Resource.Failure -> {
-              Log.d("ScanFriendQrViewModel", "Error fetching user details: ${userResult.throwable.message}")
+              Log.d(
+                  "ScanFriendQrViewModel",
+                  "Error fetching user details: ${userResult.throwable.message}")
             }
           }
         }
         is Resource.Failure -> {
-          Log.d("ScanFriendQrViewModel", "Error fetching user ID: ${userIdResource.throwable.message}")
+          Log.d(
+              "ScanFriendQrViewModel",
+              "Error fetching user ID: ${userIdResource.throwable.message}")
         }
       }
     }
