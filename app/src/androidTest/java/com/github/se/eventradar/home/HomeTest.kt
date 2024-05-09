@@ -142,7 +142,8 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
   }
 
   @Test
-  fun testUpcomingEventsTriggeredOnTabSelect() = run {
+  fun getUpcomingEventsIsCalledOnRecomposition() = run {
+    sampleEventList.value = sampleEventList.value.copy(tab = Tab.BROWSE)
     onComposeScreen<HomeScreen>(composeTestRule) {
       step("Select 'Upcoming' tab") {
         upcomingTab {
@@ -150,24 +151,55 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
           performClick()
         }
       }
+      sampleEventList.value = sampleEventList.value.copy(tab = Tab.UPCOMING)
     }
-    // Update the UI state to reflect the change
-    sampleEventList.value = sampleEventList.value.copy(tab = Tab.UPCOMING)
+    onComposeScreen<HomeScreen>(composeTestRule) {
+      verify(exactly = 1) { mockEventsOverviewViewModel.getUpcomingEvents() }
+      verify(exactly = 1) { mockEventsOverviewViewModel.uiState }
+    }
+  }
 
-    // Verify if getEvents is called upon init
-    verify { mockEventsOverviewViewModel.getEvents() }
+  @Test
+  fun testTriggeredOnTabSelect() = run {
+    onComposeScreen<HomeScreen>(composeTestRule) {
+      step("Select 'Upcoming' tab") {
+        upcomingTab {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(tab = Tab.UPCOMING)
 
-    // Verify that the tab change is handled correctly
-    verify { mockEventsOverviewViewModel.onTabChanged(Tab.UPCOMING, any()) }
+      // Verify if getEvents is called upon init
+      verify { mockEventsOverviewViewModel.getEvents() }
 
-    // Verify that the upcoming events are fetched once
-    verify(exactly = 1) { mockEventsOverviewViewModel.getUpcomingEvents() }
+      // Verify that the tab change is handled correctly
+      verify { mockEventsOverviewViewModel.onTabChanged(Tab.UPCOMING, any()) }
 
-    // Check that uiState is accessed as expected
-    verify { mockEventsOverviewViewModel.uiState }
+      // Verify that the upcoming events are fetched once
+      verify(exactly = 1) { mockEventsOverviewViewModel.getUpcomingEvents() }
 
-    // Confirm that no unexpected interactions have occurred
-    confirmVerified(mockEventsOverviewViewModel)
+      // Check that uiState is accessed as expected
+      verify { mockEventsOverviewViewModel.uiState }
+
+      step("Select 'Browse' tab") {
+        browseTab {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+      sampleEventList.value = sampleEventList.value.copy(tab = Tab.BROWSE)
+
+      // Verify if getEvents is called upon init
+      verify { mockEventsOverviewViewModel.getEvents() }
+
+      // Verify that the tab change is handled correctly
+      verify { mockEventsOverviewViewModel.onTabChanged(Tab.BROWSE, any()) }
+
+      // Confirm that no unexpected interactions have occurred
+      confirmVerified(mockEventsOverviewViewModel)
+    }
   }
 
   @Test
@@ -175,7 +207,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
     val upcomingEvents = listOf(mockEvent, mockEvent.copy(fireBaseID = "2"))
     sampleEventList.value =
         sampleEventList.value.copy(
-            eventList = EventList(allEvents = upcomingEvents), userLoggedIn = true)
+            upcomingEventList = EventList(allEvents = upcomingEvents), userLoggedIn = true)
 
     onComposeScreen<HomeScreen>(composeTestRule) {
       step("Trigger loading of upcoming events") {
@@ -199,7 +231,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
     val upcomingEvents = listOf(mockEvent, mockEvent.copy(fireBaseID = "2"))
     sampleEventList.value =
         sampleEventList.value.copy(
-            eventList = EventList(allEvents = upcomingEvents), userLoggedIn = true)
+            upcomingEventList = EventList(allEvents = upcomingEvents), userLoggedIn = true)
 
     onComposeScreen<HomeScreen>(composeTestRule) {
       step("Trigger loading of upcoming events") {
@@ -223,7 +255,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
     val upcomingEvents = listOf(mockEvent, mockEvent.copy(fireBaseID = "2"))
     sampleEventList.value =
         sampleEventList.value.copy(
-            eventList = EventList(allEvents = upcomingEvents), userLoggedIn = false)
+            upcomingEventList = EventList(allEvents = upcomingEvents), userLoggedIn = false)
 
     onComposeScreen<HomeScreen>(composeTestRule) {
       step("Trigger loading of upcoming events") {
@@ -248,7 +280,9 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
   fun testNoUpcomingEventsMessageDisplayed() = run {
     sampleEventList.value =
         sampleEventList.value.copy(
-            eventList = EventList(emptyList(), emptyList(), null), userLoggedIn = true)
+            upcomingEventList = EventList(emptyList(), emptyList(), null),
+            viewList = true,
+            userLoggedIn = true)
 
     onComposeScreen<HomeScreen>(composeTestRule) {
       step("Trigger loading of upcoming events") {
