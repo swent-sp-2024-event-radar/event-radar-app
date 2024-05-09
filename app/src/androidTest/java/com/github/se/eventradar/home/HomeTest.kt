@@ -398,7 +398,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
     val upcomingEvents = listOf(mockEvent, mockEvent.copy(eventName = "Event 2", fireBaseID = "2"))
     sampleEventList.value =
         sampleEventList.value.copy(
-            eventList = EventList(allEvents = upcomingEvents), userLoggedIn = true)
+            upcomingEventList = EventList(allEvents = upcomingEvents), userLoggedIn = true)
 
     onComposeScreen<HomeScreen>(composeTestRule) {
       // 1. Open the upcoming tab
