@@ -112,7 +112,7 @@ class ScanFriendTicketViewModelTest {
     userRepository.addUser(mockUser1)
     eventRepository.addEvent(mockEvent1)
     val testDecodedString = "user1"
-    qrCodeAnalyser.onTicketDecoded?.invoke(testDecodedString)
+    qrCodeAnalyser.onDecoded?.invoke(testDecodedString)
     TestCase.assertEquals(testDecodedString, viewModel.uiState.value.decodedResult)
   }
 
@@ -120,7 +120,7 @@ class ScanFriendTicketViewModelTest {
   fun testDecodingFailure() = runTest {
     userRepository.addUser(mockUser1)
     eventRepository.addEvent(mockEvent1)
-    qrCodeAnalyser.onTicketDecoded?.invoke(null)
+    qrCodeAnalyser.onDecoded?.invoke(null)
     TestCase.assertEquals(
         ScanTicketQrViewModel.Action.AnalyserError, viewModel.uiState.value.action)
   }
@@ -129,7 +129,7 @@ class ScanFriendTicketViewModelTest {
   fun testInvokedAndUpdatedOnce() = runTest {
     userRepository.addUser(mockUser1)
     eventRepository.addEvent(mockEvent1)
-    qrCodeAnalyser.onTicketDecoded?.invoke("user1")
+    qrCodeAnalyser.onDecoded?.invoke("user1")
     when (val event1 = eventRepository.getEvent("1")) {
       is Resource.Success -> {
         TestCase.assertEquals(mutableSetOf("user2", "user3"), event1.data!!.attendeeSet)
@@ -155,7 +155,7 @@ class ScanFriendTicketViewModelTest {
   fun testInvokedAndFetchError() = runTest {
     userRepository.addUser(mockUser1)
     eventRepository.addEvent(mockEvent1)
-    qrCodeAnalyser.onTicketDecoded?.invoke("user5")
+    qrCodeAnalyser.onDecoded?.invoke("user5")
     advanceUntilIdle()
     TestCase.assertEquals(
         ScanTicketQrViewModel.Action.FirebaseFetchError, viewModel.uiState.value.action)
@@ -165,7 +165,7 @@ class ScanFriendTicketViewModelTest {
   fun testInvokedAndDenied() = runTest {
     userRepository.addUser(mockUser2)
     eventRepository.addEvent(mockEvent1)
-    qrCodeAnalyser.onTicketDecoded?.invoke("user2")
+    qrCodeAnalyser.onDecoded?.invoke("user2")
     advanceUntilIdle()
     assertEquals(ScanTicketQrViewModel.Action.DenyEntry, viewModel.uiState.value.action)
   }

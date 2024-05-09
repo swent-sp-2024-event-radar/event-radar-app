@@ -121,7 +121,7 @@ class ScanFriendQrViewModelTest {
     userRepository.addUser(mockUser1)
     userRepository.addUser(mockUser2)
     val testDecodedString = "user2"
-    qrCodeAnalyser.onFriendDecoded?.invoke(testDecodedString)
+    qrCodeAnalyser.onDecoded?.invoke(testDecodedString)
     assertEquals(testDecodedString, viewModel.uiState.value.decodedResult)
   }
 
@@ -129,7 +129,7 @@ class ScanFriendQrViewModelTest {
   fun testDecodingFailure() = runTest {
     userRepository.addUser(mockUser1)
     userRepository.addUser(mockUser2)
-    qrCodeAnalyser.onFriendDecoded?.invoke(null)
+    qrCodeAnalyser.onDecoded?.invoke(null)
     assertEquals("Failed to decode QR Code", viewModel.uiState.value.decodedResult)
     assertEquals(ScanFriendQrViewModel.Action.AnalyserError, viewModel.uiState.value.action)
   }
@@ -138,7 +138,7 @@ class ScanFriendQrViewModelTest {
   fun testInvokedAndFriendListUpdated() = runTest {
     userRepository.addUser(mockUser1)
     userRepository.addUser(mockUser2)
-    qrCodeAnalyser.onFriendDecoded?.invoke("user2")
+    qrCodeAnalyser.onDecoded?.invoke("user2")
     when (val user1 = userRepository.getUser("user1")) {
       is Resource.Success -> {
         assertEquals(mutableSetOf("user2"), user1.data!!.friendsSet)
@@ -164,7 +164,7 @@ class ScanFriendQrViewModelTest {
   fun testInvokedWhenAlreadyFriends() = runTest {
     userRepository.addUser(mockUser1AF)
     userRepository.addUser(mockUser2AF)
-    qrCodeAnalyser.onFriendDecoded?.invoke("user2")
+    qrCodeAnalyser.onDecoded?.invoke("user2")
     when (val user1 = userRepository.getUser("user1")) {
       is Resource.Success -> {
         assertEquals(mutableSetOf("user2"), user1.data!!.friendsSet)
