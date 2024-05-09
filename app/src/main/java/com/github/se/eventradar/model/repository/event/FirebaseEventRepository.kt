@@ -84,7 +84,7 @@ class FirebaseEventRepository : IEventRepository {
     }
   }
 
-  override fun observeEvents(): Flow<Resource<List<Event>>> = callbackFlow {
+  override fun observeEvents(): Flow<Resource<List<Event>>> = callbackFlow { // to be tested
     val listener =
         eventRef.addSnapshotListener { snapshot, error ->
           if (error != null) {
