@@ -1,1 +1,5 @@
 /build
+
+app/.idea/misc.xml
+
+app/.gradle/config.properties
