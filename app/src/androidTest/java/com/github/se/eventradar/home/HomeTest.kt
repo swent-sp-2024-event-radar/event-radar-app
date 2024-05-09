@@ -134,11 +134,28 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
 
   @Test
   fun getEventsIsCalledOnLaunch() = run {
-    sampleEventList.value = sampleEventList.value.copy(tab = Tab.BROWSE)
     onComposeScreen<HomeScreen>(composeTestRule) {
       verify(exactly = 1) { mockEventsOverviewViewModel.getEvents() }
       verify(exactly = 1) { mockEventsOverviewViewModel.uiState }
       confirmVerified(mockEventsOverviewViewModel)
+    }
+  }
+
+  @Test
+  fun getUpcomingEventsIsCalledOnRecomposition() = run {
+    sampleEventList.value = sampleEventList.value.copy(tab = Tab.BROWSE)
+    onComposeScreen<HomeScreen>(composeTestRule) {
+      step("Select 'Upcoming' tab") {
+        upcomingTab {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+      sampleEventList.value = sampleEventList.value.copy(tab = Tab.UPCOMING)
+    }
+    onComposeScreen<HomeScreen>(composeTestRule) {
+      verify(exactly = 1) { mockEventsOverviewViewModel.getUpcomingEvents() }
+      verify(exactly = 1) { mockEventsOverviewViewModel.uiState }
     }
   }
 
