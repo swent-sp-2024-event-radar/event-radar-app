@@ -2,7 +2,6 @@ package com.github.se.eventradar.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -34,22 +33,14 @@ fun NavGraph(
         "${Route.EVENT_DETAILS}/{eventId}",
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
           val eventId = it.arguments!!.getString("eventId")!!
-
-          val viewModel =
-              hiltViewModel<EventDetailsViewModel, EventDetailsViewModel.Factory>(
-                  creationCallback = { factory -> factory.create(eventId = eventId) })
-
+          val viewModel = EventDetailsViewModel.create(eventId = eventId)
           EventDetails(viewModel = viewModel, navigationActions = navActions)
         }
     composable(
         "${Route.EVENT_DETAILS_TICKETS}/{eventId}",
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
           val eventId = it.arguments!!.getString("eventId")!!
-
-          val viewModel =
-              hiltViewModel<EventDetailsViewModel, EventDetailsViewModel.Factory>(
-                  creationCallback = { factory -> factory.create(eventId = eventId) })
-
+          val viewModel = EventDetailsViewModel.create(eventId = eventId)
           SelectTicket(viewModel = viewModel, navigationActions = navActions)
         }
 

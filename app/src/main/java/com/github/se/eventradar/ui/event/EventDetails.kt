@@ -19,7 +19,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberImagePainter
 import com.github.se.eventradar.R
@@ -41,15 +40,7 @@ private val widthPadding = 34.dp
 private val imageHeight = 191.dp
 
 @Composable
-fun EventDetails(
-    viewModel: EventDetailsViewModel = hiltViewModel(),
-    navigationActions: NavigationActions
-) {
-
-  /*// TODO to be moved in viewModel init
-  LaunchedEffect(Unit) { // Using `Unit` as a key to run only once
-    viewModel.getEventData()
-  }*/
+fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: NavigationActions) {
 
   val eventUiState = viewModel.uiState.collectAsStateWithLifecycle().value
 

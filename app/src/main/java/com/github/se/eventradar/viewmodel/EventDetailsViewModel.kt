@@ -1,6 +1,8 @@
 package com.github.se.eventradar.model.event
 
 import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Location
@@ -23,11 +25,6 @@ constructor(
     private val eventRepository: IEventRepository,
     @Assisted val eventId: String,
 ) : ViewModel() {
-
-  @AssistedFactory
-  interface Factory {
-    fun create(eventId: String): EventDetailsViewModel
-  }
 
   init {
     getEventData()
@@ -62,6 +59,20 @@ constructor(
 
   fun isTicketFree(): Boolean {
     return !(_uiState.value.ticket.price > 0.0)
+  }
+
+  // Code for creating an instance of EventDetailsViewModel
+  @AssistedFactory
+  interface Factory {
+    fun create(eventId: String): EventDetailsViewModel
+  }
+
+  companion object {
+    @Composable
+    fun create(eventId: String): EventDetailsViewModel {
+      return hiltViewModel<EventDetailsViewModel, Factory>(
+          creationCallback = { factory -> factory.create(eventId = eventId) })
+    }
   }
 }
 
