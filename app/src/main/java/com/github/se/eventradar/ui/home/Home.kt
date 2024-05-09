@@ -188,31 +188,26 @@ fun HomeScreen(
                       start.linkTo(parent.start)
                       end.linkTo(parent.end)
                     })
+        (uiState.viewList && uiState.upcomingEventList.allEvents.isEmpty()) ->
+            Text(
+                "You have no upcoming events",
+                modifier =
+                    Modifier.testTag("noUpcomingEventsText").constrainAs(eventList) {
+                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                    })
         (uiState.viewList) ->
-            when {
-              (uiState.upcomingEventList.allEvents.isEmpty()) ->
-                  Text(
-                      "You have no upcoming events",
-                      modifier =
-                          Modifier.testTag("noUpcomingEventsText").constrainAs(eventList) {
-                            top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                          })
-              else ->
-                  EventList(
-                      events = uiState.upcomingEventList.allEvents,
-                      modifier =
-                          Modifier.testTag("eventListUpcoming").fillMaxWidth().constrainAs(
-                              eventList) {
-                                top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                              }) { eventId ->
-                        navigationActions.navController.navigate(
-                            "${Route.EVENT_DETAILS}/${eventId}")
-                      }
-            }
+            EventList(
+                events = uiState.upcomingEventList.allEvents,
+                modifier =
+                    Modifier.testTag("eventListUpcoming").fillMaxWidth().constrainAs(eventList) {
+                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                      start.linkTo(parent.start)
+                      end.linkTo(parent.end)
+                    }) { eventId ->
+                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+                }
         else ->
             EventMap(
                 uiState.upcomingEventList.allEvents,
