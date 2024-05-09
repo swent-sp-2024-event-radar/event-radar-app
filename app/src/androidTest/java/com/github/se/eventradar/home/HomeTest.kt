@@ -145,43 +145,43 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
   @Test
   fun testTriggeredOnTabSelect() = run {
     onComposeScreen<HomeScreen>(composeTestRule) {
-        step("Select 'Upcoming' tab") {
-            upcomingTab {
-                assertIsDisplayed()
-                performClick()
-            }
+      step("Select 'Upcoming' tab") {
+        upcomingTab {
+          assertIsDisplayed()
+          performClick()
         }
-        // Update the UI state to reflect the change
-        sampleEventList.value = sampleEventList.value.copy(tab = Tab.UPCOMING)
+      }
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(tab = Tab.UPCOMING)
 
-        // Verify if getEvents is called upon init
-        verify { mockEventsOverviewViewModel.getEvents() }
+      // Verify if getEvents is called upon init
+      verify { mockEventsOverviewViewModel.getEvents() }
 
-        // Verify that the tab change is handled correctly
-        verify { mockEventsOverviewViewModel.onTabChanged(Tab.UPCOMING, any()) }
+      // Verify that the tab change is handled correctly
+      verify { mockEventsOverviewViewModel.onTabChanged(Tab.UPCOMING, any()) }
 
-        // Verify that the upcoming events are fetched once
-        verify(exactly = 1) { mockEventsOverviewViewModel.getUpcomingEvents() }
+      // Verify that the upcoming events are fetched once
+      verify(exactly = 1) { mockEventsOverviewViewModel.getUpcomingEvents() }
 
-        // Check that uiState is accessed as expected
-        verify { mockEventsOverviewViewModel.uiState }
+      // Check that uiState is accessed as expected
+      verify { mockEventsOverviewViewModel.uiState }
 
-        step("Select 'Browse' tab") {
-            browseTab {
-                assertIsDisplayed()
-                performClick()
-            }
+      step("Select 'Browse' tab") {
+        browseTab {
+          assertIsDisplayed()
+          performClick()
         }
-        sampleEventList.value = sampleEventList.value.copy(tab = Tab.BROWSE)
+      }
+      sampleEventList.value = sampleEventList.value.copy(tab = Tab.BROWSE)
 
-        // Verify if getEvents is called upon init
-        verify { mockEventsOverviewViewModel.getEvents() }
+      // Verify if getEvents is called upon init
+      verify { mockEventsOverviewViewModel.getEvents() }
 
-        // Verify that the tab change is handled correctly
-        verify { mockEventsOverviewViewModel.onTabChanged(Tab.BROWSE, any()) }
+      // Verify that the tab change is handled correctly
+      verify { mockEventsOverviewViewModel.onTabChanged(Tab.BROWSE, any()) }
 
-        // Confirm that no unexpected interactions have occurred
-        confirmVerified(mockEventsOverviewViewModel)
+      // Confirm that no unexpected interactions have occurred
+      confirmVerified(mockEventsOverviewViewModel)
     }
   }
 
