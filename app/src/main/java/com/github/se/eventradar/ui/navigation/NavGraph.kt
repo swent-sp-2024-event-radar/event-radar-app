@@ -3,9 +3,6 @@ package com.github.se.eventradar.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.HasDefaultViewModelProviderFactory
-import androidx.lifecycle.viewmodel.CreationExtras
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -21,8 +18,6 @@ import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.login.SignUpScreen
 import com.github.se.eventradar.ui.qrCode.QrCodeScreen
 import com.github.se.eventradar.util.toast
-import dagger.hilt.android.lifecycle.withCreationCallback
-import javax.inject.Inject
 
 @Composable
 fun NavGraph(
@@ -40,9 +35,9 @@ fun NavGraph(
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
           val eventId = it.arguments!!.getString("eventId")!!
 
-          val viewModel = hiltViewModel<EventDetailsViewModel, EventDetailsViewModel.Factory>(
-            creationCallback = { factory -> factory.create(eventId = eventId) }
-          )
+          val viewModel =
+              hiltViewModel<EventDetailsViewModel, EventDetailsViewModel.Factory>(
+                  creationCallback = { factory -> factory.create(eventId = eventId) })
 
           EventDetails(viewModel = viewModel, navigationActions = navActions)
         }
@@ -51,9 +46,9 @@ fun NavGraph(
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
           val eventId = it.arguments!!.getString("eventId")!!
 
-          val viewModel = hiltViewModel<EventDetailsViewModel, EventDetailsViewModel.Factory>(
-            creationCallback = { factory -> factory.create(eventId = eventId) }
-          )
+          val viewModel =
+              hiltViewModel<EventDetailsViewModel, EventDetailsViewModel.Factory>(
+                  creationCallback = { factory -> factory.create(eventId = eventId) })
 
           SelectTicket(viewModel = viewModel, navigationActions = navActions)
         }
