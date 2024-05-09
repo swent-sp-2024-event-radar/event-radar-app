@@ -143,6 +143,7 @@ class EventsOverviewViewModelTest {
 
   @Test
   fun testGetUpcomingEventsFilteredSuccess() = runTest {
+    viewModel.onTabChanged(Tab.UPCOMING)
     val events =
         listOf(
             mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
@@ -167,6 +168,7 @@ class EventsOverviewViewModelTest {
             listOf(
                 mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
                 mockEvent.copy(eventName = "Event 2", fireBaseID = "2")))
+    println(viewModel.uiState.value.upcomingEventList.filteredEvents.size)
     assert(viewModel.uiState.value.upcomingEventList.filteredEvents.size == 1)
     assert(
         viewModel.uiState.value.upcomingEventList.filteredEvents ==
