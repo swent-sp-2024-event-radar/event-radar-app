@@ -142,8 +142,8 @@ fun QrCodeScreen(
     }
     BottomNavigationMenu(
         onTabSelected = { tab ->
-          navigationActions.navigateTo(tab)
           viewModel.resetConditions()
+          navigationActions.navigateTo(tab)
         },
         tabList = TOP_LEVEL_DESTINATIONS,
         selectedItem = TOP_LEVEL_DESTINATIONS[0],
