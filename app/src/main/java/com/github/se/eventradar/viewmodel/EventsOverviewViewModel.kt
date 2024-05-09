@@ -73,19 +73,18 @@ constructor(
   }
 
   fun filterEvents() {
-      val eventList = if (_uiState.value.tab == Tab.BROWSE) {
+    val eventList =
+        if (_uiState.value.tab == Tab.BROWSE) {
           _uiState.value.eventList
-      } else {
+        } else {
           uiState.value.upcomingEventList
-      }
+        }
 
     // Filter based on search query
     val query = _uiState.value.searchQuery
 
     val filteredEventsSearch =
-        eventList.allEvents.filter {
-          it.eventName.contains(query, ignoreCase = true)
-        }
+        eventList.allEvents.filter { it.eventName.contains(query, ignoreCase = true) }
 
     // Filter based on radius query
     val radiusQuery = _uiState.value.radiusQuery
@@ -120,9 +119,7 @@ constructor(
         if (categoriesCheckedList.isEmpty()) {
           eventList.allEvents
         } else {
-          eventList.allEvents.filter { event ->
-            categoriesCheckedList.any { it == event.category }
-          }
+          eventList.allEvents.filter { event -> categoriesCheckedList.any { it == event.category } }
         }
 
     val filteredEvents =
@@ -131,15 +128,16 @@ constructor(
             .intersect(filteredEventsFree.toSet())
             .intersect(filteredEventsCategory.toSet())
 
-      if (_uiState.value.tab == Tab.BROWSE) {
-          _uiState.value =
-              _uiState.value.copy(
-                  eventList = _uiState.value.eventList.copy(filteredEvents = filteredEvents.toList()))
-      } else {
-          _uiState.value =
-              _uiState.value.copy(
-                  upcomingEventList = _uiState.value.upcomingEventList.copy(filteredEvents = filteredEvents.toList()))
-      }
+    if (_uiState.value.tab == Tab.BROWSE) {
+      _uiState.value =
+          _uiState.value.copy(
+              eventList = _uiState.value.eventList.copy(filteredEvents = filteredEvents.toList()))
+    } else {
+      _uiState.value =
+          _uiState.value.copy(
+              upcomingEventList =
+                  _uiState.value.upcomingEventList.copy(filteredEvents = filteredEvents.toList()))
+    }
   }
 
   // Calculates distance between 2 coordinate points based on Haversine formula
