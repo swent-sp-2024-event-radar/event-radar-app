@@ -141,34 +141,38 @@ class EventsOverviewViewModelTest {
     assertNull(viewModel.uiState.value.eventList.selectedEvent)
   }
 
-    @Test
-    fun testGetUpcomingEventsFilteredSuccess() = runTest {
-        val events =
+  @Test
+  fun testGetUpcomingEventsFilteredSuccess() = runTest {
+    val events =
+        listOf(
+            mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
+            mockEvent.copy(eventName = "Event 2", fireBaseID = "2"),
+            mockEvent.copy(eventName = "Event 3", fireBaseID = "3"))
+
+    events.forEach { event -> eventRepository.addEvent(event) }
+
+    userRepository.addUser(mockUser)
+    // MockUser is on the attendeeList for events with id "1" and "2"
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    viewModel.getUpcomingEvents()
+
+    val anotherQuery = "Event 1"
+    viewModel.onSearchQueryChanged(anotherQuery)
+    assert(anotherQuery == viewModel.uiState.value.searchQuery)
+
+    viewModel.filterEvents()
+    assert(viewModel.uiState.value.eventList.allEvents.size == 2)
+    assert(
+        viewModel.uiState.value.eventList.allEvents ==
             listOf(
                 mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
-                mockEvent.copy(eventName = "Event 2", fireBaseID = "2"),
-                mockEvent.copy(eventName = "Event 3", fireBaseID = "3"))
-
-        events.forEach { event -> eventRepository.addEvent(event) }
-
-        userRepository.addUser(mockUser)
-        // MockUser is on the attendeeList for events with id "1" and "2"
-        (userRepository as MockUserRepository).updateCurrentUserId("user1")
-        viewModel.getUpcomingEvents()
-
-        val anotherQuery = "Event 1"
-        viewModel.onSearchQueryChanged(anotherQuery)
-        assert(anotherQuery == viewModel.uiState.value.searchQuery)
-
-        viewModel.filterEvents()
-        assert(viewModel.uiState.value.eventList.allEvents.size == 2)
-        assert(viewModel.uiState.value.eventList.allEvents == listOf(
-            mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
-            mockEvent.copy(eventName = "Event 2", fireBaseID = "2")))
-        assert(viewModel.uiState.value.eventList.filteredEvents.size == 1)
-        assert(viewModel.uiState.value.eventList.filteredEvents == listOf(mockEvent.copy(eventName = "Event 1", fireBaseID = "1")))
-        assertNull(viewModel.uiState.value.eventList.selectedEvent)
-    }
+                mockEvent.copy(eventName = "Event 2", fireBaseID = "2")))
+    assert(viewModel.uiState.value.eventList.filteredEvents.size == 1)
+    assert(
+        viewModel.uiState.value.eventList.filteredEvents ==
+            listOf(mockEvent.copy(eventName = "Event 1", fireBaseID = "1")))
+    assertNull(viewModel.uiState.value.eventList.selectedEvent)
+  }
 
   @Test
   fun testGetUpcomingEventsWithEventsNotInRepo() = runTest {
