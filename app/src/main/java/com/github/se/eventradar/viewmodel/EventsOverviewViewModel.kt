@@ -36,21 +36,22 @@ constructor(
     checkUserLoginStatus()
   }
 
-  fun onSearchQueryChanged(query: String) {
-    _uiState.value = _uiState.value.copy(searchQuery = query)
+  fun onSearchQueryChanged(query: String, state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
+      state.value = state.value.copy(searchQuery = query)
+      filterEvents()
   }
 
-  fun onSearchActiveChanged(isSearchActive: Boolean) {
-    _uiState.value = _uiState.value.copy(isFilterDialogOpen = false)
-    _uiState.value = _uiState.value.copy(isSearchActive = isSearchActive)
+  fun onSearchActiveChanged(isSearchActive: Boolean, state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
+      state.value = state.value.copy(isFilterDialogOpen = false)
+      state.value = state.value.copy(isSearchActive = isSearchActive)
   }
 
   fun onFilterDialogOpen(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
     state.value = state.value.copy(isFilterDialogOpen = !state.value.isFilterDialogOpen)
   }
 
-  fun onRadiusQueryChanged(radius: String) {
-    _uiState.value = _uiState.value.copy(radiusQuery = radius)
+  fun onRadiusQueryChanged(radius: String, state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
+      state.value = state.value.copy(radiusQuery = radius)
   }
 
   fun onFreeSwitchChanged(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
@@ -59,9 +60,6 @@ constructor(
 
   fun onFilterApply(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
     state.value = state.value.copy(isFilterActive = true)
-    if (state.value.categoriesCheckedList.isEmpty()) {
-      state.value = state.value.copy(categoriesCheckedList = mutableSetOf(*enumValues<EventCategory>()))
-    }
     filterEvents()
   }
 
@@ -102,10 +100,13 @@ constructor(
 
     // Filter based on categories selected
     val categoriesCheckedList = _uiState.value.categoriesCheckedList
-    val filteredEventsCategory =
-        _uiState.value.eventList.allEvents.filter { event ->
-          categoriesCheckedList.any { it == event.category }
-        }
+      val filteredEventsCategory = if (categoriesCheckedList.isEmpty()) {
+          _uiState.value.eventList.allEvents
+      } else {
+          _uiState.value.eventList.allEvents.filter { event ->
+              categoriesCheckedList.any { it == event.category }
+          }
+      }
 
     val filteredEvents =
         filteredEventsSearch
@@ -147,6 +148,7 @@ constructor(
                   eventList =
                       EventList(
                           response.data, response.data, _uiState.value.eventList.selectedEvent))
+        filterEvents()
         }
         is Resource.Failure ->
             Log.d("EventsOverviewViewModel", "Error getting events: ${response.throwable.message}")
@@ -187,6 +189,7 @@ constructor(
                       eventList =
                           EventList(
                               events.data, events.data, _uiState.value.eventList.selectedEvent))
+            filterEvents()
             }
             is Resource.Failure -> {
               Log.d("EventsOverviewViewModel", "Error getting events for $uid")
@@ -217,13 +220,13 @@ constructor(
   fun onTabChanged(tab: Tab, state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
       // Reset search and filter when tab is changed
     state.value = state.value.copy(
-//        searchQuery = "",
-//        isSearchActive = false,
-//        isFilterDialogOpen = false,
-//        isFilterActive = false,
-//        radiusQuery = "",
-//        isFreeSwitchOn = false,
-//        categoriesCheckedList = mutableSetOf(),
+        searchQuery = "",
+        isSearchActive = false,
+        isFilterDialogOpen = false,
+        isFilterActive = false,
+        radiusQuery = "",
+        isFreeSwitchOn = false,
+        categoriesCheckedList = mutableSetOf(),
         tab = tab
         )
   }
