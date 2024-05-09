@@ -73,7 +73,7 @@ class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
           Message(
               sender = "$i",
               content = "Test Message",
-              dateTimeSent = LocalDateTime.now(),
+              dateTimeSent = LocalDateTime.parse("2021-01-01T00:00:00"),
               id = "1"),
           (mh as Resource.Success).data,
       )
@@ -100,6 +100,10 @@ class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
           assertHasClickAction()
         }
         bottomNav { assertIsDisplayed() }
+        profilePic { assertIsDisplayed() }
+        recipientName { assertIsDisplayed() }
+        messageContent { assertIsDisplayed() }
+        messageTime { assertIsDisplayed() }
       }
     }
   }

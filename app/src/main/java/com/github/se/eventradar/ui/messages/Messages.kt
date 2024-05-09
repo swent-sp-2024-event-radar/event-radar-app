@@ -1,6 +1,5 @@
 package com.github.se.eventradar.ui.messages
 
-import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -41,7 +40,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.rememberImagePainter
 import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.User
@@ -204,15 +202,18 @@ fun MessagePreviewItem(
           modifier
               .fillMaxWidth()
               .clickable { onChatClicked(messageHistory) }
+              .padding(vertical = 8.dp)
               .testTag("messagePreviewItem"),
       horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
       verticalAlignment = Alignment.CenterVertically) {
         Image(
-            painter = rememberImagePainter(data = Uri.parse(recipient.profilePicUrl)),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
+            painter =
+                painterResource(
+                    id = R.drawable.placeholder), // TODO: replace with actual profile pic
+            contentDescription = "Profile picture of ${recipient.firstName} ${recipient.lastName}",
+            contentScale = ContentScale.FillHeight,
             modifier =
-                Modifier.size(56.dp).padding(start = 16.dp).clip(CircleShape).testTag("profilePic"))
+                Modifier.padding(start = 16.dp).clip(CircleShape).size(56.dp).testTag("profilePic"))
         Column(
             modifier =
                 Modifier.padding(start = 16.dp).fillMaxWidth(.7f).testTag("messageContentColumn")) {
@@ -255,7 +256,7 @@ fun MessagePreviewItem(
               mostRecentMessage.dateTimeSent.isAfter(today) -> "HH:mm"
               mostRecentMessage.dateTimeSent.isBefore(today) and
                   mostRecentMessage.dateTimeSent.isAfter(thisYear) -> "dd/MM"
-              else -> "dd/MM/yyyy"
+              else -> "dd/MM/yy"
             }
 
         Text(
@@ -279,7 +280,7 @@ fun PreviewMessagesScreen() {
                   mutableListOf(
                       Message(
                           sender = "1",
-                          content = "Hello Hello Hello Hello Hello",
+                          content = "Hello Hello Hello Hello Hello Hello Hello",
                           dateTimeSent = LocalDateTime.parse("2021-08-01T12:00:00"),
                           id = "1")),
               latestMessageId = "1",
@@ -287,7 +288,7 @@ fun PreviewMessagesScreen() {
           MessageHistory(
               user1 = "1",
               user2 = "3",
-              user1ReadMostRecentMessage = true,
+              user1ReadMostRecentMessage = false,
               user2ReadMostRecentMessage = false,
               messages =
                   mutableListOf(
