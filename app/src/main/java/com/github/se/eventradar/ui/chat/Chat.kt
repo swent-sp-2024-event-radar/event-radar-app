@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -53,6 +54,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextField
@@ -61,6 +63,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -71,7 +74,9 @@ import com.github.se.eventradar.R
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.message.MockMessageRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
+import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.home.HomeScreen
+import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import java.util.Locale
 
@@ -90,12 +95,12 @@ fun ChatScreen(
         uiState = uiState,
         viewModel = viewModel,
         navigationActions = navigationActions,
+        onTabSelected = navigationActions::navigateTo,
 //        onSelectedTabIndexChange = viewModel::onSelectedTabIndexChange,
 //        onSearchQueryChange = viewModel::onSearchQueryChange,
 //        onChatClicked = {
 //            Toast.makeText(context, "Chat feature is not yet implemented", Toast.LENGTH_SHORT).show()
 //        },
-//        onTabSelected = navigationActions::navigateTo,
 //        getUser = viewModel::getUser
     )
 }
@@ -105,10 +110,10 @@ fun ChatScreenUi(
     uiState: ChatUiState,
     viewModel: ChatViewModel = hiltViewModel(),
     navigationActions: NavigationActions,
+    onTabSelected: (TopLevelDestination) -> Unit,
 //    onSelectedTabIndexChange: (Int) -> Unit,
 //    onSearchQueryChange: (String) -> Unit,
 //    onChatClicked: (MessageHistory) -> Unit,
-//    onTabSelected: (TopLevelDestination) -> Unit,
 //    getUser: (String) -> User
 ) {
     val messages = uiState.messageHistory.messages
@@ -142,56 +147,69 @@ fun ChatScreenUi(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .focusable()
-            .wrapContentHeight()
-            .imePadding()
-    ) {
-        val context = LocalContext.current // only needed until view profile is implemented
+    val context = LocalContext.current // only needed until view profile is implemented
 
-        ChatAppBar(
-            title = "$opponentName $opponentSurname",
-            pictureUrl = opponentPictureUrl,
-            onUserNameClick = {
-                Toast.makeText(context, "User Profile Display to be implemented", Toast.LENGTH_SHORT).show()
-            },
-            onBackArrowClick = { navigationActions.navController.navigate(Route.MESSAGE) },
-        )
-        LazyColumn(
+    Scaffold(
+        modifier = Modifier.testTag(""),
+        topBar = {
+            ChatAppBar(
+                title = "$opponentName $opponentSurname",
+                pictureUrl = opponentPictureUrl,
+                onUserNameClick = {
+                    Toast.makeText(context, "User Profile Display to be implemented", Toast.LENGTH_SHORT).show()
+                },
+                onBackArrowClick = { navigationActions.navController.navigate(Route.MESSAGE) },
+            )
+        },
+        bottomBar = {
+            BottomNavigationMenu(
+                onTabSelected = onTabSelected,
+                tabList = TOP_LEVEL_DESTINATIONS,
+                selectedItem = TOP_LEVEL_DESTINATIONS[1],
+                modifier = Modifier.testTag("bottomNavMenu"))
+        }) {
+        Column(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            state = scrollState
+                .padding(it)
+                .fillMaxSize()
+                .focusable()
+                .wrapContentHeight()
+                .imePadding()
         ) {
-            items(messages) { message ->
-                val sdf = remember {
-                    java.text.SimpleDateFormat("hh:mm", Locale.ROOT)
-                }
-
-                when (message.sender == uiState.opponentId){
-                    true -> {
-                        ReceivedMessageRow(
-                            text = message.content,
-                            messageTime = sdf.format(message.dateTimeSent),
-                        )
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                state = scrollState
+            ) {
+                items(messages) { message ->
+                    val sdf = remember {
+                        java.text.SimpleDateFormat("hh:mm", Locale.ROOT)
                     }
-                    false ->{
-                        SentMessageRow(
-                            text = message.content,
-                            messageTime = sdf.format(message.dateTimeSent),
-                            messageRead = true,
-                        )
+
+                    when (message.sender == uiState.opponentId){
+                        true -> {
+                            ReceivedMessageRow(
+                                text = message.content,
+                                messageTime = sdf.format(message.dateTimeSent),
+                            )
+                        }
+                        false ->{
+                            SentMessageRow(
+                                text = message.content,
+                                messageTime = sdf.format(message.dateTimeSent),
+                                messageRead = true,
+                            )
+                        }
                     }
                 }
             }
-        }
-        ChatInput(
-            uiState = uiState,
-            onMessageChange = { viewModel.onMessageBarInputChange(it) },
+            ChatInput(
+                uiState = uiState,
+                onMessageChange = { viewModel.onMessageBarInputChange(it) },
 //            onMessageSend = { viewModel.onMessageSend() }
-        )
+            )
+        }
     }
 }
 
@@ -204,7 +222,10 @@ fun ChatAppBar(
     onBackArrowClick: (() -> Unit)? = null,
 ) {
     SmallTopAppBar(
-        modifier = Modifier.statusBarsPadding(),
+        modifier = Modifier
+            .height(64.dp)
+            .fillMaxWidth()
+            .padding(top = 16.dp),
         title = {
             Row {
                 Surface(
@@ -234,14 +255,16 @@ fun ChatAppBar(
                         .clickable {
                             onUserNameClick?.invoke()
                         },
-                    verticalArrangement = Arrangement.SpaceBetween
+                    verticalArrangement = Arrangement.Center
                 ) {
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 12.dp, start = 8.dp)
                     )
                 }
             }
@@ -288,8 +311,13 @@ fun ChatInput(
                 Text(text = stringResource(R.string.message_bar_placeholder))
             },
             trailingIcon = {
-                Row() {
+                Row(
+                    modifier = Modifier.padding(end = 8.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     IconButton(
+                        // TO DO: Implement onMessageSend
 //                        onClick = { onMessageSend() }
                         onClick = { null }
                     ) {
@@ -308,6 +336,7 @@ fun ChatInput(
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.photo_camera),
+                            modifier = Modifier.size(24.dp),
                             contentDescription = "Camera")
                     }
                 }
