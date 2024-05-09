@@ -28,6 +28,7 @@ constructor(
 
   init {
     checkUserLoginStatus()
+    observeEvents()
   }
 
   fun getEvents() {
@@ -95,6 +96,25 @@ constructor(
         Log.d("EventsOverviewViewModel", "Error fetching user document")
         _uiState.value =
             _uiState.value.copy(upcomingEventList = EventList(emptyList(), emptyList(), null))
+      }
+    }
+  }
+
+  private fun observeEvents() {
+    viewModelScope.launch {
+      eventRepository.observeEvents().collect { resource ->
+        when (resource) {
+          is Resource.Success -> {
+            _uiState.update { currentState ->
+              currentState.copy(
+                  eventList =
+                      EventList(
+                          resource.data, resource.data, _uiState.value.eventList.selectedEvent))
+            }
+          }
+          is Resource.Failure ->
+              Log.d("EventsOverviewViewModel", "Failed to fetch events: ${resource.throwable}")
+        }
       }
     }
   }

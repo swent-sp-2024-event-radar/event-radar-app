@@ -6,6 +6,9 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class FirebaseEventRepository : IEventRepository {
@@ -79,5 +82,19 @@ class FirebaseEventRepository : IEventRepository {
     } catch (e: Exception) {
       Resource.Failure(e)
     }
+  }
+
+  override fun observeEvents(): Flow<Resource<List<Event>>> = callbackFlow {
+    val listener =
+        eventRef.addSnapshotListener { snapshot, error ->
+          if (error != null) {
+            trySend(
+                Resource.Failure(Exception("Error listening to event updates: ${error.message}")))
+            return@addSnapshotListener
+          }
+          val events = snapshot?.documents?.mapNotNull { Event(it.data!!, it.id) }
+          trySend(Resource.Success(events ?: listOf()))
+        }
+    awaitClose { listener.remove() }
   }
 }

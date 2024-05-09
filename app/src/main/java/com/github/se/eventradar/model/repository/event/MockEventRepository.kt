@@ -2,9 +2,13 @@ package com.github.se.eventradar.model.repository.event
 
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.event.Event
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class MockEventRepository : IEventRepository {
   private val mockEvents = mutableListOf<Event>()
+  private val eventsFlow = MutableStateFlow<Resource<List<Event>>>(Resource.Success(mockEvents))
 
   override suspend fun getEvents(): Resource<List<Event>> {
     return Resource.Success(mockEvents)
@@ -56,4 +60,6 @@ class MockEventRepository : IEventRepository {
     }
     return Resource.Success(events)
   }
+
+  override fun observeEvents(): Flow<Resource<List<Event>>> = eventsFlow.asStateFlow()
 }
