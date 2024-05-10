@@ -538,17 +538,14 @@ class FirebaseUserRepositoryUnitTest {
     val uid = "1"
     val folderName = "folderName"
     val storageRef = mockk<StorageReference>()
-    val exception =
-        Exception(
-            "Network error while trying to upload image",
-            FirebaseNetworkException("Network Exception"))
+    val networkException = FirebaseNetworkException("Network Exception")
     every { Firebase.storage.reference } returns storageRef
     every { storageRef.child("$folderName/$uid") } returns storageRef
     every { storageRef.putFile(selectedImageUri) } returns
-        mockUploadTask(null, exception, isSuccessful = false)
+        mockUploadTask(null, networkException, isSuccessful = false)
     val result = firebaseUserRepository.uploadImage(selectedImageUri, uid, folderName)
     assert(result is Resource.Failure)
-    assert((result as Resource.Failure).throwable == exception)
+    assert((result as Resource.Failure).throwable.message?.contains("Network error") == true)
   }
 
   @Test
@@ -559,15 +556,13 @@ class FirebaseUserRepositoryUnitTest {
     val folderName = "folderName"
     val storageRef = mockk<StorageReference>()
     val storageException = StorageException.fromException(Throwable("Storage Error"))
-    val exception =
-        Exception("Storage error during upload: ${storageException.message}", storageException)
     every { Firebase.storage.reference } returns storageRef
     every { storageRef.child("$folderName/$uid") } returns storageRef
     every { storageRef.putFile(selectedImageUri) } returns
-        mockUploadTask(null, exception, isSuccessful = false)
+        mockUploadTask(null, storageException, isSuccessful = false)
     val result = firebaseUserRepository.uploadImage(selectedImageUri, uid, folderName)
     assert(result is Resource.Failure)
-    assert((result as Resource.Failure).throwable == exception)
+    assert((result as Resource.Failure).throwable.message?.contains("Storage error") == true)
   }
 
   @Test

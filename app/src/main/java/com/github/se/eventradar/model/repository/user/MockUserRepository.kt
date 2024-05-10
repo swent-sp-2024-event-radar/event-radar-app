@@ -110,13 +110,13 @@ class MockUserRepository : IUserRepository {
     }
   }
 
-  override suspend fun generateQRCode(userId: String): Resource<String> {
+  override suspend fun generateQRCode(userId: String): Resource<Unit> {
     val index = mockUsers.indexOfFirst { it.userId == userId }
     return if (index != -1) {
       val userList = mockImagesDatabase.keys.filter { user -> user.userId == userId }
       val user = userList[0]
       mockImagesDatabase[user]?.replace("QR_Codes", "http://example.com/QR_Codes/$userId")
-      Resource.Success("/QR_Codes/$userId")
+      Resource.Success(Unit)
     } else {
       Resource.Failure(Exception("User with id $userId not found"))
     }

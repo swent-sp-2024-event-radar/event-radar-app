@@ -176,12 +176,8 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
 
     val storageRef = Firebase.storage.reference.child("$folderName/$uid")
     return try {
-      println("ran")
       val result = storageRef.downloadUrl.await()
-      println("run too")
-      println("run too")
       val url = result.toString()
-      println("ranning")
       Resource.Success(url)
     } catch (e: FirebaseNetworkException) {
       return Resource.Failure(Exception("Network error while trying to get image", e))
@@ -201,8 +197,9 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
     }
   }
 
-  override suspend fun generateQRCode(userId: String): Resource<String> { // upload this in firebase
+  override suspend fun generateQRCode(userId: String): Resource<Unit> { // upload this in firebase
     return try {
+
       val qrCodeWriter = QRCodeWriter()
       val bitMatrix = qrCodeWriter.encode(userId, BarcodeFormat.QR_CODE, 200, 200)
       val bitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.RGB_565)
@@ -218,24 +215,20 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
       val baos = ByteArrayOutputStream()
       bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
       val data = baos.toByteArray()
-
       // Create a reference to the file in Firebase Storage
       val storageRef = FirebaseStorage.getInstance().reference
       val qrCodesRef = storageRef.child("QR_Codes/$userId")
-
       // Upload the file to Firebase Storage
       val uploadTask = qrCodesRef.putBytes(data).await()
       // Get the download URL of the image
       if (uploadTask.task.isSuccessful) {
-        Resource.Success(qrCodesRef.path) // Return the reference to the uploaded QR Code's path
+        Resource.Success(Unit) // Return the reference to the uploaded QR Code's path
       } else {
         val error = uploadTask.task.exception
         Resource.Failure(error ?: Exception("Upload failed without a specific error"))
       }
     } catch (e: com.google.zxing.WriterException) {
       Resource.Failure(Exception("QR Code generation failed", e))
-    } catch (e: java.io.IOException) {
-      Resource.Failure(Exception("IO error during QR code generation", e))
     } catch (e: FirebaseNetworkException) {
       Resource.Failure(Exception("Network error while trying to get image", e))
     } catch (e: StorageException) {

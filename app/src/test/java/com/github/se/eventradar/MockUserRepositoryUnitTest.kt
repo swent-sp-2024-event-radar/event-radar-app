@@ -253,7 +253,6 @@ class MockUserRepositoryUnitTest {
     userRepository.addUser(mockUser)
     val result = userRepository.generateQRCode(userId)
     assert(result is Resource.Success)
-    assert((result as Resource.Success).data == "/QR_Codes/$userId")
 
     val imageLink = userRepository.getImage(userId, "QR_Codes")
     assert(imageLink is Resource.Success)
