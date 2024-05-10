@@ -12,10 +12,10 @@ data class ChatRowData(
     var measuredType: Int = 0,
 ) {
 
-    override fun toString(): String {
-        return "ChatRowData text: $text, " +
-                "lastLineWidth: $lastLineWidth, lineCount: $lineCount, " +
-                "textWidth: ${textWidth}, rowWidth: $rowWidth, height: $rowHeight, " +
-                "parentWidth: $parentWidth, measuredType: $measuredType"
-    }
+  override fun toString(): String {
+    return "ChatRowData text: $text, " +
+        "lastLineWidth: $lastLineWidth, lineCount: $lineCount, " +
+        "textWidth: ${textWidth}, rowWidth: $rowWidth, height: $rowHeight, " +
+        "parentWidth: $parentWidth, measuredType: $measuredType"
+  }
 }
