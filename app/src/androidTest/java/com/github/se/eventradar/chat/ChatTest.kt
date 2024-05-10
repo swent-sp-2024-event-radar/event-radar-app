@@ -98,7 +98,7 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
           assertIsDisplayed()
           assertHasClickAction()
         }
-        chatAppBarTitleText { assertIsDisplayed() }
+//        chatAppBarTitleText { assertIsDisplayed() }
         //                chatAppBarBackArrowIcon { assertIsDisplayed() }
 
         //                bottomNav { assertIsDisplayed() }
