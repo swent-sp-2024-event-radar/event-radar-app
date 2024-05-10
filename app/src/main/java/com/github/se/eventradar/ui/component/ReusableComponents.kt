@@ -301,14 +301,15 @@ fun CategorySelection(uiState: EventsOverviewUiState, modifier: Modifier) {
                     uiState.categoriesCheckedList.remove(category)
                   }
                 },
-                modifier = Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp))
+                modifier =
+                Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp).testTag("checkbox"))
             Text(
                 text = category.displayName,
                 style =
                     TextStyle(
                         fontSize = 16.sp,
                     ),
-                modifier = Modifier.padding(start = 16.dp))
+                modifier = Modifier.padding(start = 16.dp).testTag("checkboxText"))
           }
     }
   }
