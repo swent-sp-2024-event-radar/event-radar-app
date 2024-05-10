@@ -37,22 +37,25 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
                   ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder")
           userRepository.uploadImage(imageURI, uid, "Profile_Pictures")
           // Generate QR Code Image and Upload it to Firestore
-            val qrCodeUrl = when (val qrCodeData = generateQRCodeData(uid)) {
+          val qrCodeUrl =
+              when (val qrCodeData = generateQRCodeData(uid)) {
                 null -> {
-                    Log.d("Exception", "QR Code Generation failed, a null QR Code ByteArray is received")
-                    ""
+                  Log.d(
+                      "Exception",
+                      "QR Code Generation failed, a null QR Code ByteArray is received")
+                  ""
                 }
                 else -> {
-                    userRepository.uploadQRCode(qrCodeData, uid)
-                    when (val result = userRepository.getImage(uid, "QR_Codes")) {
-                        is Resource.Success -> result.data
-                        is Resource.Failure -> {
-                            Log.d("LoginScreenViewModel", "Fetching QR Code Error")
-                            ""
-                        }
+                  userRepository.uploadQRCode(qrCodeData, uid)
+                  when (val result = userRepository.getImage(uid, "QR_Codes")) {
+                    is Resource.Success -> result.data
+                    is Resource.Failure -> {
+                      Log.d("LoginScreenViewModel", "Fetching QR Code Error")
+                      ""
                     }
+                  }
                 }
-            }
+              }
           val profilePicUrl =
               when (val result = userRepository.getImage(uid, "Profile_Pictures")) {
                 is Resource.Success -> {

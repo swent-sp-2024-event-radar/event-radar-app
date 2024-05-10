@@ -3,14 +3,12 @@ package com.github.se.eventradar.model.repository.user
 import android.net.Uri
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
-import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.tasks.await
 
@@ -171,7 +169,7 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
       val url = result.toString()
       Resource.Success(url)
     } catch (e: Exception) {
-        Resource.Failure(Exception("Error while getting image: ${e.localizedMessage}"))
+      Resource.Failure(Exception("Error while getting image: ${e.localizedMessage}"))
     }
   }
 
@@ -202,7 +200,7 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
         Resource.Failure(error ?: Exception("Upload QR Code failed without a specific error"))
       }
     } catch (e: Exception) {
-        Resource.Failure(Exception("Error during QR code upload: ${e.localizedMessage}"))
+      Resource.Failure(Exception("Error during QR code upload: ${e.localizedMessage}"))
     }
   }
 

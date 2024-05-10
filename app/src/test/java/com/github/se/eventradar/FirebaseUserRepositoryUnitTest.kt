@@ -9,7 +9,6 @@ import com.github.se.eventradar.model.repository.user.FirebaseUserRepository
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
-import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
@@ -18,7 +17,6 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.google.firebase.storage.storage
@@ -511,7 +509,9 @@ class FirebaseUserRepositoryUnitTest {
         mockUploadTask(null, genericException, isSuccessful = false)
     val result = firebaseUserRepository.uploadImage(selectedImageUri, uid, folderName)
     assert(result is Resource.Failure)
-    assert((result as Resource.Failure).throwable.message == "Error during upload image: ${genericException.message}")
+    assert(
+        (result as Resource.Failure).throwable.message ==
+            "Error during upload image: ${genericException.message}")
   }
 
   @Test
@@ -531,7 +531,6 @@ class FirebaseUserRepositoryUnitTest {
     assert((result as Resource.Failure).throwable.message == exception.message)
   }
 
-
   @Test
   fun `test getImage Success`() = runTest {
     val uid = "1"
@@ -549,7 +548,6 @@ class FirebaseUserRepositoryUnitTest {
     assert((result as Resource.Success).data == expectedUrl)
   }
 
-
   @Test
   fun `test getImage Generic Failure`() = runTest {
     val uid = "1"
@@ -563,7 +561,9 @@ class FirebaseUserRepositoryUnitTest {
     val result = firebaseUserRepository.getImage(uid, folderName)
 
     assert(result is Resource.Failure)
-    assert((result as Resource.Failure).throwable.message == "Error while getting image: ${genericException.message}")
+    assert(
+        (result as Resource.Failure).throwable.message ==
+            "Error while getting image: ${genericException.message}")
   }
 
   @Test
@@ -610,7 +610,9 @@ class FirebaseUserRepositoryUnitTest {
 
     val result = firebaseUserRepository.uploadQRCode(mockData, uid)
     assert(result is Resource.Failure)
-    assert((result as Resource.Failure).throwable.message == "Error during QR code upload: ${genericException.message}")
+    assert(
+        (result as Resource.Failure).throwable.message ==
+            "Error during QR code upload: ${genericException.message}")
   }
 }
 
