@@ -10,10 +10,9 @@ public class ChatScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
         viewBuilderAction = { hasTestTag("chatScreen") }) {
 
     val chatAppBar: KNode = child { hasTestTag("chatAppBar") }
-    private val chatAppBarTitle: KNode = chatAppBar.child { hasTestTag("chatAppBarTitle") }
-    private val chatAppBarTitleSurface: KNode = chatAppBarTitle.child { hasTestTag("chatAppBarTitleSurface") }
+    val chatAppBarTitle: KNode = chatAppBar.child { hasTestTag("chatAppBarTitle") }
+    val chatAppBarTitleSurface: KNode = chatAppBarTitle.child { hasTestTag("chatAppBarTitleSurface") }
     val chatAppBarTitleImage: KNode = chatAppBarTitleSurface.child { hasTestTag("chatAppBarTitleImage") }
-    val chatAppBarTitleIcon: KNode = chatAppBarTitleSurface.child { hasTestTag("chatAppBarTitleIcon") }
     val chatAppBarTitleColumn: KNode = chatAppBarTitle.child { hasTestTag("chatAppBarTitleColumn") }
     val chatAppBarTitleText: KNode = chatAppBarTitleColumn.child { hasTestTag("chatAppBarTitleText") }
     private val chatAppBarBackArrow: KNode = chatAppBar.child { hasTestTag("chatAppBarBackArrow") }

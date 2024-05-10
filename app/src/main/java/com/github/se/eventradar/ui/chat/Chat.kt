@@ -238,25 +238,15 @@ fun ChatAppBar(
                     modifier = Modifier.size(50.dp).testTag("chatAppBarTitleSurface"),
                     shape = CircleShape,
                 ) {
-                    if (pictureUrl != null) {
-                        Image(
-                            // TO DO: Insert image from database, for now it's a person icon
-                            imageVector = Icons.Filled.Person,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .aspectRatio(1f)
-                                .testTag("chatAppBarTitleImage"))
-                    } else {
-                        Icon(
-                            imageVector = Icons.Filled.Person,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .aspectRatio(1f)
-                                .testTag("chatAppBarTitleIcon"))
-                    }
+                    Image(
+                        // TO DO: Insert image from database, for now it's a person icon
+                        imageVector = Icons.Filled.Person,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .aspectRatio(1f)
+                            .testTag("chatAppBarTitleImage"))
                 }
                 Column(
                     modifier = Modifier
