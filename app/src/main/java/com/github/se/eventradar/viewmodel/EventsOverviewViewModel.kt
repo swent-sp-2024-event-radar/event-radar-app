@@ -72,35 +72,45 @@ constructor(
     filterEvents()
   }
 
-    fun filterEvents() {
-        // Select the correct event list based on the active tab
-        val eventList = if (_uiState.value.tab == Tab.BROWSE) {
-            _uiState.value.eventList
-        } else {
-            _uiState.value.upcomingEventList
-        }.allEvents
+  fun filterEvents() {
+    // Select the correct event list based on the active tab
+    val eventList =
+        if (_uiState.value.tab == Tab.BROWSE) {
+              _uiState.value.eventList
+            } else {
+              _uiState.value.upcomingEventList
+            }
+            .allEvents
 
-        // User location should ideally be dynamic but is fixed for the purpose of this example
-        val userLocation = Location(latitude = 38.92, longitude = 78.78, address = "Ecublens")
+    // User location should ideally be dynamic but is fixed for the purpose of this example
+    val userLocation = Location(latitude = 38.92, longitude = 78.78, address = "Ecublens")
 
-        val filteredEvents = eventList.filter { event ->
-            // Search filter
-            event.eventName.contains(_uiState.value.searchQuery, ignoreCase = true) &&
-                    // Radius filter
-                    (_uiState.value.radiusQuery.isEmpty() || calculateDistance(userLocation, event.location) <= _uiState.value.radiusQuery.toDouble()) &&
-                    // Free event filter
-                    (!_uiState.value.isFreeSwitchOn || event.ticket.price == 0.0) &&
-                    // Category filter
-                    (_uiState.value.categoriesCheckedList.isEmpty() || _uiState.value.categoriesCheckedList.contains(event.category))
+    val filteredEvents =
+        eventList.filter { event ->
+          // Search filter
+          event.eventName.contains(_uiState.value.searchQuery, ignoreCase = true) &&
+              // Radius filter
+              (_uiState.value.radiusQuery.isEmpty() ||
+                  calculateDistance(userLocation, event.location) <=
+                      _uiState.value.radiusQuery.toDouble()) &&
+              // Free event filter
+              (!_uiState.value.isFreeSwitchOn || event.ticket.price == 0.0) &&
+              // Category filter
+              (_uiState.value.categoriesCheckedList.isEmpty() ||
+                  _uiState.value.categoriesCheckedList.contains(event.category))
         }
 
-        // Update the UI state with the filtered events for the respective tab
-        _uiState.value = if (_uiState.value.tab == Tab.BROWSE) {
-            _uiState.value.copy(eventList = _uiState.value.eventList.copy(filteredEvents = filteredEvents))
+    // Update the UI state with the filtered events for the respective tab
+    _uiState.value =
+        if (_uiState.value.tab == Tab.BROWSE) {
+          _uiState.value.copy(
+              eventList = _uiState.value.eventList.copy(filteredEvents = filteredEvents))
         } else {
-            _uiState.value.copy(upcomingEventList = _uiState.value.upcomingEventList.copy(filteredEvents = filteredEvents))
+          _uiState.value.copy(
+              upcomingEventList =
+                  _uiState.value.upcomingEventList.copy(filteredEvents = filteredEvents))
         }
-    }
+  }
 
   // Calculates distance between 2 coordinate points based on Haversine formula
   // Accounts for earth's curvature

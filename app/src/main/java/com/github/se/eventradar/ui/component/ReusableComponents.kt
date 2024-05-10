@@ -288,7 +288,9 @@ fun CategorySelection(uiState: EventsOverviewUiState, modifier: Modifier) {
       Row(
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.Start,
-          modifier = Modifier.padding(vertical = 0.dp).testTag("categoryOptionRow-${category.displayName}")) {
+          modifier =
+              Modifier.padding(vertical = 0.dp)
+                  .testTag("categoryOptionRow-${category.displayName}")) {
             Checkbox(
                 checked = isChecked,
                 onCheckedChange = {
@@ -299,8 +301,7 @@ fun CategorySelection(uiState: EventsOverviewUiState, modifier: Modifier) {
                     uiState.categoriesCheckedList.remove(category)
                   }
                 },
-                modifier =
-                    Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp))
+                modifier = Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp))
             Text(
                 text = category.displayName,
                 style =
