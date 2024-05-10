@@ -1,12 +1,17 @@
 package com.github.se.eventradar.viewmodel
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.repository.user.IUserRepository
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.qrcode.QRCodeWriter
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
@@ -32,7 +37,8 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
                   ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder")
           userRepository.uploadImage(imageURI, uid, "Profile_Pictures")
           // Generate QR Code Image and Upload it to Firestore
-          userRepository.generateQRCode(uid)
+          val qrCodeData = generateQRCodeData(uid)
+          userRepository.uploadQRCode(qrCodeData, uid)
           val qrCodeUrl =
               when (val result = userRepository.getImage(uid, "QR_Codes")) {
                 is Resource.Success -> {
@@ -82,6 +88,30 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
           Log.d("LoginScreenViewModel", "User not logged in")
         }
       }
+    }
+  }
+
+  private fun generateQRCodeData(userId: String): ByteArray {
+    return try {
+      val qrCodeWriter = QRCodeWriter()
+      val bitMatrix = qrCodeWriter.encode(userId, BarcodeFormat.QR_CODE, 200, 200)
+      val bitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.RGB_565)
+      for (x in 0 until 200) {
+        for (y in 0 until 200) {
+          bitmap.setPixel(
+              x,
+              y,
+              if (bitMatrix[x, y]) Color(0xFF000000).hashCode() else Color(0xFFFFFFFF).hashCode())
+        }
+      }
+      // Convert the bitmap to a byte array
+      val baos = ByteArrayOutputStream()
+      bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
+      val data = baos.toByteArray()
+      data
+    } catch (e: Exception) {
+      Log.d("Exception", "Error generating QR Code for User: ${e.message}")
+      ByteArray(0)
     }
   }
 

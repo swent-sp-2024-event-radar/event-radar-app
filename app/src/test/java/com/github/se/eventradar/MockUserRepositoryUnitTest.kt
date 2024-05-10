@@ -247,11 +247,12 @@ class MockUserRepositoryUnitTest {
   }
 
   @Test
-  fun testGenerateQRCodeImageSuccess() = runTest {
+  fun tesUploadQRCodeImageSuccess() = runTest {
     val userId = mockUser.userId
     (userRepository as MockUserRepository).updateCurrentUserId(userId)
     userRepository.addUser(mockUser)
-    val result = userRepository.generateQRCode(userId)
+    val mockData = ByteArray(1)
+    val result = userRepository.uploadQRCode(mockData, userId)
     assert(result is Resource.Success)
 
     val imageLink = userRepository.getImage(userId, "QR_Codes")

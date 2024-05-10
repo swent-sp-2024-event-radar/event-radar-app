@@ -110,7 +110,7 @@ class MockUserRepository : IUserRepository {
     }
   }
 
-  override suspend fun generateQRCode(userId: String): Resource<Unit> {
+  override suspend fun uploadQRCode(data: ByteArray, userId: String): Resource<Unit> {
     val index = mockUsers.indexOfFirst { it.userId == userId }
     return if (index != -1) {
       val userList = mockImagesDatabase.keys.filter { user -> user.userId == userId }

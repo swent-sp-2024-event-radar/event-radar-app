@@ -1,8 +1,6 @@
 package com.github.se.eventradar.model.repository.user
 
-import android.graphics.Bitmap
 import android.net.Uri
-import androidx.compose.ui.graphics.Color
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.google.firebase.FirebaseNetworkException
@@ -14,9 +12,6 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.ktx.storage
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.qrcode.QRCodeWriter
-import java.io.ByteArrayOutputStream
 import kotlinx.coroutines.tasks.await
 
 class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUserRepository {
@@ -197,24 +192,11 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
     }
   }
 
-  override suspend fun generateQRCode(userId: String): Resource<Unit> { // upload this in firebase
+  override suspend fun uploadQRCode(
+      data: ByteArray,
+      userId: String
+  ): Resource<Unit> { // upload this in firebase
     return try {
-
-      val qrCodeWriter = QRCodeWriter()
-      val bitMatrix = qrCodeWriter.encode(userId, BarcodeFormat.QR_CODE, 200, 200)
-      val bitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.RGB_565)
-      for (x in 0 until 200) {
-        for (y in 0 until 200) {
-          bitmap.setPixel(
-              x,
-              y,
-              if (bitMatrix[x, y]) Color(0xFF000000).hashCode() else Color(0xFFFFFFFF).hashCode())
-        }
-      }
-      // Convert the bitmap to a byte array
-      val baos = ByteArrayOutputStream()
-      bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
-      val data = baos.toByteArray()
       // Create a reference to the file in Firebase Storage
       val storageRef = FirebaseStorage.getInstance().reference
       val qrCodesRef = storageRef.child("QR_Codes/$userId")
@@ -225,14 +207,12 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
         Resource.Success(Unit) // Return the reference to the uploaded QR Code's path
       } else {
         val error = uploadTask.task.exception
-        Resource.Failure(error ?: Exception("Upload failed without a specific error"))
+        Resource.Failure(error ?: Exception("Upload QR Code failed without a specific error"))
       }
-    } catch (e: com.google.zxing.WriterException) {
-      Resource.Failure(Exception("QR Code generation failed", e))
     } catch (e: FirebaseNetworkException) {
-      Resource.Failure(Exception("Network error while trying to get image", e))
+      Resource.Failure(Exception("Network error while trying to upload qr code", e))
     } catch (e: StorageException) {
-      Resource.Failure(Exception("Firebase Upload Storage operation failed", e))
+      return Resource.Failure(Exception("Storage error during upload qr code: ${e.message}", e))
     } catch (e: Exception) {
       Resource.Failure(e)
     }
