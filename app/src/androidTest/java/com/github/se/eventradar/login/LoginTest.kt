@@ -1,9 +1,9 @@
 package com.github.se.eventradar.login
 
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
+import androidx.test.espresso.intent.rule.IntentsRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.screens.LoginScreen
@@ -22,6 +22,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class LoginTest : TestCase() {
   @get:Rule val composeTestRule = createComposeRule()
+  
+  @get:Rule val intentsTestRule = IntentsRule()
 
   // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
   @get:Rule val mockkRule = MockKRule(this)
@@ -38,7 +40,7 @@ class LoginTest : TestCase() {
   }
 
   @Test
-  fun allElementsAreCorrectlyDisplayed() = run {
+  fun allElementsAreCorrectlyDisplayed() {
     ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
       // Test the UI elements
       eventRadarLogo { assertIsDisplayed() }
@@ -52,7 +54,6 @@ class LoginTest : TestCase() {
   /** This test checks that the google authentication works correctly */
   @Test
   fun googleSignInReturnsValidActivityResult() {
-    Intents.init()
     ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
       loginButton {
         assertIsDisplayed()
@@ -62,6 +63,5 @@ class LoginTest : TestCase() {
       // assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)
       intended(toPackage("com.google.android.gms"))
     }
-    Intents.release()
   }
 }

@@ -2,10 +2,10 @@ package com.github.se.eventradar.signup
 
 import android.content.Intent
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
+import androidx.test.espresso.intent.rule.IntentsRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.screens.SignupScreen
@@ -26,6 +26,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class SignupTest : TestCase() {
   @get:Rule val composeTestRule = createComposeRule()
+  
+  @get:Rule val intentsTestRule = IntentsRule()
 
   // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
   @get:Rule val mockkRule = MockKRule(this)
@@ -42,7 +44,7 @@ class SignupTest : TestCase() {
   }
 
   @Test
-  fun allElementsAreCorrectlyDisplayed() = run {
+  fun allElementsAreCorrectlyDisplayed() {
     ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
       // Test the UI elements
       eventRadarLogo {
@@ -84,7 +86,6 @@ class SignupTest : TestCase() {
   /** This test checks that the google authentication works correctly */
   @Test
   fun googleSignInReturnsValidActivityResult() {
-    Intents.init()
     ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
       usernameTextField {
         performScrollTo()
@@ -121,12 +122,10 @@ class SignupTest : TestCase() {
       // assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)
       intended(toPackage("com.google.android.gms"))
     }
-    Intents.release()
   }
 
   @Test
-  fun profilePicClickOpensGallery() = run {
-    Intents.init()
+  fun profilePicClickOpensGallery() {
     ComposeScreen.onComposeScreen<SignupScreen>(composeTestRule) {
       profilePicture {
         assertIsDisplayed()
@@ -135,7 +134,6 @@ class SignupTest : TestCase() {
 
       intended(hasAction(Intent.ACTION_GET_CONTENT))
     }
-    Intents.release()
   }
 
   @Test
