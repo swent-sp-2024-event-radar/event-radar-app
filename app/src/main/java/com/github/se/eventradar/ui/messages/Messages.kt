@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,6 +31,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -173,16 +175,31 @@ fun MessagesList(
 ) {
   val filteredMessageList = messageList.filter { it.user1 == userId || it.user2 == userId }
 
-  LazyColumn(modifier = modifier.padding(top = 16.dp)) {
-    items(filteredMessageList) { messageHistory ->
-      val otherUser =
-          if (userId == messageHistory.user1) messageHistory.user2 else messageHistory.user1
-      val currentUserReadLatestMessage =
-          if (userId == messageHistory.user1) messageHistory.user1ReadMostRecentMessage
-          else messageHistory.user2ReadMostRecentMessage
-      val recipient = getUser(otherUser)
-      MessagePreviewItem(messageHistory, recipient, currentUserReadLatestMessage, onChatClicked)
-      Divider()
+  if (filteredMessageList.isEmpty()) {
+    Text(
+        text = stringResource(R.string.no_message_found_string),
+        style =
+            TextStyle(
+                fontSize = 16.sp,
+                lineHeight = 24.sp,
+                fontFamily = FontFamily(Font(R.font.roboto)),
+                fontWeight = FontWeight.Normal,
+                color = Color(0xFF49454F),
+                letterSpacing = 0.15.sp,
+                textAlign = TextAlign.Center),
+        modifier = Modifier.fillMaxSize().padding(top = 32.dp).testTag("noMessagesFound"))
+  } else {
+    LazyColumn(modifier = modifier.padding(top = 16.dp)) {
+      items(filteredMessageList) { messageHistory ->
+        val otherUser =
+            if (userId == messageHistory.user1) messageHistory.user2 else messageHistory.user1
+        val currentUserReadLatestMessage =
+            if (userId == messageHistory.user1) messageHistory.user1ReadMostRecentMessage
+            else messageHistory.user2ReadMostRecentMessage
+        val recipient = getUser(otherUser)
+        MessagePreviewItem(messageHistory, recipient, currentUserReadLatestMessage, onChatClicked)
+        Divider()
+      }
     }
   }
 }
@@ -332,4 +349,32 @@ fun PreviewMessagesScreen() {
             "",
             "johndoe")
       })
+}
+
+@Preview(showSystemUi = true, showBackground = true)
+@ExcludeFromJacocoGeneratedReport
+@Composable
+fun PreviewEmptyMessagesList() {
+  MessagesList(
+      messageList = emptyList(),
+      searchQuery = "",
+      userId = "1",
+      onChatClicked = {},
+      getUser = {
+        User(
+            it,
+            "10/10/2003",
+            "test@test.com",
+            "John",
+            "Doe",
+            "1234567890",
+            "active",
+            mutableSetOf(),
+            mutableSetOf(),
+            mutableSetOf(),
+            "content://com.google.android.apps.docs.storage/document/acc%3D1%3Bdoc%3Dencoded%3D_UfMfUb7G-_gMA2naQlf9EvwC7BF37dTn3wqEbCsPCFqL25u15za15OI19GK4g%3D",
+            "",
+            "johndoe")
+      },
+      modifier = Modifier)
 }
