@@ -156,6 +156,7 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
     val storageRef = Firebase.storage.reference.child("$folderName/$uid")
     try {
       val result = storageRef.putFile(selectedImageUri).await()
+      Resource.Success(Unit)
       return if (result.task.isSuccessful) {
         Resource.Success(Unit)
       } else {
@@ -165,13 +166,9 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
     } catch (e: FirebaseNetworkException) {
       return Resource.Failure(Exception("Network error while trying to upload image", e))
     } catch (e: StorageException) {
-      return if (e.message == StorageException.ERROR_OBJECT_NOT_FOUND.toString()) {
-        Resource.Failure(Exception("File not found during upload", e))
-      } else {
-        Resource.Failure(Exception("Storage error during upload: ${e.message}", e))
-      }
+      return Resource.Failure(Exception("Storage error during upload: ${e.message}", e))
     } catch (e: Exception) {
-      return Resource.Failure(Exception("Unknown error occurred during upload: ${e.message}", e))
+      return Resource.Failure(e)
     }
   }
 
@@ -179,19 +176,18 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
 
     val storageRef = Firebase.storage.reference.child("$folderName/$uid")
     return try {
+      println("ran")
       val result = storageRef.downloadUrl.await()
+      println("run too")
       val url = result.toString()
+      println("ranning")
       Resource.Success(url)
     } catch (e: FirebaseNetworkException) {
-      Resource.Failure(Exception("Network error while trying to get image", e))
+      return Resource.Failure(Exception("Network error while trying to get image", e))
     } catch (e: StorageException) {
-      if (e.message == StorageException.ERROR_OBJECT_NOT_FOUND.toString()) {
-        Resource.Failure(Exception("Image file not found", e))
-      } else {
-        Resource.Failure(Exception("Storage error: ${e.message}", e))
-      }
+      return Resource.Failure(Exception("Storage error during get image: ${e.message}", e))
     } catch (e: Exception) {
-      Resource.Failure(Exception("Unknown error occurred", e))
+      return Resource.Failure(e)
     }
   }
 

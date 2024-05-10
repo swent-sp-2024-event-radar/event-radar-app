@@ -1,10 +1,15 @@
 package com.github.se.eventradar
 
+import android.content.Context
+import android.net.Uri
+import androidx.test.core.app.ApplicationProvider
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.FirebaseUserRepository
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
@@ -12,6 +17,11 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageException
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
+import com.google.firebase.storage.storage
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
@@ -64,6 +74,29 @@ class FirebaseUserRepositoryUnitTest {
     every { mockDb.collection("users") } returns userRef
 
     firebaseUserRepository = FirebaseUserRepository(db = mockDb)
+
+    val mockFirebaseApp = mockk<FirebaseApp>()
+    val mockFirebaseAuth = mockk<FirebaseAuth>()
+    val mockFirebaseStorage = mockk<FirebaseStorage>()
+
+    mockkStatic(FirebaseApp::class)
+    mockkStatic(FirebaseAuth::class)
+    mockkStatic(FirebaseStorage::class)
+
+    every { FirebaseApp.getInstance() } returns mockFirebaseApp
+    every { FirebaseAuth.getInstance() } returns mockFirebaseAuth
+    every { FirebaseStorage.getInstance() } returns mockFirebaseStorage
+
+    // Mock Context
+    val mockContext = mockk<Context>()
+
+    // Mock static methods
+    mockkStatic(FirebaseApp::class)
+    mockkStatic(ApplicationProvider::class)
+
+    // Define behavior
+    every { FirebaseApp.initializeApp(any()) } returns mockFirebaseApp
+    every { ApplicationProvider.getApplicationContext<Context>() } returns mockContext
   }
 
   @After
@@ -448,6 +481,91 @@ class FirebaseUserRepositoryUnitTest {
     unmockkStatic("com.google.firebase.Firebase")
     unmockkStatic("com.google.firebase.auth.FirebaseAuth")
   }
+
+  @Test
+  fun `test uploadImage Success`() = runTest {
+    val selectedImageUri = mockk<Uri>()
+    every { selectedImageUri.path } returns "/path/to/image"
+    val uid = "1"
+    val folderName = "folderName"
+    val storageRef = mockk<StorageReference>()
+    every { Firebase.storage.reference } returns storageRef
+    every { storageRef.child("$folderName/$uid") } returns storageRef
+    every { storageRef.putFile(selectedImageUri) } returns
+        mockSuccessfulUploadTask(selectedImageUri, true)
+    val result = firebaseUserRepository.uploadImage(selectedImageUri, uid, folderName)
+    assert(result is Resource.Success)
+  }
+
+  @Test
+  fun `test uploadImage Failure`() = runTest {
+    val selectedImageUri = mockk<Uri>()
+    every { selectedImageUri.path } returns "/path/to/image"
+    val uid = "1"
+    val folderName = "folderName"
+    val storageRef = mockk<StorageReference>()
+    val exception = Exception("Error")
+    every { Firebase.storage.reference } returns storageRef
+    every { storageRef.child("$folderName/$uid") } returns storageRef
+    every { storageRef.putFile(selectedImageUri) } returns mockUploadTask(null, exception)
+    val result = firebaseUserRepository.uploadImage(selectedImageUri, uid, folderName)
+    assert(result is Resource.Failure)
+    assert((result as Resource.Failure).throwable == exception)
+  }
+
+  @Test
+  fun `test uploadImage Failure From Task`() = runTest {
+    val selectedImageUri = mockk<Uri>()
+    every { selectedImageUri.path } returns "/path/to/image"
+    val uid = "1"
+    val folderName = "folderName"
+    val storageRef = mockk<StorageReference>()
+    val exception = Exception("Upload failed without a specific error")
+    every { Firebase.storage.reference } returns storageRef
+    every { storageRef.child("$folderName/$uid") } returns storageRef
+    every { storageRef.putFile(selectedImageUri) } returns
+        mockSuccessfulUploadTask(selectedImageUri, false)
+    val result = firebaseUserRepository.uploadImage(selectedImageUri, uid, folderName)
+    assert(result is Resource.Failure)
+    assert((result as Resource.Failure).throwable.message == exception.message)
+  }
+
+  @Test
+  fun `test uploadImage Failure Network Exception`() = runTest {
+    val selectedImageUri = mockk<Uri>()
+    every { selectedImageUri.path } returns "/path/to/image"
+    val uid = "1"
+    val folderName = "folderName"
+    val storageRef = mockk<StorageReference>()
+    val exception =
+        Exception(
+            "Network error while trying to upload image",
+            FirebaseNetworkException("Network Exception"))
+    every { Firebase.storage.reference } returns storageRef
+    every { storageRef.child("$folderName/$uid") } returns storageRef
+    every { storageRef.putFile(selectedImageUri) } returns mockUploadTask(null, exception)
+    val result = firebaseUserRepository.uploadImage(selectedImageUri, uid, folderName)
+    assert(result is Resource.Failure)
+    assert((result as Resource.Failure).throwable == exception)
+  }
+
+  @Test
+  fun `test uploadImage Failure Storage Exception`() = runTest {
+    val selectedImageUri = mockk<Uri>()
+    every { selectedImageUri.path } returns "/path/to/image"
+    val uid = "1"
+    val folderName = "folderName"
+    val storageRef = mockk<StorageReference>()
+    val storageException = StorageException.fromException(Throwable("Storage Error"))
+    val exception =
+        Exception("Storage error during upload: ${storageException.message}", storageException)
+    every { Firebase.storage.reference } returns storageRef
+    every { storageRef.child("$folderName/$uid") } returns storageRef
+    every { storageRef.putFile(selectedImageUri) } returns mockUploadTask(null, exception)
+    val result = firebaseUserRepository.uploadImage(selectedImageUri, uid, folderName)
+    assert(result is Resource.Failure)
+    assert((result as Resource.Failure).throwable == exception)
+  }
 }
 
 /**
@@ -461,5 +579,34 @@ inline fun <reified T> mockTask(result: T?, exception: Exception? = null): Task<
   every { task.isCanceled } returns false
   val relaxedT: T = mockk(relaxed = true)
   every { task.result } returns result
+  return task
+}
+
+fun mockSuccessfulUploadTask(result: Uri?, isSuccessful: Boolean): UploadTask {
+  val task: UploadTask = mockk(relaxed = true)
+  val snapshot: UploadTask.TaskSnapshot = mockk(relaxed = true)
+
+  // Mock the snapshot metadata path retrieval
+  every { snapshot.metadata } returns mockk { every { path } returns result?.path.toString() }
+
+  // Link the snapshot to the task and set typical successful task properties
+  every { snapshot.task } returns task
+  every { task.isComplete } returns true
+  every { task.exception } returns null
+  every { task.isCanceled } returns false
+  every { task.isSuccessful } returns isSuccessful
+  every { task.result } returns snapshot
+
+  return task
+}
+
+fun mockUploadTask(result: Uri?, exception: Exception? = null): UploadTask {
+  val task: UploadTask = mockk(relaxed = true)
+  val snapshot: UploadTask.TaskSnapshot = mockk(relaxed = true)
+  every { snapshot.metadata } returns mockk { every { path } returns result?.path.toString() }
+  every { task.isComplete } returns true
+  every { task.exception } returns exception
+  every { task.isCanceled } returns false
+  every { task.result } returns snapshot
   return task
 }
