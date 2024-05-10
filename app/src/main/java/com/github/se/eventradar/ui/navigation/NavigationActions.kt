@@ -24,8 +24,9 @@ object Route {
 data class TopLevelDestination(val route: String, val icon: Int, val textId: Int)
 
 class NavigationActions(val navController: NavController) {
-  fun navigateTo(destination: TopLevelDestination) {
-    navController.navigate(destination.route) {
+  fun navigateTo(destination: TopLevelDestination, extra: String? = null) {
+    val route = if (extra != null) "${destination.route}/$extra" else destination.route
+    navController.navigate(route) {
       // Pop up to the start destination of the graph to
       // avoid building up a large stack of destinations
       // on the back stack as users select items
