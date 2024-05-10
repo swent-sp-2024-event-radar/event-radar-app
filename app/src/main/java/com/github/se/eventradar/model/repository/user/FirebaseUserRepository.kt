@@ -158,12 +158,8 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
         val error = result.task.exception
         Resource.Failure(error ?: Exception("Upload failed without a specific error"))
       }
-    } catch (e: FirebaseNetworkException) {
-      return Resource.Failure(Exception("Network error while trying to upload image", e))
-    } catch (e: StorageException) {
-      return Resource.Failure(Exception("Storage error during upload: ${e.message}", e))
     } catch (e: Exception) {
-      return Resource.Failure(e)
+      return Resource.Failure(Exception("Error during upload image: ${e.localizedMessage}"))
     }
   }
 
@@ -174,12 +170,8 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
       val result = storageRef.downloadUrl.await()
       val url = result.toString()
       Resource.Success(url)
-    } catch (e: FirebaseNetworkException) {
-      return Resource.Failure(Exception("Network error while trying to get image", e))
-    } catch (e: StorageException) {
-      return Resource.Failure(Exception("Storage error during get image: ${e.message}", e))
     } catch (e: Exception) {
-      return Resource.Failure(e)
+        Resource.Failure(Exception("Error while getting image: ${e.localizedMessage}"))
     }
   }
 
@@ -209,12 +201,8 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
         val error = uploadTask.task.exception
         Resource.Failure(error ?: Exception("Upload QR Code failed without a specific error"))
       }
-    } catch (e: FirebaseNetworkException) {
-      Resource.Failure(Exception("Network error while trying to upload qr code", e))
-    } catch (e: StorageException) {
-      return Resource.Failure(Exception("Storage error during upload qr code: ${e.message}", e))
     } catch (e: Exception) {
-      Resource.Failure(e)
+        Resource.Failure(Exception("Error during QR code upload: ${e.localizedMessage}"))
     }
   }
 

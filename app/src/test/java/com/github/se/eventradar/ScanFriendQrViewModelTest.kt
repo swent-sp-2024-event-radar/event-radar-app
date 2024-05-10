@@ -209,11 +209,11 @@ class ScanFriendQrViewModelTest {
     assertEquals(ScanFriendQrViewModel.Action.NavigateToNextScreen, viewModel.uiState.value.action)
   }
 
+    //This is testing if the getUserDetails function (to display information in MyQRCode Tab) returns an error when we are trying to get a username when no user is logged in (no userid)
   @Test
   fun testGetUserNameFailNoUserId() = runTest {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
-    // Given
     // initialize user with no mock
     (userRepository as MockUserRepository).updateCurrentUserId(null)
     userRepository.addUser(mockUser) // user in database, but no currentUserId

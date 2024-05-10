@@ -37,18 +37,22 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
                   ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder")
           userRepository.uploadImage(imageURI, uid, "Profile_Pictures")
           // Generate QR Code Image and Upload it to Firestore
-          val qrCodeData = generateQRCodeData(uid)
-          userRepository.uploadQRCode(qrCodeData, uid)
-          val qrCodeUrl =
-              when (val result = userRepository.getImage(uid, "QR_Codes")) {
-                is Resource.Success -> {
-                  result.data
+            val qrCodeUrl = when (val qrCodeData = generateQRCodeData(uid)) {
+                null -> {
+                    Log.d("Exception", "QR Code Generation failed, a null QR Code ByteArray is received")
+                    ""
                 }
-                is Resource.Failure -> {
-                  Log.d("LoginScreenViewModel", "Fetching QR Code Error")
-                  ""
+                else -> {
+                    userRepository.uploadQRCode(qrCodeData, uid)
+                    when (val result = userRepository.getImage(uid, "QR_Codes")) {
+                        is Resource.Success -> result.data
+                        is Resource.Failure -> {
+                            Log.d("LoginScreenViewModel", "Fetching QR Code Error")
+                            ""
+                        }
+                    }
                 }
-              }
+            }
           val profilePicUrl =
               when (val result = userRepository.getImage(uid, "Profile_Pictures")) {
                 is Resource.Success -> {
@@ -91,7 +95,7 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
     }
   }
 
-  private fun generateQRCodeData(userId: String): ByteArray {
+  private fun generateQRCodeData(userId: String): ByteArray? {
     return try {
       val qrCodeWriter = QRCodeWriter()
       val bitMatrix = qrCodeWriter.encode(userId, BarcodeFormat.QR_CODE, 200, 200)
@@ -111,7 +115,7 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
       data
     } catch (e: Exception) {
       Log.d("Exception", "Error generating QR Code for User: ${e.message}")
-      ByteArray(0)
+      null
     }
   }
 
