@@ -1,7 +1,8 @@
 package com.github.se.eventradar.signup
 
 import android.content.Intent
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
@@ -9,7 +10,6 @@ import androidx.test.espresso.intent.rule.IntentsRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.screens.SignupScreen
-import com.github.se.eventradar.ui.MainActivity
 import com.github.se.eventradar.ui.login.SignUpScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.viewmodel.LoginViewModel
@@ -26,7 +26,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class SignupTest : TestCase() {
-  @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
+  @get:Rule val composeTestRule = createComposeRule()
 
   @get:Rule val intentsTestRule = IntentsRule()
 
@@ -121,6 +121,7 @@ class SignupTest : TestCase() {
       }
 
       // assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)
+      Espresso.onIdle()
       intended(toPackage("com.google.android.gms"))
     }
   }

@@ -85,10 +85,10 @@ dependencies {
   implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
   // Jetpack Compose
-  implementation(platform("androidx.compose:compose-bom:2024.02.02"))
+  implementation(platform("androidx.compose:compose-bom:2024.05.00"))
   implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
   implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
-  androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.02"))
+  androidTestImplementation(platform("androidx.compose:compose-bom:2024.05.00"))
   implementation("androidx.compose.ui:ui")
   implementation("androidx.compose.ui:ui-tooling-preview")
   debugImplementation("androidx.compose.ui:ui-tooling")
@@ -111,11 +111,12 @@ dependencies {
   implementation("com.google.dagger:hilt-android:${rootProject.extra.get("hiltVersion")}")
   kapt("com.google.dagger:hilt-android-compiler:${rootProject.extra.get("hiltVersion")}")
   testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1-Beta")
-  kaptTest("com.google.dagger:hilt-android-compiler:2.44")
+  kaptTest("com.google.dagger:hilt-android-compiler:2.51.1")
   testImplementation("com.google.dagger:hilt-android-testing:2.44")
-  kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
+  kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.51.1")
   androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
   implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+  
   // JUnit
   testImplementation("junit:junit:4.13.2")
   androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -124,19 +125,17 @@ dependencies {
 
   testImplementation("org.json:json:20220924")
     
-    // Mockk & Espresso
-    testImplementation("io.mockk:mockk:1.13.10")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
-    androidTestImplementation("com.kaspersky.android-components:kaspresso:1.4.3")
-    androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:1.4.1")
-    androidTestImplementation("io.mockk:mockk:1.13.10")
-    androidTestImplementation("io.mockk:mockk-android:1.13.10")
-    androidTestImplementation("io.mockk:mockk-agent:1.13.10")
-    androidTestImplementation ("androidx.test:runner:1.5.2")
-    androidTestImplementation ("androidx.test:rules:1.5.0")
-    androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation ("androidx.test.espresso:espresso-intents:3.5.1")
+  // Mockk & Espresso
+  testImplementation("io.mockk:mockk:1.13.10")
+  androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+  androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
+  androidTestImplementation("com.kaspersky.android-components:kaspresso:1.4.3")
+  androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:1.4.1")
+  androidTestImplementation("io.mockk:mockk:1.13.10")
+  androidTestImplementation("io.mockk:mockk-android:1.13.10")
+  androidTestImplementation("io.mockk:mockk-agent:1.13.10")
+  androidTestImplementation ("androidx.test:runner:1.5.2")
+  androidTestImplementation ("androidx.test:rules:1.5.0")
 
   // Robolectric
   testImplementation("org.robolectric:robolectric:4.11.1")
@@ -146,17 +145,16 @@ dependencies {
   implementation("com.squareup.okhttp3:okhttp")
   implementation("com.squareup.okhttp3:logging-interceptor")
 
-    //QR CODE (Zxing)
-    implementation ("com.google.zxing:core:3.4.1")
+  //QR CODE (Zxing)
+  implementation ("com.google.zxing:core:3.4.1")
 
-    // CameraX
-    implementation ("androidx.camera:camera-camera2:$androidXCameraVersion")
-    implementation ("androidx.camera:camera-lifecycle:$androidXCameraVersion")
-    implementation ("androidx.camera:camera-view:$androidXCameraVersion")
+  // CameraX
+  implementation ("androidx.camera:camera-camera2:$androidXCameraVersion")
+  implementation ("androidx.camera:camera-lifecycle:$androidXCameraVersion")
+  implementation ("androidx.camera:camera-view:$androidXCameraVersion")
 
-    // Android Test
-    androidTestImplementation ("androidx.test.uiautomator:uiautomator:$androidXEmulatorVersion")
-
+  // Android Test
+  androidTestImplementation ("androidx.test.uiautomator:uiautomator:$androidXEmulatorVersion")
 }
 
 secrets {
