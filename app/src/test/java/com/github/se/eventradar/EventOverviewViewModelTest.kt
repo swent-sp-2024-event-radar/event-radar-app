@@ -143,6 +143,7 @@ class EventsOverviewViewModelTest {
 
   @Test
   fun testGetUpcomingEventsFilteredSuccess() = runTest {
+    viewModel.onTabChanged(Tab.UPCOMING)
     val events =
         listOf(
             mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),

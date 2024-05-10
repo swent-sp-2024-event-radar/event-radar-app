@@ -362,11 +362,14 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       }
       sampleEventList.value = sampleEventList.value.copy(tab = Tab.BROWSE)
 
+      // Verify that the tab change is handled correctly
+      verify { mockEventsOverviewViewModel.onTabChanged(Tab.BROWSE, any()) }
+
       // Verify if getEvents is called upon init
       verify { mockEventsOverviewViewModel.getEvents() }
 
-      // Verify that the tab change is handled correctly
-      verify { mockEventsOverviewViewModel.onTabChanged(Tab.BROWSE, any()) }
+      // Check that uiState is accessed as expected
+      verify { mockEventsOverviewViewModel.uiState }
 
       // Confirm that no unexpected interactions have occurred
       confirmVerified(mockEventsOverviewViewModel)
@@ -453,7 +456,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
     val upcomingEvents = listOf(mockEvent, mockEvent.copy(eventName = "Event 2", fireBaseID = "2"))
     sampleEventList.value =
         sampleEventList.value.copy(
-            eventList = EventList(allEvents = upcomingEvents), userLoggedIn = true)
+            upcomingEventList = EventList(allEvents = upcomingEvents), userLoggedIn = true)
 
     onComposeScreen<HomeScreen>(composeTestRule) {
       // 1. Open the upcoming tab
