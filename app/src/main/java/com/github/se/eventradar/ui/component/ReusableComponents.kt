@@ -302,7 +302,7 @@ fun CategorySelection(uiState: EventsOverviewUiState, modifier: Modifier) {
                   }
                 },
                 modifier =
-                Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp).testTag("checkbox"))
+                    Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp).testTag("checkbox"))
             Text(
                 text = category.displayName,
                 style =
