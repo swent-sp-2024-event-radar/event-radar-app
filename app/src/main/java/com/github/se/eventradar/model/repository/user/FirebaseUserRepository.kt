@@ -179,6 +179,7 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
       println("ran")
       val result = storageRef.downloadUrl.await()
       println("run too")
+      println("run too")
       val url = result.toString()
       println("ranning")
       Resource.Success(url)

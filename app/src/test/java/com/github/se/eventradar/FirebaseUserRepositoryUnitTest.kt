@@ -492,7 +492,7 @@ class FirebaseUserRepositoryUnitTest {
     every { Firebase.storage.reference } returns storageRef
     every { storageRef.child("$folderName/$uid") } returns storageRef
     every { storageRef.putFile(selectedImageUri) } returns
-        mockSuccessfulUploadTask(selectedImageUri, true)
+        mockUploadTask(selectedImageUri, null, isSuccessful = true)
     val result = firebaseUserRepository.uploadImage(selectedImageUri, uid, folderName)
     assert(result is Resource.Success)
   }
@@ -507,7 +507,8 @@ class FirebaseUserRepositoryUnitTest {
     val exception = Exception("Error")
     every { Firebase.storage.reference } returns storageRef
     every { storageRef.child("$folderName/$uid") } returns storageRef
-    every { storageRef.putFile(selectedImageUri) } returns mockUploadTask(null, exception)
+    every { storageRef.putFile(selectedImageUri) } returns
+        mockUploadTask(null, exception, isSuccessful = false)
     val result = firebaseUserRepository.uploadImage(selectedImageUri, uid, folderName)
     assert(result is Resource.Failure)
     assert((result as Resource.Failure).throwable == exception)
@@ -524,7 +525,7 @@ class FirebaseUserRepositoryUnitTest {
     every { Firebase.storage.reference } returns storageRef
     every { storageRef.child("$folderName/$uid") } returns storageRef
     every { storageRef.putFile(selectedImageUri) } returns
-        mockSuccessfulUploadTask(selectedImageUri, false)
+        mockUploadTask(selectedImageUri, exception, isSuccessful = false)
     val result = firebaseUserRepository.uploadImage(selectedImageUri, uid, folderName)
     assert(result is Resource.Failure)
     assert((result as Resource.Failure).throwable.message == exception.message)
@@ -543,7 +544,8 @@ class FirebaseUserRepositoryUnitTest {
             FirebaseNetworkException("Network Exception"))
     every { Firebase.storage.reference } returns storageRef
     every { storageRef.child("$folderName/$uid") } returns storageRef
-    every { storageRef.putFile(selectedImageUri) } returns mockUploadTask(null, exception)
+    every { storageRef.putFile(selectedImageUri) } returns
+        mockUploadTask(null, exception, isSuccessful = false)
     val result = firebaseUserRepository.uploadImage(selectedImageUri, uid, folderName)
     assert(result is Resource.Failure)
     assert((result as Resource.Failure).throwable == exception)
@@ -561,10 +563,76 @@ class FirebaseUserRepositoryUnitTest {
         Exception("Storage error during upload: ${storageException.message}", storageException)
     every { Firebase.storage.reference } returns storageRef
     every { storageRef.child("$folderName/$uid") } returns storageRef
-    every { storageRef.putFile(selectedImageUri) } returns mockUploadTask(null, exception)
+    every { storageRef.putFile(selectedImageUri) } returns
+        mockUploadTask(null, exception, isSuccessful = false)
     val result = firebaseUserRepository.uploadImage(selectedImageUri, uid, folderName)
     assert(result is Resource.Failure)
     assert((result as Resource.Failure).throwable == exception)
+  }
+
+  @Test
+  fun `test getImage Success`() = runTest {
+    val uid = "1"
+    val folderName = "folderName"
+    val selectedImageUri = mockk<Uri>()
+    val expectedUrl = "http://example.com/image.png"
+    every { selectedImageUri.toString() } returns expectedUrl
+    val storageRef = mockk<StorageReference>()
+    every { Firebase.storage.reference.child("$folderName/$uid") } returns storageRef
+    every { storageRef.downloadUrl } returns mockDownloadUrlTask(selectedImageUri)
+
+    val result = firebaseUserRepository.getImage(uid, folderName)
+
+    assert(result is Resource.Success)
+    assert((result as Resource.Success).data == expectedUrl)
+  }
+
+  @Test
+  fun `test getImage Network Failure`() = runTest {
+    val uid = "1"
+    val folderName = "folderName"
+    val networkException = FirebaseNetworkException("Network Exception")
+    val storageRef = mockk<StorageReference>()
+
+    every { Firebase.storage.reference.child("$folderName/$uid") } returns storageRef
+    every { storageRef.downloadUrl } throws networkException
+
+    val result = firebaseUserRepository.getImage(uid, folderName)
+
+    assert(result is Resource.Failure)
+    assert((result as Resource.Failure).throwable.message?.contains("Network error") == true)
+  }
+
+  @Test
+  fun `test getImage Storage Failure`() = runTest {
+    val uid = "1"
+    val folderName = "folderName"
+    val storageException = StorageException.fromException(Throwable("Storage Error"))
+    val storageRef = mockk<StorageReference>()
+
+    every { Firebase.storage.reference.child("$folderName/$uid") } returns storageRef
+    every { storageRef.downloadUrl } throws storageException
+
+    val result = firebaseUserRepository.getImage(uid, folderName)
+
+    assert(result is Resource.Failure)
+    assert((result as Resource.Failure).throwable.message?.contains("Storage error") == true)
+  }
+
+  @Test
+  fun `test getImage Generic Failure`() = runTest {
+    val uid = "1"
+    val folderName = "folderName"
+    val genericException = Exception("Generic Error")
+    val storageRef = mockk<StorageReference>()
+
+    every { Firebase.storage.reference.child("$folderName/$uid") } returns storageRef
+    every { storageRef.downloadUrl } throws genericException
+
+    val result = firebaseUserRepository.getImage(uid, folderName)
+
+    assert(result is Resource.Failure)
+    assert((result as Resource.Failure).throwable.message?.contains("Generic Error") == true)
   }
 }
 
@@ -582,31 +650,26 @@ inline fun <reified T> mockTask(result: T?, exception: Exception? = null): Task<
   return task
 }
 
-fun mockSuccessfulUploadTask(result: Uri?, isSuccessful: Boolean): UploadTask {
+fun mockUploadTask(result: Uri?, exception: Exception? = null, isSuccessful: Boolean): UploadTask {
   val task: UploadTask = mockk(relaxed = true)
   val snapshot: UploadTask.TaskSnapshot = mockk(relaxed = true)
-
-  // Mock the snapshot metadata path retrieval
-  every { snapshot.metadata } returns mockk { every { path } returns result?.path.toString() }
-
-  // Link the snapshot to the task and set typical successful task properties
   every { snapshot.task } returns task
-  every { task.isComplete } returns true
-  every { task.exception } returns null
-  every { task.isCanceled } returns false
-  every { task.isSuccessful } returns isSuccessful
-  every { task.result } returns snapshot
-
-  return task
-}
-
-fun mockUploadTask(result: Uri?, exception: Exception? = null): UploadTask {
-  val task: UploadTask = mockk(relaxed = true)
-  val snapshot: UploadTask.TaskSnapshot = mockk(relaxed = true)
   every { snapshot.metadata } returns mockk { every { path } returns result?.path.toString() }
   every { task.isComplete } returns true
   every { task.exception } returns exception
   every { task.isCanceled } returns false
+  every { task.isSuccessful } returns isSuccessful
   every { task.result } returns snapshot
+  return task
+}
+
+fun mockDownloadUrlTask(result: Uri?, exception: Exception? = null): Task<Uri> {
+
+  val task: Task<Uri> = mockk(relaxed = true)
+  every { task.isComplete } returns true
+  every { task.isCanceled } returns false
+  every { task.isSuccessful } returns (exception == null)
+  every { task.exception } returns exception
+  every { task.result } returns result
   return task
 }
