@@ -1,6 +1,7 @@
 package com.github.se.eventradar.screens
 
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
+import com.github.se.eventradar.model.event.EventCategory
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.github.kakaocup.compose.node.element.KNode
 
@@ -48,7 +49,9 @@ class HomeScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   val categoryLabel: KNode = filterCardColumn.child { hasTestTag("categoryLabel") }
   private val filterApplyRow: KNode = filterCardColumn.child { hasTestTag("filterApplyRow") }
   val filterApplyButton: KNode = filterApplyRow.child { hasTestTag("filterApplyButton") }
-  private val categoryOptionsColumn: KNode =
-      filterCardColumn.child { hasTestTag("categoryOptionsColumn") }
-  private val categoryRow: KNode = categoryOptionsColumn.child { hasTestTag("categoryRow") }
+  private val categoryRow: KNode = filterCardColumn.child { hasTestTag("categoryRow") }
+  val categoryOptionsColumn: KNode =
+    categoryRow.child { hasTestTag("categoryOptionsColumn") }
+  val categoryOptionRow: KNode =
+    categoryOptionsColumn.child { hasTestTag("categoryOptionRow-Music") }
 }

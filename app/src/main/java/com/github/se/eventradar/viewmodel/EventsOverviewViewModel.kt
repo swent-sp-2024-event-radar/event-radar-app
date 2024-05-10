@@ -72,75 +72,35 @@ constructor(
     filterEvents()
   }
 
-  fun filterEvents() {
-      val eventList = if (_uiState.value.tab == Tab.BROWSE) {
-          _uiState.value.eventList
-      } else {
-          uiState.value.upcomingEventList
-      }
-
-    // Filter based on search query
-    val query = _uiState.value.searchQuery
-
-    val filteredEventsSearch =
-        eventList.allEvents.filter {
-          it.eventName.contains(query, ignoreCase = true)
-        }
-
-    // Filter based on radius query
-    val radiusQuery = _uiState.value.radiusQuery
-
-    // For now, use a fixed user location - but this should be updated to use the user's actual
-    // location
-    val userLocation = Location(latitude = 38.92, longitude = 78.78, address = "Ecublens")
-    val filteredEventsRadius =
-        if (radiusQuery == "") {
-          eventList.allEvents
+    fun filterEvents() {
+        // Select the correct event list based on the active tab
+        val eventList = if (_uiState.value.tab == Tab.BROWSE) {
+            _uiState.value.eventList
         } else {
-          eventList.allEvents.filter { event ->
-            val distance = calculateDistance(userLocation, event.location)
-            distance <= radiusQuery.toDouble()
-          }
+            _uiState.value.upcomingEventList
+        }.allEvents
+
+        // User location should ideally be dynamic but is fixed for the purpose of this example
+        val userLocation = Location(latitude = 38.92, longitude = 78.78, address = "Ecublens")
+
+        val filteredEvents = eventList.filter { event ->
+            // Search filter
+            event.eventName.contains(_uiState.value.searchQuery, ignoreCase = true) &&
+                    // Radius filter
+                    (_uiState.value.radiusQuery.isEmpty() || calculateDistance(userLocation, event.location) <= _uiState.value.radiusQuery.toDouble()) &&
+                    // Free event filter
+                    (!_uiState.value.isFreeSwitchOn || event.ticket.price == 0.0) &&
+                    // Category filter
+                    (_uiState.value.categoriesCheckedList.isEmpty() || _uiState.value.categoriesCheckedList.contains(event.category))
         }
 
-    // Filter based on free switch
-    val isFreeSwitchOn = _uiState.value.isFreeSwitchOn
-    val filteredEventsFree =
-        eventList.allEvents.filter {
-          if (isFreeSwitchOn) {
-            it.ticket.price == 0.0
-          } else {
-            true
-          }
-        }
-
-    // Filter based on categories selected
-    val categoriesCheckedList = _uiState.value.categoriesCheckedList
-    val filteredEventsCategory =
-        if (categoriesCheckedList.isEmpty()) {
-          eventList.allEvents
+        // Update the UI state with the filtered events for the respective tab
+        _uiState.value = if (_uiState.value.tab == Tab.BROWSE) {
+            _uiState.value.copy(eventList = _uiState.value.eventList.copy(filteredEvents = filteredEvents))
         } else {
-          eventList.allEvents.filter { event ->
-            categoriesCheckedList.any { it == event.category }
-          }
+            _uiState.value.copy(upcomingEventList = _uiState.value.upcomingEventList.copy(filteredEvents = filteredEvents))
         }
-
-    val filteredEvents =
-        filteredEventsSearch
-            .intersect(filteredEventsRadius.toSet())
-            .intersect(filteredEventsFree.toSet())
-            .intersect(filteredEventsCategory.toSet())
-
-      if (_uiState.value.tab == Tab.BROWSE) {
-          _uiState.value =
-              _uiState.value.copy(
-                  eventList = _uiState.value.eventList.copy(filteredEvents = filteredEvents.toList()))
-      } else {
-          _uiState.value =
-              _uiState.value.copy(
-                  upcomingEventList = _uiState.value.upcomingEventList.copy(filteredEvents = filteredEvents.toList()))
-      }
-  }
+    }
 
   // Calculates distance between 2 coordinate points based on Haversine formula
   // Accounts for earth's curvature

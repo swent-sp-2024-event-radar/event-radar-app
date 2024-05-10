@@ -22,7 +22,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -281,7 +280,6 @@ fun FilterPopUp(
   }
 }
 
-// TO DO: Need to convert category selection to MVVM and test
 @Composable
 fun CategorySelection(uiState: EventsOverviewUiState, modifier: Modifier) {
   LazyColumn(modifier = modifier) {
@@ -290,7 +288,7 @@ fun CategorySelection(uiState: EventsOverviewUiState, modifier: Modifier) {
       Row(
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.Start,
-          modifier = Modifier.padding(vertical = 0.dp).testTag("categoryRow")) {
+          modifier = Modifier.padding(vertical = 0.dp).testTag("categoryOptionRow-${category.displayName}")) {
             Checkbox(
                 checked = isChecked,
                 onCheckedChange = {
@@ -302,14 +300,14 @@ fun CategorySelection(uiState: EventsOverviewUiState, modifier: Modifier) {
                   }
                 },
                 modifier =
-                    Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp).testTag("checkbox"))
+                    Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp))
             Text(
                 text = category.displayName,
                 style =
                     TextStyle(
                         fontSize = 16.sp,
                     ),
-                modifier = Modifier.padding(start = 16.dp).testTag("checkboxText"))
+                modifier = Modifier.padding(start = 16.dp))
           }
     }
   }
