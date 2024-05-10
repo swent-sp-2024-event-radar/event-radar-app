@@ -26,7 +26,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class SignupTest : TestCase() {
   @get:Rule val composeTestRule = createComposeRule()
-  
+
   @get:Rule val intentsTestRule = IntentsRule()
 
   // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
