@@ -52,7 +52,12 @@ constructor(
     viewModelScope.launch {
       when (val response = messagesRepository.getMessages(_uiState.value.userId!!)) {
         is Resource.Success -> {
-          _uiState.value = _uiState.value.copy(messageList = response.data)
+          // sort message list by timestamp of latest message for each message history
+          val sortedMessageList =
+              response.data.sortedByDescending {
+                it.messages.find { message -> message.id == it.latestMessageId }?.dateTimeSent
+              }
+          _uiState.value = _uiState.value.copy(messageList = sortedMessageList)
         }
         is Resource.Failure -> {
           Log.d("MessagesViewModel", "Error getting messages: ${response.throwable.message}")
