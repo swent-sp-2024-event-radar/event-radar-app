@@ -117,9 +117,9 @@ class MessagesViewModelTest {
                 lastName = "",
                 phoneNumber = "",
                 accountStatus = "",
-                eventsAttendeeSet = mutableSetOf(),
-                eventsHostSet = mutableSetOf(),
-                friendsSet = mutableSetOf(),
+                eventsAttendeeList = mutableListOf(),
+                eventsHostList = mutableListOf(),
+                friendsList = mutableListOf(),
                 profilePicUrl = "",
                 qrCodeUrl = "",
                 username = ""))
@@ -157,9 +157,9 @@ class MessagesViewModelTest {
             lastName = "",
             phoneNumber = "",
             accountStatus = "",
-            eventsAttendeeSet = mutableSetOf(),
-            eventsHostSet = mutableSetOf(),
-            friendsSet = mutableSetOf(),
+            eventsAttendeeList = mutableListOf(),
+            eventsHostList = mutableListOf(),
+            friendsList = mutableListOf(),
             profilePicUrl = "",
             qrCodeUrl = "",
             username = "")
@@ -184,7 +184,7 @@ class MessagesViewModelTest {
 
     assert(addUser5 is Resource.Success)
 
-    userRepository.updateUser(user.copy(friendsSet = mutableSetOf("2", "3", "4", "5")))
+    userRepository.updateUser(user.copy(friendsList = mutableListOf("2", "3", "4", "5")))
 
     viewModel.getFriends()
 
@@ -202,9 +202,9 @@ class MessagesViewModelTest {
             lastName = "",
             phoneNumber = "",
             accountStatus = "",
-            eventsAttendeeSet = mutableSetOf(),
-            eventsHostSet = mutableSetOf(),
-            friendsSet = mutableSetOf(),
+            eventsAttendeeList = mutableListOf(),
+            eventsHostList = mutableListOf(),
+            friendsList = mutableListOf(),
             profilePicUrl = "",
             qrCodeUrl = "",
             username = "")
@@ -245,9 +245,9 @@ class MessagesViewModelTest {
             lastName = "",
             phoneNumber = "",
             accountStatus = "",
-            eventsAttendeeSet = mutableSetOf(),
-            eventsHostSet = mutableSetOf(),
-            friendsSet = mutableSetOf(),
+            eventsAttendeeList = mutableListOf(),
+            eventsHostList = mutableListOf(),
+            friendsList = mutableListOf(),
             profilePicUrl = "",
             qrCodeUrl = "",
             username = "")
@@ -272,7 +272,7 @@ class MessagesViewModelTest {
 
     assert(addUser5 is Resource.Success)
 
-    userRepository.updateUser(user.copy(friendsSet = mutableSetOf("2", "3", "4", "5")))
+    userRepository.updateUser(user.copy(friendsList = mutableListOf("2", "3", "4", "5")))
 
     userRepository.deleteUser(user.copy(userId = "4"))
 
