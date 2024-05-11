@@ -19,13 +19,13 @@ import io.github.kakaocup.compose.node.element.ComposeScreen.Companion.onCompose
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.unmockkAll
+import java.time.LocalDateTime
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
 class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
