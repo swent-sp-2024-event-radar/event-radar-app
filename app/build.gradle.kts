@@ -119,7 +119,6 @@ dependencies {
   
   // JUnit
   testImplementation("junit:junit:4.13.2")
-  androidTestImplementation("androidx.test.ext:junit:1.1.5")
 
   testImplementation("androidx.arch.core:core-testing:2.2.0")
 
