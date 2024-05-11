@@ -5,10 +5,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import com.github.se.eventradar.model.event.Event
-import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
@@ -19,11 +21,12 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun EventMap(
     events: List<Event>,
-    navigationActions: NavigationActions,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onCardClick: (String) -> Unit,
 ) {
   val mapProperties by remember {
     mutableStateOf(MapProperties(maxZoomPreference = 50f, minZoomPreference = 0f))
@@ -40,7 +43,11 @@ fun EventMap(
       properties = mapProperties,
       uiSettings = mapUiSettings,
       cameraPositionState = cameraPositionState,
-      modifier = modifier.fillMaxSize().testTag("map")) {
+      modifier =
+          modifier.fillMaxSize().semantics {
+            testTagsAsResourceId = true
+            testTag = "map"
+          }) {
         for (event in events) {
           Marker(
               contentDescription = "Marker for ${event.eventName}",
@@ -49,11 +56,7 @@ fun EventMap(
                       position = LatLng(event.location.latitude, event.location.longitude)),
               title = event.eventName,
               snippet = event.description,
-              onClick = {
-                // TODO: Navigate to event details
-                //          navigationActions.navController.navigate(Route.EVENT_DETAILS)
-                true
-              })
+              onInfoWindowClick = { onCardClick(event.fireBaseID) })
         }
       }
 }
