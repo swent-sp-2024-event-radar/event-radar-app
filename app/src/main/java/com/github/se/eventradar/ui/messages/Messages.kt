@@ -77,6 +77,9 @@ fun MessagesScreen(
         Toast.makeText(context, "Chat feature is not yet implemented", Toast.LENGTH_SHORT).show()
       },
       onTabSelected = navigationActions::navigateTo,
+      onFriendClicked = {
+        Toast.makeText(context, "Profile feature is not yet implemented", Toast.LENGTH_SHORT).show()
+      },
       getUser = viewModel::getUser)
 }
 
@@ -87,6 +90,7 @@ fun MessagesScreenUi(
     onSearchQueryChange: (String) -> Unit,
     onChatClicked: (MessageHistory) -> Unit,
     onTabSelected: (TopLevelDestination) -> Unit,
+    onFriendClicked: (User) -> Unit,
     getUser: (String) -> User
 ) {
   Scaffold(
@@ -156,11 +160,11 @@ fun MessagesScreenUi(
                 getUser = getUser,
                 modifier = Modifier.testTag("messagesList"))
           } else {
-            Toast.makeText(
-                    LocalContext.current,
-                    "Contacts feature is not yet implemented",
-                    Toast.LENGTH_SHORT)
-                .show()
+            FriendsList(
+                friendsList = uiState.friendsList,
+                searchQuery = uiState.searchQuery,
+                onFriendClicked = onFriendClicked,
+                modifier = Modifier.testTag("friendsList"))
           }
         }
       }
@@ -292,6 +296,104 @@ fun MessagePreviewItem(
       }
 }
 
+@Composable
+fun FriendsList(
+    friendsList: List<User>,
+    searchQuery: String,
+    onFriendClicked: (User) -> Unit,
+    modifier: Modifier = Modifier
+) {
+  val filteredFriendsList =
+      friendsList.sortedWith(compareBy(User::firstName, User::lastName)).filter {
+        it.firstName.contains(searchQuery, ignoreCase = true) ||
+            it.lastName.contains(searchQuery, ignoreCase = true)
+      }
+
+  if (filteredFriendsList.isEmpty()) {
+    Text(
+        text = stringResource(R.string.no_friends_found_string),
+        style =
+            TextStyle(
+                fontSize = 16.sp,
+                lineHeight = 24.sp,
+                fontFamily = FontFamily(Font(R.font.roboto)),
+                fontWeight = FontWeight.Normal,
+                color = Color(0xFF49454F),
+                letterSpacing = 0.15.sp,
+                textAlign = TextAlign.Center),
+        modifier = Modifier.fillMaxSize().padding(top = 32.dp).testTag("noFriendsFound"))
+  } else {
+    LazyColumn(modifier = modifier.padding(top = 16.dp)) {
+      items(filteredFriendsList) { friend ->
+        FriendPreviewItem(friend, onFriendClicked)
+        Divider()
+      }
+    }
+  }
+}
+
+@Composable
+fun FriendPreviewItem(
+    friend: User,
+    onFriendClicked: (User) -> Unit,
+) {
+  Row(
+      modifier =
+          Modifier.fillMaxWidth()
+              .clickable { onFriendClicked(friend) }
+              .padding(vertical = 8.dp)
+              .testTag("friendPreviewItem"),
+      horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
+      verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Image(
+        painter =
+            rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                    .data(data = friend.profilePicUrl)
+                    .apply(
+                        block =
+                            fun ImageRequest.Builder.() {
+                              crossfade(false)
+                              placeholder(R.drawable.placeholder)
+                            })
+                    .build()),
+        contentDescription = "Profile picture of ${friend.firstName} ${friend.lastName}",
+        contentScale = ContentScale.Crop,
+        modifier =
+            Modifier.padding(start = 16.dp).clip(CircleShape).size(56.dp).testTag("profilePic"))
+    Column(
+        modifier =
+            Modifier.padding(start = 16.dp).fillMaxWidth(.7f).testTag("friendContentColumn")) {
+          Text(
+              text = "${friend.firstName} ${friend.lastName}",
+              style =
+                  TextStyle(
+                      fontSize = 16.sp,
+                      lineHeight = 24.sp,
+                      fontFamily = FontFamily(Font(R.font.roboto)),
+                      fontWeight = FontWeight.Bold,
+                      color = Color.Black,
+                      letterSpacing = 0.5.sp,
+                  ),
+              modifier = Modifier.testTag("friendName"))
+          Text(
+              text = friend.phoneNumber,
+              style =
+                  TextStyle(
+                      fontSize = 14.sp,
+                      lineHeight = 20.sp,
+                      fontFamily = FontFamily(Font(R.font.roboto)),
+                      fontWeight = FontWeight.Normal,
+                      color = Color(0xFF49454F),
+                      letterSpacing = 0.25.sp,
+                  ),
+              modifier = Modifier.testTag("friendPhoneNumber"))
+        }
+    Spacer(modifier = Modifier.weight(1f))
+  }
+}
+
 @Preview(showSystemUi = true, showBackground = true)
 @ExcludeFromJacocoGeneratedReport
 @Composable
@@ -331,6 +433,23 @@ fun PreviewMessagesScreen() {
                           id = "2")),
               latestMessageId = "2",
           ))
+  val friendsList =
+      List(2) {
+        User(
+            "$it",
+            "10/10/2003",
+            "test@test.com",
+            "Test",
+            "$it",
+            "1234567890",
+            "active",
+            mutableListOf(),
+            mutableListOf(),
+            mutableListOf(),
+            "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FYJP3bYiaGFPqx64CT6kHOpwvXnv1?alt=media&token=5587f942-efc7-4cbf-920c-7f24a76d7ad1",
+            "",
+            "test $it")
+      }
   MessagesScreenUi(
       uiState =
           MessagesUiState(
@@ -338,7 +457,9 @@ fun PreviewMessagesScreen() {
               messageList =
                   messageList.sortedByDescending {
                     it.messages.find { message -> message.id == it.latestMessageId }?.dateTimeSent
-                  }),
+                  },
+              friendsList = friendsList,
+              selectedTabIndex = 0),
       onSelectedTabIndexChange = {},
       onSearchQueryChange = {},
       onChatClicked = {},
@@ -357,34 +478,7 @@ fun PreviewMessagesScreen() {
             mutableListOf(),
             "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FYJP3bYiaGFPqx64CT6kHOpwvXnv1?alt=media&token=5587f942-efc7-4cbf-920c-7f24a76d7ad1",
             "",
-            "johndoe")
-      })
-}
-
-@Preview(showSystemUi = true, showBackground = true)
-@ExcludeFromJacocoGeneratedReport
-@Composable
-fun PreviewEmptyMessagesList() {
-  MessagesList(
-      messageList = emptyList(),
-      searchQuery = "",
-      userId = "1",
-      onChatClicked = {},
-      getUser = {
-        User(
-            it,
-            "10/10/2003",
-            "test@test.com",
-            "John",
-            "Doe",
-            "1234567890",
-            "active",
-            mutableListOf(),
-            mutableListOf(),
-            mutableListOf(),
-            "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FYJP3bYiaGFPqx64CT6kHOpwvXnv1?alt=media&token=5587f942-efc7-4cbf-920c-7f24a76d7ad1",
-            "",
-            "johndoe")
+            "test $it")
       },
-      modifier = Modifier)
+      onFriendClicked = {})
 }

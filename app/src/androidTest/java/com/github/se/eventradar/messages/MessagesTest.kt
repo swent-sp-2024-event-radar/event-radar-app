@@ -19,13 +19,13 @@ import io.github.kakaocup.compose.node.element.ComposeScreen.Companion.onCompose
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.unmockkAll
-import java.time.LocalDateTime
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
 class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -50,7 +50,7 @@ class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
     mockUserRepository.updateCurrentUserId("1")
 
     // Starting at 2 to avoid conflicts with the current user
-    for (i in 2..9) {
+    for (i in 1..9) {
       mockUserRepository.addUser(
           User(
               userId = "$i",
@@ -58,25 +58,28 @@ class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
               email = "",
               firstName = "Test",
               lastName = "$i",
-              phoneNumber = "",
+              phoneNumber = "TestPhone$i",
               accountStatus = "active",
               eventsAttendeeList = mutableListOf(),
               eventsHostList = mutableListOf(),
-              friendsList = mutableListOf(),
-              profilePicUrl = "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2Fplaceholder.png?alt=media&token=ba4b4efb-ff45-4617-b60f-3789e8fb75b6",
+              friendsList = if (i > 1) mutableListOf() else List(8) { "${it + 2}" }.toMutableList(),
+              profilePicUrl =
+                  "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2Fplaceholder.png?alt=media&token=ba4b4efb-ff45-4617-b60f-3789e8fb75b6",
               qrCodeUrl = "",
               username = "Test$i"))
-
-      val mh = mockMessageRepository.createNewMessageHistory("1", "$i")
-
-      mockMessageRepository.addMessage(
+      if (i > 1) {
+        val mh = mockMessageRepository.createNewMessageHistory("1", "$i")
+        
+        mockMessageRepository.addMessage(
           Message(
-              sender = "$i",
-              content = "Test Message",
-              dateTimeSent = LocalDateTime.parse("2021-01-01T00:00:00"),
-              id = "1"),
+            sender = "$i",
+            content = "Test Message",
+            dateTimeSent = LocalDateTime.parse("2021-01-01T00:00:00"),
+            id = "1"
+          ),
           (mh as Resource.Success).data,
-      )
+        )
+      }
     }
 
     mockMessagesViewModel = MessagesViewModel(mockMessageRepository, mockUserRepository)
@@ -87,7 +90,7 @@ class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
   @After fun testTeardown() = runTest { unmockkAll() }
 
   @Test
-  fun screenDisplaysAllElementsCorrectly() = run {
+  fun messagesScreenDisplaysAllElementsCorrectly() = run {
     onComposeScreen<MessagesScreen>(composeTestRule) {
       step("Check if all elements are displayed") {
         logo { assertIsDisplayed() }
@@ -104,6 +107,25 @@ class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
         recipientName { assertIsDisplayed() }
         messageContent { assertIsDisplayed() }
         messageTime { assertIsDisplayed() }
+      }
+    }
+  }
+  
+  @Test
+  fun friendsScreenDisplaysAllElementsCorrectly() = run {
+    onComposeScreen<MessagesScreen>(composeTestRule) {
+      step("Navigate to contacts tab") {
+        contactsTab { performClick() }
+      }
+      step("Check if all elements are displayed") {
+        friendsList { assertIsDisplayed() }
+        friendPreviewItem {
+          assertIsDisplayed()
+          assertHasClickAction()
+        }
+        friendProfilePic { assertIsDisplayed() }
+        friendName { assertIsDisplayed() }
+        friendPhoneNumber { assertIsDisplayed() }
       }
     }
   }
