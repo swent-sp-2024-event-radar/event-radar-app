@@ -19,13 +19,13 @@ import io.github.kakaocup.compose.node.element.ComposeScreen.Companion.onCompose
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.unmockkAll
-import java.time.LocalDateTime
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
 class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -63,7 +63,7 @@ class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
               eventsAttendeeList = mutableListOf(),
               eventsHostList = mutableListOf(),
               friendsList = mutableListOf(),
-              profilePicUrl = "",
+              profilePicUrl = "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2Fplaceholder.png?alt=media&token=ba4b4efb-ff45-4617-b60f-3789e8fb75b6",
               qrCodeUrl = "",
               username = "Test$i"))
 

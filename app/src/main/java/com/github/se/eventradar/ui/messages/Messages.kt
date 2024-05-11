@@ -42,6 +42,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.User
@@ -225,10 +227,18 @@ fun MessagePreviewItem(
       verticalAlignment = Alignment.CenterVertically) {
         Image(
             painter =
-                painterResource(
-                    id = R.drawable.placeholder), // TODO: replace with actual profile pic
+                rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current)
+                        .data(data = recipient.profilePicUrl)
+                        .apply(
+                            block =
+                                fun ImageRequest.Builder.() {
+                                  crossfade(false)
+                                  placeholder(R.drawable.placeholder)
+                                })
+                        .build()),
             contentDescription = "Profile picture of ${recipient.firstName} ${recipient.lastName}",
-            contentScale = ContentScale.FillHeight,
+            contentScale = ContentScale.Crop,
             modifier =
                 Modifier.padding(start = 16.dp).clip(CircleShape).size(56.dp).testTag("profilePic"))
         Column(
@@ -338,14 +348,14 @@ fun PreviewMessagesScreen() {
             it,
             "10/10/2003",
             "test@test.com",
-            "John",
-            "Doe",
+            "Test",
+            it,
             "1234567890",
             "active",
             mutableListOf(),
             mutableListOf(),
             mutableListOf(),
-            "content://com.google.android.apps.docs.storage/document/acc%3D1%3Bdoc%3Dencoded%3D_UfMfUb7G-_gMA2naQlf9EvwC7BF37dTn3wqEbCsPCFqL25u15za15OI19GK4g%3D",
+            "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FYJP3bYiaGFPqx64CT6kHOpwvXnv1?alt=media&token=5587f942-efc7-4cbf-920c-7f24a76d7ad1",
             "",
             "johndoe")
       })
@@ -372,7 +382,7 @@ fun PreviewEmptyMessagesList() {
             mutableListOf(),
             mutableListOf(),
             mutableListOf(),
-            "content://com.google.android.apps.docs.storage/document/acc%3D1%3Bdoc%3Dencoded%3D_UfMfUb7G-_gMA2naQlf9EvwC7BF37dTn3wqEbCsPCFqL25u15za15OI19GK4g%3D",
+            "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FYJP3bYiaGFPqx64CT6kHOpwvXnv1?alt=media&token=5587f942-efc7-4cbf-920c-7f24a76d7ad1",
             "",
             "johndoe")
       },
