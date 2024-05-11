@@ -8,6 +8,8 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.tasks.await
 
 class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUserRepository {
@@ -144,11 +146,31 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
       uid: String,
       folderName: String
   ): Resource<Unit> {
-    return Resource.Success(Unit)
+    val storageRef = Firebase.storage.reference.child("$folderName/$uid")
+    try {
+      val result = storageRef.putFile(selectedImageUri).await()
+      Resource.Success(Unit)
+      return if (result.task.isSuccessful) {
+        Resource.Success(Unit)
+      } else {
+        val error = result.task.exception
+        Resource.Failure(error ?: Exception("Upload failed without a specific error"))
+      }
+    } catch (e: Exception) {
+      return Resource.Failure(Exception("Error during upload image: ${e.localizedMessage}"))
+    }
   }
 
   override suspend fun getImage(uid: String, folderName: String): Resource<String> {
-    return Resource.Success("To Be Implemented")
+
+    val storageRef = Firebase.storage.reference.child("$folderName/$uid")
+    return try {
+      val result = storageRef.downloadUrl.await()
+      val url = result.toString()
+      Resource.Success(url)
+    } catch (e: Exception) {
+      Resource.Failure(Exception("Error while getting image: ${e.localizedMessage}"))
+    }
   }
 
   override suspend fun getCurrentUserId(): Resource<String> {
@@ -157,6 +179,28 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
       Resource.Success(userId)
     } else {
       Resource.Failure(Exception("No user currently signed in"))
+    }
+  }
+
+  override suspend fun uploadQRCode(
+      data: ByteArray,
+      userId: String
+  ): Resource<Unit> { // upload this in firebase
+    return try {
+      // Create a reference to the file in Firebase Storage
+      val storageRef = FirebaseStorage.getInstance().reference
+      val qrCodesRef = storageRef.child("QR_Codes/$userId")
+      // Upload the file to Firebase Storage
+      val uploadTask = qrCodesRef.putBytes(data).await()
+      // Get the download URL of the image
+      if (uploadTask.task.isSuccessful) {
+        Resource.Success(Unit) // Return the reference to the uploaded QR Code's path
+      } else {
+        val error = uploadTask.task.exception
+        Resource.Failure(error ?: Exception("Upload QR Code failed without a specific error"))
+      }
+    } catch (e: Exception) {
+      Resource.Failure(Exception("Error during QR code upload: ${e.localizedMessage}"))
     }
   }
 
@@ -176,9 +220,9 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
             "qrCodeUrl" to user.qrCodeUrl,
             "username" to user.username,
             "accountStatus" to user.accountStatus,
-            "eventsAttendeeList" to user.eventsAttendeeSet,
-            "eventsHostList" to user.eventsHostSet,
-            "friendsList" to user.friendsSet,
+            "eventsAttendeeList" to user.eventsAttendeeList,
+            "eventsHostList" to user.eventsHostList,
+            "friendsList" to user.friendsList,
         )
 
     return Pair(publicMap, privateMap)

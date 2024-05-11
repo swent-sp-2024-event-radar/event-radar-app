@@ -71,7 +71,7 @@ constructor(
       when (val response = userRepository.getUser(_uiState.value.userId!!)) {
         is Resource.Success -> {
           val friendsList = mutableListOf<User>()
-          for (friendId in response.data!!.friendsSet) {
+          for (friendId in response.data!!.friendsList) {
             val friend = userRepository.getUser(friendId)
             if (friend is Resource.Success) {
               friendsList.add(friend.data!!)
