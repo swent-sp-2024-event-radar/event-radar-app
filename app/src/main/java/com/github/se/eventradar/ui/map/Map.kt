@@ -5,11 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTag
-import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.platform.testTag
 import com.github.se.eventradar.model.event.Event
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -21,7 +18,6 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun EventMap(
     events: List<Event>,
@@ -43,11 +39,7 @@ fun EventMap(
       properties = mapProperties,
       uiSettings = mapUiSettings,
       cameraPositionState = cameraPositionState,
-      modifier =
-          modifier.fillMaxSize().semantics {
-            testTagsAsResourceId = true
-            testTag = "map"
-          }) {
+      modifier = modifier.fillMaxSize().testTag("map")) {
         for (event in events) {
           Marker(
               contentDescription = "Marker for ${event.eventName}",
