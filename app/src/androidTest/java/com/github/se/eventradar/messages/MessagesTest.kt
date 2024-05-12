@@ -19,13 +19,13 @@ import io.github.kakaocup.compose.node.element.ComposeScreen.Companion.onCompose
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.unmockkAll
+import java.time.LocalDateTime
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
 class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -69,15 +69,14 @@ class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
               username = "Test$i"))
       if (i > 1) {
         val mh = mockMessageRepository.createNewMessageHistory("1", "$i")
-        
+
         mockMessageRepository.addMessage(
-          Message(
-            sender = "$i",
-            content = "Test Message",
-            dateTimeSent = LocalDateTime.parse("2021-01-01T00:00:00"),
-            id = "1"
-          ),
-          (mh as Resource.Success).data,
+            Message(
+                sender = "$i",
+                content = "Test Message",
+                dateTimeSent = LocalDateTime.parse("2021-01-01T00:00:00"),
+                id = "1"),
+            (mh as Resource.Success).data,
         )
       }
     }
@@ -96,7 +95,7 @@ class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
         logo { assertIsDisplayed() }
         tabs { assertIsDisplayed() }
         messagesTab { assertIsDisplayed() }
-        contactsTab { assertIsDisplayed() }
+        friendsTab { assertIsDisplayed() }
         messagesList { assertIsDisplayed() }
         messagePreviewItem {
           assertIsDisplayed()
@@ -110,13 +109,11 @@ class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
       }
     }
   }
-  
+
   @Test
   fun friendsScreenDisplaysAllElementsCorrectly() = run {
     onComposeScreen<MessagesScreen>(composeTestRule) {
-      step("Navigate to contacts tab") {
-        contactsTab { performClick() }
-      }
+      step("Navigate to friends tab") { friendsTab { performClick() } }
       step("Check if all elements are displayed") {
         friendsList { assertIsDisplayed() }
         friendPreviewItem {

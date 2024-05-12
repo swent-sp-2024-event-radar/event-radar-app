@@ -135,9 +135,9 @@ fun MessagesScreenUi(
             Tab(
                 selected = uiState.selectedTabIndex == 1,
                 onClick = { onSelectedTabIndexChange(1) },
-                modifier = Modifier.testTag("contactsTab")) {
+                modifier = Modifier.testTag("friendsTab")) {
                   Text(
-                      text = "Contacts",
+                      text = "Friends",
                       style =
                           TextStyle(
                               fontSize = 19.sp,
