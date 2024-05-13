@@ -124,7 +124,7 @@ constructor(
       val event: Event = displayedEvent as Event
 
       // add currentUserId to the event attendees list
-      event.attendeeSet.add(currentUserId)
+      event.attendeeList.add(currentUserId)
 
       // decrement ticket capacity
       event.ticket = EventTicket(event.ticket.name, event.ticket.price, event.ticket.capacity - 1)
@@ -155,7 +155,7 @@ constructor(
             Log.d("EventDetailsViewModel", "No existing users")
           } else {
             // adding eventId to current user attended event list
-            currentUser.eventsAttendeeSet.add(eventId)
+            currentUser.eventsAttendeeList.add(eventId)
 
             // update user data to the database
             when (val updateResponse = userRepository.updateUser(currentUser)) {

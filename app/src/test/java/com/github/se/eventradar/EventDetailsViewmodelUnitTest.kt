@@ -76,9 +76,9 @@ class EventDetailsViewmodelUnitTest {
           lastName = "Doe",
           phoneNumber = "1234567890",
           accountStatus = "active",
-          eventsAttendeeSet = mutableSetOf("event2"),
-          eventsHostSet = mutableSetOf("event3"),
-          friendsSet = mutableSetOf(),
+          eventsAttendeeList = mutableListOf("event2"),
+          eventsHostList = mutableListOf("event3"),
+          friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/Profile_Pictures/pic.jpg",
           qrCodeUrl = "http://example.com/QR_Codes/qr.jpg",
           username = "johndoe")
@@ -160,8 +160,8 @@ class EventDetailsViewmodelUnitTest {
     eventRepository.addEvent(mockEvent)
     userRepository.addUser(mockUser)
     println("\n\n\n")
-    println("user set: ${mockUser.eventsAttendeeSet}")
-    println("event set: ${mockEvent.attendeeSet}")
+    println("user set: ${mockUser.eventsAttendeeList}")
+    println("event set: ${mockEvent.attendeeList}")
 
     viewModel.getEventData()
 
@@ -170,11 +170,11 @@ class EventDetailsViewmodelUnitTest {
 
     viewModel.buyTicketForEvent()
 
-    println("user set: ${mockUser.eventsAttendeeSet}")
-    println("event set: ${mockEvent.attendeeSet}")
+    println("user set: ${mockUser.eventsAttendeeList}")
+    println("event set: ${mockEvent.attendeeList}")
 
-    assert(mockUser.eventsAttendeeSet.contains(mockEvent.fireBaseID))
-    assert(mockEvent.attendeeSet.contains(mockUser.userId))
+    assert(mockUser.eventsAttendeeList.contains(mockEvent.fireBaseID))
+    assert(mockEvent.attendeeList.contains(mockUser.userId))
     assert(mockEvent.ticket.capacity == ticketCapacity - 1)
 
     unmockkAll()
