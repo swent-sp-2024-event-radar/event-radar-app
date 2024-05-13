@@ -59,7 +59,7 @@ constructor(
                 "EventsOverviewViewModel",
                 "Error fetching user ID: ${userIdResource.throwable.message}")
             _uiState.value =
-                _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+                _uiState.value.copy(upcomingEventList = EventList(emptyList(), emptyList(), null))
           }
         }
       }
@@ -70,32 +70,31 @@ constructor(
     when (val userResponse = userRepository.getUser(uid)) {
       is Resource.Success -> {
         val user = userResponse.data!!
-        val attendeeList = user.eventsAttendeeSet.toList()
+        val attendeeList = user.eventsAttendeeList.toList()
         if (attendeeList.isNotEmpty()) {
           when (val events = eventRepository.getEventsByIds(attendeeList)) {
             is Resource.Success -> {
               _uiState.value =
                   _uiState.value.copy(
-                      eventList =
+                      upcomingEventList =
                           EventList(
                               events.data, events.data, _uiState.value.eventList.selectedEvent))
             }
             is Resource.Failure -> {
               Log.d("EventsOverviewViewModel", "Error getting events for $uid")
               _uiState.value =
-                  _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+                  _uiState.value.copy(upcomingEventList = EventList(emptyList(), emptyList(), null))
             }
           }
         } else {
           _uiState.value =
-              _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+              _uiState.value.copy(upcomingEventList = EventList(emptyList(), emptyList(), null))
         }
       }
       is Resource.Failure -> {
-        Log.d(
-            "EventsOverviewViewModel",
-            "Error fetching user document: ${userResponse.throwable.message}")
-        _uiState.value = _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+        Log.d("EventsOverviewViewModel", "Error fetching user document")
+        _uiState.value =
+            _uiState.value.copy(upcomingEventList = EventList(emptyList(), emptyList(), null))
       }
     }
   }
@@ -128,6 +127,7 @@ constructor(
 
 data class EventsOverviewUiState(
     val eventList: EventList = EventList(emptyList(), emptyList(), null),
+    val upcomingEventList: EventList = EventList(emptyList(), emptyList(), null),
     val searchQuery: String = "",
     val isFilterDialogOpen: Boolean = false,
     var radiusInputFilter: Double = -1.0,

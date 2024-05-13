@@ -57,7 +57,12 @@ fun HomeScreen(
   // Ui States handled by viewModel
   val uiState by viewModel.uiState.collectAsState()
 
-  LaunchedEffect(Unit) { viewModel.getEvents() }
+  LaunchedEffect(Unit) {
+    when {
+      (uiState.tab == Tab.BROWSE) -> viewModel.getEvents()
+      else -> viewModel.getUpcomingEvents()
+    }
+  }
 
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("homeScreen")) {
     val (logo, tabs, searchAndFilter, filterPopUp, eventList, eventMap, bottomNav, viewToggle) =
@@ -165,12 +170,13 @@ fun HomeScreen(
         else ->
             EventMap(
                 uiState.eventList.allEvents,
-                navigationActions,
                 Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
                   top.linkTo(tabs.bottom, margin = 8.dp)
                   start.linkTo(parent.start)
                   end.linkTo(parent.end)
-                })
+                }) { eventId ->
+                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+                }
       }
     } else {
       when {
@@ -183,7 +189,7 @@ fun HomeScreen(
                       start.linkTo(parent.start)
                       end.linkTo(parent.end)
                     })
-        (uiState.eventList.allEvents.isEmpty()) ->
+        (uiState.viewList && uiState.upcomingEventList.allEvents.isEmpty()) ->
             Text(
                 "You have no upcoming events",
                 modifier =
@@ -194,7 +200,7 @@ fun HomeScreen(
                     })
         (uiState.viewList) ->
             EventList(
-                events = uiState.eventList.allEvents,
+                events = uiState.upcomingEventList.allEvents,
                 modifier =
                     Modifier.testTag("eventListUpcoming").fillMaxWidth().constrainAs(eventList) {
                       top.linkTo(searchAndFilter.bottom, margin = 8.dp)
@@ -205,13 +211,14 @@ fun HomeScreen(
                 }
         else ->
             EventMap(
-                uiState.eventList.allEvents,
-                navigationActions,
+                uiState.upcomingEventList.allEvents,
                 Modifier.testTag("mapUpcoming").fillMaxWidth().constrainAs(eventMap) {
                   top.linkTo(tabs.bottom, margin = 8.dp)
                   start.linkTo(parent.start)
                   end.linkTo(parent.end)
-                })
+                }) { eventId ->
+                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+                }
       }
     }
     // Note for now, the filter dialog is always open to verify the UI

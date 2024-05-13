@@ -19,6 +19,7 @@ import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -65,9 +66,9 @@ class AuthenticationViewModelTest {
           lastName = "Doe",
           phoneNumber = "1234567890",
           accountStatus = "active",
-          eventsAttendeeSet = mutableSetOf(),
-          eventsHostSet = mutableSetOf(),
-          friendsSet = mutableSetOf(),
+          eventsAttendeeList = mutableListOf(),
+          eventsHostList = mutableListOf(),
+          friendsList = mutableListOf(),
           profilePicUrl = "",
           qrCodeUrl = "",
           username = "john_doe")
@@ -173,10 +174,14 @@ class AuthenticationViewModelTest {
     viewModel.onCountryCodeChanged(CountryCode.AU, mockUiState)
     viewModel.onPhoneNumberChanged("1234567890", mockUiState)
     viewModel.onSelectedImageUriChanged(uri, mockUiState)
-
-    val result = viewModel.addUser(mockUiState, user)
-    assert(result)
-
+    // Mocks Sign In From Google, which sets the userId
+    (userRepository as MockUserRepository).updateCurrentUserId(mockUser.userId)
+    viewModel.onSignUpStarted(mockUiState)
+    // Adds the User Information for Sign Up after Sign In is Successful
+    runBlocking { viewModel.addUser(mockUiState) }
+    assert(mockUiState.value.isSignUpStarted)
+    assert(mockUiState.value.isSignUpCompleted)
+    assert(mockUiState.value.isSignUpSuccessful)
     assert(userRepository.getUser("1") is Resource.Success)
   }
 
@@ -184,9 +189,12 @@ class AuthenticationViewModelTest {
   fun testAddUserFalseCase() = runTest {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
-
-    val result = viewModel.addUser(mockUiState, null)
-    assert(!result)
+    (userRepository as MockUserRepository).updateCurrentUserId(null)
+    viewModel.onSignUpStarted(mockUiState)
+    runBlocking { viewModel.addUser(mockUiState) }
+    assert(mockUiState.value.isSignUpStarted)
+    assert(!mockUiState.value.isSignUpCompleted)
+    assert(!mockUiState.value.isSignUpSuccessful)
 
     verify { Log.d("LoginScreenViewModel", "User not logged in") }
 

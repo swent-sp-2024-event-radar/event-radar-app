@@ -45,9 +45,9 @@ constructor(
     when (val userResponse = userRepository.getUser(uid)) {
       is Resource.Success -> {
         val user = userResponse.data!!
-        val eventsHostSet = user.eventsHostSet
-        if (eventsHostSet.isNotEmpty()) {
-          when (val events = eventRepository.getEventsByIds(eventsHostSet.toList())) {
+        val eventsHostList = user.eventsHostList
+        if (eventsHostList.isNotEmpty()) {
+          when (val events = eventRepository.getEventsByIds(eventsHostList.toList())) {
             is Resource.Success -> {
               _uiState.value =
                   _uiState.value.copy(
