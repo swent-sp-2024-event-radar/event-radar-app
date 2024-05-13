@@ -45,7 +45,7 @@ class EmptyMessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     mockUserRepository = MockUserRepository()
 
     mockUserRepository.updateCurrentUserId("new")
-    
+
     // Add user that has no friends
     mockUserRepository.addUser(
         User(
@@ -70,14 +70,14 @@ class EmptyMessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   }
 
   @After fun testTeardown() = runTest { unmockkAll() }
-  
+
   @Test
   fun noMessagesFoundDisplaysCorrectly() = run {
     onComposeScreen<MessagesScreen>(composeTestRule) {
       step("Check that no message found text is shown") { noMessagesFound { assertIsDisplayed() } }
     }
   }
-  
+
   @Test
   fun noFriendsFoundDisplaysCorrectly() = run {
     onComposeScreen<MessagesScreen>(composeTestRule) {

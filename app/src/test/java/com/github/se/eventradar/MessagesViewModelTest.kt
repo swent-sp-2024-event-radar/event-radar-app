@@ -16,6 +16,7 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import io.mockk.verify
+import java.time.LocalDateTime
 import junit.framework.TestCase.fail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,7 +34,6 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
-import java.time.LocalDateTime
 
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
@@ -147,28 +147,28 @@ class MessagesViewModelTest {
     }
     fail("Expected exception to be thrown")
   }
-  
+
   @Test
   fun testGetMessagesWithEmptyMessages() = runTest {
     viewModel.getMessages()
 
     assert(viewModel.uiState.value.messageList.isEmpty())
   }
-  
+
   @Test
   fun testGetMessagesFailure() = runTest {
     mockkStatic(Log::class)
     messagesRepository = mockk()
-    
+
     val exception = "Test exception"
-    
+
     coEvery { messagesRepository.getMessages(any()) } returns Resource.Failure(Exception(exception))
     every { Log.d(any(), any()) } returns 0
-    
+
     viewModel = MessagesViewModel(messagesRepository, userRepository)
 
     viewModel.getMessages()
-    
+
     verify { Log.d("MessagesViewModel", "Error getting messages: $exception") }
   }
 
