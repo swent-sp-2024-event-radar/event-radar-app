@@ -89,11 +89,11 @@ constructor(
     println("entered retryUpdate")
     var maxNumberOfRetries = 3
     var updateResult: Resource<Any>?
-    if (user.eventsAttendeeSet.contains(myEventID) && event.attendeeSet.contains(user.userId)) {
+    if (user.eventsAttendeeList.contains(myEventID) && event.attendeeList.contains(user.userId)) {
       println("both contain one another")
-      user.eventsAttendeeSet.remove(myEventID)
+      user.eventsAttendeeList.remove(myEventID)
       val userUpdateResult = userRepository.updateUser(user)
-      event.attendeeSet.remove(user.userId)
+      event.attendeeList.remove(user.userId)
       val eventUpdateResult = eventRepository.updateEvent(event)
 
       do {
