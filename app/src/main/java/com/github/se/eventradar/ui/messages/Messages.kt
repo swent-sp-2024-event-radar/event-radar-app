@@ -20,6 +20,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -64,6 +65,13 @@ fun MessagesScreen(
 ) {
   val uiState by viewModel.uiState.collectAsState()
   val context = LocalContext.current // only needed while the chat feature is not implemented
+
+  LaunchedEffect(Unit) {
+    when (uiState.selectedTabIndex) {
+      0 -> viewModel.getMessages()
+      1 -> viewModel.getFriends()
+    }
+  }
 
   MessagesScreenUi(
       uiState = uiState,
