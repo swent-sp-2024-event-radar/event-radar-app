@@ -102,7 +102,7 @@ class MessagesViewModelTest {
 
   @Test
   fun testOnSelectedTabIndexChange() = runTest {
-    viewModel.onSelectedTabIndexChange(1, mockUiState)
+    viewModel.onSelectedTabIndexChanged(1, mockUiState)
 
     assert(mockUiState.value.selectedTabIndex == 1)
   }
@@ -330,7 +330,7 @@ class MessagesViewModelTest {
 
   @Test
   fun testOnSelectedTabIndexChanged() = runTest {
-    viewModel.onSelectedTabIndexChange(1, mockUiState)
+    viewModel.onSelectedTabIndexChanged(1, mockUiState)
 
     assert(mockUiState.value.selectedTabIndex == 1)
   }

@@ -47,6 +47,7 @@ import com.github.se.eventradar.model.message.Message
 import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.ProfilePic
+import com.github.se.eventradar.ui.component.SearchBarField
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.TopLevelDestination
@@ -66,6 +67,12 @@ fun MessagesScreen(
   val uiState by viewModel.uiState.collectAsState()
   val context = LocalContext.current // only needed while the chat feature is not implemented
 
+  LaunchedEffect(key1 = uiState.isSearchActive) {
+    if (uiState.isSearchActive) {
+      viewModel.filterMessagesLists()
+    }
+  }
+
   LaunchedEffect(Unit) {
     when (uiState.selectedTabIndex) {
       0 -> viewModel.getMessages()
@@ -75,8 +82,9 @@ fun MessagesScreen(
 
   MessagesScreenUi(
       uiState = uiState,
-      onSelectedTabIndexChange = viewModel::onSelectedTabIndexChange,
-      onSearchQueryChange = viewModel::onSearchQueryChange,
+      onSelectedTabIndexChanged = viewModel::onSelectedTabIndexChanged,
+      onSearchQueryChanged = viewModel::onSearchQueryChanged,
+      onSearchActiveChanged = viewModel::onSearchActiveChanged,
       onChatClicked = {
         Toast.makeText(context, "Chat feature is not yet implemented", Toast.LENGTH_SHORT).show()
       },
@@ -90,8 +98,9 @@ fun MessagesScreen(
 @Composable
 fun MessagesScreenUi(
     uiState: MessagesUiState,
-    onSelectedTabIndexChange: (Int) -> Unit,
-    onSearchQueryChange: (String) -> Unit,
+    onSelectedTabIndexChanged: (Int) -> Unit,
+    onSearchQueryChanged: (String) -> Unit,
+    onSearchActiveChanged: (Boolean) -> Unit,
     onChatClicked: (MessageHistory) -> Unit,
     onTabSelected: (TopLevelDestination) -> Unit,
     onFriendClicked: (User) -> Unit,
@@ -120,7 +129,7 @@ fun MessagesScreenUi(
           TabRow(selectedTabIndex = uiState.selectedTabIndex, modifier = Modifier.testTag("tabs")) {
             Tab(
                 selected = uiState.selectedTabIndex == 0,
-                onClick = { onSelectedTabIndexChange(0) },
+                onClick = { onSelectedTabIndexChanged(0) },
                 modifier = Modifier.testTag("messagesTab")) {
                   Text(
                       text = "Messages",
@@ -138,7 +147,7 @@ fun MessagesScreenUi(
                 }
             Tab(
                 selected = uiState.selectedTabIndex == 1,
-                onClick = { onSelectedTabIndexChange(1) },
+                onClick = { onSelectedTabIndexChanged(1) },
                 modifier = Modifier.testTag("friendsTab")) {
                   Text(
                       text = "Friends",
@@ -155,17 +164,28 @@ fun MessagesScreenUi(
                       modifier = Modifier.padding(bottom = 8.dp))
                 }
           }
+
+          SearchBarField(
+              searchQuery = uiState.searchQuery,
+              onSearchQueryChanged = onSearchQueryChanged,
+              onSearchActiveChanged = onSearchActiveChanged,
+              modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 16.dp))
+
           if (uiState.selectedTabIndex == 0) {
+            val messageList =
+                if (uiState.isSearchActive) uiState.filteredMessageList else uiState.messageList
             MessagesList(
-                messageList = uiState.messageList,
+                messageList = messageList,
                 userId = uiState.userId!!,
                 searchQuery = uiState.searchQuery,
                 onChatClicked = onChatClicked,
                 getUser = getUser,
                 modifier = Modifier.testTag("messagesList"))
           } else {
+            val friendsList =
+                if (uiState.isSearchActive) uiState.filteredFriendsList else uiState.friendsList
             FriendsList(
-                friendsList = uiState.friendsList,
+                friendsList = friendsList,
                 searchQuery = uiState.searchQuery,
                 onFriendClicked = onFriendClicked,
                 modifier = Modifier.testTag("friendsList"))
@@ -439,8 +459,9 @@ fun PreviewMessagesScreen() {
                   },
               friendsList = friendsList,
               selectedTabIndex = 0),
-      onSelectedTabIndexChange = {},
-      onSearchQueryChange = {},
+      onSelectedTabIndexChanged = {},
+      onSearchQueryChanged = {},
+      onSearchActiveChanged = {},
       onChatClicked = {},
       onTabSelected = {},
       getUser = {
