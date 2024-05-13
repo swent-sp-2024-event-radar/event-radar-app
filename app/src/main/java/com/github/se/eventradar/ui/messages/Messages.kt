@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -25,9 +24,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -42,14 +39,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.message.Message
 import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.ui.BottomNavigationMenu
+import com.github.se.eventradar.ui.component.ProfilePic
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.TopLevelDestination
@@ -229,14 +225,11 @@ fun MessagePreviewItem(
               .testTag("messagePreviewItem"),
       horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
       verticalAlignment = Alignment.CenterVertically) {
-        AsyncImage(
-            model =
-                ImageRequest.Builder(LocalContext.current).data(recipient.profilePicUrl).build(),
-            placeholder = painterResource(id = R.drawable.placeholder),
-            contentDescription = "Profile picture of ${recipient.firstName} ${recipient.lastName}",
-            contentScale = ContentScale.Crop,
-            modifier =
-                Modifier.padding(start = 16.dp).clip(CircleShape).size(56.dp).testTag("profilePic"))
+        ProfilePic(
+            recipient.profilePicUrl,
+            recipient.firstName,
+            recipient.lastName,
+            Modifier.testTag("profilePic"))
         Column(
             modifier =
                 Modifier.padding(start = 16.dp).fillMaxWidth(.7f).testTag("messageContentColumn")) {
@@ -338,13 +331,8 @@ fun FriendPreviewItem(
       horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
       verticalAlignment = Alignment.CenterVertically,
   ) {
-    AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current).data(friend.profilePicUrl).build(),
-        placeholder = painterResource(id = R.drawable.placeholder),
-        contentDescription = "Profile picture of ${friend.firstName} ${friend.lastName}",
-        contentScale = ContentScale.Crop,
-        modifier =
-            Modifier.padding(start = 16.dp).clip(CircleShape).size(56.dp).testTag("profilePic"))
+    ProfilePic(
+        friend.profilePicUrl, friend.firstName, friend.lastName, Modifier.testTag("profilePic"))
     Column(
         modifier =
             Modifier.padding(start = 16.dp).fillMaxWidth(.7f).testTag("friendContentColumn")) {

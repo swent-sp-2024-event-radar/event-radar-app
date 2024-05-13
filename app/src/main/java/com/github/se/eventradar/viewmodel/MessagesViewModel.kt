@@ -48,7 +48,7 @@ constructor(
     }
   }
 
-  private fun getMessages() {
+  fun getMessages() {
     viewModelScope.launch {
       when (val response = messagesRepository.getMessages(_uiState.value.userId!!)) {
         is Resource.Success -> {

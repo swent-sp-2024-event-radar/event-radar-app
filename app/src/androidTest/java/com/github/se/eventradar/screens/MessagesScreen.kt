@@ -21,6 +21,7 @@ public class MessagesScreen(semanticsProvider: SemanticsNodeInteractionsProvider
   val recipientName: KNode = onNode { hasText("Test 2") }
   val messageContent: KNode = onNode { hasText("Test Message") }
   val messageTime: KNode = onNode { hasText("01/01/21") }
+  val noMessagesFound: KNode = onNode { hasTestTag("noMessagesFound") }
 
   val friendsList: KNode = child { hasTestTag("friendsList") }
   val friendPreviewItem: KNode = friendsList.child { hasTestTag("friendPreviewItem") }
@@ -29,4 +30,5 @@ public class MessagesScreen(semanticsProvider: SemanticsNodeInteractionsProvider
   }
   val friendName: KNode = onNode { hasText("Test", substring = true) }
   val friendPhoneNumber: KNode = onNode { hasText("TestPhone", substring = true) }
+  val noFriendsFound: KNode = onNode { hasTestTag("noFriendsFound") }
 }
