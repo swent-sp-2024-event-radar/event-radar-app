@@ -182,7 +182,7 @@ fun SearchBarField(
         onSearchQueryChanged(it)
         if (it == "") onSearchActiveChanged(false) else onSearchActiveChanged(true)
       },
-      modifier = modifier.testTag("searchBar"),
+      modifier = modifier.fillMaxWidth().testTag("searchBar"),
       maxLines = 1,
       shape = RoundedCornerShape(32.dp),
       colors =
