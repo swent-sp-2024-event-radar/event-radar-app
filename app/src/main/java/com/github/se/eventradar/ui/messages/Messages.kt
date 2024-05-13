@@ -338,18 +338,9 @@ fun FriendPreviewItem(
       horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
       verticalAlignment = Alignment.CenterVertically,
   ) {
-    Image(
-        painter =
-            rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current)
-                    .data(data = friend.profilePicUrl)
-                    .apply(
-                        block =
-                            fun ImageRequest.Builder.() {
-                              crossfade(false)
-                              placeholder(R.drawable.placeholder)
-                            })
-                    .build()),
+    AsyncImage(
+        model = ImageRequest.Builder(LocalContext.current).data(friend.profilePicUrl).build(),
+        placeholder = painterResource(id = R.drawable.placeholder),
         contentDescription = "Profile picture of ${friend.firstName} ${friend.lastName}",
         contentScale = ContentScale.Crop,
         modifier =
@@ -471,29 +462,6 @@ fun PreviewMessagesScreen() {
             "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FYJP3bYiaGFPqx64CT6kHOpwvXnv1?alt=media&token=5587f942-efc7-4cbf-920c-7f24a76d7ad1",
             "",
             "johndoe")
-      })
-}
-
-@Preview(showSystemUi = true, showBackground = true)
-@ExcludeFromJacocoGeneratedReport
-@Composable
-fun PreviewEmptyMessagesList() {
-  MessagesList(
-      messageList = emptyList(),
-      searchQuery = "",
-      userId = "1",
-      onChatClicked = {},
-      getUser = {
-        User(
-            it,
-            "1234567890",
-            "active",
-            mutableListOf(),
-            mutableListOf(),
-            mutableListOf(),
-            "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FYJP3bYiaGFPqx64CT6kHOpwvXnv1?alt=media&token=5587f942-efc7-4cbf-920c-7f24a76d7ad1",
-            "",
-            "test $it")
       },
       onFriendClicked = {})
 }
