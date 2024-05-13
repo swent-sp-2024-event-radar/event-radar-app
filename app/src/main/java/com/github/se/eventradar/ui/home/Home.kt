@@ -186,12 +186,13 @@ fun HomeScreen(
         (uiState.isSearchActive || uiState.isFilterActive) ->
             EventMap(
                 uiState.eventList.filteredEvents,
-                navigationActions,
                 Modifier.testTag("filteredMap").fillMaxWidth().constrainAs(eventMap) {
-                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                  start.linkTo(parent.start)
-                  end.linkTo(parent.end)
-                })
+                    top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }) { eventId ->
+                navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+            }
         // In map view + neither search nor filter are active
         else ->
             EventMap(
@@ -250,17 +251,16 @@ fun HomeScreen(
                   navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
                 }
         // In map view + search or filter is active
-        (uiState.isSearchActive || uiState.isFilterActive) -> {
-          Log.d("HomeScreen", "Filtered event list: ${uiState.upcomingEventList.filteredEvents}")
-          EventMap(
-              uiState.upcomingEventList.filteredEvents,
-              navigationActions,
-              Modifier.testTag("filteredMapUpcoming").fillMaxWidth().constrainAs(eventMap) {
-                top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-              })
-        }
+        (uiState.isSearchActive || uiState.isFilterActive) ->
+            EventMap(
+                uiState.upcomingEventList.filteredEvents,
+                Modifier.testTag("filteredMapUpcoming").fillMaxWidth().constrainAs(eventMap) {
+                    top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }) { eventId ->
+                navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+            }
         // In map view + neither search nor filter are active
         else ->
             EventMap(
