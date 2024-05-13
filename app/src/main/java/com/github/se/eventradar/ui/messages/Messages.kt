@@ -42,7 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
@@ -225,18 +225,10 @@ fun MessagePreviewItem(
               .testTag("messagePreviewItem"),
       horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
       verticalAlignment = Alignment.CenterVertically) {
-        Image(
-            painter =
-                rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current)
-                        .data(data = recipient.profilePicUrl)
-                        .apply(
-                            block =
-                                fun ImageRequest.Builder.() {
-                                  crossfade(false)
-                                  placeholder(R.drawable.placeholder)
-                                })
-                        .build()),
+        AsyncImage(
+            model =
+                ImageRequest.Builder(LocalContext.current).data(recipient.profilePicUrl).build(),
+            placeholder = painterResource(id = R.drawable.placeholder),
             contentDescription = "Profile picture of ${recipient.firstName} ${recipient.lastName}",
             contentScale = ContentScale.Crop,
             modifier =
