@@ -1,6 +1,8 @@
 package com.github.se.eventradar.viewmodel.qrCode
 
 import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
@@ -8,6 +10,9 @@ import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.async
@@ -16,14 +21,29 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-@HiltViewModel
+@HiltViewModel(assistedFactory = ScanTicketQrViewModel.Factory::class)
 class ScanTicketQrViewModel
-@Inject // Dependency injection
+@AssistedInject // Dependency injection
 constructor(
     private val userRepository: IUserRepository,
     private val eventRepository: IEventRepository,
     qrCodeAnalyser: QrCodeAnalyser,
+    @Assisted private val eventID: String
 ) : ViewModel() {
+
+
+  @AssistedFactory
+  interface Factory {
+    fun create(eventId: String): ScanTicketQrViewModel
+  }
+
+  companion object {
+    @Composable
+    fun create(eventId: String): ScanTicketQrViewModel {
+      return hiltViewModel<ScanTicketQrViewModel, Factory>(
+        creationCallback = { factory -> factory.create(eventId = eventId) })
+    }
+  }
 
   private val _uiState = MutableStateFlow(QrCodeScanTicketState())
   val uiState: StateFlow<QrCodeScanTicketState> = _uiState
