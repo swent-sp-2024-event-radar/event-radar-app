@@ -1,7 +1,7 @@
 package com.github.se.eventradar.ui.qrCode
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -59,12 +58,10 @@ fun QrCodeScreen(
     }
   }
 
-  val context = LocalContext.current
-
   ConstraintLayout(
       modifier = Modifier.fillMaxSize().testTag("qrCodeScannerScreen"),
   ) {
-    val (logo, tabs, bottomNav) = createRefs()
+    val (logo, tabs, myqrcode, bottomNav) = createRefs()
     Row(
         modifier =
             Modifier.fillMaxWidth()
@@ -135,7 +132,18 @@ fun QrCodeScreen(
         }
 
     if (qrScanUiState.value.tabState == ScanFriendQrViewModel.Tab.MyQR) {
-      Toast.makeText(context, "My Qr Code not yet available", Toast.LENGTH_SHORT).show()
+      Column(
+          modifier =
+              Modifier.testTag("myQrCodeScreen").constrainAs(myqrcode) {
+                top.linkTo(tabs.bottom, margin = 74.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+              },
+          verticalArrangement = Arrangement.Center, // Vertically center the content
+          horizontalAlignment = Alignment.CenterHorizontally // Horizontally center the content
+          ) {
+            MyQrCodeScreen(viewModel)
+          }
     } else {
       Column(modifier = Modifier.testTag("QrScanner")) {
         QrCodeScanner(analyser = viewModel.qrCodeAnalyser)
