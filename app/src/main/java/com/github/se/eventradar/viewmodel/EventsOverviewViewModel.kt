@@ -226,7 +226,8 @@ constructor(
   }
 
   fun onViewListStatusChanged(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
-    state.value = state.value.copy(viewList = !state.value.viewList)
+      state.value = state.value.copy(isFilterDialogOpen = false)
+      state.value = state.value.copy(viewList = !state.value.viewList)
   }
 }
 
