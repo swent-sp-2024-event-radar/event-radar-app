@@ -35,7 +35,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.se.eventradar.R
-import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.EventComponentsStyle
 import com.github.se.eventradar.ui.component.EventTitle
@@ -43,11 +42,12 @@ import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.util.toast
+import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 
 @Composable
 fun SelectTicket(
-  viewModel: EventDetailsViewModel = hiltViewModel(),
-  navigationActions: NavigationActions
+    viewModel: EventDetailsViewModel = hiltViewModel(),
+    navigationActions: NavigationActions
 ) {
 
   // TODO to be moved in viewModel init

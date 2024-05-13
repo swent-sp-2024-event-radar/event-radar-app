@@ -24,7 +24,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberImagePainter
 import com.github.se.eventradar.R
-import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.EventCategory
 import com.github.se.eventradar.ui.component.EventComponentsStyle
@@ -36,6 +35,7 @@ import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 
 // Temporary sizes. Needs to be responsive...
 private val widthPadding = 34.dp
@@ -43,8 +43,8 @@ private val imageHeight = 191.dp
 
 @Composable
 fun EventDetails(
-  viewModel: EventDetailsViewModel = hiltViewModel(),
-  navigationActions: NavigationActions
+    viewModel: EventDetailsViewModel = hiltViewModel(),
+    navigationActions: NavigationActions
 ) {
 
   // TODO to be moved in viewModel init

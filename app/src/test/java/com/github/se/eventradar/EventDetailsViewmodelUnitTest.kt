@@ -2,12 +2,15 @@ package com.github.se.eventradar
 
 import android.util.Log
 import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
-import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.event.MockEventRepository
+import com.github.se.eventradar.model.repository.user.IUserRepository
+import com.github.se.eventradar.model.repository.user.MockUserRepository
+import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
@@ -29,6 +32,7 @@ import org.junit.runner.Description
 class EventDetailsViewmodelUnitTest {
   private lateinit var viewModel: EventDetailsViewModel
   private lateinit var eventRepository: IEventRepository
+  private lateinit var userRepository: IUserRepository
 
   class MainDispatcherRule(
       private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
@@ -46,6 +50,8 @@ class EventDetailsViewmodelUnitTest {
 
   val test: MutableSet<String> = mutableSetOf("Test Organiser", "Organiser2")
 
+  private val ticketCapacity = 1
+
   private val mockEvent =
       Event(
           eventName = "Event 1",
@@ -54,17 +60,36 @@ class EventDetailsViewmodelUnitTest {
           end = LocalDateTime.now(),
           location = Location(0.0, 0.0, "Test Location"),
           description = "Test Description",
-          ticket = EventTicket("Test Ticket", 0.0, 1),
+          ticket = EventTicket("Test Ticket", 0.0, ticketCapacity),
           mainOrganiser = "1",
           organiserSet = mutableSetOf("Test Organiser"),
           attendeeSet = mutableSetOf("Test Attendee"),
           category = EventCategory.COMMUNITY,
-          fireBaseID = "1")
+          fireBaseID = "event1")
+
+  private val mockUser =
+      User(
+          userId = "user1",
+          birthDate = "01/01/2000",
+          email = "test@example.com",
+          firstName = "John",
+          lastName = "Doe",
+          phoneNumber = "1234567890",
+          accountStatus = "active",
+          eventsAttendeeSet = mutableSetOf("event2"),
+          eventsHostSet = mutableSetOf("event3"),
+          friendsSet = mutableSetOf(),
+          profilePicUrl = "http://example.com/Profile_Pictures/pic.jpg",
+          qrCodeUrl = "http://example.com/QR_Codes/qr.jpg",
+          username = "johndoe")
 
   @Before
   fun setUp() {
     eventRepository = MockEventRepository()
-    viewModel = EventDetailsViewModel(eventRepository)
+    userRepository = MockUserRepository()
+    (userRepository as MockUserRepository).updateCurrentUserId(mockUser.userId)
+
+    viewModel = EventDetailsViewModel(eventRepository, userRepository)
     viewModel.saveEventId(mockEvent.fireBaseID)
   }
 
@@ -125,5 +150,33 @@ class EventDetailsViewmodelUnitTest {
     mockEvent.ticket = EventTicket("Paid", randomPrice, 10)
     viewModel.getEventData()
     assert(!viewModel.isTicketFree())
+  }
+
+  @Test
+  fun testJoinAnEvent() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    eventRepository.addEvent(mockEvent)
+    userRepository.addUser(mockUser)
+    println("\n\n\n")
+    println("user set: ${mockUser.eventsAttendeeSet}")
+    println("event set: ${mockEvent.attendeeSet}")
+
+    viewModel.getEventData()
+
+    println("eventId: ${viewModel.getEventId()}")
+    println("userId: ${userRepository.getCurrentUserId()}")
+
+    viewModel.buyTicketForEvent()
+
+    println("user set: ${mockUser.eventsAttendeeSet}")
+    println("event set: ${mockEvent.attendeeSet}")
+
+    assert(mockUser.eventsAttendeeSet.contains(mockEvent.fireBaseID))
+    assert(mockEvent.attendeeSet.contains(mockUser.userId))
+    assert(mockEvent.ticket.capacity == ticketCapacity - 1)
+
+    unmockkAll()
   }
 }

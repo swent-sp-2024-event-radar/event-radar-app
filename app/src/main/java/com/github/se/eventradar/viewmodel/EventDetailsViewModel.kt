@@ -29,26 +29,24 @@ constructor(
   private val _uiState = MutableStateFlow(EventUiState())
   val uiState: StateFlow<EventUiState> = _uiState
 
-
   // TODO would require assisted data injection to have this as a parameters
   private lateinit var eventId: String
-
 
   private lateinit var currentUserId: String
   private var displayedEvent: Event? = null
 
-  init{
-    viewModelScope.launch{
+  init {
+    viewModelScope.launch {
       when (val response = userRepository.getCurrentUserId()) {
         is Resource.Success -> {
           currentUserId = response.data
         }
         is Resource.Failure ->
-          Log.d("EventDetailsViewModel", "Could not get the user Id: ${response.throwable.message}")
+            Log.d(
+                "EventDetailsViewModel", "Could not get the user Id: ${response.throwable.message}")
       }
     }
   }
-
 
   fun saveEventId(eventId: String) {
     this.eventId = eventId
@@ -87,52 +85,51 @@ constructor(
     return !(_uiState.value.ticket.price > 0.0)
   }
 
-
   /*TODO actually, I had to recreate a view model when switching to the
    * buy ticket screen so that function is not needed anymore...
    */
-  fun getTickets() : Unit{ //update ticket, while buying ticket give user 5 minutes to buy?
+  fun getTickets(): Unit { // update ticket, while buying ticket give user 5 minutes to buy?
     viewModelScope.launch {
       when (val response = eventRepository.getEvent(eventId)) {
         is Resource.Success -> {
-          _uiState.update {
-            it.copy(ticket = response.data!!.ticket)
-          }
+          _uiState.update { it.copy(ticket = response.data!!.ticket) }
         }
         is Resource.Failure ->
-          Log.d("EventDetailsViewModel", "Error getting ticket for event: ${response.throwable.message}")
+            Log.d(
+                "EventDetailsViewModel",
+                "Error getting ticket for event: ${response.throwable.message}")
       }
     }
   }
 
   // TODO needs to be atomic to avoid concurrency issues
-  fun buyTicketForEvent(){ //update the user attendee list, update the eventRepo ticket count
-    viewModelScope.launch{
-      if (!isTicketFree()){
-        Log.d("EventDetailsViewModel", "Paid tickets are not supported, all of them are considered free")
+  fun buyTicketForEvent() { // update the user attendee list, update the eventRepo ticket count
+    viewModelScope.launch {
+      if (!isTicketFree()) {
+        Log.d(
+            "EventDetailsViewModel",
+            "Paid tickets are not supported, all of them are considered free")
       }
 
       // TODO would need an atomic update of the database, using transaction... ?
       registrationUpdateEvent()
       registerationUpdateUser()
-
     }
   }
 
   private fun registrationUpdateEvent() {
-    if(displayedEvent == null){
+    if (displayedEvent == null) {
       Log.d("EventDetailsViewModel", "No existing event")
-    }
-    else{
+    } else {
       val event: Event = displayedEvent as Event
 
       // add currentUserId to the event attendees list
       event.attendeeSet.add(currentUserId)
 
       // decrement ticket capacity
-      //event.ticket = EventTicket(event.ticket.name, event.ticket.price, event.ticket.capacity-1)
+      event.ticket = EventTicket(event.ticket.name, event.ticket.price, event.ticket.capacity - 1)
 
-      viewModelScope.launch{
+      viewModelScope.launch {
         // update event data to the database
         when (val updateResponse = eventRepository.updateEvent(event)) {
           is Resource.Success -> {
@@ -140,26 +137,23 @@ constructor(
             Log.i("EventDetailsViewModel", "Successfully updated event")
           }
           is Resource.Failure ->
-            Log.d(
-              "EventDetailsViewModel",
-              "Error updating event data: ${updateResponse.throwable.message}"
-            )
+              Log.d(
+                  "EventDetailsViewModel",
+                  "Error updating event data: ${updateResponse.throwable.message}")
         }
       }
     }
-
-
   }
-  private fun registerationUpdateUser(){
-    viewModelScope.launch{
+
+  private fun registerationUpdateUser() {
+    viewModelScope.launch {
       // fetch current user data
       when (val userResponse = userRepository.getUser(currentUserId)) {
         is Resource.Success -> {
           val currentUser = userResponse.data
-          if(currentUser == null){
+          if (currentUser == null) {
             Log.d("EventDetailsViewModel", "No existing users")
-          }
-          else {
+          } else {
             // adding eventId to current user attended event list
             currentUser.eventsAttendeeSet.add(eventId)
 
@@ -170,33 +164,29 @@ constructor(
                 Log.i("EventDetailsViewModel", "Successfully updated user")
               }
               is Resource.Failure ->
-                Log.d(
-                  "EventDetailsViewModel",
-                  "Error updating user data: ${updateResponse.throwable.message}"
-                )
+                  Log.d(
+                      "EventDetailsViewModel",
+                      "Error updating user data: ${updateResponse.throwable.message}")
             }
           }
         }
         is Resource.Failure ->
-          Log.d("EventDetailsViewModel", "Error getting user data: ${userResponse.throwable.message}")
+            Log.d(
+                "EventDetailsViewModel",
+                "Error getting user data: ${userResponse.throwable.message}")
       }
     }
   }
-
-
-
-
-
 }
 
 data class EventUiState(
-  val eventName: String = "",
-  val eventPhoto: String = "",
-  val start: LocalDateTime = LocalDateTime.MIN,
-  val end: LocalDateTime = LocalDateTime.MAX,
-  val location: Location = Location(0.0, 0.0, ""),
-  val description: String = "",
-  val ticket: EventTicket = EventTicket("", 0.0, 0),
-  val mainOrganiser: String = "",
-  val category: EventCategory = EventCategory.MUSIC,
+    val eventName: String = "",
+    val eventPhoto: String = "",
+    val start: LocalDateTime = LocalDateTime.MIN,
+    val end: LocalDateTime = LocalDateTime.MAX,
+    val location: Location = Location(0.0, 0.0, ""),
+    val description: String = "",
+    val ticket: EventTicket = EventTicket("", 0.0, 0),
+    val mainOrganiser: String = "",
+    val category: EventCategory = EventCategory.MUSIC,
 )
