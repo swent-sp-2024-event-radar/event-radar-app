@@ -34,7 +34,10 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.BottomNavigationMenu
-import com.github.se.eventradar.ui.component.*
+import com.github.se.eventradar.ui.component.EventList
+import com.github.se.eventradar.ui.component.Logo
+import com.github.se.eventradar.ui.component.ViewToggleFab
+import com.github.se.eventradar.ui.component.getIconFromViewListBool
 import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
@@ -86,12 +89,13 @@ fun HostingScreen(
     } else {
       EventMap(
           uiState.eventList.filteredEvents,
-          navigationActions,
           Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
             top.linkTo(divider.bottom, margin = 8.dp)
             start.linkTo(parent.start)
             end.linkTo(parent.end)
-          })
+          }) { eventId ->
+            navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+          }
     }
     val context = LocalContext.current
     Row(
