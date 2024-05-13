@@ -61,7 +61,7 @@ android {
 }
 val activityComposeVersion = "1.9.0"
 val androidXCameraVersion = "1.3.3"
-val androidXEmulatorVersion = "2.3.0"
+val androidXEmulatorVersion = "2.3.0-alpha04"
 dependencies {
   implementation("androidx.core:core-ktx:1.7.0")
   implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")

@@ -170,12 +170,13 @@ fun HomeScreen(
         else ->
             EventMap(
                 uiState.eventList.allEvents,
-                navigationActions,
                 Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
                   top.linkTo(tabs.bottom, margin = 8.dp)
                   start.linkTo(parent.start)
                   end.linkTo(parent.end)
-                })
+                }) { eventId ->
+                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+                }
       }
     } else {
       when {
@@ -211,12 +212,13 @@ fun HomeScreen(
         else ->
             EventMap(
                 uiState.upcomingEventList.allEvents,
-                navigationActions,
                 Modifier.testTag("mapUpcoming").fillMaxWidth().constrainAs(eventMap) {
                   top.linkTo(tabs.bottom, margin = 8.dp)
                   start.linkTo(parent.start)
                   end.linkTo(parent.end)
-                })
+                }) { eventId ->
+                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+                }
       }
     }
     // Note for now, the filter dialog is always open to verify the UI
