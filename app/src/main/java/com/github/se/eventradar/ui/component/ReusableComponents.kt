@@ -146,29 +146,13 @@ fun EventCard(event: Event, onCardClick: (String) -> Unit) {
 @Composable
 fun SearchBarAndFilter(
     onSearchQueryChanged: (String) -> Unit,
-    uiState: EventsOverviewUiState,
+    searchQuery: String,
     onSearchActiveChanged: (Boolean) -> Unit,
     onFilterDialogOpen: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
   Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
-    // Search bar
-    TextField(
-        value = uiState.searchQuery,
-        onValueChange = {
-          onSearchQueryChanged(it)
-          if (it == "") onSearchActiveChanged(false) else onSearchActiveChanged(true)
-        },
-        modifier = Modifier.weight(1f).testTag("searchBar"),
-        maxLines = 1,
-        shape = RoundedCornerShape(32.dp),
-        colors =
-            TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent),
-        placeholder = { Text(stringResource(id = R.string.home_search_placeholder)) },
-        trailingIcon = { Icon(Icons.Default.Search, contentDescription = null) })
+    SearchBarField(searchQuery, onSearchQueryChanged, onSearchActiveChanged, Modifier.weight(1f))
 
     // Filter button
     Button(
@@ -177,6 +161,32 @@ fun SearchBarAndFilter(
           Text(stringResource(id = R.string.filter))
         }
   }
+}
+
+@Composable
+fun SearchBarField(
+    searchQuery: String,
+    onSearchQueryChanged: (String) -> Unit,
+    onSearchActiveChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+  // Search bar
+  TextField(
+      value = searchQuery,
+      onValueChange = {
+        onSearchQueryChanged(it)
+        if (it == "") onSearchActiveChanged(false) else onSearchActiveChanged(true)
+      },
+      modifier = modifier.testTag("searchBar"),
+      maxLines = 1,
+      shape = RoundedCornerShape(32.dp),
+      colors =
+          TextFieldDefaults.colors(
+              focusedIndicatorColor = Color.Transparent,
+              unfocusedIndicatorColor = Color.Transparent,
+              disabledIndicatorColor = Color.Transparent),
+      placeholder = { Text(stringResource(id = R.string.home_search_placeholder)) },
+      trailingIcon = { Icon(Icons.Default.Search, contentDescription = null) })
 }
 
 @Composable
