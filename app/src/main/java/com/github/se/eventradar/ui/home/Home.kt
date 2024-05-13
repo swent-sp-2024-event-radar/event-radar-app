@@ -145,7 +145,7 @@ fun HomeScreen(
 
     SearchBarAndFilter(
         onSearchQueryChanged = { viewModel.onSearchQueryChanged(it) },
-        uiState = uiState,
+        searchQuery = uiState.searchQuery,
         onSearchActiveChanged = { viewModel.onSearchActiveChanged(it) },
         onFilterDialogOpen = { viewModel.onFilterDialogOpen() },
         modifier =
