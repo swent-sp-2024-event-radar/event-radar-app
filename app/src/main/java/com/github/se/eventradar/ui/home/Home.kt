@@ -1,6 +1,5 @@
 package com.github.se.eventradar.ui.home
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -187,12 +186,12 @@ fun HomeScreen(
             EventMap(
                 uiState.eventList.filteredEvents,
                 Modifier.testTag("filteredMap").fillMaxWidth().constrainAs(eventMap) {
-                    top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
+                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
                 }) { eventId ->
-                navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-            }
+                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+                }
         // In map view + neither search nor filter are active
         else ->
             EventMap(
@@ -255,12 +254,12 @@ fun HomeScreen(
             EventMap(
                 uiState.upcomingEventList.filteredEvents,
                 Modifier.testTag("filteredMapUpcoming").fillMaxWidth().constrainAs(eventMap) {
-                    top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
+                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
                 }) { eventId ->
-                navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-            }
+                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+                }
         // In map view + neither search nor filter are active
         else ->
             EventMap(
