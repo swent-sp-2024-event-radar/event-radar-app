@@ -24,11 +24,11 @@ class MockUserRepositoryUnitTest {
           lastName = "Doe",
           phoneNumber = "1234567890",
           accountStatus = "active",
-          eventsAttendeeSet = mutableSetOf("event1", "event2"),
-          eventsHostSet = mutableSetOf("event3"),
-          friendsSet = mutableSetOf(),
-          profilePicUrl = "http://example.com/Profile_Pictures/pic.jpg",
-          qrCodeUrl = "http://example.com/QR_Codes/qr.jpg",
+          eventsAttendeeList = mutableListOf("event1", "event2"),
+          eventsHostList = mutableListOf("event3"),
+          friendsList = mutableListOf(),
+          profilePicUrl = "http://example.com/Profile_Pictures/1",
+          qrCodeUrl = "http://example.com/QR_Codes/1",
           username = "johndoe")
 
   @Before
@@ -159,8 +159,8 @@ class MockUserRepositoryUnitTest {
   @Test
   fun testGetImageUserExistsFolderExistsSuccess() = runTest {
     // Arrange
-    val expectedUrl = "http://example.com/Profile_Pictures/pic.jpg"
     val userId = mockUser.userId
+    val expectedUrl = "http://example.com/Profile_Pictures/$userId"
     userRepository.addUser(mockUser)
     // Act
     val result = userRepository.getImage(userId, "Profile_Pictures")
@@ -217,8 +217,8 @@ class MockUserRepositoryUnitTest {
 
   @Test
   fun testUploadAndGetImageSuccess() = runTest {
-    val expectedUrl = "http://example.com/Profile_Pictures/pic.jpg"
     val userId = mockUser.userId
+    val expectedUrl = "http://example.com/Profile_Pictures/$userId"
     // initialize user with no mock
     val mockUserWithNoProfilePic = mockUser.copy(profilePicUrl = "")
     userRepository.addUser(mockUserWithNoProfilePic)
@@ -230,6 +230,7 @@ class MockUserRepositoryUnitTest {
     assertEquals(expectedUrl, (result as Resource.Success).data)
   }
 
+  @Test
   fun testGetCurrentUserIdSuccess() = runTest {
     (userRepository as MockUserRepository).updateCurrentUserId("1")
     val result = userRepository.getCurrentUserId()
@@ -243,5 +244,19 @@ class MockUserRepositoryUnitTest {
     val result = userRepository.getCurrentUserId()
     assert(result is Resource.Failure)
     assert((result as Resource.Failure).throwable.message == "No user currently signed in")
+  }
+
+  @Test
+  fun tesUploadQRCodeImageSuccess() = runTest {
+    val userId = mockUser.userId
+    (userRepository as MockUserRepository).updateCurrentUserId(userId)
+    userRepository.addUser(mockUser)
+    val mockData = ByteArray(1)
+    val result = userRepository.uploadQRCode(mockData, userId)
+    assert(result is Resource.Success)
+
+    val imageLink = userRepository.getImage(userId, "QR_Codes")
+    assert(imageLink is Resource.Success)
+    assert((imageLink as Resource.Success).data == "http://example.com/QR_Codes/$userId")
   }
 }
