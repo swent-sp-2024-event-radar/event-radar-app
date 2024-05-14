@@ -38,52 +38,53 @@ class ScanFriendTicketViewModelTest {
 
   private val myUID = "user1"
 
-  private val mockEvent1 =
-      Event(
-          eventName = "Event 1",
-          eventPhoto = "",
-          start = LocalDateTime.now(),
-          end = LocalDateTime.now(),
-          location = Location(0.0, 0.0, "Test Location"),
-          description = "Test Description",
-          ticket = EventTicket("Test Ticket", 0.0, 1),
-          mainOrganiser = "1",
-          organiserSet = mutableSetOf("Test Organiser"),
-          attendeeSet = mutableSetOf("user1", "user2", "user3"),
-          category = EventCategory.COMMUNITY,
-          fireBaseID = "1")
+    private val mockEvent1 =
+        Event(
+            eventName = "Event 1",
+            eventPhoto = "",
+            start = LocalDateTime.now(),
+            end = LocalDateTime.now(),
+            location = Location(0.0, 0.0, "Test Location"),
+            description = "Test Description",
+            ticket = EventTicket("Test Ticket", 0.0, 1),
+            mainOrganiser = "1",
+            organiserList = mutableListOf("Test Organiser"),
+            attendeeList = mutableListOf("Test Attendee"),
+            category = EventCategory.COMMUNITY,
+            fireBaseID = "1")
 
-  private val mockUser1 = // access to event 1 & 2 & 3
-      User(
-          userId = "user1",
-          birthDate = "01/01/2000",
-          email = "test@example.com",
-          firstName = "John",
-          lastName = "Doe",
-          phoneNumber = "1234567890",
-          accountStatus = "active",
-          eventsAttendeeSet = mutableSetOf("1", "2", "3"),
-          eventsHostSet = mutableSetOf("3"),
-          friendsSet = mutableSetOf(),
-          profilePicUrl = "http://example.com/pic.jpg",
-          qrCodeUrl = "http://example.com/qr.jpg",
-          username = "john_doe")
 
-  private val mockUser2 = // access to event 2 & 3 only
-      User(
-          userId = "user2",
-          birthDate = "01/01/2002",
-          email = "test@example2.com",
-          firstName = "John2",
-          lastName = "Doe2",
-          phoneNumber = "12345678902",
-          accountStatus = "active2",
-          eventsAttendeeSet = mutableSetOf("2", "3"),
-          eventsHostSet = mutableSetOf("32"),
-          friendsSet = mutableSetOf(),
-          profilePicUrl = "http://example.com/pic.jpg2",
-          qrCodeUrl = "http://example.com/qr.jpg2",
-          username = "john_doe2")
+    private val mockUser1 =
+        User(
+            userId = "user1",
+            birthDate = "01/01/2000",
+            email = "test@example.com",
+            firstName = "John",
+            lastName = "Doe",
+            phoneNumber = "1234567890",
+            accountStatus = "active",
+            eventsAttendeeList = mutableListOf("1", "2", "3"),
+            eventsHostList = mutableListOf("3"),
+            friendsList = mutableListOf(),
+            profilePicUrl = "http://example.com/Profile_Pictures/1",
+            qrCodeUrl = "http://example.com/QR_Codes/1",
+            username = "johndoe")
+
+    private val mockUser2 =
+        User(
+            userId = "user2",
+            birthDate = "01/01/2000",
+            email = "test@example.com",
+            firstName = "John",
+            lastName = "Doe",
+            phoneNumber = "1234567890",
+            accountStatus = "active",
+            eventsAttendeeList = mutableListOf("2", "3"),
+            eventsHostList = mutableListOf("event3"),
+            friendsList = mutableListOf(),
+            profilePicUrl = "http://example.com/Profile_Pictures/1",
+            qrCodeUrl = "http://example.com/QR_Codes/1",
+            username = "johndoe")
 
   class MainDispatcherRule(
       private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
@@ -132,7 +133,7 @@ class ScanFriendTicketViewModelTest {
     qrCodeAnalyser.onDecoded?.invoke("user1")
     when (val event1 = eventRepository.getEvent("1")) {
       is Resource.Success -> {
-        TestCase.assertEquals(mutableSetOf("user2", "user3"), event1.data!!.attendeeSet)
+        TestCase.assertEquals(mutableListOf("user2", "user3"), event1.data!!.attendeeList)
       }
       else -> {
         assert(false)
@@ -141,7 +142,7 @@ class ScanFriendTicketViewModelTest {
     }
     when (val user1 = userRepository.getUser("user1")) {
       is Resource.Success -> {
-        TestCase.assertEquals(mutableSetOf("2", "3"), user1.data!!.eventsAttendeeSet)
+        TestCase.assertEquals(mutableListOf("2", "3"), user1.data!!.eventsAttendeeList)
       }
       else -> {
         assert(false)
