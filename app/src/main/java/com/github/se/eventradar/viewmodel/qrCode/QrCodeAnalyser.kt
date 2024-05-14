@@ -43,7 +43,7 @@ class QrCodeAnalyser @Inject constructor() : ImageAnalysis.Analyzer {
                       mapOf(DecodeHintType.POSSIBLE_FORMATS to arrayListOf(BarcodeFormat.QR_CODE)))
                 }
                 .decode(binaryBitmap)
-        onDecoded?.invoke(result.toString()) // TODO RESET IT to null when respective  viewmodel
+        onDecoded?.invoke(result.toString())
       } catch (e: Exception) {
 
         Log.d("QrCodeAnalyser", "Error decoding QR Code: ${e.message}")

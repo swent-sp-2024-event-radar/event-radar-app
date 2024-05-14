@@ -31,7 +31,7 @@ class ScanTicketQrViewModel
 constructor(
     private val userRepository: IUserRepository,
     private val eventRepository: IEventRepository,
-    qrCodeAnalyser: QrCodeAnalyser,
+    private val qrCodeAnalyser: QrCodeAnalyser,
     @Assisted private val eventID: String
 ) : ViewModel() {
 
@@ -142,6 +142,19 @@ constructor(
     _uiState.update { it.copy(decodedResult = result) }
   }
 
+  fun resetConditions() {
+    changeAction(Action.ScanTicket)
+    qrCodeAnalyser.onDecoded = null
+    _uiState.update { it.copy(decodedResult = "") }
+    _uiState.update { it.copy(action = Action.ScanTicket) }
+    changeTabState(Tab.MyEvent)
+  }
+
+
+  fun changeTabState(tab: Tab) {
+    _uiState.update { it.copy(tabState = tab) }
+  }
+
   fun changeAction(action: Action) {
     _uiState.update { it.copy(action = action) }
   }
@@ -184,4 +197,5 @@ constructor(
     val mainOrganiser: String = "",
     val category: EventCategory = EventCategory.MUSIC,
   )
+
 }
