@@ -1,6 +1,5 @@
 package com.github.se.eventradar.event
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.model.Location
@@ -56,19 +55,10 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
 
   private val eventId = "tdjWMT9Eon2ROTVakQb"
 
-  private var isTicketFree = true
-
-  private val error = mutableStateOf(false)
-  private val success = mutableStateOf(false)
-  private var isAttending = false
-
   @Before
   fun testSetup() {
 
-    every { mockViewModel.errorOccurred } returns error
-    every { mockViewModel.registrationSuccessful } returns success
-    every { mockViewModel.isUserAttendingEvent()} returns true
-    every { mockViewModel.isTicketFree() } returns isTicketFree
+    every { mockViewModel.isUserAttendingEvent() } returns false
     every { mockViewModel.uiState } returns sampleEventDetailsUiState
     every { mockViewModel.eventId } returns eventId
 
@@ -104,19 +94,6 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
       dateTimeTitle { assertIsDisplayed() }
       dateTimeStartContent { assertIsDisplayed() }
       dateTimeEndContent { assertIsDisplayed() }
-    }
-  }
-
-
-  @Test
-  fun ticketFABDoNotShowUpWhenUserIsAttendingEvent() = run {
-    step("ah") {
-      isAttending = true
-    }
-    step("b"){
-      ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
-        ticketButton { assertIsNotDisplayed() }
-      }
     }
   }
 

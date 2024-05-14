@@ -62,10 +62,9 @@ data class Event(
     map["category"] = category.name
     return map
   }
-
 }
 
-//helper function
+// helper function
 private fun convertToDouble(value: Any?): Double {
   return when (value) {
     is Double -> value

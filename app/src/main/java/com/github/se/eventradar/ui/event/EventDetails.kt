@@ -70,24 +70,23 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
       },
       floatingActionButton = {
         // view ticket button
-        if (!viewModel.isUserAttendingEvent()){
+        if (!viewModel.isUserAttendingEvent()) {
           FloatingActionButton(
-            onClick = {
-              navigationActions.navController.navigate(
-                  "${Route.EVENT_DETAILS_TICKETS}/${viewModel.eventId}")
-            },
-            modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("ticketButton"),
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
+              onClick = {
+                navigationActions.navController.navigate(
+                    "${Route.EVENT_DETAILS_TICKETS}/${viewModel.eventId}")
+              },
+              modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("ticketButton"),
+              containerColor = MaterialTheme.colorScheme.primaryContainer,
           ) {
             Icon(
-              painter = painterResource(id = R.drawable.ticket),
-              contentDescription = "view tickets button",
-              modifier = Modifier.size(32.dp),
-              tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                painter = painterResource(id = R.drawable.ticket),
+                contentDescription = "view tickets button",
+                modifier = Modifier.size(32.dp),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
             )
           }
         }
-
       }) { innerPadding ->
         ConstraintLayout(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
           val (image, backButton, title, description, distance, category, dateAndTime, joined) =
@@ -167,18 +166,22 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
               eventUiState,
               componentStyle)
 
-          if(viewModel.isUserAttendingEvent()){
-            Text(text = stringResource(id = R.string.event_attendance_message), modifier =
-            Modifier.constrainAs(joined) {
-              top.linkTo(category.bottom, margin = 32.dp)
-              start.linkTo(parent.start, margin = widthPadding)
-              end.linkTo(parent.end, margin = widthPadding)
-            }, style = TextStyle(
-              fontSize = 18.sp,
-              fontFamily = FontFamily(Font(R.font.roboto)),
-              fontWeight = FontWeight.Bold,
-            ), color = MaterialTheme.colorScheme.primary
-            )
+          if (viewModel.isUserAttendingEvent()) {
+            Text(
+                text = stringResource(id = R.string.event_attendance_message),
+                modifier =
+                    Modifier.constrainAs(joined) {
+                      top.linkTo(category.bottom, margin = 32.dp)
+                      start.linkTo(parent.start, margin = widthPadding)
+                      end.linkTo(parent.end, margin = widthPadding)
+                    },
+                style =
+                    TextStyle(
+                        fontSize = 18.sp,
+                        fontFamily = FontFamily(Font(R.font.roboto)),
+                        fontWeight = FontWeight.Bold,
+                    ),
+                color = MaterialTheme.colorScheme.primary)
           }
         }
       }

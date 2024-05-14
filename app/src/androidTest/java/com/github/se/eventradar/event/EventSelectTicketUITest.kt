@@ -60,14 +60,14 @@ class EventSelectTicketUITest :
 
   private val error = mutableStateOf(false)
   private val success = mutableStateOf(false)
-  private val isAttending = false
+  private var isAttending = false
 
   @Before
   fun testSetup() {
 
     every { mockViewModel.errorOccurred } returns error
     every { mockViewModel.registrationSuccessful } returns success
-    every { mockViewModel.isUserAttendingEvent()} returns isAttending
+    every { mockViewModel.isUserAttendingEvent() } returns isAttending
     every { mockViewModel.uiState } returns sampleEventDetailsUiState
     every { mockViewModel.isTicketFree() } returns isTicketFree
 
@@ -76,6 +76,7 @@ class EventSelectTicketUITest :
 
   @Test
   fun screenDisplaysNavigationElementsCorrectly() = run {
+    isAttending = false
     ComposeScreen.onComposeScreen<EventSelectTicketScreen>(composeTestRule) {
       buyButton { assertIsDisplayed() }
       goBackButton { assertIsDisplayed() }
@@ -112,23 +113,48 @@ class EventSelectTicketUITest :
 
   @Test
   fun buyTicketSuccessful() = run {
+    ComposeScreen.onComposeScreen<EventSelectTicketScreen>(composeTestRule) {
+      step("Check buy action") {
+        buyButton {
+          assertIsDisplayed()
+          performClick()
+        }
+        // assert: the buy has been triggered
+        verify { mockViewModel.buyTicketForEvent() }
+      }
 
+      step("Check success dialog box appear") {
+        success.value = true
+
+        successDialog { assertIsDisplayed() }
+      }
+
+      step("Ok button back navigate to event details") {
+        okButton {
+          assertIsDisplayed()
+          performClick()
+        }
+        verify { mockNavActions.goBack() }
+      }
+    }
+  }
+
+  @Test
+  fun buyTicketFailure() = run {
     ComposeScreen.onComposeScreen<EventSelectTicketScreen>(composeTestRule) {
       buyButton {
         assertIsDisplayed()
         performClick()
       }
+      // assert: the buy has been triggered
+      verify { mockViewModel.buyTicketForEvent() }
+      // confirmVerified(mockViewModel)
 
-      /*successDialog{
-        assertIsDisplayed()
-      }*/
+      error.value = true
 
+      errorDialog { assertIsDisplayed() }
     }
-    // assert: the buy has been triggered
-    verify { mockViewModel.buyTicketForEvent() }
-    //confirmVerified(mockViewModel)
   }
-
 
   @Test
   fun goBackButtonTriggersBackNavigation() = run {
