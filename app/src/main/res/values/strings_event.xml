@@ -15,6 +15,13 @@
     <string name="event_category_party">Party</string>
     <string name="event_category_social">Social</string>
     <string name="event_category_undefined">Undefined</string>
+    <string name="home_search_placeholder">Search event...</string>
+    <string name="filter">Filter</string>
+    <string name="radius_label">Radius: </string>
+    <string name="radius_km_label">  km</string>
+    <string name="free_events_label">Free Events Only:  </string>
+    <string name="category_label">Category: </string>
+    <string name="filter_apply">Apply</string>
     <string name="tickets_title">Tickets</string>
     <string name="ticket_currency">CHF</string>
 </resources>
