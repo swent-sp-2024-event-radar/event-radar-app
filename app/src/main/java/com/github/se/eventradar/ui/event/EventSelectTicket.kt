@@ -20,7 +20,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -64,36 +63,32 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
 
   // Error
   GenericDialogBox(
-    viewModel.errorOccurred,
-    modifier = Modifier.testTag("buyingTicketErrorDialog"),
-    "Registration Failure",
-    "We are sorry an error occurred during the registration process."
-  ) {
-    Icon(
-      painter = painterResource(id = R.drawable.ticket),
-      contentDescription = "ticket icon",
-      modifier = Modifier.size(32.dp),
-      tint = MaterialTheme.colorScheme.onPrimaryContainer,
-    )
-  }
+      viewModel.errorOccurred,
+      modifier = Modifier.testTag("buyingTicketErrorDialog"),
+      "Registration Failure",
+      "We are sorry an error occurred during the registration process.") {
+        Icon(
+            painter = painterResource(id = R.drawable.ticket),
+            contentDescription = "ticket icon",
+            modifier = Modifier.size(32.dp),
+            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+        )
+      }
 
   // Success
   GenericDialogBox(
-    viewModel.registrationSuccessful,
-    modifier = Modifier.testTag("buyingTicketSuccessDialog"),
-    "Successful registration",
-    "You successfully joined that event",
-    {
-      navigationActions.goBack()
-    }
-  ) {
-    Icon(
-      painter = painterResource(id = R.drawable.check),
-      contentDescription = "ticket icon",
-      modifier = Modifier.size(32.dp),
-      tint = MaterialTheme.colorScheme.onPrimaryContainer,
-    )
-  }
+      viewModel.registrationSuccessful,
+      modifier = Modifier.testTag("buyingTicketSuccessDialog"),
+      "Successful registration",
+      "You successfully joined that event",
+      { navigationActions.goBack() }) {
+        Icon(
+            painter = painterResource(id = R.drawable.check),
+            contentDescription = "ticket icon",
+            modifier = Modifier.size(32.dp),
+            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+        )
+      }
 
   Scaffold(
       modifier = Modifier.testTag("joinEventScreen"),
@@ -110,11 +105,9 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
         FloatingActionButton(
             onClick = {
               viewModel.buyTicketForEvent()
-              //context.toast("You registered to the event !")
+              // context.toast("You registered to the event !")
             },
-            modifier = Modifier
-              .padding(bottom = 16.dp, end = 16.dp)
-              .testTag("buyButton"),
+            modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("buyButton"),
             containerColor = MaterialTheme.colorScheme.primaryContainer,
         ) {
           val icon = if (viewModel.isTicketFree()) R.drawable.check else R.drawable.credit_card
@@ -126,19 +119,15 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
           )
         }
       }) { innerPadding ->
-        ConstraintLayout(modifier = Modifier
-          .fillMaxSize()
-          .padding(innerPadding)) {
+        ConstraintLayout(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
           val (backButton, title, ticketTitle, ticketCard) = createRefs()
 
           GoBackButton(
               modifier =
-              Modifier
-                .wrapContentSize()
-                .constrainAs(backButton) {
-                  top.linkTo(parent.top, margin = 12.dp)
-                  start.linkTo(parent.start)
-                }) {
+                  Modifier.wrapContentSize().constrainAs(backButton) {
+                    top.linkTo(parent.top, margin = 12.dp)
+                    start.linkTo(parent.start)
+                  }) {
                 navigationActions.goBack()
               }
 
@@ -155,26 +144,24 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
           Text(
               text = stringResource(id = R.string.tickets_title),
               modifier =
-              Modifier
-                .constrainAs(ticketTitle) {
-                  top.linkTo(title.bottom, margin = 32.dp)
-                  start.linkTo(parent.start, margin = 32.dp)
-                }
-                .testTag("ticketsTitle"),
+                  Modifier.constrainAs(ticketTitle) {
+                        top.linkTo(title.bottom, margin = 32.dp)
+                        start.linkTo(parent.start, margin = 32.dp)
+                      }
+                      .testTag("ticketsTitle"),
               style = componentStyle.subTitleStyle)
 
           Card(
               modifier =
-              Modifier
-                .padding(horizontal = 32.dp, vertical = 8.dp)
-                .height(IntrinsicSize.Min)
-                .fillMaxWidth()
-                .testTag("ticketCard")
-                .constrainAs(ticketCard) {
-                  top.linkTo(ticketTitle.bottom, margin = 32.dp)
-                  start.linkTo(parent.start)
-                  end.linkTo(parent.end)
-                },
+                  Modifier.padding(horizontal = 32.dp, vertical = 8.dp)
+                      .height(IntrinsicSize.Min)
+                      .fillMaxWidth()
+                      .testTag("ticketCard")
+                      .constrainAs(ticketCard) {
+                        top.linkTo(ticketTitle.bottom, margin = 32.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                      },
               colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
               elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
               onClick = {
@@ -183,11 +170,10 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
               }) {
                 Row(
                     modifier =
-                    Modifier
-                      .fillMaxWidth()
-                      .fillMaxHeight()
-                      .padding(horizontal = 16.dp, vertical = 4.dp)
-                      .testTag("ticketInfo"),
+                        Modifier.fillMaxWidth()
+                            .fillMaxHeight()
+                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                            .testTag("ticketInfo"),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically) {
                       val style =
@@ -211,43 +197,42 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
       }
 }
 
-
 @Composable
 fun GenericDialogBox(
-  openErrorDialog: MutableState<Boolean>,
-  modifier: Modifier = Modifier,
-  title : String,
-  message : String,
-  onClick: ()->Unit = {},
-  boxIcon: @Composable (()->Unit)?,
-  ) {
+    openErrorDialog: MutableState<Boolean>,
+    modifier: Modifier = Modifier,
+    title: String,
+    message: String,
+    onClick: () -> Unit = {},
+    boxIcon: @Composable (() -> Unit)?,
+) {
   val display by openErrorDialog
   if (display) {
     AlertDialog(
-      icon = boxIcon,
-      text = {
-        Text(
-          text = message,
-          textAlign = TextAlign.Center,
-          modifier = Modifier.testTag("ErrorDisplayText"))
-      },
-      title = {
-        Text(
-          text = title,
-          modifier = Modifier.testTag("ErrorTitle"),
-        )
-      },
-      onDismissRequest = { openErrorDialog.value = false },
-      confirmButton = {
-        TextButton(
-          onClick = {
-            openErrorDialog.value = false
-            onClick()
-                    },
-          modifier = Modifier.testTag("errorDialogConfirmButton")) {
-          Text("Ok")
-        }
-      },
-      modifier = modifier)
+        icon = boxIcon,
+        text = {
+          Text(
+              text = message,
+              textAlign = TextAlign.Center,
+              modifier = Modifier.testTag("ErrorDisplayText"))
+        },
+        title = {
+          Text(
+              text = title,
+              modifier = Modifier.testTag("ErrorTitle"),
+          )
+        },
+        onDismissRequest = { openErrorDialog.value = false },
+        confirmButton = {
+          TextButton(
+              onClick = {
+                openErrorDialog.value = false
+                onClick()
+              },
+              modifier = Modifier.testTag("dialogConfirmButton")) {
+                Text("Ok")
+              }
+        },
+        modifier = modifier)
   }
 }

@@ -1,8 +1,8 @@
 package com.github.se.eventradar.viewmodel
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -40,8 +40,8 @@ constructor(
           currentUserId = response.data
         }
         is Resource.Failure ->
-          Log.d(
-            "EventDetailsViewModel", "Could not get the user Id: ${response.throwable.message}")
+            Log.d(
+                "EventDetailsViewModel", "Could not get the user Id: ${response.throwable.message}")
       }
     }
   }
@@ -52,10 +52,8 @@ constructor(
   val errorOccurred = mutableStateOf(false)
   val registrationSuccessful = mutableStateOf(false)
 
-
   private lateinit var currentUserId: String
-  private lateinit var displayedEvent: Event
-
+  private var displayedEvent: Event? = null
 
   fun getEventData() {
     viewModelScope.launch {
@@ -103,7 +101,6 @@ constructor(
     }
   }
 
-
   fun buyTicketForEvent() { // update the user attendee list, update the eventRepo ticket count
     viewModelScope.launch {
       if (!isTicketFree()) {
@@ -112,7 +109,7 @@ constructor(
             "Paid tickets are not supported, all of them are considered free")
       }
 
-      if(!isUserAttendingEvent()){
+      if (!isUserAttendingEvent()) {
         // TODO needs to be atomic to avoid concurrency issues
         registrationUpdateEvent()
         registrationUpdateUser()
@@ -121,15 +118,15 @@ constructor(
     }
   }
 
-  fun isUserAttendingEvent(): Boolean{
-    return false
-    // TODO reimplement this when factory is merged
-    //displayedEvent.attendeeList.contains(currentUserId)
+  fun isUserAttendingEvent(): Boolean {
+    if (displayedEvent == null) {
+      getEventData()
+    }
+    return displayedEvent?.attendeeList?.contains(currentUserId) ?: false
   }
 
-
   private fun registrationUpdateEvent() {
-    val event: Event = displayedEvent
+    val event: Event = displayedEvent as Event
 
     // add currentUserId to the event attendees list
     event.attendeeList.add(currentUserId)
@@ -146,8 +143,8 @@ constructor(
         is Resource.Failure -> {
           errorOccurred.value = true
           Log.d(
-            "EventDetailsViewModel",
-            "Error updating event data: ${updateResponse.throwable.message}")
+              "EventDetailsViewModel",
+              "Error updating event data: ${updateResponse.throwable.message}")
         }
       }
     }
@@ -173,18 +170,16 @@ constructor(
               is Resource.Failure -> {
                 errorOccurred.value = true
                 Log.d(
-                  "EventDetailsViewModel",
-                  "Error updating user data: ${updateResponse.throwable.message}")
+                    "EventDetailsViewModel",
+                    "Error updating user data: ${updateResponse.throwable.message}")
               }
-
             }
           }
         }
         is Resource.Failure -> {
           errorOccurred.value = true
           Log.d(
-            "EventDetailsViewModel",
-            "Error getting user data: ${userResponse.throwable.message}")
+              "EventDetailsViewModel", "Error getting user data: ${userResponse.throwable.message}")
         }
       }
     }
