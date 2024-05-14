@@ -34,7 +34,6 @@ public class ChatScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   private val sentChatBubbleTimeRow: KNode =
       sentChatBubbleText.child { hasTestTag("sentChatBubbleTimeRow") }
   val messageTimeRowText: KNode = sentChatBubbleTimeRow.child { hasTestTag("messageTimeRowText") }
-  val messageTimeRowIcon: KNode = sentChatBubbleTimeRow.child { hasTestTag("messageTimeRowIcon") }
 
   private val chatInput: KNode = chatScreenColumn.child { hasTestTag("chatInput") }
   val chatInputField: KNode = chatInput.child { hasTestTag("chatInputField") }
