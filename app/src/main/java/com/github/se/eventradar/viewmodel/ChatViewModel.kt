@@ -62,7 +62,7 @@ constructor(
 
       }
   }
-    private fun initOpponent(opponentId: String) {
+    fun initOpponent(opponentId: String) {
         viewModelScope.launch {
             _uiState.update {
                 when (val opponentResource = userRepository.getUser(opponentId)) {

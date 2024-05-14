@@ -76,7 +76,7 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), navigationActions: Na
   val uiState by viewModel.uiState.collectAsState()
 
   // TO DO: Implement get messages between two users in VM
-  //    viewModel.getMessages(senderId, opponentId)
+   viewModel.initAndGetMessages(opponentId)
 
   // TO DO: Implement changed function results
   ChatScreenUi(
@@ -109,7 +109,7 @@ fun ChatScreenUi(
 
   // TO DO: Implement load opponent in VM
   LaunchedEffect(key1 = Unit) {
-    //        viewModel.loadOpponentProfileFromFirebase(uiState.opponentId!!)
+      viewModel.initOpponent(uiState.opponentId!!)
   }
   val opponentName = uiState.opponentProfile.firstName
   val opponentSurname = uiState.opponentProfile.lastName
