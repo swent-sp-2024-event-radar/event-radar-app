@@ -38,53 +38,52 @@ class ScanFriendTicketViewModelTest {
 
   private val myUID = "user1"
 
-    private val mockEvent1 =
-        Event(
-            eventName = "Event 1",
-            eventPhoto = "",
-            start = LocalDateTime.now(),
-            end = LocalDateTime.now(),
-            location = Location(0.0, 0.0, "Test Location"),
-            description = "Test Description",
-            ticket = EventTicket("Test Ticket", 0.0, 1),
-            mainOrganiser = "1",
-            organiserList = mutableListOf("Test Organiser"),
-            attendeeList = mutableListOf("Test Attendee"),
-            category = EventCategory.COMMUNITY,
-            fireBaseID = "1")
+  private val mockEvent1 =
+      Event(
+          eventName = "Event 1",
+          eventPhoto = "",
+          start = LocalDateTime.now(),
+          end = LocalDateTime.now(),
+          location = Location(0.0, 0.0, "Test Location"),
+          description = "Test Description",
+          ticket = EventTicket("Test Ticket", 0.0, 1),
+          mainOrganiser = "1",
+          organiserList = mutableListOf("Test Organiser"),
+          attendeeList = mutableListOf("user1", "user2", "user3"),
+          category = EventCategory.COMMUNITY,
+          fireBaseID = "1")
 
+  private val mockUser1 =
+      User(
+          userId = "user1",
+          birthDate = "01/01/2000",
+          email = "test@example.com",
+          firstName = "John",
+          lastName = "Doe",
+          phoneNumber = "1234567890",
+          accountStatus = "active",
+          eventsAttendeeList = mutableListOf("1", "2", "3"),
+          eventsHostList = mutableListOf("3"),
+          friendsList = mutableListOf(),
+          profilePicUrl = "http://example.com/Profile_Pictures/1",
+          qrCodeUrl = "http://example.com/QR_Codes/1",
+          username = "johndoe")
 
-    private val mockUser1 =
-        User(
-            userId = "user1",
-            birthDate = "01/01/2000",
-            email = "test@example.com",
-            firstName = "John",
-            lastName = "Doe",
-            phoneNumber = "1234567890",
-            accountStatus = "active",
-            eventsAttendeeList = mutableListOf("1", "2", "3"),
-            eventsHostList = mutableListOf("3"),
-            friendsList = mutableListOf(),
-            profilePicUrl = "http://example.com/Profile_Pictures/1",
-            qrCodeUrl = "http://example.com/QR_Codes/1",
-            username = "johndoe")
-
-    private val mockUser2 =
-        User(
-            userId = "user2",
-            birthDate = "01/01/2000",
-            email = "test@example.com",
-            firstName = "John",
-            lastName = "Doe",
-            phoneNumber = "1234567890",
-            accountStatus = "active",
-            eventsAttendeeList = mutableListOf("2", "3"),
-            eventsHostList = mutableListOf("event3"),
-            friendsList = mutableListOf(),
-            profilePicUrl = "http://example.com/Profile_Pictures/1",
-            qrCodeUrl = "http://example.com/QR_Codes/1",
-            username = "johndoe")
+  private val mockUser2 =
+      User(
+          userId = "user2",
+          birthDate = "01/01/2000",
+          email = "test@example.com",
+          firstName = "John",
+          lastName = "Doe",
+          phoneNumber = "1234567890",
+          accountStatus = "active",
+          eventsAttendeeList = mutableListOf("2", "3"),
+          eventsHostList = mutableListOf("event3"),
+          friendsList = mutableListOf(),
+          profilePicUrl = "http://example.com/Profile_Pictures/1",
+          qrCodeUrl = "http://example.com/QR_Codes/1",
+          username = "johndoe")
 
   class MainDispatcherRule(
       private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
