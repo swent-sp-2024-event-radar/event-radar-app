@@ -99,20 +99,23 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
           assertIsDisplayed()
           assertHasClickAction()
         }
-        //        chatAppBarTitleText { assertIsDisplayed() }
-        //                chatAppBarBackArrowIcon { assertIsDisplayed() }
 
-        //                bottomNav { assertIsDisplayed() }
-        //                chatScreenMessagesList { assertIsDisplayed() }
+        chatAppBarBackArrow {
+          assertIsDisplayed()
+          assertHasClickAction()
+        }
+
+        bottomNav { assertIsDisplayed() }
+        chatScreenMessagesList { assertIsDisplayed() }
+
+        //        receivedMessageText { assertIsDisplayed() }
+        //        messageTimeRowText { assertIsDisplayed() }
+        //        messageTimeRowIcon { assertIsDisplayed() }
         //
-        //                receivedMessageText { assertIsDisplayed() }
-        //                messageTimeRowText { assertIsDisplayed() }
-        //                messageTimeRowIcon { assertIsDisplayed() }
-        //
-        //                chatInputField { assertIsDisplayed() }
-        //                chatInputPlaceholder { assertIsDisplayed() }
-        //                chatInputSendButtonIcon { assertIsDisplayed() }
-        //                chatInputCameraButtonIcon { assertIsDisplayed() }
+        //        chatInputField { assertIsDisplayed() }
+        //        chatInputPlaceholder { assertIsDisplayed() }
+        //        chatInputSendButtonIcon { assertIsDisplayed() }
+        //        chatInputCameraButtonIcon { assertIsDisplayed() }
       }
     }
   }
