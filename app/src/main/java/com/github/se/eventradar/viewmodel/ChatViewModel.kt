@@ -1,6 +1,8 @@
 package com.github.se.eventradar.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
@@ -8,22 +10,39 @@ import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.model.repository.message.IMessageRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-@HiltViewModel
+@HiltViewModel(assistedFactory = ChatViewModel.Factory::class)
 class ChatViewModel
-@Inject
+@AssistedInject
 constructor(
     private val messagesRepository: IMessageRepository,
     private val userRepository: IUserRepository,
-) : ViewModel() {
+    @Assisted val opponentId: String,
+    ) : ViewModel() {
   private val _uiState = MutableStateFlow(ChatUiState())
   val uiState: StateFlow<ChatUiState> = _uiState
+
+    // Code for creating an instance of ChatViewModel
+    @AssistedFactory
+    interface Factory {
+        fun create(opponentId: String): ChatViewModel
+    }
+
+    companion object {
+        @Composable
+        fun create(opponentId: String): ChatViewModel {
+            return hiltViewModel<ChatViewModel, Factory>(
+                creationCallback = { factory -> factory.create(opponentId = opponentId) })
+        }
+    }
 
     private val nullUser =
         User(
@@ -62,7 +81,7 @@ constructor(
 
       }
   }
-    fun initOpponent(opponentId: String) {
+    fun initOpponent() {
         viewModelScope.launch {
             _uiState.update {
                 when (val opponentResource = userRepository.getUser(opponentId)) {
@@ -77,10 +96,8 @@ constructor(
             }
         }
     }
-    fun initAndGetMessages(opponentId: String) {
+    fun getMessages() {
         viewModelScope.launch {
-            initOpponent(opponentId)
-
             // Fetch messages
             val userId = _uiState.value.userId
             if (userId != null && _uiState.value.opponentId!= null) {
@@ -126,9 +143,9 @@ data class ChatUiState(
         lastName = "Default",
         phoneNumber = "Default",
         accountStatus = "Default",
-        eventsAttendeeSet = mutableSetOf(),
-        eventsHostSet = mutableSetOf(),
-        friendsSet = mutableSetOf(),
+        eventsAttendeeList = mutableListOf(),
+        eventsHostList = mutableListOf(),
+        friendsList = mutableListOf(),
         profilePicUrl = "Default",
         qrCodeUrl = "Default",
         username = "Default"),

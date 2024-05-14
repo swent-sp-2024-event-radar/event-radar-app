@@ -76,7 +76,7 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), navigationActions: Na
   val uiState by viewModel.uiState.collectAsState()
 
   // TO DO: Implement get messages between two users in VM
-   viewModel.initAndGetMessages(opponentId)
+   viewModel.getMessages()
 
   // TO DO: Implement changed function results
   ChatScreenUi(
@@ -109,7 +109,7 @@ fun ChatScreenUi(
 
   // TO DO: Implement load opponent in VM
   LaunchedEffect(key1 = Unit) {
-      viewModel.initOpponent(uiState.opponentId!!)
+      viewModel.initOpponent()
   }
   val opponentName = uiState.opponentProfile.firstName
   val opponentSurname = uiState.opponentProfile.lastName
@@ -311,5 +311,5 @@ fun ChatScreenPreview() {
   val mockMessageRepo = MockMessageRepository()
   val mockUserRepo = MockUserRepository()
   ChatScreen(
-      ChatViewModel(mockMessageRepo, mockUserRepo), NavigationActions(rememberNavController()))
+      ChatViewModel(mockMessageRepo, mockUserRepo, "1"), NavigationActions(rememberNavController()))
 }
