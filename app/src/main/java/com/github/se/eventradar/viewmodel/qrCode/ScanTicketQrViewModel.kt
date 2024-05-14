@@ -5,9 +5,12 @@ import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
+import com.github.se.eventradar.model.event.EventCategory
+import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import dagger.assisted.Assisted
@@ -20,6 +23,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 @HiltViewModel(assistedFactory = ScanTicketQrViewModel.Factory::class)
 class ScanTicketQrViewModel
@@ -39,10 +43,11 @@ constructor(
 
   companion object {
     @Composable
-    fun create(eventId: String): ScanTicketQrViewModel {
+    fun create(eventId: String): ScanTicketQrViewModel  {
       return hiltViewModel<ScanTicketQrViewModel, Factory>(
         creationCallback = { factory -> factory.create(eventId = eventId) })
     }
+
   }
 
   private val _uiState = MutableStateFlow(QrCodeScanTicketState())
@@ -109,11 +114,11 @@ constructor(
     println("entered retryUpdate")
     var maxNumberOfRetries = 3
     var updateResult: Resource<Any>?
-    if (user.eventsAttendeeSet.contains(myEventID) && event.attendeeSet.contains(user.userId)) {
+    if (user.eventsAttendeeList.contains(myEventID) && event.attendeeList.contains(user.userId)) {
       println("both contain one another")
-      user.eventsAttendeeSet.remove(myEventID)
+      user.eventsAttendeeList.remove(myEventID)
       val userUpdateResult = userRepository.updateUser(user)
-      event.attendeeSet.remove(user.userId)
+      event.attendeeList.remove(user.userId)
       val eventUpdateResult = eventRepository.updateEvent(event)
 
       do {
@@ -137,17 +142,46 @@ constructor(
     _uiState.update { it.copy(decodedResult = result) }
   }
 
-  fun saveEventID(eventID: String) {
-    myEventID = eventID
-  }
-
   fun changeAction(action: Action) {
     _uiState.update { it.copy(action = action) }
   }
 
+  fun getEventData() {
+    viewModelScope.launch {
+      when (val response = eventRepository.getEvent(eventID)) {
+        is Resource.Success -> {
+          _uiState.update {
+            it.copy(
+              eventName = response.data!!.eventName,
+              eventPhoto = response.data.eventPhoto,
+              start = response.data.start,
+              end = response.data.end,
+              location = response.data.location,
+              description = response.data.description,
+              ticket = response.data.ticket,
+              mainOrganiser = response.data.mainOrganiser,
+              category = response.data.category,
+            )
+          }
+        }
+        is Resource.Failure ->
+          Log.d("EventDetailsViewModel", "Error getting event: ${response.throwable.message}")
+      }
+    }
+  }
+
   data class QrCodeScanTicketState(
-      val decodedResult: String = "",
-      val action: Action = Action.ScanTicket,
-      val tabState: Tab = Tab.MyEvent
+    val decodedResult: String = "",
+    val action: Action = Action.ScanTicket,
+    val tabState: Tab = Tab.MyEvent,
+    val eventName: String = "",
+    val eventPhoto: String = "",
+    val start: LocalDateTime = LocalDateTime.MIN,
+    val end: LocalDateTime = LocalDateTime.MAX,
+    val location: Location = Location(0.0, 0.0, ""),
+    val description: String = "",
+    val ticket: EventTicket = EventTicket("", 0.0, 0),
+    val mainOrganiser: String = "",
+    val category: EventCategory = EventCategory.MUSIC,
   )
 }
