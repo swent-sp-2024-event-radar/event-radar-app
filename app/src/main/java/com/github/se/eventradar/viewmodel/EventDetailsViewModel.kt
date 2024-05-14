@@ -1,6 +1,8 @@
 package com.github.se.eventradar.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Location
@@ -28,6 +30,9 @@ constructor(
 
   private val _uiState = MutableStateFlow(EventUiState())
   val uiState: StateFlow<EventUiState> = _uiState
+
+  val errorOccurred = mutableStateOf(false)
+  val registrationSuccessful = mutableStateOf(false)
 
   // TODO would require assisted data injection to have this as a parameters
   private lateinit var eventId: String
@@ -111,9 +116,12 @@ constructor(
             "Paid tickets are not supported, all of them are considered free")
       }
 
-      // TODO would need an atomic update of the database, using transaction... ?
-      registrationUpdateEvent()
-      registrationUpdateUser()
+      if(!isUserRegistered()){
+        // TODO would need an atomic update of the database, using transaction... ?
+        registrationUpdateEvent()
+        registrationUpdateUser()
+      }
+      registrationSuccessful.value = true
     }
   }
 
@@ -140,10 +148,12 @@ constructor(
           // TODO implement some states to display this information to the user through the UI
           Log.i("EventDetailsViewModel", "Successfully updated event")
         }
-        is Resource.Failure ->
-            Log.d(
-                "EventDetailsViewModel",
-                "Error updating event data: ${updateResponse.throwable.message}")
+        is Resource.Failure -> {
+          errorOccurred.value = true
+          Log.d(
+            "EventDetailsViewModel",
+            "Error updating event data: ${updateResponse.throwable.message}")
+        }
       }
     }
   }
@@ -166,17 +176,22 @@ constructor(
                 // TODO implement some states to display this information to the user through the UI
                 Log.i("EventDetailsViewModel", "Successfully updated user")
               }
-              is Resource.Failure ->
-                  Log.d(
-                      "EventDetailsViewModel",
-                      "Error updating user data: ${updateResponse.throwable.message}")
+              is Resource.Failure -> {
+                errorOccurred.value = true
+                Log.d(
+                  "EventDetailsViewModel",
+                  "Error updating user data: ${updateResponse.throwable.message}")
+              }
+
             }
           }
         }
-        is Resource.Failure ->
-            Log.d(
-                "EventDetailsViewModel",
-                "Error getting user data: ${userResponse.throwable.message}")
+        is Resource.Failure -> {
+          errorOccurred.value = true
+          Log.d(
+            "EventDetailsViewModel",
+            "Error getting user data: ${userResponse.throwable.message}")
+        }
       }
     }
   }
