@@ -1,6 +1,9 @@
 package com.github.se.eventradar.ui.messages
 
+<<<<<<< HEAD
 import android.net.Uri
+=======
+>>>>>>> 2e1afce72ba72c3f8c1c6b843c914c0fc4c89ae3
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -8,6 +11,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+<<<<<<< HEAD
+=======
+import androidx.compose.foundation.layout.fillMaxSize
+>>>>>>> 2e1afce72ba72c3f8c1c6b843c914c0fc4c89ae3
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -31,6 +38,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+<<<<<<< HEAD
+=======
+import androidx.compose.ui.res.stringResource
+>>>>>>> 2e1afce72ba72c3f8c1c6b843c914c0fc4c89ae3
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -41,7 +52,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+<<<<<<< HEAD
 import coil.compose.rememberImagePainter
+=======
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+>>>>>>> 2e1afce72ba72c3f8c1c6b843c914c0fc4c89ae3
 import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.User
@@ -175,6 +191,7 @@ fun MessagesList(
 ) {
   val filteredMessageList = messageList.filter { it.user1 == userId || it.user2 == userId }
 
+<<<<<<< HEAD
   LazyColumn(modifier = modifier.padding(top = 16.dp)) {
     items(filteredMessageList) { messageHistory ->
       val otherUser =
@@ -185,6 +202,33 @@ fun MessagesList(
       val recipient = getUser(otherUser)
       MessagePreviewItem(messageHistory, recipient, currentUserReadLatestMessage, onChatClicked)
       Divider()
+=======
+  if (filteredMessageList.isEmpty()) {
+    Text(
+        text = stringResource(R.string.no_message_found_string),
+        style =
+            TextStyle(
+                fontSize = 16.sp,
+                lineHeight = 24.sp,
+                fontFamily = FontFamily(Font(R.font.roboto)),
+                fontWeight = FontWeight.Normal,
+                color = Color(0xFF49454F),
+                letterSpacing = 0.15.sp,
+                textAlign = TextAlign.Center),
+        modifier = Modifier.fillMaxSize().padding(top = 32.dp).testTag("noMessagesFound"))
+  } else {
+    LazyColumn(modifier = modifier.padding(top = 16.dp)) {
+      items(filteredMessageList) { messageHistory ->
+        val otherUser =
+            if (userId == messageHistory.user1) messageHistory.user2 else messageHistory.user1
+        val currentUserReadLatestMessage =
+            if (userId == messageHistory.user1) messageHistory.user1ReadMostRecentMessage
+            else messageHistory.user2ReadMostRecentMessage
+        val recipient = getUser(otherUser)
+        MessagePreviewItem(messageHistory, recipient, currentUserReadLatestMessage, onChatClicked)
+        Divider()
+      }
+>>>>>>> 2e1afce72ba72c3f8c1c6b843c914c0fc4c89ae3
     }
   }
 }
@@ -204,6 +248,7 @@ fun MessagePreviewItem(
           modifier
               .fillMaxWidth()
               .clickable { onChatClicked(messageHistory) }
+<<<<<<< HEAD
               .testTag("messagePreviewItem"),
       horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
       verticalAlignment = Alignment.CenterVertically) {
@@ -213,6 +258,20 @@ fun MessagePreviewItem(
             contentScale = ContentScale.Crop,
             modifier =
                 Modifier.size(56.dp).padding(start = 16.dp).clip(CircleShape).testTag("profilePic"))
+=======
+              .padding(vertical = 8.dp)
+              .testTag("messagePreviewItem"),
+      horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
+      verticalAlignment = Alignment.CenterVertically) {
+        AsyncImage(
+            model =
+                ImageRequest.Builder(LocalContext.current).data(recipient.profilePicUrl).build(),
+            placeholder = painterResource(id = R.drawable.placeholder),
+            contentDescription = "Profile picture of ${recipient.firstName} ${recipient.lastName}",
+            contentScale = ContentScale.Crop,
+            modifier =
+                Modifier.padding(start = 16.dp).clip(CircleShape).size(56.dp).testTag("profilePic"))
+>>>>>>> 2e1afce72ba72c3f8c1c6b843c914c0fc4c89ae3
         Column(
             modifier =
                 Modifier.padding(start = 16.dp).fillMaxWidth(.7f).testTag("messageContentColumn")) {
@@ -255,7 +314,11 @@ fun MessagePreviewItem(
               mostRecentMessage.dateTimeSent.isAfter(today) -> "HH:mm"
               mostRecentMessage.dateTimeSent.isBefore(today) and
                   mostRecentMessage.dateTimeSent.isAfter(thisYear) -> "dd/MM"
+<<<<<<< HEAD
               else -> "dd/MM/yyyy"
+=======
+              else -> "dd/MM/yy"
+>>>>>>> 2e1afce72ba72c3f8c1c6b843c914c0fc4c89ae3
             }
 
         Text(
@@ -279,7 +342,11 @@ fun PreviewMessagesScreen() {
                   mutableListOf(
                       Message(
                           sender = "1",
+<<<<<<< HEAD
                           content = "Hello Hello Hello Hello Hello",
+=======
+                          content = "Hello Hello Hello Hello Hello Hello Hello",
+>>>>>>> 2e1afce72ba72c3f8c1c6b843c914c0fc4c89ae3
                           dateTimeSent = LocalDateTime.parse("2021-08-01T12:00:00"),
                           id = "1")),
               latestMessageId = "1",
@@ -287,7 +354,11 @@ fun PreviewMessagesScreen() {
           MessageHistory(
               user1 = "1",
               user2 = "3",
+<<<<<<< HEAD
               user1ReadMostRecentMessage = true,
+=======
+              user1ReadMostRecentMessage = false,
+>>>>>>> 2e1afce72ba72c3f8c1c6b843c914c0fc4c89ae3
               user2ReadMostRecentMessage = false,
               messages =
                   mutableListOf(
@@ -320,6 +391,7 @@ fun PreviewMessagesScreen() {
             it,
             "10/10/2003",
             "test@test.com",
+<<<<<<< HEAD
             "John",
             "Doe",
             "1234567890",
@@ -328,7 +400,48 @@ fun PreviewMessagesScreen() {
             mutableSetOf(),
             mutableSetOf(),
             "content://com.google.android.apps.docs.storage/document/acc%3D1%3Bdoc%3Dencoded%3D_UfMfUb7G-_gMA2naQlf9EvwC7BF37dTn3wqEbCsPCFqL25u15za15OI19GK4g%3D",
+=======
+            "Test",
+            it,
+            "1234567890",
+            "active",
+            mutableListOf(),
+            mutableListOf(),
+            mutableListOf(),
+            "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FYJP3bYiaGFPqx64CT6kHOpwvXnv1?alt=media&token=5587f942-efc7-4cbf-920c-7f24a76d7ad1",
+>>>>>>> 2e1afce72ba72c3f8c1c6b843c914c0fc4c89ae3
             "",
             "johndoe")
       })
 }
+<<<<<<< HEAD
+=======
+
+@Preview(showSystemUi = true, showBackground = true)
+@ExcludeFromJacocoGeneratedReport
+@Composable
+fun PreviewEmptyMessagesList() {
+  MessagesList(
+      messageList = emptyList(),
+      searchQuery = "",
+      userId = "1",
+      onChatClicked = {},
+      getUser = {
+        User(
+            it,
+            "10/10/2003",
+            "test@test.com",
+            "John",
+            "Doe",
+            "1234567890",
+            "active",
+            mutableListOf(),
+            mutableListOf(),
+            mutableListOf(),
+            "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FYJP3bYiaGFPqx64CT6kHOpwvXnv1?alt=media&token=5587f942-efc7-4cbf-920c-7f24a76d7ad1",
+            "",
+            "johndoe")
+      },
+      modifier = Modifier)
+}
+>>>>>>> 2e1afce72ba72c3f8c1c6b843c914c0fc4c89ae3

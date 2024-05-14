@@ -5,9 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,7 +30,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SentMessageRow(text: String, messageTime: String, messageRead: Boolean) {
+fun SentMessageRow(text: String, messageTime: String) {
   // Whole column that contains chat bubble and padding on start or end
   Column(
       horizontalAlignment = Alignment.End,
@@ -60,16 +57,14 @@ fun SentMessageRow(text: String, messageTime: String, messageRead: Boolean) {
                   style = MaterialTheme.typography.bodyLarge,
                   messageStat = {
                     MessageTimeText(
-                        modifier = Modifier.wrapContentSize(),
-                        messageTime = messageTime,
-                        messageRead = messageRead)
+                        modifier = Modifier.wrapContentSize(), messageTime = messageTime)
                   })
             })
       }
 }
 
 @Composable
-fun MessageTimeText(modifier: Modifier = Modifier, messageTime: String, messageRead: Boolean) {
+fun MessageTimeText(modifier: Modifier = Modifier, messageTime: String) {
   Row(
       modifier = modifier.testTag("sentChatBubbleTimeRow"),
       verticalAlignment = Alignment.CenterVertically) {
@@ -78,13 +73,6 @@ fun MessageTimeText(modifier: Modifier = Modifier, messageTime: String, messageR
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = modifier.testTag("messageTimeRowText"))
-
-        Icon(
-            modifier = Modifier.size(18.dp).padding(start = 4.dp).testTag("messageTimeRowIcon"),
-            imageVector = Icons.Default.Done,
-            // TO DO: Change color based on messageRead
-            tint = if (messageRead) Color.Blue else Color.Gray,
-            contentDescription = "messageStatus")
       }
 }
 

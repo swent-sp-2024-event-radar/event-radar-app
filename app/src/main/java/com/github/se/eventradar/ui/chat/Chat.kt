@@ -179,7 +179,6 @@ fun ChatScreenUi(
                           SentMessageRow(
                               text = message.content,
                               messageTime = sdf.format(message.dateTimeSent),
-                              messageRead = true,
                           )
                         }
                       }

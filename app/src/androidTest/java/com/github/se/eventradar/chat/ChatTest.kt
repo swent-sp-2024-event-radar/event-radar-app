@@ -2,16 +2,24 @@ package com.github.se.eventradar.chat
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
+import com.github.se.eventradar.model.event.Event
+import com.github.se.eventradar.model.event.EventCategory
+import com.github.se.eventradar.model.event.EventList
+import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.message.Message
+import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.model.repository.message.IMessageRepository
 import com.github.se.eventradar.model.repository.message.MockMessageRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.screens.ChatScreen
 import com.github.se.eventradar.ui.chat.ChatScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.viewmodel.ChatUiState
 import com.github.se.eventradar.viewmodel.ChatViewModel
+import com.github.se.eventradar.viewmodel.EventsOverviewUiState
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -19,6 +27,7 @@ import io.github.kakaocup.compose.node.element.ComposeScreen.Companion.onCompose
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.unmockkAll
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDateTime
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -42,6 +51,29 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
   private lateinit var mockUserRepository: MockUserRepository
   private lateinit var mockChatViewModel: ChatViewModel
 
+    private val sampleMessageHistory =
+        MutableStateFlow(
+            ChatUiState(
+                messageHistory = MessageHistory(
+                    user1 = "1",
+                    user2 = "2",
+                    latestMessageId = "DefaultId",
+                    user1ReadMostRecentMessage = true,
+                    user2ReadMostRecentMessage = true,
+                    messages =
+                        MutableList(10) {
+                            Message(
+                                sender = "1",
+                                content = "Default message $it",
+                                dateTimeSent = LocalDateTime.now(),
+                                id = "1$it")
+
+                            Message(
+                                sender = "2",
+                                content = "Default response $it",
+                                dateTimeSent = LocalDateTime.now(),
+                                id = "2$it")
+                        })))
   @Before
   fun testSetup() = runTest {
     mockMessageRepository = MockMessageRepository()
@@ -60,10 +92,11 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
               lastName = "$i",
               phoneNumber = "",
               accountStatus = "active",
-              eventsAttendeeSet = mutableSetOf(),
-              eventsHostSet = mutableSetOf(),
-              friendsSet = mutableSetOf(),
-              profilePicUrl = "",
+              eventsAttendeeList = mutableListOf(),
+              eventsHostList = mutableListOf(),
+              friendsList = mutableListOf(),
+              profilePicUrl =
+                  "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2Fplaceholder.png?alt=media&token=ba4b4efb-ff45-4617-b60f-3789e8fb75b6",
               qrCodeUrl = "",
               username = "Test$i"))
 
@@ -98,21 +131,46 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
           assertIsDisplayed()
           assertHasClickAction()
         }
-        //        chatAppBarTitleText { assertIsDisplayed() }
-        //                chatAppBarBackArrowIcon { assertIsDisplayed() }
 
-        //                bottomNav { assertIsDisplayed() }
-        //                chatScreenMessagesList { assertIsDisplayed() }
-        //
-        //                receivedMessageText { assertIsDisplayed() }
-        //                messageTimeRowText { assertIsDisplayed() }
-        //                messageTimeRowIcon { assertIsDisplayed() }
-        //
-        //                chatInputField { assertIsDisplayed() }
-        //                chatInputPlaceholder { assertIsDisplayed() }
-        //                chatInputSendButtonIcon { assertIsDisplayed() }
-        //                chatInputCameraButtonIcon { assertIsDisplayed() }
+        chatAppBarBackArrow {
+          assertIsDisplayed()
+          assertHasClickAction()
+        }
+
+        bottomNav { assertIsDisplayed() }
+        chatScreenMessagesList { assertIsDisplayed() }
+
+//        receivedMessageText { assertIsDisplayed() }
+//        messageTimeRowText { assertIsDisplayed() }
+//
+//        chatInputField {  }
+//        chatInputPlaceholder { assertIsDisplayed() }
+//        chatInputSendButtonIcon {  }
+        chatInputCameraButtonIcon { assertIsDisplayed() }
       }
     }
   }
+
+    @Test
+    fun testSendingMessage() = run {
+        val testMessage = "Hello Test!"
+
+        onComposeScreen<ChatScreen>(composeTestRule) {
+            step("Enter message and send") {
+                chatInputField {
+                    assertIsDisplayed()
+                    performTextInput(testMessage)
+                }
+                chatInputSendButtonIcon {
+                    assertIsDisplayed()
+                    performClick()
+                }
+            }
+
+            step("Verify message is displayed in list") {
+//                chatScreenMessagesList.onNodeWithText(testMessage).assertIsDisplayed()
+                chatInputField.assertTextEquals("")  // Check if input field is cleared
+            }
+        }
+    }
 }

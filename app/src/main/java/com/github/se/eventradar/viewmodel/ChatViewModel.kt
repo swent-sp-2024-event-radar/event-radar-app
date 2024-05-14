@@ -34,9 +34,9 @@ constructor(
             lastName = "Default",
             phoneNumber = "Default",
             accountStatus = "Default",
-            eventsAttendeeSet = mutableSetOf(),
-            eventsHostSet = mutableSetOf(),
-            friendsSet = mutableSetOf(),
+            eventsAttendeeList = mutableListOf(),
+            eventsHostList = mutableListOf(),
+            friendsList = mutableListOf(),
             profilePicUrl = "Default",
             qrCodeUrl = "Default",
             username = "Default")

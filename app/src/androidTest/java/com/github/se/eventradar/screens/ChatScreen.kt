@@ -14,10 +14,7 @@ public class ChatScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   val chatAppBarTitleImage: KNode =
       chatAppBarTitleSurface.child { hasTestTag("chatAppBarTitleImage") }
   val chatAppBarTitleColumn: KNode = chatAppBarTitle.child { hasTestTag("chatAppBarTitleColumn") }
-  val chatAppBarTitleText: KNode = chatAppBarTitleColumn.child { hasTestTag("chatAppBarTitleText") }
-  private val chatAppBarBackArrow: KNode = chatAppBar.child { hasTestTag("chatAppBarBackArrow") }
-  val chatAppBarBackArrowIcon: KNode =
-      chatAppBarBackArrow.child { hasTestTag("chatAppBarBackArrowIcon") }
+  val chatAppBarBackArrow: KNode = chatAppBar.child { hasTestTag("chatAppBarBackArrow") }
 
   val bottomNav: KNode = child { hasTestTag("bottomNavMenu") }
   private val chatScreenColumn: KNode = child { hasTestTag("chatScreenColumn") }
@@ -37,7 +34,6 @@ public class ChatScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   private val sentChatBubbleTimeRow: KNode =
       sentChatBubbleText.child { hasTestTag("sentChatBubbleTimeRow") }
   val messageTimeRowText: KNode = sentChatBubbleTimeRow.child { hasTestTag("messageTimeRowText") }
-  val messageTimeRowIcon: KNode = sentChatBubbleTimeRow.child { hasTestTag("messageTimeRowIcon") }
 
   private val chatInput: KNode = chatScreenColumn.child { hasTestTag("chatInput") }
   val chatInputField: KNode = chatInput.child { hasTestTag("chatInputField") }
