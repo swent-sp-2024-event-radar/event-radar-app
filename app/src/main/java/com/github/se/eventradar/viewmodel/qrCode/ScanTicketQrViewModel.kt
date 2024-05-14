@@ -31,8 +31,8 @@ class ScanTicketQrViewModel
 constructor(
     private val userRepository: IUserRepository,
     private val eventRepository: IEventRepository,
-    private val qrCodeAnalyser: QrCodeAnalyser,
-    @Assisted private val eventID: String
+    val qrCodeAnalyser: QrCodeAnalyser,
+    @Assisted private val myEventID: String
 ) : ViewModel() {
 
 
@@ -67,9 +67,6 @@ constructor(
     ScanQr
   }
 
-  private var myEventID: String? =
-      "1" // TODO MUst be chaNged to NUll and initialized by navigation via saveEventID()
-
   init {
     qrCodeAnalyser.onDecoded = { decodedString ->
       val result = decodedString ?: "Failed to decode QR Code"
@@ -86,9 +83,7 @@ constructor(
   }
 
   private fun updatePermissions(decodedString: String) {
-    while (myEventID == null) {
-      // Wait until myEventID is not null
-    }
+
     println("entered updatePermissions")
     val uiLength = 28
     val attendeeID = decodedString.take(uiLength)
@@ -161,7 +156,7 @@ constructor(
 
   fun getEventData() {
     viewModelScope.launch {
-      when (val response = eventRepository.getEvent(eventID)) {
+      when (val response = eventRepository.getEvent(myEventID)) {
         is Resource.Success -> {
           _uiState.update {
             it.copy(
