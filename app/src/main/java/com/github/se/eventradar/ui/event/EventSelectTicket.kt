@@ -37,7 +37,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.BottomNavigationMenu
@@ -50,15 +49,7 @@ import com.github.se.eventradar.util.toast
 import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 
 @Composable
-fun SelectTicket(
-    viewModel: EventDetailsViewModel = hiltViewModel(),
-    navigationActions: NavigationActions
-) {
-
-  // TODO to be moved in viewModel init
-  LaunchedEffect(Unit) { // Using `Unit` as a key to run only once
-    viewModel.getEventData()
-  }
+fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: NavigationActions) {
 
   val eventUiState = viewModel.uiState.collectAsStateWithLifecycle().value
 

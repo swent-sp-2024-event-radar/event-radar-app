@@ -83,14 +83,21 @@ class EventDetailsViewmodelUnitTest {
           qrCodeUrl = "http://example.com/QR_Codes/qr.jpg",
           username = "johndoe")
 
+  private val factory =
+      object : EventDetailsViewModel.Factory {
+        override fun create(eventId: String): EventDetailsViewModel {
+          return EventDetailsViewModel(eventRepository, userRepository, eventId)
+        }
+      }
+
   @Before
   fun setUp() {
     eventRepository = MockEventRepository()
+
     userRepository = MockUserRepository()
     (userRepository as MockUserRepository).updateCurrentUserId(mockUser.userId)
 
-    viewModel = EventDetailsViewModel(eventRepository, userRepository)
-    viewModel.saveEventId(mockEvent.fireBaseID)
+    viewModel = factory.create(eventId = mockEvent.fireBaseID)
   }
 
   @Test
@@ -165,7 +172,7 @@ class EventDetailsViewmodelUnitTest {
 
     viewModel.getEventData()
 
-    println("eventId: ${viewModel.getEventId()}")
+    println("eventId: ${viewModel.eventId}")
     println("userId: ${userRepository.getCurrentUserId()}")
 
     viewModel.buyTicketForEvent()
