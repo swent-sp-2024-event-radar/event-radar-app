@@ -35,7 +35,7 @@ data class Event(
       ticket =
           EventTicket(
               name = map["ticket_name"] as String,
-              price = (map["ticket_price"] as Long).toDouble(),
+              price = convertToDouble(map["ticket_price"]),
               capacity = (map["ticket_quantity"] as Long).toInt()),
       mainOrganiser = map["main_organiser"] as String,
       organiserList = convertToMutableListOfStrings(map["organisers_list"]),
@@ -61,5 +61,15 @@ data class Event(
     map["attendees_list"] = attendeeList.toList()
     map["category"] = category.name
     return map
+  }
+
+}
+
+//helper function
+private fun convertToDouble(value: Any?): Double {
+  return when (value) {
+    is Double -> value
+    is Long -> value.toDouble()
+    else -> 0.0 // Default value
   }
 }

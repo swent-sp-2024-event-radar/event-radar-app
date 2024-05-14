@@ -33,7 +33,7 @@ constructor(
   private lateinit var eventId: String
 
   private lateinit var currentUserId: String
-  private var displayedEvent: Event? = null
+  private lateinit var displayedEvent: Event
 
   init {
     viewModelScope.launch {
@@ -73,7 +73,7 @@ constructor(
                 category = response.data.category,
             )
           }
-          displayedEvent = response.data
+          displayedEvent = response.data!!
         }
         is Resource.Failure ->
             Log.d("EventDetailsViewModel", "Error getting event: ${response.throwable.message}")
@@ -113,39 +113,42 @@ constructor(
 
       // TODO would need an atomic update of the database, using transaction... ?
       registrationUpdateEvent()
-      registerationUpdateUser()
+      registrationUpdateUser()
     }
   }
 
+  fun isUserRegistered(): Boolean{
+    return false
+    // TODO reimplement this when factory is merged
+    //displayedEvent.attendeeList.contains(currentUserId)
+  }
+
+
   private fun registrationUpdateEvent() {
-    if (displayedEvent == null) {
-      Log.d("EventDetailsViewModel", "No existing event")
-    } else {
-      val event: Event = displayedEvent as Event
+    val event: Event = displayedEvent as Event
 
-      // add currentUserId to the event attendees list
-      event.attendeeList.add(currentUserId)
+    // add currentUserId to the event attendees list
+    event.attendeeList.add(currentUserId)
 
-      // decrement ticket capacity
-      event.ticket = EventTicket(event.ticket.name, event.ticket.price, event.ticket.capacity - 1)
+    // decrement ticket capacity
+    event.ticket = EventTicket(event.ticket.name, event.ticket.price, event.ticket.capacity - 1)
 
-      viewModelScope.launch {
-        // update event data to the database
-        when (val updateResponse = eventRepository.updateEvent(event)) {
-          is Resource.Success -> {
-            // TODO implement some states to display this information to the user through the UI
-            Log.i("EventDetailsViewModel", "Successfully updated event")
-          }
-          is Resource.Failure ->
-              Log.d(
-                  "EventDetailsViewModel",
-                  "Error updating event data: ${updateResponse.throwable.message}")
+    viewModelScope.launch {
+      // update event data to the database
+      when (val updateResponse = eventRepository.updateEvent(event)) {
+        is Resource.Success -> {
+          // TODO implement some states to display this information to the user through the UI
+          Log.i("EventDetailsViewModel", "Successfully updated event")
         }
+        is Resource.Failure ->
+            Log.d(
+                "EventDetailsViewModel",
+                "Error updating event data: ${updateResponse.throwable.message}")
       }
     }
   }
 
-  private fun registerationUpdateUser() {
+  private fun registrationUpdateUser() {
     viewModelScope.launch {
       // fetch current user data
       when (val userResponse = userRepository.getUser(currentUserId)) {
