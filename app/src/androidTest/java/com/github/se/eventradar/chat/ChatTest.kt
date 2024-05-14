@@ -81,26 +81,26 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
 
     mockUserRepository.updateCurrentUserId("1")
 
-    // Starting at 2 to avoid conflicts with the current user
-    for (i in 2..9) {
       mockUserRepository.addUser(
           User(
-              userId = "$i",
+              userId = "2",
               birthDate = "01/01/2000",
               email = "",
               firstName = "Test",
-              lastName = "$i",
+              lastName = "2",
               phoneNumber = "",
               accountStatus = "active",
               eventsAttendeeList = mutableListOf(),
               eventsHostList = mutableListOf(),
               friendsList = mutableListOf(),
               profilePicUrl =
-                  "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2Fplaceholder.png?alt=media&token=ba4b4efb-ff45-4617-b60f-3789e8fb75b6",
+              "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2Fplaceholder.png?alt=media&token=ba4b4efb-ff45-4617-b60f-3789e8fb75b6",
               qrCodeUrl = "",
-              username = "Test$i"))
+              username = "Test2"))
 
-      val mh = mockMessageRepository.createNewMessageHistory("1", "$i")
+    // Starting at 2 to avoid conflicts with the current user
+    for (i in 1..5) {
+      val mh = mockMessageRepository.createNewMessageHistory("1", "2")
 
       mockMessageRepository.addMessage(
           Message(
@@ -112,7 +112,7 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       )
     }
 
-    mockChatViewModel = ChatViewModel(mockMessageRepository, mockUserRepository)
+    mockChatViewModel = ChatViewModel(mockMessageRepository, mockUserRepository, "2")
 
     composeTestRule.setContent { ChatScreen(mockChatViewModel, mockNavActions) }
   }
@@ -125,7 +125,6 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       step("Check if all elements are displayed") {
         chatAppBar { assertIsDisplayed() }
         chatAppBarTitle { assertIsDisplayed() }
-        chatAppBarTitleSurface { assertIsDisplayed() }
         chatAppBarTitleImage { assertIsDisplayed() }
         chatAppBarTitleColumn {
           assertIsDisplayed()

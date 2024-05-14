@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
+import com.github.se.eventradar.model.message.Message
 import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.model.repository.message.IMessageRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 @HiltViewModel(assistedFactory = ChatViewModel.Factory::class)
 class ChatViewModel
@@ -59,9 +61,6 @@ constructor(
             profilePicUrl = "Default",
             qrCodeUrl = "Default",
             username = "Default")
-  fun onMessageBarInputChange(newInput: String) {
-    _uiState.update { currentState -> currentState.copy(messageBarInput = newInput) }
-  }
 
   // TO DO: Complete VM functions for chat screen
   init {
@@ -81,6 +80,7 @@ constructor(
 
       }
   }
+
     fun initOpponent() {
         viewModelScope.launch {
             _uiState.update {
@@ -96,6 +96,7 @@ constructor(
             }
         }
     }
+
     fun getMessages() {
         viewModelScope.launch {
             // Fetch messages
@@ -122,6 +123,37 @@ constructor(
         }
     }
 
+    fun onMessageBarInputChange(newInput: String) {
+        _uiState.update { currentState -> currentState.copy(messageBarInput = newInput) }
+    }
+
+    fun onMessageSend() {
+        val message = _uiState.value.messageBarInput
+        if (message.isNotBlank()) {
+            sendMessage(message)
+            getMessages()
+        }
+    }
+
+    private fun sendMessage(message: String) {
+        viewModelScope.launch {
+            val userId = _uiState.value.userId
+            val opponentId = _uiState.value.opponentId
+            if (userId != null && opponentId != null) {
+
+                val newMessage = Message(
+                    sender = userId,
+                    content = message,
+                    dateTimeSent = LocalDateTime.now(),
+                    id = "",
+                )
+
+                messagesRepository.addMessage(newMessage, _uiState.value.messageHistory)
+            } else {
+                Log.d("ChatViewModel", "Invalid state: User ID or Opponent ID is null.")
+            }
+        }
+    }
 }
 
 data class ChatUiState(

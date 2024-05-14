@@ -64,9 +64,27 @@ class FirebaseMessageRepository(db: FirebaseFirestore = Firebase.firestore) : IM
             .get()
             .await()
 
+    if (resultDocument == null || resultDocument.isEmpty) {
+        return createNewMessageHistory(user1, user2)
+    }
+
     return try {
       val result = resultDocument.documents[0]
-      val messageHistory = MessageHistory(result.data!!, result.id)
+      val messageHistoryMap = result.data!!
+
+      val messages = messageRef.document(result.id).collection("messages_list").get().await()
+
+      messageHistoryMap["messages"] =
+          messages.documents.map { message ->
+              Message(
+                  sender = message["sender"] as String,
+                  content = message["content"] as String,
+                  dateTimeSent = LocalDateTime.parse(message["date_time_sent"] as String),
+                  id = message.id,
+              )
+          }
+
+      val messageHistory = MessageHistory(messageHistoryMap, result.id)
       Resource.Success(messageHistory)
     } catch (e: Exception) {
       createNewMessageHistory(user1, user2)

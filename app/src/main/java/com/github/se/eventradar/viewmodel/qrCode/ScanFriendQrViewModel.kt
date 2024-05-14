@@ -107,10 +107,10 @@ constructor(
     var updateResult: Resource<Any>?
     do {
       updateResult =
-          if (user.friendsSet.contains(friendIDToAdd)) {
+          if (user.friendsList.contains(friendIDToAdd)) {
             Resource.Success(Unit)
           } else {
-            user.friendsSet.add(friendIDToAdd)
+            user.friendsList.add(friendIDToAdd)
             when (userRepository.updateUser(user)) {
               is Resource.Success -> Resource.Success(Unit)
               is Resource.Failure -> Resource.Failure(Exception("Failed to update user"))

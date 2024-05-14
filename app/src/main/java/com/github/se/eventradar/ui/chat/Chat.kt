@@ -63,6 +63,7 @@ import com.github.se.eventradar.R
 import com.github.se.eventradar.model.repository.message.MockMessageRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu
+import com.github.se.eventradar.ui.component.ProfilePic
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
@@ -75,42 +76,28 @@ import java.util.Locale
 fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), navigationActions: NavigationActions) {
   val uiState by viewModel.uiState.collectAsState()
 
-  // TO DO: Implement get messages between two users in VM
-   viewModel.getMessages()
+    viewModel.initOpponent()
+    viewModel.getMessages()
 
-  // TO DO: Implement changed function results
   ChatScreenUi(
       uiState = uiState,
-      viewModel = viewModel,
       navigationActions = navigationActions,
       onTabSelected = navigationActions::navigateTo,
-      //        onSelectedTabIndexChange = viewModel::onSelectedTabIndexChange,
-      //        onSearchQueryChange = viewModel::onSearchQueryChange,
-      //        onChatClicked = {
-      //            Toast.makeText(context, "Chat feature is not yet implemented",
-      // Toast.LENGTH_SHORT).show()
-      //        },
-      //        getUser = viewModel::getUser
+      onMessageChange = viewModel::onMessageBarInputChange,
+      onMessageSend = viewModel::onMessageSend
   )
 }
 
 @Composable
 fun ChatScreenUi(
     uiState: ChatUiState,
-    viewModel: ChatViewModel = hiltViewModel(),
     navigationActions: NavigationActions,
     onTabSelected: (TopLevelDestination) -> Unit,
-    //    onSelectedTabIndexChange: (Int) -> Unit,
-    //    onSearchQueryChange: (String) -> Unit,
-    //    onChatClicked: (MessageHistory) -> Unit,
-    //    getUser: (String) -> User
+    onMessageChange: (String) -> Unit,
+    onMessageSend: () -> Unit
 ) {
   val messages = uiState.messageHistory.messages
 
-  // TO DO: Implement load opponent in VM
-  LaunchedEffect(key1 = Unit) {
-      viewModel.initOpponent()
-  }
   val opponentName = uiState.opponentProfile.firstName
   val opponentSurname = uiState.opponentProfile.lastName
   val opponentPictureUrl = uiState.opponentProfile.profilePicUrl
@@ -138,10 +125,12 @@ fun ChatScreenUi(
       modifier = Modifier.testTag("chatScreen"),
       topBar = {
         ChatAppBar(
-            title = "$opponentName $opponentSurname",
+            opponentName = opponentName,
+            opponentSurname = opponentSurname,
             pictureUrl = opponentPictureUrl,
             onUserNameClick = {
-              Toast.makeText(context, "User Profile Display to be implemented", Toast.LENGTH_SHORT)
+                // TO DO : Implement user profile screen with private chat FAB
+              Toast.makeText(context, "User Profile to be implemented", Toast.LENGTH_SHORT)
                   .show()
             },
             onBackArrowClick = { navigationActions.navController.navigate(Route.MESSAGE) },
@@ -156,14 +145,18 @@ fun ChatScreenUi(
       }) {
         Column(
             modifier =
-                Modifier.padding(it)
-                    .fillMaxSize()
-                    .focusable()
-                    .wrapContentHeight()
-                    .imePadding()
-                    .testTag("chatScreenColumn")) {
+            Modifier
+                .padding(it)
+                .fillMaxSize()
+                .focusable()
+                .wrapContentHeight()
+                .imePadding()
+                .testTag("chatScreenColumn")) {
               LazyColumn(
-                  modifier = Modifier.weight(1f).fillMaxWidth().testTag("chatScreenMessagesList"),
+                  modifier = Modifier
+                      .weight(1f)
+                      .fillMaxWidth()
+                      .testTag("chatScreenMessagesList"),
                   state = scrollState) {
                     items(messages) { message ->
                       val sdf = remember { java.text.SimpleDateFormat("hh:mm", Locale.ROOT) }
@@ -187,8 +180,8 @@ fun ChatScreenUi(
               ChatInput(
                   modifier = Modifier.testTag("chatInput"),
                   uiState = uiState,
-                  onMessageChange = { viewModel.onMessageBarInputChange(it) },
-                  //            onMessageSend = { viewModel.onMessageSend() }
+                  onMessageChange = onMessageChange,
+                  onMessageSend = onMessageSend
               )
             }
       }
@@ -197,39 +190,42 @@ fun ChatScreenUi(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatAppBar(
-    title: String = "Title",
-    pictureUrl: String? = null,
+    opponentName: String,
+    opponentSurname: String,
+    pictureUrl: String,
     onUserNameClick: (() -> Unit)? = null,
     onBackArrowClick: (() -> Unit)? = null,
 ) {
   SmallTopAppBar(
-      modifier = Modifier.height(64.dp).fillMaxWidth().padding(top = 16.dp).testTag("chatAppBar"),
+      modifier = Modifier
+          .height(64.dp)
+          .fillMaxWidth()
+          .padding(top = 16.dp)
+          .testTag("chatAppBar"),
       title = {
         Row(modifier = Modifier.testTag("chatAppBarTitle")) {
-          Surface(
-              modifier = Modifier.size(50.dp).testTag("chatAppBarTitleSurface"),
-              shape = CircleShape,
-          ) {
-            Image(
-                // TO DO: Insert image from database, for now it's a person icon
-                imageVector = Icons.Filled.Person,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxHeight().aspectRatio(1f).testTag("chatAppBarTitleImage"))
-          }
+          ProfilePic(
+                profilePicUrl = pictureUrl,
+                firstName = opponentName,
+                lastName = opponentSurname,
+                modifier = Modifier.testTag("chatAppBarTitleImage"))
           Column(
               modifier =
-                  Modifier.clickable { onUserNameClick?.invoke() }.testTag("chatAppBarTitleColumn"),
+              Modifier
+                  .clickable { onUserNameClick?.invoke() }
+                  .testTag("chatAppBarTitleColumn"),
               verticalArrangement = Arrangement.Center) {
                 Text(
-                    text = title,
+                    text = "$opponentName $opponentSurname",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     fontSize = 22.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier =
-                        Modifier.padding(top = 12.dp, start = 8.dp).testTag("chatAppBarTitleText"))
+                    Modifier
+                        .padding(top = 12.dp, start = 8.dp)
+                        .testTag("chatAppBarTitleText"))
               }
         }
       },
@@ -251,16 +247,19 @@ fun ChatInput(
     modifier: Modifier = Modifier,
     uiState: ChatUiState,
     onMessageChange: (String) -> Unit,
-    //    onMessageSend: () -> Unit
+    onMessageSend: () -> Unit
 ) {
   val context = LocalContext.current
-  Row(modifier = modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.Bottom) {
+  Row(modifier = modifier
+      .fillMaxWidth()
+      .padding(16.dp), verticalAlignment = Alignment.Bottom) {
     TextField(
         modifier =
-            Modifier.clip(MaterialTheme.shapes.extraLarge)
-                .weight(1f)
-                .focusable(true)
-                .testTag("chatInputField"),
+        Modifier
+            .clip(MaterialTheme.shapes.extraLarge)
+            .weight(1f)
+            .focusable(true)
+            .testTag("chatInputField"),
         value = uiState.messageBarInput,
         onValueChange = { onMessageChange(it) },
         colors =
@@ -275,13 +274,13 @@ fun ChatInput(
         },
         trailingIcon = {
           Row(
-              modifier = Modifier.padding(end = 8.dp).testTag("chatInputTrailingIcon"),
+              modifier = Modifier
+                  .padding(end = 8.dp)
+                  .testTag("chatInputTrailingIcon"),
               horizontalArrangement = Arrangement.End,
               verticalAlignment = Alignment.CenterVertically) {
                 IconButton(
-                    // TO DO: Implement onMessageSend
-                    //                        onClick = { onMessageSend() }
-                    onClick = { null },
+                    onClick = { onMessageSend() },
                     modifier = Modifier.testTag("chatInputSendButton")) {
                       Icon(
                           imageVector = Icons.AutoMirrored.Filled.Send,
@@ -296,7 +295,9 @@ fun ChatInput(
                     modifier = Modifier.testTag("chatInputCameraButton")) {
                       Icon(
                           painter = painterResource(id = R.drawable.photo_camera),
-                          modifier = Modifier.size(24.dp).testTag("chatInputCameraButtonIcon"),
+                          modifier = Modifier
+                              .size(24.dp)
+                              .testTag("chatInputCameraButtonIcon"),
                           contentDescription = "Camera")
                     }
               }
