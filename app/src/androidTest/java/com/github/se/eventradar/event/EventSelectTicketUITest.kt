@@ -1,5 +1,6 @@
 package com.github.se.eventradar.event
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.model.Location
@@ -55,11 +56,18 @@ class EventSelectTicketUITest :
 
   private val eventId = "tdjWMT9Eon2ROTVakQb"
 
-  private val isTicketFree = true
+  private var isTicketFree = true
+
+  private val error = mutableStateOf(false)
+  private val success = mutableStateOf(false)
+  private val isAttending = false
 
   @Before
   fun testSetup() {
 
+    every { mockViewModel.errorOccurred } returns error
+    every { mockViewModel.registrationSuccessful } returns success
+    every { mockViewModel.isUserAttendingEvent()} returns isAttending
     every { mockViewModel.uiState } returns sampleEventDetailsUiState
     every { mockViewModel.isTicketFree() } returns isTicketFree
 
@@ -101,6 +109,26 @@ class EventSelectTicketUITest :
       }*/
     }
   }
+
+  @Test
+  fun buyTicketSuccessful() = run {
+
+    ComposeScreen.onComposeScreen<EventSelectTicketScreen>(composeTestRule) {
+      buyButton {
+        assertIsDisplayed()
+        performClick()
+      }
+
+      /*successDialog{
+        assertIsDisplayed()
+      }*/
+
+    }
+    // assert: the buy has been triggered
+    verify { mockViewModel.buyTicketForEvent() }
+    //confirmVerified(mockViewModel)
+  }
+
 
   @Test
   fun goBackButtonTriggersBackNavigation() = run {

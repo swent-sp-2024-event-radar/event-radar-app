@@ -1,7 +1,6 @@
 package com.github.se.eventradar.viewmodel
 
 import android.util.Log
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -107,7 +106,7 @@ constructor(
     }
   }
 
-  // TODO needs to be atomic to avoid concurrency issues
+
   fun buyTicketForEvent() { // update the user attendee list, update the eventRepo ticket count
     viewModelScope.launch {
       if (!isTicketFree()) {
@@ -116,8 +115,8 @@ constructor(
             "Paid tickets are not supported, all of them are considered free")
       }
 
-      if(!isUserRegistered()){
-        // TODO would need an atomic update of the database, using transaction... ?
+      if(!isUserAttendingEvent()){
+        // TODO needs to be atomic to avoid concurrency issues
         registrationUpdateEvent()
         registrationUpdateUser()
       }
@@ -125,7 +124,7 @@ constructor(
     }
   }
 
-  fun isUserRegistered(): Boolean{
+  fun isUserAttendingEvent(): Boolean{
     return false
     // TODO reimplement this when factory is merged
     //displayedEvent.attendeeList.contains(currentUserId)
@@ -133,7 +132,7 @@ constructor(
 
 
   private fun registrationUpdateEvent() {
-    val event: Event = displayedEvent as Event
+    val event: Event = displayedEvent
 
     // add currentUserId to the event attendees list
     event.attendeeList.add(currentUserId)
@@ -145,7 +144,6 @@ constructor(
       // update event data to the database
       when (val updateResponse = eventRepository.updateEvent(event)) {
         is Resource.Success -> {
-          // TODO implement some states to display this information to the user through the UI
           Log.i("EventDetailsViewModel", "Successfully updated event")
         }
         is Resource.Failure -> {
@@ -173,7 +171,6 @@ constructor(
             // update user data to the database
             when (val updateResponse = userRepository.updateUser(currentUser)) {
               is Resource.Success -> {
-                // TODO implement some states to display this information to the user through the UI
                 Log.i("EventDetailsViewModel", "Successfully updated user")
               }
               is Resource.Failure -> {

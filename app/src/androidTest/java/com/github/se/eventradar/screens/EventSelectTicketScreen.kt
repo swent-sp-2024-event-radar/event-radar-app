@@ -13,6 +13,9 @@ class EventSelectTicketScreen(semanticsProvider: SemanticsNodeInteractionsProvid
   val goBackButton: KNode = onNode { hasTestTag("goBackButton") }
   val bottomNav: KNode = onNode { hasTestTag("bottomNavMenu") }
 
+  val errorDialog: KNode = onNode {hasTestTag("buyingTicketErrorDialog")}
+  val successDialog: KNode = onNode {hasTestTag("buyingTicketSuccessDialog")}
+
   val eventTitle: KNode = onNode { hasTestTag("eventTitle") }
   val ticketsTitle: KNode = onNode { hasTestTag("ticketsTitle") }
   val ticketCard: KNode = onNode { hasTestTag("ticketCard") }

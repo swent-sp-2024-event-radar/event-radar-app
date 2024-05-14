@@ -80,7 +80,7 @@ fun EventDetails(
       },
       floatingActionButton = {
         // view ticket button
-        if (!viewModel.isUserRegistered()){
+        if (!viewModel.isUserAttendingEvent()){
           FloatingActionButton(
             onClick = {
               navigationActions.navController.navigate(
@@ -177,7 +177,7 @@ fun EventDetails(
               eventUiState,
               componentStyle)
 
-          if(viewModel.isUserRegistered()){
+          if(viewModel.isUserAttendingEvent()){
             Text(text = stringResource(id = R.string.event_attendance_message), modifier =
             Modifier.constrainAs(joined) {
               top.linkTo(category.bottom, margin = 32.dp)
