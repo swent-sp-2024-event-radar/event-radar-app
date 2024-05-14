@@ -1,15 +1,12 @@
 package com.github.se.eventradar.ui.chat
 
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,12 +17,10 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -33,7 +28,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallTopAppBar
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -46,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -76,16 +69,15 @@ import java.util.Locale
 fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), navigationActions: NavigationActions) {
   val uiState by viewModel.uiState.collectAsState()
 
-    viewModel.initOpponent()
-    viewModel.getMessages()
+  viewModel.initOpponent()
+  viewModel.getMessages()
 
   ChatScreenUi(
       uiState = uiState,
       navigationActions = navigationActions,
       onTabSelected = navigationActions::navigateTo,
       onMessageChange = viewModel::onMessageBarInputChange,
-      onMessageSend = viewModel::onMessageSend
-  )
+      onMessageSend = viewModel::onMessageSend)
 }
 
 @Composable
@@ -129,9 +121,8 @@ fun ChatScreenUi(
             opponentSurname = opponentSurname,
             pictureUrl = opponentPictureUrl,
             onUserNameClick = {
-                // TO DO : Implement user profile screen with private chat FAB
-              Toast.makeText(context, "User Profile to be implemented", Toast.LENGTH_SHORT)
-                  .show()
+              // TO DO : Implement user profile screen with private chat FAB
+              Toast.makeText(context, "User Profile to be implemented", Toast.LENGTH_SHORT).show()
             },
             onBackArrowClick = { navigationActions.navController.navigate(Route.MESSAGE) },
         )
@@ -145,18 +136,14 @@ fun ChatScreenUi(
       }) {
         Column(
             modifier =
-            Modifier
-                .padding(it)
-                .fillMaxSize()
-                .focusable()
-                .wrapContentHeight()
-                .imePadding()
-                .testTag("chatScreenColumn")) {
+                Modifier.padding(it)
+                    .fillMaxSize()
+                    .focusable()
+                    .wrapContentHeight()
+                    .imePadding()
+                    .testTag("chatScreenColumn")) {
               LazyColumn(
-                  modifier = Modifier
-                      .weight(1f)
-                      .fillMaxWidth()
-                      .testTag("chatScreenMessagesList"),
+                  modifier = Modifier.weight(1f).fillMaxWidth().testTag("chatScreenMessagesList"),
                   state = scrollState) {
                     items(messages) { message ->
                       val sdf = remember { java.text.SimpleDateFormat("hh:mm", Locale.ROOT) }
@@ -181,8 +168,7 @@ fun ChatScreenUi(
                   modifier = Modifier.testTag("chatInput"),
                   uiState = uiState,
                   onMessageChange = onMessageChange,
-                  onMessageSend = onMessageSend
-              )
+                  onMessageSend = onMessageSend)
             }
       }
 }
@@ -197,23 +183,17 @@ fun ChatAppBar(
     onBackArrowClick: (() -> Unit)? = null,
 ) {
   SmallTopAppBar(
-      modifier = Modifier
-          .height(64.dp)
-          .fillMaxWidth()
-          .padding(top = 16.dp)
-          .testTag("chatAppBar"),
+      modifier = Modifier.height(64.dp).fillMaxWidth().padding(top = 16.dp).testTag("chatAppBar"),
       title = {
         Row(modifier = Modifier.testTag("chatAppBarTitle")) {
           ProfilePic(
-                profilePicUrl = pictureUrl,
-                firstName = opponentName,
-                lastName = opponentSurname,
-                modifier = Modifier.testTag("chatAppBarTitleImage"))
+              profilePicUrl = pictureUrl,
+              firstName = opponentName,
+              lastName = opponentSurname,
+              modifier = Modifier.testTag("chatAppBarTitleImage"))
           Column(
               modifier =
-              Modifier
-                  .clickable { onUserNameClick?.invoke() }
-                  .testTag("chatAppBarTitleColumn"),
+                  Modifier.clickable { onUserNameClick?.invoke() }.testTag("chatAppBarTitleColumn"),
               verticalArrangement = Arrangement.Center) {
                 Text(
                     text = "$opponentName $opponentSurname",
@@ -223,9 +203,7 @@ fun ChatAppBar(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier =
-                    Modifier
-                        .padding(top = 12.dp, start = 8.dp)
-                        .testTag("chatAppBarTitleText"))
+                        Modifier.padding(top = 12.dp, start = 8.dp).testTag("chatAppBarTitleText"))
               }
         }
       },
@@ -250,16 +228,13 @@ fun ChatInput(
     onMessageSend: () -> Unit
 ) {
   val context = LocalContext.current
-  Row(modifier = modifier
-      .fillMaxWidth()
-      .padding(16.dp), verticalAlignment = Alignment.Bottom) {
+  Row(modifier = modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.Bottom) {
     TextField(
         modifier =
-        Modifier
-            .clip(MaterialTheme.shapes.extraLarge)
-            .weight(1f)
-            .focusable(true)
-            .testTag("chatInputField"),
+            Modifier.clip(MaterialTheme.shapes.extraLarge)
+                .weight(1f)
+                .focusable(true)
+                .testTag("chatInputField"),
         value = uiState.messageBarInput,
         onValueChange = { onMessageChange(it) },
         colors =
@@ -274,9 +249,7 @@ fun ChatInput(
         },
         trailingIcon = {
           Row(
-              modifier = Modifier
-                  .padding(end = 8.dp)
-                  .testTag("chatInputTrailingIcon"),
+              modifier = Modifier.padding(end = 8.dp).testTag("chatInputTrailingIcon"),
               horizontalArrangement = Arrangement.End,
               verticalAlignment = Alignment.CenterVertically) {
                 IconButton(
@@ -295,9 +268,7 @@ fun ChatInput(
                     modifier = Modifier.testTag("chatInputCameraButton")) {
                       Icon(
                           painter = painterResource(id = R.drawable.photo_camera),
-                          modifier = Modifier
-                              .size(24.dp)
-                              .testTag("chatInputCameraButtonIcon"),
+                          modifier = Modifier.size(24.dp).testTag("chatInputCameraButtonIcon"),
                           contentDescription = "Camera")
                     }
               }

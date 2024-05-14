@@ -65,7 +65,7 @@ class FirebaseMessageRepository(db: FirebaseFirestore = Firebase.firestore) : IM
             .await()
 
     if (resultDocument == null || resultDocument.isEmpty) {
-        return createNewMessageHistory(user1, user2)
+      return createNewMessageHistory(user1, user2)
     }
 
     return try {
@@ -76,12 +76,12 @@ class FirebaseMessageRepository(db: FirebaseFirestore = Firebase.firestore) : IM
 
       messageHistoryMap["messages"] =
           messages.documents.map { message ->
-              Message(
-                  sender = message["sender"] as String,
-                  content = message["content"] as String,
-                  dateTimeSent = LocalDateTime.parse(message["date_time_sent"] as String),
-                  id = message.id,
-              )
+            Message(
+                sender = message["sender"] as String,
+                content = message["content"] as String,
+                dateTimeSent = LocalDateTime.parse(message["date_time_sent"] as String),
+                id = message.id,
+            )
           }
 
       val messageHistory = MessageHistory(messageHistoryMap, result.id)

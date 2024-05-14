@@ -50,13 +50,13 @@ fun NavGraph(
           viewModel.saveEventId(eventId)
           SelectTicket(viewModel = viewModel, navigationActions = navActions)
         }
-      composable(
-          "${Route.PRIVATE_CHAT}/{opponentId}",
-          arguments = listOf(navArgument("opponentId") { type = NavType.StringType })) {
+    composable(
+        "${Route.PRIVATE_CHAT}/{opponentId}",
+        arguments = listOf(navArgument("opponentId") { type = NavType.StringType })) {
           val opponentId = it.arguments!!.getString("opponentId")!!
           val viewModel = ChatViewModel.create(opponentId = opponentId)
           ChatScreen(viewModel = viewModel, navigationActions = navActions)
-      }
+        }
 
     // TODO replace the Toast message with the corresponding screen function of the route
     composable(Route.MESSAGE) { MessagesScreen(navigationActions = navActions) }

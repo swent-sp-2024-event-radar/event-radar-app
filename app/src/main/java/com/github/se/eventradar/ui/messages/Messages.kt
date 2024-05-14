@@ -1,7 +1,5 @@
 package com.github.se.eventradar.ui.messages
 
-import com.github.se.eventradar.ui.navigation.Route
-
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -53,6 +51,7 @@ import com.github.se.eventradar.model.message.Message
 import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.TopLevelDestination
 import com.github.se.eventradar.viewmodel.MessagesUiState

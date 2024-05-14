@@ -336,10 +336,10 @@ fun ProfilePic(
     lastName: String,
     modifier: Modifier = Modifier
 ) {
-    AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current).data(profilePicUrl).build(),
-                placeholder = painterResource(id = R.drawable.placeholder),
-        contentDescription = "Profile picture of $firstName $lastName",
-        contentScale = ContentScale.Crop,
-        modifier = modifier.padding(start = 16.dp).clip(CircleShape).size(56.dp))
+  AsyncImage(
+      model = ImageRequest.Builder(LocalContext.current).data(profilePicUrl).build(),
+      placeholder = painterResource(id = R.drawable.placeholder),
+      contentDescription = "Profile picture of $firstName $lastName",
+      contentScale = ContentScale.Crop,
+      modifier = modifier.padding(start = 16.dp).clip(CircleShape).size(56.dp))
 }
