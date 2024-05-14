@@ -95,6 +95,8 @@ The structure of the Messages database is as follows:
     "message_history_id": {
       "from_user": "xu378csh",
       "to_user": "qwglei7",
+      "from_user_read": true,
+      "to_user_read": false,
       "latest_message_id": "ortz34k39",
       "messages_list": [
         {
@@ -102,7 +104,6 @@ The structure of the Messages database is as follows:
             "sender": "qwglei7",
             "content": "message here",
             "date_time_sent": "31/12/2024 23:00:00",
-            "message_read": true
           }
         }
       ]

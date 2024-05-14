@@ -49,13 +49,15 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
 
   private lateinit var mDevice: UiDevice
 
-  private lateinit var viewModel: ScanFriendQrViewModel
+  @RelaxedMockK lateinit var viewModel: ScanFriendQrViewModel
   private lateinit var userRepository: IUserRepository
   private lateinit var qrCodeAnalyser: QrCodeAnalyser
+
   private val myUID = "user1"
 
   @Before
   fun testSetup() {
+
     MockKAnnotations.init(this)
     every { mockNavActions.navigateTo(any()) } just Runs
     userRepository = MockUserRepository()
@@ -64,6 +66,16 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
     viewModel = ScanFriendQrViewModel(userRepository, qrCodeAnalyser)
     composeTestRule.setContent { QrCodeScreen(viewModel, mockNavActions) }
     mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+  }
+
+  @Test
+  fun myQrCodeComponentsDisplayedCorrectly(): Unit = run {
+    onComposeScreen<QrCodeScanFriendUiScreen>(composeTestRule) {
+      myQrTab.performClick()
+      myQrScreen.assertIsDisplayed()
+      myQrCodeImage.assertIsDisplayed()
+      username.assertIsDisplayed()
+    }
   }
 
   @Test
