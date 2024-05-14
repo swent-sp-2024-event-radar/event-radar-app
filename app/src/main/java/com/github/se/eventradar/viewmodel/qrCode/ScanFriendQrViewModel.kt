@@ -107,10 +107,10 @@ constructor(
     var updateResult: Resource<Any>?
     do {
       updateResult =
-          if (user.friendsSet.contains(friendIDToAdd)) {
+          if (user.friendsList.contains(friendIDToAdd)) {
             Resource.Success(Unit)
           } else {
-            user.friendsSet.add(friendIDToAdd)
+            user.friendsList.add(friendIDToAdd)
             when (userRepository.updateUser(user)) {
               is Resource.Success -> Resource.Success(Unit)
               is Resource.Failure -> Resource.Failure(Exception("Failed to update user"))
@@ -133,9 +133,39 @@ constructor(
     _uiState.value = _uiState.value.copy(action = action)
   }
 
+  fun getUserDetails() {
+    viewModelScope.launch {
+      when (val userIdResource = userRepository.getCurrentUserId()) {
+        is Resource.Success -> {
+          val userId = userIdResource.data
+          // Now fetch the user data using the fetched user ID
+          when (val userResult = userRepository.getUser(userId)) {
+            is Resource.Success -> {
+              _uiState.value =
+                  _uiState.value.copy(
+                      username = userResult.data!!.username, qrCodeLink = userResult.data.qrCodeUrl)
+            }
+            is Resource.Failure -> {
+              Log.d(
+                  "ScanFriendQrViewModel",
+                  "Error fetching user details: ${userResult.throwable.message}")
+            }
+          }
+        }
+        is Resource.Failure -> {
+          Log.d(
+              "ScanFriendQrViewModel",
+              "Error fetching user ID: ${userIdResource.throwable.message}")
+        }
+      }
+    }
+  }
+
   data class QrCodeScanFriendState(
       val decodedResult: String = "",
       val action: Action = Action.None,
-      val tabState: Tab = Tab.MyQR
+      val tabState: Tab = Tab.MyQR,
+      val username: String = "",
+      val qrCodeLink: String = "",
   )
 }
