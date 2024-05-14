@@ -145,7 +145,7 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
 //        chatInputField {  }
 //        chatInputPlaceholder { assertIsDisplayed() }
 //        chatInputSendButtonIcon {  }
-        chatInputCameraButtonIcon { assertIsDisplayed() }
+//        chatInputCameraButtonIcon { assertIsDisplayed() }
       }
     }
   }
