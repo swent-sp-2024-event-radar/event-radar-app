@@ -1,6 +1,10 @@
 package com.github.se.eventradar.home
 
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
@@ -96,8 +100,8 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       bottomNav { assertIsDisplayed() }
       viewToggleFab { assertIsDisplayed() }
       searchBarAndFilter { assertIsDisplayed() }
-      filterPopUp { assertIsDisplayed() }
       eventList { assertIsDisplayed() }
+      filterPopUp { assertIsNotDisplayed() }
     }
   }
 
@@ -129,6 +133,173 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
         map { assertDoesNotExist() }
         eventCard { assertIsDisplayed() }
       }
+    }
+  }
+
+  @Test
+  fun filterPopUpDisplaysOnceFilterClicked() = run {
+    onComposeScreen<HomeScreen>(composeTestRule) {
+      step("Click on filter button") {
+        filterButton {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(isFilterDialogOpen = true)
+      step("Check if filter pop up is displayed") { filterPopUp { assertIsDisplayed() } }
+
+      step("Check if category checkboxes are displayed") {
+        composeTestRule.onAllNodesWithTag("checkbox").assertCountEquals(EventCategory.entries.size)
+      }
+
+      step("Check if category checkbox text is displayed") {
+        composeTestRule
+            .onAllNodesWithTag("checkboxText")
+            .assertCountEquals(EventCategory.entries.size)
+      }
+
+      step("Click on filter button again") {
+        filterButton {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+      verify(exactly = 2) { mockEventsOverviewViewModel.onFilterDialogOpen() }
+
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(isFilterDialogOpen = false)
+      step("Check if filter pop up is hidden") { filterPopUp { assertDoesNotExist() } }
+    }
+  }
+
+  @Test
+  fun filterClickedShowsResults() = run {
+    onComposeScreen<HomeScreen>(composeTestRule) {
+      // 1. Open filter pop up
+      step("Click on filter button") {
+        filterButton {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(isFilterDialogOpen = true)
+      step("Check if filter pop up is displayed") { filterPopUp { assertIsDisplayed() } }
+      verify { mockEventsOverviewViewModel.onFilterDialogOpen() }
+
+      // 2. Enter radius filter
+      radiusLabel { assertIsDisplayed() }
+      radiusInput {
+        assertIsDisplayed()
+        performClick()
+        performTextInput("100000000")
+      }
+      verify { mockEventsOverviewViewModel.onRadiusQueryChanged("100000000") }
+      kmLabel { assertIsDisplayed() }
+
+      // 3. Change free event filter
+      freeSwitchLabel { assertIsDisplayed() }
+      freeSwitch {
+        assertIsDisplayed()
+        performClick()
+      }
+      sampleEventList.value = sampleEventList.value.copy(isFreeSwitchOn = true)
+      verify { mockEventsOverviewViewModel.onFreeSwitchChanged() }
+
+      // 4. Check category filter
+      categoryLabel { assertIsDisplayed() }
+      categoryOptionsColumn { assertIsDisplayed() }
+      categoryOptionRow { assertIsDisplayed() }
+
+      // 5. Apply filter
+      step("Click on filter apply button") {
+        filterApplyButton {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(isFilterActive = true)
+      verify { mockEventsOverviewViewModel.onFilterApply() }
+
+      // 6. Check filtered events are displayed
+      filteredEventList { assertIsDisplayed() }
+      eventCard { assertIsDisplayed() }
+      verify { mockEventsOverviewViewModel.uiState }
+      verify { mockEventsOverviewViewModel.filterEvents() }
+    }
+  }
+
+  @Test
+  fun typingInSearchBarShowsResults() = run {
+    onComposeScreen<HomeScreen>(composeTestRule) {
+      searchBar {
+        assertIsDisplayed()
+        performClick()
+        performTextInput("Event 0")
+      }
+
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(isSearchActive = true)
+
+      filteredEventList { assertIsDisplayed() }
+      eventCard { assertIsDisplayed() }
+
+      verify { mockEventsOverviewViewModel.onSearchQueryChanged("Event 0") }
+      verify { mockEventsOverviewViewModel.onSearchActiveChanged(true) }
+      verify { mockEventsOverviewViewModel.uiState }
+      verify { mockEventsOverviewViewModel.filterEvents() }
+
+      searchBar { performTextClearance() }
+
+      verify { mockEventsOverviewViewModel.onSearchQueryChanged("") }
+      verify { mockEventsOverviewViewModel.onSearchActiveChanged(false) }
+      verify { mockEventsOverviewViewModel.getEvents() }
+
+      confirmVerified(mockEventsOverviewViewModel)
+    }
+  }
+
+  @Test
+  fun typingInSearchBarShowsResultsInMap() = run {
+    onComposeScreen<HomeScreen>(composeTestRule) {
+      // 1. Open the map view
+      step("Click on view toggle fab") {
+        viewToggleFab {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(viewList = false)
+      step("Check if map is displayed") { map { assertIsDisplayed() } }
+
+      // 2. Activate search
+      searchBar {
+        assertIsDisplayed()
+        performClick()
+        performTextInput("Event 0")
+      }
+
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(isSearchActive = true)
+
+      verify { mockEventsOverviewViewModel.onSearchQueryChanged("Event 0") }
+      verify { mockEventsOverviewViewModel.onSearchActiveChanged(true) }
+      verify { mockEventsOverviewViewModel.uiState }
+
+      // 3. Check filtered map is displayed
+      filteredMap { assertIsDisplayed() }
+      verify { mockEventsOverviewViewModel.filterEvents() }
+
+      // 4. Clear search
+      searchBar { performTextClearance() }
+      verify { mockEventsOverviewViewModel.onSearchQueryChanged("") }
+      verify { mockEventsOverviewViewModel.onSearchActiveChanged(false) }
+      verify { mockEventsOverviewViewModel.getEvents() }
     }
   }
 
@@ -191,11 +362,14 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       }
       sampleEventList.value = sampleEventList.value.copy(tab = Tab.BROWSE)
 
+      // Verify that the tab change is handled correctly
+      verify { mockEventsOverviewViewModel.onTabChanged(Tab.BROWSE, any()) }
+
       // Verify if getEvents is called upon init
       verify { mockEventsOverviewViewModel.getEvents() }
 
-      // Verify that the tab change is handled correctly
-      verify { mockEventsOverviewViewModel.onTabChanged(Tab.BROWSE, any()) }
+      // Check that uiState is accessed as expected
+      verify { mockEventsOverviewViewModel.uiState }
 
       // Confirm that no unexpected interactions have occurred
       confirmVerified(mockEventsOverviewViewModel)
@@ -223,6 +397,107 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
 
       // Verify that the upcoming events are fetched once
       verify(exactly = 1) { mockEventsOverviewViewModel.getUpcomingEvents() }
+    }
+  }
+
+  @Test
+  fun testDisplayUpcomingEventsListFiltered() = run {
+    val upcomingEvents = listOf(mockEvent, mockEvent.copy(eventName = "Event 2", fireBaseID = "2"))
+    sampleEventList.value =
+        sampleEventList.value.copy(
+            upcomingEventList = EventList(allEvents = upcomingEvents), userLoggedIn = true)
+
+    onComposeScreen<HomeScreen>(composeTestRule) {
+      // 1. Open the upcoming tab
+      step("Trigger loading of upcoming events") {
+        upcomingTab {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+      sampleEventList.value = sampleEventList.value.copy(tab = Tab.UPCOMING, viewList = true)
+      step("view list") { eventListUpcoming.assertIsDisplayed() }
+      // Verify that the tab change is handled correctly
+      verify(exactly = 1) { mockEventsOverviewViewModel.onTabChanged(Tab.UPCOMING, any()) }
+
+      // Verify that the upcoming events are fetched once
+      verify(exactly = 1) { mockEventsOverviewViewModel.getUpcomingEvents() }
+
+      // 2. Search in the upcoming tab
+      searchBar {
+        assertIsDisplayed()
+        performClick()
+        performTextInput("Event 1")
+      }
+
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(isSearchActive = true)
+
+      filteredEventListUpcoming { assertIsDisplayed() }
+      eventCard { assertIsDisplayed() }
+
+      verify { mockEventsOverviewViewModel.onSearchQueryChanged("Event 1") }
+      verify { mockEventsOverviewViewModel.onSearchActiveChanged(true) }
+      verify { mockEventsOverviewViewModel.uiState }
+      verify { mockEventsOverviewViewModel.filterEvents() }
+
+      searchBar { performTextClearance() }
+
+      verify { mockEventsOverviewViewModel.onSearchQueryChanged("") }
+      verify { mockEventsOverviewViewModel.onSearchActiveChanged(false) }
+      verify { mockEventsOverviewViewModel.getEvents() }
+
+      confirmVerified(mockEventsOverviewViewModel)
+    }
+  }
+
+  @Test
+  fun testDisplayUpcomingEventsMapFiltered() = run {
+    val upcomingEvents = listOf(mockEvent, mockEvent.copy(eventName = "Event 2", fireBaseID = "2"))
+    sampleEventList.value =
+        sampleEventList.value.copy(
+            upcomingEventList = EventList(allEvents = upcomingEvents), userLoggedIn = true)
+
+    onComposeScreen<HomeScreen>(composeTestRule) {
+      // 1. Open the upcoming tab
+      step("Trigger loading of upcoming events") {
+        upcomingTab {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+      sampleEventList.value = sampleEventList.value.copy(tab = Tab.UPCOMING, viewList = false)
+      step("view map") { mapUpcoming.assertIsDisplayed() }
+      // Verify that the tab change is handled correctly
+      verify(exactly = 1) { mockEventsOverviewViewModel.onTabChanged(Tab.UPCOMING, any()) }
+
+      // Verify that the upcoming events are fetched once
+      verify(exactly = 1) { mockEventsOverviewViewModel.getUpcomingEvents() }
+
+      // 2. Search in the upcoming tab
+      searchBar {
+        assertIsDisplayed()
+        performClick()
+        performTextInput("Event 1")
+      }
+
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(isSearchActive = true)
+
+      filteredMapUpcoming { assertIsDisplayed() }
+
+      verify { mockEventsOverviewViewModel.onSearchQueryChanged("Event 1") }
+      verify { mockEventsOverviewViewModel.onSearchActiveChanged(true) }
+      verify { mockEventsOverviewViewModel.uiState }
+      verify { mockEventsOverviewViewModel.filterEvents() }
+
+      searchBar { performTextClearance() }
+
+      verify { mockEventsOverviewViewModel.onSearchQueryChanged("") }
+      verify { mockEventsOverviewViewModel.onSearchActiveChanged(false) }
+      verify { mockEventsOverviewViewModel.getEvents() }
+
+      confirmVerified(mockEventsOverviewViewModel)
     }
   }
 
