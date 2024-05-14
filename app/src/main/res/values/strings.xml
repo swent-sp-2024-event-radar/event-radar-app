@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Event Radar</string>
     <string name="web_client_id">1043895872028–8m8f4kpcmqe60ofkef734vbgqph8g5ut.apps.googleusercontent.com</string>
     <string name="default_web_client_id" translatable="false">webClientId.apps.googleusercontent.com</string>
     <string name="test1">test1</string>
@@ -26,7 +26,9 @@
     <string name="homeScreen_events">Home</string>
     <string name="user_profile">Profile</string>
     <string name="hosting">Hosting</string>
-    <string name="message_bar_placeholder">Type here...</string>
+    <string name="message_bar_placeholder">Type here…</string>
+    <string name="my_qr_code">My Qr Code</string>
+    <string name="no_message_found_string">You have no messages, go to \"Contacts\" to start messaging a friend!</string>
 </resources>
 
 

@@ -60,10 +60,11 @@ class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
               lastName = "$i",
               phoneNumber = "",
               accountStatus = "active",
-              eventsAttendeeSet = mutableSetOf(),
-              eventsHostSet = mutableSetOf(),
-              friendsSet = mutableSetOf(),
-              profilePicUrl = "",
+              eventsAttendeeList = mutableListOf(),
+              eventsHostList = mutableListOf(),
+              friendsList = mutableListOf(),
+              profilePicUrl =
+                  "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2Fplaceholder.png?alt=media&token=ba4b4efb-ff45-4617-b60f-3789e8fb75b6",
               qrCodeUrl = "",
               username = "Test$i"))
 
@@ -73,7 +74,7 @@ class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
           Message(
               sender = "$i",
               content = "Test Message",
-              dateTimeSent = LocalDateTime.now(),
+              dateTimeSent = LocalDateTime.parse("2021-01-01T00:00:00"),
               id = "1"),
           (mh as Resource.Success).data,
       )
@@ -100,6 +101,10 @@ class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
           assertHasClickAction()
         }
         bottomNav { assertIsDisplayed() }
+        profilePic { assertIsDisplayed() }
+        recipientName { assertIsDisplayed() }
+        messageContent { assertIsDisplayed() }
+        messageTime { assertIsDisplayed() }
       }
     }
   }
