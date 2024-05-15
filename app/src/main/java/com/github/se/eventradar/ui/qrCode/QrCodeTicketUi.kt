@@ -50,6 +50,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.event.EventDetailsViewModel
+import com.github.se.eventradar.model.event.EventUiState
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu
@@ -161,7 +162,7 @@ fun QrCodeTicketUi(
                     MaterialTheme.colorScheme.onSurface,
                 )
 
-                val (image, backButton, title, description, distance, category, dateAndTime) =
+                val (image, backButton, title, description, distance, category, dateAndTime, ticketSold) =
                     createRefs()
 
                 // TODO uncomment when image are implemented
@@ -242,8 +243,22 @@ fun QrCodeTicketUi(
                     eventUiState = uiState.eventUiState,
                     componentStyle)
 
-
-
+                Column(modifier =
+                Modifier.constrainAs(ticketSold) {
+                    top.linkTo(category.bottom, margin = 32.dp)
+                    start.linkTo(parent.start, margin = widthPadding)
+                }) {
+                    Text(
+                        text = "Tickets Sold",
+                        style = componentStyle.fieldTitleStyle,
+                        color = componentStyle.fieldTitleColor,
+                        modifier = Modifier.testTag("ticketSoldTitle"))
+                    Text(
+                        text = "${uiState.eventUiState.ticket.capacity} left" , //TODO CHNAGE TO SOLD
+                        style = componentStyle.contentStyle,
+                        color = componentStyle.contentColor,
+                        modifier = Modifier.testTag("ticketSoldTContent"))
+                }
 
         }
         else {

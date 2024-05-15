@@ -113,21 +113,7 @@ fun EventCategory(modifier: Modifier, eventUiState: EventUiState, style: EventCo
         modifier = Modifier.testTag("categoryContent"))
   }
 
-@Composable
-fun TicketSold(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.SpaceBetween) {
-        Text(
-            text = "Tickets Sold",
-            style = style.fieldTitleStyle,
-            color = style.fieldTitleColor,
-            modifier = Modifier.testTag("TicketSoldTitle"))
-        Text(
-            text = eventUiState.category.convertToResString(LocalContext.current),
-            style = style.contentStyle,
-            color = style.contentColor,
-            modifier = Modifier.testTag("categoryContent"))
-    }
-}
+
 }
 
 @Composable
