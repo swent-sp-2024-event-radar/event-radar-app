@@ -95,7 +95,7 @@ class MessagesViewModelTest {
 
   @Test
   fun testOnSearchQueryChange() = runTest {
-    viewModel.onSearchQueryChange("Hello", mockUiState)
+    viewModel.onSearchQueryChanged("Hello", mockUiState)
 
     assert(mockUiState.value.searchQuery == "Hello")
   }
@@ -323,7 +323,7 @@ class MessagesViewModelTest {
 
   @Test
   fun testOnSearchQueryChanged() = runTest {
-    viewModel.onSearchQueryChange("Hello", mockUiState)
+    viewModel.onSearchQueryChanged("Hello", mockUiState)
 
     assert(mockUiState.value.searchQuery == "Hello")
   }
