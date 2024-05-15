@@ -18,6 +18,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -25,12 +26,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun SentMessageRow(text: String) {
+  val screenWidthDp = LocalConfiguration.current.screenWidthDp
+  val maxWidth = (0.7f * screenWidthDp).dp
+
   // Whole column that contains chat bubble and padding on start or end
   Column(
       horizontalAlignment = Alignment.End,
@@ -47,6 +52,7 @@ fun SentMessageRow(text: String) {
                     .background(MaterialTheme.colorScheme.primaryContainer)
                     .clickable {}
                     .testTag("sentChatBubble"),
+            maxWidth = maxWidth,
             content = {
               TextMessageInsideBubble(
                   modifier =
@@ -63,6 +69,9 @@ fun SentMessageRow(text: String) {
 fun ReceivedMessageRow(
     text: String,
 ) {
+  val screenWidthDp = LocalConfiguration.current.screenWidthDp
+  val maxWidth = (0.7f * screenWidthDp).dp
+
   Column(
       horizontalAlignment = Alignment.Start,
       modifier =
@@ -78,6 +87,7 @@ fun ReceivedMessageRow(
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .clickable {}
                     .testTag("receivedChatBubble"),
+            maxWidth = maxWidth,
             content = {
               TextMessageInsideBubble(
                   modifier =
@@ -93,12 +103,15 @@ fun ReceivedMessageRow(
 @Composable
 fun ChatBubbleConstraints(
     modifier: Modifier = Modifier,
+    maxWidth: Dp,
     content: @Composable () -> Unit = {},
 ) {
   SubcomposeLayout(modifier = modifier) { constraints ->
     var recompositionIndex = 0
+    val constrainedMaxWidth = Constraints(maxWidth = maxWidth.roundToPx())
+
     var placeables: List<Placeable> =
-        subcompose(recompositionIndex++, content).map { it.measure(constraints) }
+        subcompose(recompositionIndex++, content).map { it.measure(constrainedMaxWidth) }
     val columnSize =
         placeables.fold(IntSize.Zero) { currentMax: IntSize, placeable: Placeable ->
           IntSize(
