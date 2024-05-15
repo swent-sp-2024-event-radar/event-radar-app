@@ -1,4 +1,4 @@
-package com.github.se.eventradar
+package com.github.se.eventradar.di
 
 import com.github.se.eventradar.model.di.FirebaseEventDatabaseModule
 import com.github.se.eventradar.model.di.FirebaseMessageDatabaseModule
@@ -20,7 +20,6 @@ import javax.inject.Singleton
     components = [SingletonComponent::class], replaces = [FirebaseEventDatabaseModule::class])
 class MockEventDatabaseModule {
   @Provides
-  @Singleton
   fun provideMockEventRepository(): IEventRepository {
     return MockEventRepository()
   }
@@ -31,7 +30,6 @@ class MockEventDatabaseModule {
     components = [SingletonComponent::class], replaces = [FirebaseUserDatabaseModule::class])
 class MockUserDatabaseModule {
   @Provides
-  @Singleton
   fun provideMockUserRepository(): IUserRepository {
     return MockUserRepository()
   }
@@ -42,7 +40,6 @@ class MockUserDatabaseModule {
     components = [SingletonComponent::class], replaces = [FirebaseMessageDatabaseModule::class])
 class MockMessageDatabaseModule {
   @Provides
-  @Singleton
   fun provideMockMessageRepository(): IMessageRepository {
     return MockMessageRepository()
   }
