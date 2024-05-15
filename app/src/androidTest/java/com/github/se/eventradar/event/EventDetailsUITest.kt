@@ -4,9 +4,9 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.EventCategory
-import com.github.se.eventradar.model.event.EventDetailsViewModel
+import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.model.event.EventTicket
-import com.github.se.eventradar.model.event.EventUiState
+import com.github.se.eventradar.viewmodel.EventUiState
 import com.github.se.eventradar.screens.EventDetailsScreen
 import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.navigation.NavigationActions
@@ -51,7 +51,8 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
               ticket = EventTicket("Luck", 0.0, 7, 0),
               mainOrganiser = "some.name@host.com",
               category = EventCategory.COMMUNITY,
-          ))
+          )
+      )
 
   private val eventId = "tdjWMT9Eon2ROTVakQb"
 
