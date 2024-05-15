@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SentMessageRow(text: String, messageTime: String) {
+fun SentMessageRow(text: String) {
   // Whole column that contains chat bubble and padding on start or end
   Column(
       horizontalAlignment = Alignment.End,
@@ -54,32 +54,14 @@ fun SentMessageRow(text: String, messageTime: String) {
                           .testTag("sentChatBubbleText"),
                   text = text,
                   color = MaterialTheme.colorScheme.onPrimaryContainer,
-                  style = MaterialTheme.typography.bodyLarge,
-                  messageStat = {
-                    MessageTimeText(
-                        modifier = Modifier.wrapContentSize(), messageTime = messageTime)
-                  })
+                  style = MaterialTheme.typography.bodyLarge)
             })
-      }
-}
-
-@Composable
-fun MessageTimeText(modifier: Modifier = Modifier, messageTime: String) {
-  Row(
-      modifier = modifier.testTag("sentChatBubbleTimeRow"),
-      verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text = messageTime,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
-            modifier = modifier.testTag("messageTimeRowText"))
       }
 }
 
 @Composable
 fun ReceivedMessageRow(
     text: String,
-    messageTime: String,
 ) {
   Column(
       horizontalAlignment = Alignment.Start,
@@ -103,15 +85,7 @@ fun ReceivedMessageRow(
                           .testTag("receivedChatBubbleText"),
                   text = text,
                   color = MaterialTheme.colorScheme.onSurfaceVariant,
-                  style = MaterialTheme.typography.bodyLarge,
-                  messageStat = {
-                    Text(
-                        modifier = Modifier.padding(end = 10.dp).testTag("receivedMessageText"),
-                        text = messageTime,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                  })
+                  style = MaterialTheme.typography.bodyLarge)
             })
       }
 }
@@ -161,7 +135,6 @@ fun TextMessageInsideBubble(
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
     style: TextStyle = LocalTextStyle.current,
-    messageStat: @Composable () -> Unit,
     onMeasure: ((ChatRowData) -> Unit)? = null
 ) {
   val chatRowData = remember { ChatRowData() }
@@ -186,34 +159,23 @@ fun TextMessageInsideBubble(
               chatRowData.lastLineWidth = textLayoutResult.getLineRight(chatRowData.lineCount - 1)
               chatRowData.textWidth = textLayoutResult.size.width
             })
-
-        messageStat()
       }
 
   Layout(modifier = modifier, content = content) {
       measurables: List<Measurable>,
       constraints: Constraints ->
-    if (measurables.size != 2)
-        throw IllegalArgumentException("There should be 2 components for this layout")
+    if (measurables.size != 1)
+        throw IllegalArgumentException("There should be 1 component for this layout")
 
-    //        println("⚠️ CHAT constraints: $constraints")
+    val placeable: Placeable = measurables.first().measure(Constraints(0, constraints.maxWidth))
 
-    val placeables: List<Placeable> =
-        measurables.map { measurable ->
-          // Measure each child maximum constraints since message can cover all of the available
-          // space by parent
-          measurable.measure(Constraints(0, constraints.maxWidth))
-        }
-
-    val message = placeables.first()
-    val status = placeables.last()
-
-    // calculate chat row dimensions are not  based on message and status positions
+    // calculate chat row dimensions are not  based on message positions
     if ((chatRowData.rowWidth == 0 || chatRowData.rowHeight == 0) || chatRowData.text != text) {
       // Constrain with max width instead of longest sibling
       // since this composable can be longest of siblings after calculation
       chatRowData.parentWidth = constraints.maxWidth
-      calculateChatWidthAndHeight(chatRowData, message, status)
+      chatRowData.rowWidth = placeable.width
+      chatRowData.rowHeight = placeable.height
       // Parent width of this chat row is either result of width calculation
       // or quote or other sibling width if they are longer than calculated width.
       // minWidth of Constraint equals (text width + horizontal padding)
@@ -221,17 +183,11 @@ fun TextMessageInsideBubble(
           chatRowData.rowWidth.coerceAtLeast(minimumValue = constraints.minWidth)
     }
 
-    //        println("⚠️⚠️ CHAT after calculation-> CHAT_ROW_DATA: $chatRowData")
-
     // Send measurement results if requested by Composable
     onMeasure?.invoke(chatRowData)
 
     layout(width = chatRowData.parentWidth, height = chatRowData.rowHeight) {
-      message.placeRelative(0, 0)
-      // set left of status relative to parent because other elements could result this row
-      // to be long as longest composable
-      status.placeRelative(
-          chatRowData.parentWidth - status.width, chatRowData.rowHeight - status.height)
+      placeable.placeRelative(0, 0)
     }
   }
 }

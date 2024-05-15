@@ -66,6 +66,59 @@ constructor(
 }
 
 data class ChatUiState(
+    //    val userId: String? = "1",
+    //    val opponentId: String? = "2",
+    //    val messageHistory: MessageHistory = MessageHistory(
+    //        user1 = "Default sender",
+    //        user2 = "Default recipient",
+    //        latestMessageId = "DefaultId",
+    //        user1ReadMostRecentMessage = false,
+    //        user2ReadMostRecentMessage = false,
+    //        messages = mutableListOf(
+    //            Message(
+    //                sender = "1",
+    //                content = "Test Message 1",
+    //                dateTimeSent = LocalDateTime.now(),
+    //                id = "1"),
+    //            Message(
+    //                sender = "2",
+    //                content = "Test Message 2",
+    //                dateTimeSent = LocalDateTime.now(),
+    //                id = "2"),
+    //            Message(
+    //                sender = "1",
+    //                content = "Test Message 3",
+    //                dateTimeSent = LocalDateTime.now(),
+    //                id = "3"),
+    //            Message(
+    //                sender = "2",
+    //                content = "Test Message 4",
+    //                dateTimeSent = LocalDateTime.now(),
+    //                id = "4"),
+    //            Message(
+    //                sender = "1",
+    //                content = "Test Message 5",
+    //                dateTimeSent = LocalDateTime.now(),
+    //                id = "5"))),
+    //    val opponentProfile: User =
+    //        User(
+    //            userId = "2",
+    //            birthDate = "01/01/2000",
+    //            email = "",
+    //            firstName = "Test",
+    //            lastName = "2",
+    //            phoneNumber = "",
+    //            accountStatus = "active",
+    //            eventsAttendeeList = mutableListOf(),
+    //            eventsHostList = mutableListOf(),
+    //            friendsList = mutableListOf(),
+    //            profilePicUrl =
+    // "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2Fplaceholder.png?alt=media&token=ba4b4efb-ff45-4617-b60f-3789e8fb75b6",
+    //            qrCodeUrl = "",
+    //            username = "Test2"),
+    //    val messageInserted: Boolean = true,
+    //    val messagesLoadedFirstTime: Boolean = true,
+    //    val messageBarInput: String = "",
     val userId: String? = null,
     val opponentId: String? = null,
     val messageHistory: MessageHistory =

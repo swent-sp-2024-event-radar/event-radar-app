@@ -35,7 +35,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,20 +48,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
-import com.github.se.eventradar.model.repository.message.MockMessageRepository
-import com.github.se.eventradar.model.repository.user.MockUserRepository
+import com.github.se.eventradar.model.User
+import com.github.se.eventradar.model.message.Message
+import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.ProfilePic
 import com.github.se.eventradar.ui.navigation.NavigationActions
-import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.TopLevelDestination
 import com.github.se.eventradar.viewmodel.ChatUiState
 import com.github.se.eventradar.viewmodel.ChatViewModel
-import java.util.Locale
+import java.time.LocalDateTime
 
 @Composable
 fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), navigationActions: NavigationActions) {
@@ -74,7 +72,7 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), navigationActions: Na
   // TO DO: Implement changed function results
   ChatScreenUi(
       uiState = uiState,
-      navigationActions = navigationActions,
+      onBackArrowClick = navigationActions::goBack,
       onTabSelected = navigationActions::navigateTo,
       onMessageChange = viewModel::onMessageBarInputChange,
       //        onSelectedTabIndexChange = viewModel::onSelectedTabIndexChange,
@@ -90,7 +88,7 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), navigationActions: Na
 @Composable
 fun ChatScreenUi(
     uiState: ChatUiState,
-    navigationActions: NavigationActions,
+    onBackArrowClick: () -> Unit,
     onTabSelected: (TopLevelDestination) -> Unit,
     onMessageChange: (String) -> Unit,
     //    onSelectedTabIndexChange: (Int) -> Unit,
@@ -138,7 +136,7 @@ fun ChatScreenUi(
               // TO DO : Implement user profile screen with private chat FAB
               Toast.makeText(context, "User Profile to be implemented", Toast.LENGTH_SHORT).show()
             },
-            onBackArrowClick = { navigationActions.navController.navigate(Route.MESSAGE) },
+            onBackArrowClick = onBackArrowClick,
         )
       },
       bottomBar = {
@@ -160,19 +158,15 @@ fun ChatScreenUi(
                   modifier = Modifier.weight(1f).fillMaxWidth().testTag("chatScreenMessagesList"),
                   state = scrollState) {
                     items(messages) { message ->
-                      val sdf = remember { java.text.SimpleDateFormat("hh:mm", Locale.ROOT) }
-
                       when (message.sender == uiState.opponentId) {
                         true -> {
                           ReceivedMessageRow(
                               text = message.content,
-                              messageTime = sdf.format(message.dateTimeSent),
                           )
                         }
                         false -> {
                           SentMessageRow(
                               text = message.content,
-                              messageTime = sdf.format(message.dateTimeSent),
                           )
                         }
                       }
@@ -281,8 +275,78 @@ fun ChatInput(
 @ExcludeFromJacocoGeneratedReport
 @Composable
 fun ChatScreenPreview() {
-  val mockMessageRepo = MockMessageRepository()
-  val mockUserRepo = MockUserRepository()
-  ChatScreen(
-      ChatViewModel(mockMessageRepo, mockUserRepo), NavigationActions(rememberNavController()))
+  val sampleUiState =
+      ChatUiState(
+          userId = "1",
+          opponentId = "2",
+          messageHistory =
+              MessageHistory(
+                  user1 = "Default sender",
+                  user2 = "Default recipient",
+                  latestMessageId = "DefaultId",
+                  user1ReadMostRecentMessage = false,
+                  user2ReadMostRecentMessage = false,
+                  messages =
+                      mutableListOf(
+                          Message(
+                              sender = "1",
+                              content = "Test Message 1",
+                              dateTimeSent = LocalDateTime.now(),
+                              id = "1"),
+                          Message(
+                              sender = "2",
+                              content = "Test Message 2",
+                              dateTimeSent = LocalDateTime.now(),
+                              id = "2"),
+                          Message(
+                              sender = "1",
+                              content = "Test Message 3",
+                              dateTimeSent = LocalDateTime.now(),
+                              id = "3"),
+                          Message(
+                              sender = "2",
+                              content = "Test Message 4",
+                              dateTimeSent = LocalDateTime.now(),
+                              id = "4"),
+                          Message(
+                              sender = "1",
+                              content = "Test Message 5",
+                              dateTimeSent = LocalDateTime.now(),
+                              id = "5"),
+                          Message(
+                              sender = "1",
+                              content = "Test Message 6",
+                              dateTimeSent = LocalDateTime.now(),
+                              id = "6"),
+                          Message(
+                              sender = "1",
+                              content = "Test Message 7",
+                              dateTimeSent = LocalDateTime.now(),
+                              id = "7"),
+                          Message(
+                              sender = "1",
+                              content = "Test Message 8",
+                              dateTimeSent = LocalDateTime.now(),
+                              id = "8"))),
+          opponentProfile =
+              User(
+                  userId = "2",
+                  birthDate = "01/01/2000",
+                  email = "",
+                  firstName = "Test",
+                  lastName = "2",
+                  phoneNumber = "",
+                  accountStatus = "active",
+                  eventsAttendeeList = mutableListOf(),
+                  eventsHostList = mutableListOf(),
+                  friendsList = mutableListOf(),
+                  profilePicUrl =
+                      "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2Fplaceholder.png?alt=media&token=ba4b4efb-ff45-4617-b60f-3789e8fb75b6",
+                  qrCodeUrl = "",
+                  username = "Test2"),
+          messageInserted = true,
+          messagesLoadedFirstTime = true)
+
+  ChatScreenUi(
+      uiState = sampleUiState, onBackArrowClick = {}, onTabSelected = {}, onMessageChange = {})
 }
