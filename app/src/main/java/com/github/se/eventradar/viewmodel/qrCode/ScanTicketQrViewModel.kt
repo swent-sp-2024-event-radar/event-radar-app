@@ -11,6 +11,7 @@ import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventTicket
+import com.github.se.eventradar.model.event.EventUiState
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import dagger.assisted.Assisted
@@ -29,10 +30,10 @@ import java.time.LocalDateTime
 class ScanTicketQrViewModel
 @AssistedInject // Dependency injection
 constructor(
-    private val userRepository: IUserRepository,
-    private val eventRepository: IEventRepository,
-    val qrCodeAnalyser: QrCodeAnalyser,
-    @Assisted private val myEventID: String
+  private val userRepository: IUserRepository,
+  private val eventRepository: IEventRepository,
+  val qrCodeAnalyser: QrCodeAnalyser,
+  @Assisted private val myEventID: String
 ) : ViewModel() {
 
 
@@ -80,6 +81,7 @@ constructor(
         //        println("checkpoint 2")
       }
     }
+    getEventData()
   }
 
   private fun updatePermissions(decodedString: String) {
@@ -119,13 +121,13 @@ constructor(
       do {
         // Check if both updates were successful
         updateResult =
-            if (userUpdateResult is Resource.Success && eventUpdateResult is Resource.Success) {
-              changeAction(Action.ApproveEntry)
-              Resource.Success(Unit)
-            } else {
-              changeAction(Action.FirebaseUpdateError)
-              Resource.Failure(Exception("Failed to update user and event"))
-            }
+          if (userUpdateResult is Resource.Success && eventUpdateResult is Resource.Success) {
+            changeAction(Action.ApproveEntry)
+            Resource.Success(Unit)
+          } else {
+            changeAction(Action.FirebaseUpdateError)
+            Resource.Failure(Exception("Failed to update user and event"))
+          }
       } while ((updateResult !is Resource.Success) && (maxNumberOfRetries-- > 0))
     } else {
       println("one does not contain the other")
@@ -160,15 +162,17 @@ constructor(
         is Resource.Success -> {
           _uiState.update {
             it.copy(
-              eventName = response.data!!.eventName,
-              eventPhoto = response.data.eventPhoto,
-              start = response.data.start,
-              end = response.data.end,
-              location = response.data.location,
-              description = response.data.description,
-              ticket = response.data.ticket,
-              mainOrganiser = response.data.mainOrganiser,
-              category = response.data.category,
+              eventUiState = EventUiState(
+                eventName = response.data!!.eventName,
+                eventPhoto = response.data.eventPhoto,
+                start = response.data.start,
+                end = response.data.end,
+                location = response.data.location,
+                description = response.data.description,
+                ticket = response.data.ticket,
+                mainOrganiser = response.data.mainOrganiser,
+                category = response.data.category
+              )
             )
           }
         }
@@ -182,15 +186,7 @@ constructor(
     val decodedResult: String = "",
     val action: Action = Action.ScanTicket,
     val tabState: Tab = Tab.MyEvent,
-    val eventName: String = "",
-    val eventPhoto: String = "",
-    val start: LocalDateTime = LocalDateTime.MIN,
-    val end: LocalDateTime = LocalDateTime.MAX,
-    val location: Location = Location(0.0, 0.0, ""),
-    val description: String = "",
-    val ticket: EventTicket = EventTicket("", 0.0, 0),
-    val mainOrganiser: String = "",
-    val category: EventCategory = EventCategory.MUSIC,
+    val eventUiState: EventUiState = EventUiState()
   )
 
 }

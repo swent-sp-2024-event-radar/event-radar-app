@@ -55,7 +55,8 @@ class ScanFriendTicketViewModelTest {
             organiserList = mutableListOf("Test Organiser"),
             attendeeList = mutableListOf("user1", "user2", "user3"),
             category = EventCategory.COMMUNITY,
-            fireBaseID = "1")
+            fireBaseID = "1"
+        )
 
     private val mockUser1 =
         User(
@@ -71,7 +72,8 @@ class ScanFriendTicketViewModelTest {
             friendsList = mutableListOf(),
             profilePicUrl = "http://example.com/Profile_Pictures/1",
             qrCodeUrl = "http://example.com/QR_Codes/1",
-            username = "johndoe")
+            username = "johndoe"
+        )
 
     private val mockUser2 =
         User(
@@ -87,7 +89,8 @@ class ScanFriendTicketViewModelTest {
             friendsList = mutableListOf(),
             profilePicUrl = "http://example.com/Profile_Pictures/1",
             qrCodeUrl = "http://example.com/QR_Codes/1",
-            username = "johndoe")
+            username = "johndoe"
+        )
 
     class MainDispatcherRule(
         private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
@@ -101,7 +104,8 @@ class ScanFriendTicketViewModelTest {
         }
     }
 
-    @get:Rule val mainDispatcherRule = MainDispatcherRule()
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
 
     @Before
     fun setUp() {
@@ -126,7 +130,8 @@ class ScanFriendTicketViewModelTest {
         eventRepository.addEvent(mockEvent)
         qrCodeAnalyser.onDecoded?.invoke(null)
         TestCase.assertEquals(
-            ScanTicketQrViewModel.Action.AnalyserError, viewModel.uiState.value.action)
+            ScanTicketQrViewModel.Action.AnalyserError, viewModel.uiState.value.action
+        )
     }
 
     @Test
@@ -138,6 +143,7 @@ class ScanFriendTicketViewModelTest {
             is Resource.Success -> {
                 TestCase.assertEquals(mutableListOf("user2", "user3"), event1.data!!.attendeeList)
             }
+
             else -> {
                 assert(false)
                 println("User 2 not found or could not be fetched")
@@ -147,12 +153,16 @@ class ScanFriendTicketViewModelTest {
             is Resource.Success -> {
                 TestCase.assertEquals(mutableListOf("2", "3"), user1.data!!.eventsAttendeeList)
             }
+
             else -> {
                 assert(false)
                 println("User 1 not found or could not be fetched")
             }
         }
-        TestCase.assertEquals(ScanTicketQrViewModel.Action.ApproveEntry, viewModel.uiState.value.action)
+        TestCase.assertEquals(
+            ScanTicketQrViewModel.Action.ApproveEntry,
+            viewModel.uiState.value.action
+        )
     }
 
     @Test
@@ -162,7 +172,8 @@ class ScanFriendTicketViewModelTest {
         qrCodeAnalyser.onDecoded?.invoke("user5")
         advanceUntilIdle()
         TestCase.assertEquals(
-            ScanTicketQrViewModel.Action.FirebaseFetchError, viewModel.uiState.value.action)
+            ScanTicketQrViewModel.Action.FirebaseFetchError, viewModel.uiState.value.action
+        )
     }
 
     @Test
@@ -180,10 +191,10 @@ class ScanFriendTicketViewModelTest {
         every { Log.d(any(), any()) } returns 0
 
         viewModel.getEventData()
-        assert(viewModel.uiState.value.eventName.isEmpty())
-        assert(viewModel.uiState.value.description.isEmpty())
-        assert(viewModel.uiState.value.eventPhoto.isEmpty())
-        assert(viewModel.uiState.value.mainOrganiser.isEmpty())
+        assert(viewModel.uiState.value.eventUiState.eventName.isEmpty())
+        assert(viewModel.uiState.value.eventUiState.description.isEmpty())
+        assert(viewModel.uiState.value.eventUiState.eventPhoto.isEmpty())
+        assert(viewModel.uiState.value.eventUiState.mainOrganiser.isEmpty())
 
         unmockkAll()
     }
@@ -193,27 +204,27 @@ class ScanFriendTicketViewModelTest {
         eventRepository.addEvent(mockEvent)
         viewModel.getEventData()
 
-        assert(viewModel.uiState.value.eventName == mockEvent.eventName)
-        assert(viewModel.uiState.value.description == mockEvent.description)
-        assert(viewModel.uiState.value.mainOrganiser == mockEvent.mainOrganiser)
-        assert(viewModel.uiState.value.start == mockEvent.start)
-        assert(viewModel.uiState.value.end == mockEvent.end)
-        assert(viewModel.uiState.value.location == mockEvent.location)
-        assert(viewModel.uiState.value.ticket == mockEvent.ticket)
-        assert(viewModel.uiState.value.category == mockEvent.category)
+        assert(viewModel.uiState.value.eventUiState.eventName == mockEvent.eventName)
+        assert(viewModel.uiState.value.eventUiState.description == mockEvent.description)
+        assert(viewModel.uiState.value.eventUiState.mainOrganiser == mockEvent.mainOrganiser)
+        assert(viewModel.uiState.value.eventUiState.start == mockEvent.start)
+        assert(viewModel.uiState.value.eventUiState.end == mockEvent.end)
+        assert(viewModel.uiState.value.eventUiState.location == mockEvent.location)
+        assert(viewModel.uiState.value.eventUiState.ticket == mockEvent.ticket)
+        assert(viewModel.uiState.value.eventUiState.category == mockEvent.category)
     }
 
     @Test
     fun testGetEventWithUpdateAndFetchAgain() = runTest {
         eventRepository.addEvent(mockEvent)
         viewModel.getEventData()
-        assert(viewModel.uiState.value.eventName == mockEvent.eventName)
+        assert(viewModel.uiState.value.eventUiState.eventName == mockEvent.eventName)
 
         mockEvent.eventName = "New Name"
-        assert(viewModel.uiState.value.eventName != mockEvent.eventName)
+        assert(viewModel.uiState.value.eventUiState.eventName != mockEvent.eventName)
 
         viewModel.getEventData()
-        assert(viewModel.uiState.value.eventName == mockEvent.eventName)
+        assert(viewModel.uiState.value.eventUiState.eventName == mockEvent.eventName)
     }
 }
 
