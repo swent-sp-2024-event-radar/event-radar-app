@@ -9,12 +9,12 @@ import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.model.repository.message.IMessageRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import javax.inject.Inject
 
 @HiltViewModel
 class MessagesViewModel
@@ -104,7 +104,7 @@ constructor(
             isSearchActive = false,
             searchQuery = "",
         )
-    
+
     if (index == 0) {
       getMessages()
     } else {
@@ -124,15 +124,17 @@ constructor(
                 getUser(
                     if (_uiState.value.userId != messageHistory.user1) messageHistory.user1
                     else messageHistory.user2)
-            friend.firstName.contains(query, ignoreCase = true) or friend.lastName.contains(
-                query,
-                ignoreCase = true)
+            friend.firstName.contains(query, ignoreCase = true) or
+                friend.lastName.contains(query, ignoreCase = true)
           }
 
       _uiState.value = _uiState.value.copy(filteredMessageList = filteredMessageList)
     } else {
       val filteredFriendsList =
-        friendsList.filter { user -> user.firstName.contains(query, ignoreCase = true) or user.lastName.contains(query, ignoreCase = true) }
+          friendsList.filter { user ->
+            user.firstName.contains(query, ignoreCase = true) or
+                user.lastName.contains(query, ignoreCase = true)
+          }
       _uiState.value = _uiState.value.copy(filteredFriendsList = filteredFriendsList)
     }
   }
