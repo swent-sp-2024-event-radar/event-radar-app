@@ -1,11 +1,11 @@
 package com.github.se.eventradar.ui.event
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.FloatingActionButton
@@ -13,15 +13,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
@@ -30,6 +29,7 @@ import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.model.event.EventTicket
+import com.github.se.eventradar.model.event.EventUiState
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.EventCategory
@@ -42,6 +42,7 @@ import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 
 // Temporary sizes. Needs to be responsive...
@@ -49,15 +50,7 @@ private val widthPadding = 34.dp
 private val imageHeight = 191.dp
 
 @Composable
-fun EventDetails(
-    viewModel: EventDetailsViewModel = hiltViewModel(),
-    navigationActions: NavigationActions
-) {
-
-    // TODO to be moved in viewModel init
-    LaunchedEffect(Unit) { // Using `Unit` as a key to run only once
-        viewModel.getEventData()
-    }
+fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: NavigationActions) {
 
     val eventUiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
@@ -76,16 +69,14 @@ fun EventDetails(
                 onTabSelected = { tab -> navigationActions.navigateTo(tab) },
                 tabList = TOP_LEVEL_DESTINATIONS,
                 selectedItem = TOP_LEVEL_DESTINATIONS[2],
-                modifier = Modifier.testTag("bottomNavMenu")
-            )
+                modifier = Modifier.testTag("bottomNavMenu"))
         },
         floatingActionButton = {
             // view ticket button
             FloatingActionButton(
                 onClick = {
                     navigationActions.navController.navigate(
-                        "${Route.EVENT_DETAILS_TICKETS}/${viewModel.eventId}"
-                    )
+                        "${Route.EVENT_DETAILS_TICKETS}/${viewModel.eventId}")
                 },
                 modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("ticketButton"),
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -136,8 +127,7 @@ fun EventDetails(
                     end.linkTo(image.end)
                 },
                 eventUiState = eventUiState,
-                style = componentStyle
-            )
+                style = componentStyle)
 
             EventDescription(
                 modifier =
@@ -148,8 +138,7 @@ fun EventDetails(
                         start.linkTo(parent.start, margin = widthPadding)
                     },
                 eventUiState,
-                componentStyle
-            )
+                componentStyle)
 
             EventDistance(
                 modifier =
@@ -158,8 +147,7 @@ fun EventDetails(
                     start.linkTo(parent.start, margin = widthPadding)
                 },
                 eventUiState,
-                componentStyle
-            )
+                componentStyle)
 
             EventDateTime(
                 modifier =
@@ -168,8 +156,7 @@ fun EventDetails(
                     start.linkTo(parent.start, margin = widthPadding)
                 },
                 eventUiState,
-                componentStyle
-            )
+                componentStyle)
 
             EventCategory(
                 modifier =
@@ -178,11 +165,8 @@ fun EventDetails(
                     start.linkTo(parent.start, margin = widthPadding)
                 },
                 eventUiState,
-                componentStyle
-            )
+                componentStyle)
         }
     }
 }
-
-
 

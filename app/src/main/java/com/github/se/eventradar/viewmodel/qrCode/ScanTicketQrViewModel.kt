@@ -11,6 +11,7 @@ import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventTicket
+import com.github.se.eventradar.model.event.EventUiState
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import dagger.assisted.Assisted
@@ -80,6 +81,7 @@ constructor(
         //        println("checkpoint 2")
       }
     }
+    getEventData()
   }
 
   private fun updatePermissions(decodedString: String) {
@@ -160,15 +162,17 @@ constructor(
         is Resource.Success -> {
           _uiState.update {
             it.copy(
-              eventName = response.data!!.eventName,
-              eventPhoto = response.data.eventPhoto,
-              start = response.data.start,
-              end = response.data.end,
-              location = response.data.location,
-              description = response.data.description,
-              ticket = response.data.ticket,
-              mainOrganiser = response.data.mainOrganiser,
-              category = response.data.category,
+              eventUiState = EventUiState(
+                eventName = response.data!!.eventName,
+                eventPhoto = response.data.eventPhoto,
+                start = response.data.start,
+                end = response.data.end,
+                location = response.data.location,
+                description = response.data.description,
+                ticket = response.data.ticket,
+                mainOrganiser = response.data.mainOrganiser,
+                category = response.data.category
+              )
             )
           }
         }
@@ -182,15 +186,7 @@ constructor(
     val decodedResult: String = "",
     val action: Action = Action.ScanTicket,
     val tabState: Tab = Tab.MyEvent,
-    val eventName: String = "",
-    val eventPhoto: String = "",
-    val start: LocalDateTime = LocalDateTime.MIN,
-    val end: LocalDateTime = LocalDateTime.MAX,
-    val location: Location = Location(0.0, 0.0, ""),
-    val description: String = "",
-    val ticket: EventTicket = EventTicket("", 0.0, 0),
-    val mainOrganiser: String = "",
-    val category: EventCategory = EventCategory.MUSIC,
+    val eventUiState: EventUiState = EventUiState()
   )
 
 }

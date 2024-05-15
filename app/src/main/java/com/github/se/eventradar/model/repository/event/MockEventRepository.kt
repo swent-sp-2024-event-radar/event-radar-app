@@ -1,10 +1,29 @@
 package com.github.se.eventradar.model.repository.event
 
+import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.event.Event
+import com.github.se.eventradar.model.event.EventTicket
+import java.time.LocalDateTime
 
 class MockEventRepository : IEventRepository {
-  private val mockEvents = mutableListOf<Event>()
+  private val mockEvents =
+  mutableListOf( Event(
+    eventName = "Event 1",
+    eventPhoto = "",
+    start = LocalDateTime.now(),
+    end = LocalDateTime.now(),
+    location = Location(0.0, 0.0, "Test Location"),
+    description = "Test Description",
+    ticket = EventTicket("Test Ticket", 0.0, 1),
+    mainOrganiser = "1",
+    organiserList = mutableListOf("Test Organiser"),
+    attendeeList = mutableListOf("user1", "user2", "user3"),
+    category = com.github.se.eventradar.model.event.EventCategory.COMMUNITY,
+    fireBaseID = "1"
+  )
+  )
+    //TODO PUT BACK mutableListOf<Event>()
 
   override suspend fun getEvents(): Resource<List<Event>> {
     return Resource.Success(mockEvents)
