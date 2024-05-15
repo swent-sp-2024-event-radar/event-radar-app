@@ -5,12 +5,13 @@ import com.github.se.eventradar.model.Location
 import java.time.LocalDateTime
 
 private fun convertToDouble(value: Any?): Double {
-    return when (value) {
-        is Double -> value
-        is Long -> value.toDouble()
-        else -> 0.0 // Default value
-    }
+  return when (value) {
+    is Double -> value
+    is Long -> value.toDouble()
+    else -> 0.0 // Default value
+  }
 }
+
 data class Event(
     var eventName: String,
     var eventPhoto: String,
