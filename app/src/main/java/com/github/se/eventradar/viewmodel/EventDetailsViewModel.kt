@@ -78,13 +78,13 @@ constructor(
 }
 
 data class EventUiState(
-  val eventName: String = "",
-  val eventPhoto: String = "",
-  val start: LocalDateTime = LocalDateTime.MIN,
-  val end: LocalDateTime = LocalDateTime.MAX,
-  val location: Location = Location(0.0, 0.0, ""),
-  val description: String = "",
-  val ticket: EventTicket = EventTicket("", 0.0, 0, 0),
-  val mainOrganiser: String = "",
-  val category: EventCategory = EventCategory.MUSIC,
+    val eventName: String = "",
+    val eventPhoto: String = "",
+    val start: LocalDateTime = LocalDateTime.MIN,
+    val end: LocalDateTime = LocalDateTime.MAX,
+    val location: Location = Location(0.0, 0.0, ""),
+    val description: String = "",
+    val ticket: EventTicket = EventTicket("", 0.0, 0, 0),
+    val mainOrganiser: String = "",
+    val category: EventCategory = EventCategory.MUSIC,
 )
