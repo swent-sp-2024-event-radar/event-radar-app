@@ -42,7 +42,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -264,32 +263,15 @@ fun ChatInput(
                   modifier = Modifier.testTag("chatInputPlaceholder"))
             },
             trailingIcon = {
-              Row(
-                  modifier = Modifier.padding(end = 8.dp).testTag("chatInputTrailingIcon"),
-                  horizontalArrangement = Arrangement.End,
-                  verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(
-                        // TO DO: Implement onMessageSend
-                        //                        onClick = { onMessageSend() }
-                        onClick = { null },
-                        modifier = Modifier.testTag("chatInputSendButton")) {
-                          Icon(
-                              imageVector = Icons.AutoMirrored.Filled.Send,
-                              contentDescription = "Send",
-                              modifier = Modifier.testTag("chatInputSendButtonIcon"))
-                        }
-                    IconButton(
-                        onClick = {
-                          Toast.makeText(
-                                  context, "Insert image not available yet", Toast.LENGTH_SHORT)
-                              .show()
-                        },
-                        modifier = Modifier.testTag("chatInputCameraButton")) {
-                          Icon(
-                              painter = painterResource(id = R.drawable.photo_camera),
-                              modifier = Modifier.size(24.dp).testTag("chatInputCameraButtonIcon"),
-                              contentDescription = "Camera")
-                        }
+              IconButton(
+                  // TO DO: Implement onMessageSend
+                  //                        onClick = { onMessageSend() }
+                  onClick = { null },
+                  modifier = Modifier.testTag("chatInputSendButton")) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Send,
+                        contentDescription = "Send",
+                        modifier = Modifier.testTag("chatInputSendButtonIcon"))
                   }
             })
       }

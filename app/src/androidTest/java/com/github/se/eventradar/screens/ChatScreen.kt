@@ -41,8 +41,4 @@ public class ChatScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
       chatInputTrailingIcon.child { hasTestTag("chatInputSendButton") }
   val chatInputSendButtonIcon: KNode =
       chatInputSendButton.child { hasTestTag("chatInputSendButtonIcon") }
-  private val chatInputCameraButton: KNode =
-      chatInputTrailingIcon.child { hasTestTag("chatInputCameraButton") }
-  val chatInputCameraButtonIcon: KNode =
-      chatInputCameraButton.child { hasTestTag("chatInputCameraButtonIcon") }
 }

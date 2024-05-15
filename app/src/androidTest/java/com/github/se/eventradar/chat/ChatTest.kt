@@ -2,17 +2,12 @@ package com.github.se.eventradar.chat
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.eventradar.model.Resource
-import com.github.se.eventradar.model.User
-import com.github.se.eventradar.model.message.Message
-import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.model.repository.message.IMessageRepository
 import com.github.se.eventradar.model.repository.message.MockMessageRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.screens.ChatScreen
 import com.github.se.eventradar.ui.chat.ChatScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
-import com.github.se.eventradar.viewmodel.ChatUiState
 import com.github.se.eventradar.viewmodel.ChatViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
@@ -21,8 +16,6 @@ import io.github.kakaocup.compose.node.element.ComposeScreen.Companion.onCompose
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.unmockkAll
-import java.time.LocalDateTime
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -45,31 +38,6 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
   private lateinit var mockUserRepository: MockUserRepository
   private lateinit var mockChatViewModel: ChatViewModel
 
-  private val sampleMessageHistory =
-      MutableStateFlow(
-          ChatUiState(
-              messageHistory =
-                  MessageHistory(
-                      user1 = "1",
-                      user2 = "2",
-                      latestMessageId = "DefaultId",
-                      user1ReadMostRecentMessage = true,
-                      user2ReadMostRecentMessage = true,
-                      messages =
-                          MutableList(10) {
-                            Message(
-                                sender = "1",
-                                content = "Default message $it",
-                                dateTimeSent = LocalDateTime.now(),
-                                id = "1$it")
-
-                            Message(
-                                sender = "2",
-                                content = "Default response $it",
-                                dateTimeSent = LocalDateTime.now(),
-                                id = "2$it")
-                          })))
-
   @Before
   fun testSetup() = runTest {
     mockMessageRepository = MockMessageRepository()
@@ -77,36 +45,39 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
 
     mockUserRepository.updateCurrentUserId("1")
 
-    // Starting at 2 to avoid conflicts with the current user
-    for (i in 2..9) {
-      mockUserRepository.addUser(
-          User(
-              userId = "$i",
-              birthDate = "01/01/2000",
-              email = "",
-              firstName = "Test",
-              lastName = "$i",
-              phoneNumber = "",
-              accountStatus = "active",
-              eventsAttendeeList = mutableListOf(),
-              eventsHostList = mutableListOf(),
-              friendsList = mutableListOf(),
-              profilePicUrl =
-                  "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2Fplaceholder.png?alt=media&token=ba4b4efb-ff45-4617-b60f-3789e8fb75b6",
-              qrCodeUrl = "",
-              username = "Test$i"))
-
-      val mh = mockMessageRepository.createNewMessageHistory("1", "$i")
-
-      mockMessageRepository.addMessage(
-          Message(
-              sender = "$i",
-              content = "Test Message",
-              dateTimeSent = LocalDateTime.now(),
-              id = "$i"),
-          (mh as Resource.Success).data,
-      )
-    }
+    //      // TO DO: Once VM is done, re-write tests to mock the message and user repo
+    //      // Create mock user who receives messages
+    //      mockUserRepository.addUser(
+    //          User(
+    //              userId = "2",
+    //              birthDate = "01/01/2000",
+    //              email = "",
+    //              firstName = "Test",
+    //              lastName = "2",
+    //              phoneNumber = "",
+    //              accountStatus = "active",
+    //              eventsAttendeeList = mutableListOf(),
+    //              eventsHostList = mutableListOf(),
+    //              friendsList = mutableListOf(),
+    //              profilePicUrl =
+    //
+    // "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2Fplaceholder.png?alt=media&token=ba4b4efb-ff45-4617-b60f-3789e8fb75b6",
+    //              qrCodeUrl = "",
+    //              username = "Test2"))
+    //
+    //      val mh = mockMessageRepository.createNewMessageHistory("1", "2")
+    //
+    //      // create some messages between the two users
+    //      for (i in 1..5) {
+    //          mockMessageRepository.addMessage(
+    //          Message(
+    //              sender = "$i",
+    //              content = "Test Message $i",
+    //              dateTimeSent = LocalDateTime.now(),
+    //              id = "$i"),
+    //          (mh as Resource.Success).data,
+    //      )
+    //    }
 
     mockChatViewModel = ChatViewModel(mockMessageRepository, mockUserRepository)
 
