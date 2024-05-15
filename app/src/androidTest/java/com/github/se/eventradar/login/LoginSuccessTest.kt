@@ -10,7 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.core.app.ActivityOptionsCompat
 import com.github.se.eventradar.model.User
-import com.github.se.eventradar.model.repository.user.MockUserRepository
+import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.screens.LoginScreen
 import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
@@ -19,6 +19,7 @@ import com.github.se.eventradar.viewmodel.LoginViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.mockk.confirmVerified
@@ -29,6 +30,7 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import io.mockk.verify
+import javax.inject.Inject
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -36,7 +38,9 @@ import org.junit.Test
 
 @HiltAndroidTest
 class LoginSuccessTest : TestCase() {
-  @get:Rule val composeTestRule = createComposeRule()
+  @get:Rule(order = 1) val composeTestRule = createComposeRule()
+
+  @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
 
   // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
   @get:Rule val mockkRule = MockKRule(this)
@@ -44,10 +48,12 @@ class LoginSuccessTest : TestCase() {
   // Relaxed mocks methods have a default implementation returning values
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
-  private var mockUserRepository: MockUserRepository = MockUserRepository()
+  @Inject lateinit var userRepository: IUserRepository
 
   @Before
   fun setUp() {
+    hiltRule.inject()
+
     // Launch the Login screen
     composeTestRule.setContent {
       val context = LocalContext.current
@@ -71,14 +77,14 @@ class LoginSuccessTest : TestCase() {
 
       CompositionLocalProvider(LocalActivityResultRegistryOwner provides registryOwner) {
         // any composable inside this block will now use our mock ActivityResultRegistry
-        LoginScreen(LoginViewModel(mockUserRepository), mockNavActions)
+        LoginScreen(LoginViewModel(userRepository), mockNavActions)
       }
     }
   }
 
   @Test
   fun homeScreenOpensOnSuccessfulLogin() = runTest {
-    mockUserRepository.addUser(
+    userRepository.addUser(
         User(
             userId = "1",
             birthDate = "01/01/2000",

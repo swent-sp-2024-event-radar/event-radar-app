@@ -2,7 +2,6 @@ package com.github.se.eventradar.qrCode
 
 import android.Manifest
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
@@ -16,6 +15,8 @@ import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import io.github.kakaocup.compose.node.element.ComposeScreen.Companion.onComposeScreen
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
@@ -25,19 +26,21 @@ import io.mockk.junit4.MockKRule
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
+import javax.inject.Inject
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
 // TODO test when camera denied
 // TODO fix navigation test
 
-@RunWith(AndroidJUnit4::class)
+@HiltAndroidTest
 class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
 
-  @get:Rule val composeTestRule = createComposeRule()
+  @get:Rule(order = 1) val composeTestRule = createComposeRule()
+
+  @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
 
   @get:Rule
   val mRuntimePermissionRule: GrantPermissionRule =
@@ -49,18 +52,17 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
 
   private lateinit var mDevice: UiDevice
 
-  @RelaxedMockK lateinit var viewModel: ScanFriendQrViewModel
-  private lateinit var userRepository: IUserRepository
+  private lateinit var viewModel: ScanFriendQrViewModel
+  @Inject lateinit var userRepository: IUserRepository
   private lateinit var qrCodeAnalyser: QrCodeAnalyser
 
   private val myUID = "user1"
 
   @Before
   fun testSetup() {
-
+    hiltRule.inject()
     MockKAnnotations.init(this)
     every { mockNavActions.navigateTo(any()) } just Runs
-    userRepository = MockUserRepository()
     (userRepository as MockUserRepository).updateCurrentUserId(myUID)
     qrCodeAnalyser = mockk<QrCodeAnalyser>(relaxed = true)
     viewModel = ScanFriendQrViewModel(userRepository, qrCodeAnalyser)
