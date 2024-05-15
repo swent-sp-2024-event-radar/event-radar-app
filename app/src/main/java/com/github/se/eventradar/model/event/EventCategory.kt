@@ -1,7 +1,6 @@
 package com.github.se.eventradar.model.event
 
 import android.content.Context
-import android.util.Log
 import com.github.se.eventradar.R
 
 enum class EventCategory(val displayName: String) {
@@ -23,14 +22,5 @@ enum class EventCategory(val displayName: String) {
       COMMUNITY -> context.getString(R.string.event_category_communities)
       SOCIAL -> context.getString(R.string.event_category_social)
     }
-  }
-}
-
-fun getEventCategory(categoryString: String): EventCategory {
-  return try {
-    enumValueOf<EventCategory>(categoryString.uppercase())
-  } catch (e: IllegalArgumentException) {
-    Log.d("EventCategory", "Invalid category for $categoryString defaulting to SOCIAL")
-    EventCategory.SOCIAL // Default to SOCIAL if categoryString is not valid
   }
 }
