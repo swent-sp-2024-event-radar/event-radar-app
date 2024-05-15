@@ -75,9 +75,9 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), navigationActions: Na
   // TO DO: Implement changed function results
   ChatScreenUi(
       uiState = uiState,
-      viewModel = viewModel,
       navigationActions = navigationActions,
       onTabSelected = navigationActions::navigateTo,
+      onMessageChange = viewModel::onMessageBarInputChange,
       //        onSelectedTabIndexChange = viewModel::onSelectedTabIndexChange,
       //        onSearchQueryChange = viewModel::onSearchQueryChange,
       //        onChatClicked = {
@@ -91,9 +91,9 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), navigationActions: Na
 @Composable
 fun ChatScreenUi(
     uiState: ChatUiState,
-    viewModel: ChatViewModel = hiltViewModel(),
     navigationActions: NavigationActions,
     onTabSelected: (TopLevelDestination) -> Unit,
+    onMessageChange: (String) -> Unit,
     //    onSelectedTabIndexChange: (Int) -> Unit,
     //    onSearchQueryChange: (String) -> Unit,
     //    onChatClicked: (MessageHistory) -> Unit,
@@ -181,7 +181,7 @@ fun ChatScreenUi(
                   }
               ChatInput(
                   uiState = uiState,
-                  onMessageChange = { viewModel.onMessageBarInputChange(it) },
+                  onMessageChange = onMessageChange,
                   //            onMessageSend = { viewModel.onMessageSend() }
               )
             }
