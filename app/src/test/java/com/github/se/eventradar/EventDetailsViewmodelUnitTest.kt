@@ -67,6 +67,21 @@ class EventDetailsViewmodelUnitTest {
           category = EventCategory.COMMUNITY,
           fireBaseID = "event1")
 
+  private val corruptedEvent =
+      Event(
+          eventName = mockEvent.eventName,
+          eventPhoto = mockEvent.eventPhoto,
+          start = mockEvent.start,
+          end = mockEvent.end,
+          location = mockEvent.location,
+          description = mockEvent.description,
+          ticket = mockEvent.ticket,
+          mainOrganiser = mockEvent.mainOrganiser,
+          organiserList = mockEvent.organiserList,
+          attendeeList = mockEvent.attendeeList,
+          category = mockEvent.category,
+          fireBaseID = "corrupted_id")
+
   private val mockUser =
       User(
           userId = "user1",
@@ -160,29 +175,72 @@ class EventDetailsViewmodelUnitTest {
   }
 
   @Test
+  fun testJoinEventNoUser() = runTest {
+    mockkStatic(Log::class)
+
+    eventRepository.addEvent(mockEvent)
+    // userRepository.addUser(mockUser)
+
+    viewModel.getEventData()
+
+    viewModel.buyTicketForEvent()
+
+    assert(viewModel.errorOccurred.value)
+
+    unmockkAll()
+  }
+
+  @Test
+  fun testJoinEventNoEvent() = runTest {
+    mockkStatic(Log::class)
+
+    // eventRepository.addEvent(mockEvent)
+    userRepository.addUser(mockUser)
+
+    viewModel.getEventData()
+    viewModel.buyTicketForEvent()
+
+    assert(viewModel.errorOccurred.value)
+
+    unmockkAll()
+  }
+
+  @Test
+  fun testCorruptEventIdInDb() = runTest {
+    mockkStatic(Log::class)
+
+    eventRepository.addEvent(mockEvent)
+    userRepository.addUser(mockUser)
+
+    viewModel.getEventData()
+
+    // corrupt db
+    eventRepository.deleteEvent(mockEvent)
+    eventRepository.addEvent(corruptedEvent)
+
+    // assert error
+    viewModel.buyTicketForEvent()
+    assert(viewModel.errorOccurred.value)
+
+    unmockkAll()
+  }
+
+  @Test
   fun testJoinAnEvent() = runTest {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
 
     eventRepository.addEvent(mockEvent)
     userRepository.addUser(mockUser)
-    println("\n\n\n")
-    println("user set: ${mockUser.eventsAttendeeList}")
-    println("event set: ${mockEvent.attendeeList}")
 
     viewModel.getEventData()
 
-    println("eventId: ${viewModel.eventId}")
-    println("userId: ${userRepository.getCurrentUserId()}")
-
     viewModel.buyTicketForEvent()
-
-    println("user set: ${mockUser.eventsAttendeeList}")
-    println("event set: ${mockEvent.attendeeList}")
 
     assert(mockUser.eventsAttendeeList.contains(mockEvent.fireBaseID))
     assert(mockEvent.attendeeList.contains(mockUser.userId))
     assert(mockEvent.ticket.capacity == ticketCapacity - 1)
+    assert(viewModel.registrationSuccessful.value)
 
     unmockkAll()
   }

@@ -84,23 +84,6 @@ constructor(
     return !(_uiState.value.ticket.price > 0.0)
   }
 
-  /*TODO actually, I had to recreate a view model when switching to the
-   * buy ticket screen so that function is not needed anymore...
-   */
-  fun getTickets(): Unit { // update ticket, while buying ticket give user 5 minutes to buy?
-    viewModelScope.launch {
-      when (val response = eventRepository.getEvent(eventId)) {
-        is Resource.Success -> {
-          _uiState.update { it.copy(ticket = response.data!!.ticket) }
-        }
-        is Resource.Failure ->
-            Log.d(
-                "EventDetailsViewModel",
-                "Error getting ticket for event: ${response.throwable.message}")
-      }
-    }
-  }
-
   fun buyTicketForEvent() { // update the user attendee list, update the eventRepo ticket count
     viewModelScope.launch {
       if (!isTicketFree()) {
@@ -130,32 +113,37 @@ constructor(
   }
 
   private fun registrationUpdateEvent() {
-    val event: Event = displayedEvent as Event
+    if (displayedEvent != null) {
+      val event: Event = displayedEvent as Event
 
-    // add currentUserId to the event attendees list
-    event.attendeeList.add(currentUserId)
+      // add currentUserId to the event attendees list
+      event.attendeeList.add(currentUserId)
 
-    // decrement ticket capacity
-    if (event.ticket.capacity > 0) {
-      event.ticket = EventTicket(event.ticket.name, event.ticket.price, event.ticket.capacity - 1)
+      // decrement ticket capacity
+      if (event.ticket.capacity > 0) {
+        event.ticket = EventTicket(event.ticket.name, event.ticket.price, event.ticket.capacity - 1)
 
-      viewModelScope.launch {
-        // update event data to the database
-        when (val updateResponse = eventRepository.updateEvent(event)) {
-          is Resource.Success -> {
-            Log.i("EventDetailsViewModel", "Successfully updated event")
-          }
-          is Resource.Failure -> {
-            errorOccurred.value = true
-            Log.d(
-                "EventDetailsViewModel",
-                "Error updating event data: ${updateResponse.throwable.message}")
+        viewModelScope.launch {
+          // update event data to the database
+          when (val updateResponse = eventRepository.updateEvent(event)) {
+            is Resource.Success -> {
+              Log.i("EventDetailsViewModel", "Successfully updated event")
+            }
+            is Resource.Failure -> {
+              errorOccurred.value = true
+              Log.d(
+                  "EventDetailsViewModel",
+                  "Error updating event data: ${updateResponse.throwable.message}")
+            }
           }
         }
+      } else {
+        errorOccurred.value = true
+        Log.d("EventDetailsViewModel", "Error updating event data: No more tickets !}")
       }
     } else {
       errorOccurred.value = true
-      Log.d("EventDetailsViewModel", "Error updating event data: No more tickets !}")
+      Log.d("EventDetailsViewModel", "Error no such event}")
     }
   }
 
