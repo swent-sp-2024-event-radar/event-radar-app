@@ -18,7 +18,6 @@ class MockMessageRepositoryUnitTest {
           sender = "1",
           content = "Hello",
           dateTimeSent = LocalDateTime.parse("2021-01-01T00:00:00"),
-          isRead = false,
           id = "1")
 
   @Before
@@ -87,14 +86,12 @@ class MockMessageRepositoryUnitTest {
 
     assert(addMessage is Resource.Success)
 
-    val updateMessage = messageRepository.updateMessageToReadState(mockMessage, messageHistory.data)
+    val updateMessage = messageRepository.updateReadStateForUser("1", messageHistory.data)
 
     assert(updateMessage is Resource.Success)
 
-    assert(messageHistory.data.messages[0].isRead)
-    assert(
-        messageHistory.data.messages[0].dateTimeSent == LocalDateTime.parse("2021-01-01T00:00:00"))
-    assert(messageHistory.data.messages[0].id == "1")
+    assert(messageHistory.data.user1ReadMostRecentMessage)
+    assert(!messageHistory.data.user2ReadMostRecentMessage)
   }
 
   @Test
@@ -116,7 +113,7 @@ class MockMessageRepositoryUnitTest {
     val id = "50"
     val addMessage =
         messageRepository.addMessage(
-            mockMessage, MessageHistory("1", "2", "1", mutableListOf(), id = id))
+            mockMessage, MessageHistory("1", "2", "1", true, false, mutableListOf(), id = id))
 
     assert(addMessage is Resource.Failure)
     assert(
@@ -129,30 +126,13 @@ class MockMessageRepositoryUnitTest {
     // Test updateMessage() method
     val id = "50"
     val updateMessage =
-        messageRepository.updateMessageToReadState(
-            mockMessage, MessageHistory("1", "2", "1", mutableListOf(), id = id))
+        messageRepository.updateReadStateForUser(
+            id, MessageHistory("1", "2", "1", true, true, mutableListOf(), id = id))
 
     assert(updateMessage is Resource.Failure)
     assert(
         (updateMessage as Resource.Failure).throwable.message ==
-            "Message with id 1 not found in MessageHistory with id $id")
-  }
-
-  @Test
-  fun updateNonExistentMessageInValidMessageHistory() = runTest {
-    // Test updateMessage() method
-    var messageHistory = messageRepository.getMessages("1", "2")
-
-    assert(messageHistory is Resource.Success)
-
-    messageHistory = messageHistory as Resource.Success
-
-    val updateMessage = messageRepository.updateMessageToReadState(mockMessage, messageHistory.data)
-
-    assert(updateMessage is Resource.Failure)
-    assert(
-        (updateMessage as Resource.Failure).throwable.message ==
-            "Message with id 1 not found in MessageHistory with id ${messageHistory.data.id}")
+            "Message history with id $id not found or user with id $id not found")
   }
 
   @Test

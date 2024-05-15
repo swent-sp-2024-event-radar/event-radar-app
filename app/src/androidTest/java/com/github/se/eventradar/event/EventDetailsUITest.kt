@@ -59,7 +59,7 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   fun testSetup() {
 
     every { mockViewModel.uiState } returns sampleEventDetailsUiState
-    every { mockViewModel.getEventId() } returns eventId
+    every { mockViewModel.eventId } returns eventId
 
     composeTestRule.setContent { EventDetails(mockViewModel, navigationActions = mockNavActions) }
   }

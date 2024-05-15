@@ -2,7 +2,7 @@ package com.github.se.eventradar.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -15,6 +15,7 @@ import com.github.se.eventradar.ui.home.HomeScreen
 import com.github.se.eventradar.ui.hosting.HostingScreen
 import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.login.SignUpScreen
+import com.github.se.eventradar.ui.messages.MessagesScreen
 import com.github.se.eventradar.ui.qrCode.QrCodeScreen
 import com.github.se.eventradar.util.toast
 
@@ -33,27 +34,20 @@ fun NavGraph(
         "${Route.EVENT_DETAILS}/{eventId}",
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
           val eventId = it.arguments!!.getString("eventId")!!
-
-          val viewModel: EventDetailsViewModel = hiltViewModel()
-          viewModel.saveEventId(eventId)
-
+          val viewModel = EventDetailsViewModel.create(eventId = eventId)
           EventDetails(viewModel = viewModel, navigationActions = navActions)
         }
     composable(
         "${Route.EVENT_DETAILS_TICKETS}/{eventId}",
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
           val eventId = it.arguments!!.getString("eventId")!!
-          val viewModel: EventDetailsViewModel = hiltViewModel()
-          viewModel.saveEventId(eventId)
+          val viewModel = EventDetailsViewModel.create(eventId = eventId)
           SelectTicket(viewModel = viewModel, navigationActions = navActions)
         }
 
     // TODO replace the Toast message with the corresponding screen function of the route
+    composable(Route.MESSAGE) { MessagesScreen(navigationActions = navActions) }
     composable(Route.SCANNER) { QrCodeScreen(navigationActions = navActions) }
-    composable(Route.MESSAGE) {
-      HomeScreen(navigationActions = navActions)
-      context.toast("Message main screen needs to be implemented")
-    }
     composable(Route.PROFILE) {
       HomeScreen(navigationActions = navActions)
       context.toast("Profile screen needs to be implemented")

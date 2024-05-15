@@ -26,6 +26,8 @@
     <string name="homeScreen_events">Home</string>
     <string name="user_profile">Profile</string>
     <string name="hosting">Hosting</string>
+    <string name="my_qr_code">My Qr Code</string>
+    <string name="no_message_found_string">You have no messages, go to \"Contacts\" to start messaging a friend!</string>
 </resources>
 
 

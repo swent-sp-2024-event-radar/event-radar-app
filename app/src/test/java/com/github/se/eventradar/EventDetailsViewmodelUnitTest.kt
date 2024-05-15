@@ -56,16 +56,22 @@ class EventDetailsViewmodelUnitTest {
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1),
           mainOrganiser = "1",
-          organiserSet = mutableSetOf("Test Organiser"),
-          attendeeSet = mutableSetOf("Test Attendee"),
+          organiserList = mutableListOf("Test Organiser"),
+          attendeeList = mutableListOf("Test Attendee"),
           category = EventCategory.COMMUNITY,
           fireBaseID = "1")
+
+  private val factory =
+      object : EventDetailsViewModel.Factory {
+        override fun create(eventId: String): EventDetailsViewModel {
+          return EventDetailsViewModel(eventRepository, eventId)
+        }
+      }
 
   @Before
   fun setUp() {
     eventRepository = MockEventRepository()
-    viewModel = EventDetailsViewModel(eventRepository)
-    viewModel.saveEventId(mockEvent.fireBaseID)
+    viewModel = factory.create(eventId = mockEvent.fireBaseID)
   }
 
   @Test
