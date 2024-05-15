@@ -191,7 +191,7 @@ fun ChatAppBar(
     onBackArrowClick: (() -> Unit)? = null,
 ) {
   SmallTopAppBar(
-      modifier = Modifier.height(64.dp).fillMaxWidth().padding(top = 16.dp).testTag("chatAppBar"),
+      modifier = Modifier.height(72.dp).fillMaxWidth().padding(top = 8.dp).testTag("chatAppBar"),
       title = {
         Row(modifier = Modifier.testTag("chatAppBarTitle")) {
           ProfilePic(
@@ -211,7 +211,7 @@ fun ChatAppBar(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier =
-                        Modifier.padding(top = 12.dp, start = 8.dp).testTag("chatAppBarTitleText"))
+                        Modifier.padding(top = 16.dp, start = 8.dp).testTag("chatAppBarTitleText"))
               }
         }
       },
@@ -222,7 +222,7 @@ fun ChatAppBar(
               Icon(
                   imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                   contentDescription = "Localized description",
-                  modifier = Modifier.testTag("chatAppBarBackArrowIcon"))
+                  modifier = Modifier.padding(top = 8.dp).testTag("chatAppBarBackArrowIcon"))
             }
       })
 }
