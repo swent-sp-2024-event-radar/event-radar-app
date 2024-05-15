@@ -300,12 +300,14 @@ fun ChatScreenPreview() {
                               id = "2"),
                           Message(
                               sender = "1",
-                              content = "Test Message 3",
+                              content =
+                                  "Test Message 3 Test Message 3 Test Message 3 Test Message 3 Test Message 3 Test Message 3",
                               dateTimeSent = LocalDateTime.now(),
                               id = "3"),
                           Message(
                               sender = "2",
-                              content = "Test Message 4",
+                              content =
+                                  "Test Message 4 Test Message 4 Test Message 4 Test Message 4 Test Message 4 Test Message 4",
                               dateTimeSent = LocalDateTime.now(),
                               id = "4"),
                           Message(
@@ -322,12 +324,7 @@ fun ChatScreenPreview() {
                               sender = "1",
                               content = "Test Message 7",
                               dateTimeSent = LocalDateTime.now(),
-                              id = "7"),
-                          Message(
-                              sender = "1",
-                              content = "Test Message 8",
-                              dateTimeSent = LocalDateTime.now(),
-                              id = "8"))),
+                              id = "7"))),
           opponentProfile =
               User(
                   userId = "2",

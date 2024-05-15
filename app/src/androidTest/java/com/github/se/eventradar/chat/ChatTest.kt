@@ -6,7 +6,6 @@ import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.message.Message
 import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.model.repository.message.IMessageRepository
-import com.github.se.eventradar.model.repository.message.MockMessageRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.screens.ChatScreen
 import com.github.se.eventradar.ui.chat.ChatScreen
@@ -20,6 +19,7 @@ import io.github.kakaocup.compose.node.element.ComposeScreen.Companion.onCompose
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
+import io.mockk.mockk
 import io.mockk.unmockkAll
 import java.time.LocalDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,15 +45,17 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
   private lateinit var mockUserRepository: MockUserRepository
   private lateinit var mockChatViewModel: ChatViewModel
 
-  private val sampleMessagesBetweenUsers =
+  private val sampleChatUiState =
       MutableStateFlow(
           ChatUiState(
+              userId = "1",
+              opponentId = "2",
               messageHistory =
                   MessageHistory(
-                      user1 = "Default sender",
-                      user2 = "Default recipient",
-                      latestMessageId = "DefaultId",
-                      user1ReadMostRecentMessage = false,
+                      user1 = "1",
+                      user2 = "2",
+                      latestMessageId = "8",
+                      user1ReadMostRecentMessage = true,
                       user2ReadMostRecentMessage = false,
                       messages =
                           mutableListOf(
@@ -77,11 +79,7 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
                                   content = "Test Message 4",
                                   dateTimeSent = LocalDateTime.now(),
                                   id = "4"),
-                              Message(
-                                  sender = "1",
-                                  content = "Test Message 5",
-                                  dateTimeSent = LocalDateTime.now(),
-                                  id = "5"))),
+                          )),
               opponentProfile =
                   User(
                       userId = "2",
@@ -97,17 +95,14 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
                       profilePicUrl =
                           "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2Fplaceholder.png?alt=media&token=ba4b4efb-ff45-4617-b60f-3789e8fb75b6",
                       qrCodeUrl = "",
-                      username = "Test2")))
+                      username = "Test2"),
+              messageInserted = true,
+              messagesLoadedFirstTime = true))
 
   @Before
   fun testSetup() = runTest {
-    mockMessageRepository = MockMessageRepository()
-    mockUserRepository = MockUserRepository()
-
-    mockUserRepository.updateCurrentUserId("1")
-
-    mockChatViewModel = ChatViewModel(mockMessageRepository, mockUserRepository)
-    every { mockChatViewModel.uiState } returns sampleMessagesBetweenUsers
+    // Properly mock the ChatViewModel
+    mockChatViewModel = mockk(relaxed = true) { every { uiState } returns sampleChatUiState }
 
     composeTestRule.setContent { ChatScreen(mockChatViewModel, mockNavActions) }
   }
@@ -133,6 +128,10 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
         chatScreenMessagesList { assertIsDisplayed() }
         chatInput { assertIsDisplayed() }
         bottomNav { assertIsDisplayed() }
+
+        // Check chat bubbles
+        receivedChatBubble { assertIsDisplayed() }
+        sentChatBubble { assertIsDisplayed() }
       }
     }
   }

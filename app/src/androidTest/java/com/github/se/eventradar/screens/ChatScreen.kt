@@ -20,25 +20,19 @@ public class ChatScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
       chatScreenColumn.child { hasTestTag("chatScreenMessagesList") }
 
   private val receivedColumn: KNode = chatScreenMessagesList.child { hasTestTag("receivedColumn") }
-  private val receivedChatBubble: KNode = receivedColumn.child { hasTestTag("receivedChatBubble") }
-  private val receivedChatBubbleText: KNode =
+  val receivedChatBubble: KNode = receivedColumn.child { hasTestTag("receivedChatBubble") }
+  val receivedChatBubbleText: KNode =
       receivedChatBubble.child { hasTestTag("receivedChatBubbleText") }
-  val receivedMessageText: KNode =
-      receivedChatBubbleText.child { hasTestTag("receivedMessageText") }
 
   private val sentColumn: KNode = chatScreenMessagesList.child { hasTestTag("sentColumn") }
-  private val sentChatBubble: KNode = sentColumn.child { hasTestTag("sentChatBubble") }
-  private val sentChatBubbleText: KNode = sentChatBubble.child { hasTestTag("sentChatBubbleText") }
-  private val sentChatBubbleTimeRow: KNode =
-      sentChatBubbleText.child { hasTestTag("sentChatBubbleTimeRow") }
-  val messageTimeRowText: KNode = sentChatBubbleTimeRow.child { hasTestTag("messageTimeRowText") }
+  val sentChatBubble: KNode = sentColumn.child { hasTestTag("sentChatBubble") }
+  val sentChatBubbleText: KNode = sentChatBubble.child { hasTestTag("sentChatBubbleText") }
 
   val chatInput: KNode = chatScreenColumn.child { hasTestTag("chatInput") }
-  val chatInputField: KNode = chatInput.child { hasTestTag("chatInputField") }
-  val chatInputPlaceholder: KNode = chatInput.child { hasTestTag("chatInputPlaceholder") }
-  private val chatInputTrailingIcon: KNode = chatInput.child { hasTestTag("chatInputTrailingIcon") }
+  private val chatInputField: KNode = chatInput.child { hasTestTag("chatInputField") }
+  val chatInputPlaceholder: KNode = chatInputField.child { hasTestTag("chatInputPlaceholder") }
   private val chatInputSendButton: KNode =
-      chatInputTrailingIcon.child { hasTestTag("chatInputSendButton") }
+      chatInputField.child { hasTestTag("chatInputSendButton") }
   val chatInputSendButtonIcon: KNode =
       chatInputSendButton.child { hasTestTag("chatInputSendButtonIcon") }
 }
