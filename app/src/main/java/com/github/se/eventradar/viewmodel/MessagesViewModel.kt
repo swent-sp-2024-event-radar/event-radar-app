@@ -40,15 +40,10 @@ constructor(
           it.copy(userId = null)
         }
       }
-
-      if (_uiState.value.userId != null) {
-        getMessages()
-        getFriends()
-      }
     }
   }
 
-  private fun getMessages() {
+  fun getMessages() {
     viewModelScope.launch {
       when (val response = messagesRepository.getMessages(_uiState.value.userId!!)) {
         is Resource.Success -> {
@@ -90,12 +85,58 @@ constructor(
     }
   }
 
-  fun onSearchQueryChange(query: String, state: MutableStateFlow<MessagesUiState> = _uiState) {
+  fun onSearchQueryChanged(query: String, state: MutableStateFlow<MessagesUiState> = _uiState) {
     state.value = state.value.copy(searchQuery = query)
+    filterMessagesLists()
   }
 
-  fun onSelectedTabIndexChange(index: Int, state: MutableStateFlow<MessagesUiState> = _uiState) {
-    state.value = state.value.copy(selectedTabIndex = index)
+  fun onSearchActiveChanged(
+      isActive: Boolean,
+      state: MutableStateFlow<MessagesUiState> = _uiState
+  ) {
+    state.value = state.value.copy(isSearchActive = isActive)
+  }
+
+  fun onSelectedTabIndexChanged(index: Int, state: MutableStateFlow<MessagesUiState> = _uiState) {
+    state.value =
+        state.value.copy(
+            selectedTabIndex = index,
+            isSearchActive = false,
+            searchQuery = "",
+        )
+
+    if (index == 0) {
+      getMessages()
+    } else {
+      getFriends()
+    }
+  }
+
+  fun filterMessagesLists() {
+    val query = _uiState.value.searchQuery
+    val friendsList = _uiState.value.friendsList
+    val messageList = _uiState.value.messageList
+
+    if (_uiState.value.selectedTabIndex == 0) {
+      val filteredMessageList =
+          messageList.filter { messageHistory ->
+            val friend =
+                getUser(
+                    if (_uiState.value.userId != messageHistory.user1) messageHistory.user1
+                    else messageHistory.user2)
+            friend.firstName.contains(query, ignoreCase = true) or
+                friend.lastName.contains(query, ignoreCase = true)
+          }
+
+      _uiState.value = _uiState.value.copy(filteredMessageList = filteredMessageList)
+    } else {
+      val filteredFriendsList =
+          friendsList.filter { user ->
+            user.firstName.contains(query, ignoreCase = true) or
+                user.lastName.contains(query, ignoreCase = true)
+          }
+      _uiState.value = _uiState.value.copy(filteredFriendsList = filteredFriendsList)
+    }
   }
 
   fun getUser(userId: String): User {
@@ -122,7 +163,10 @@ constructor(
 data class MessagesUiState(
     val userId: String? = null,
     val messageList: List<MessageHistory> = emptyList(),
+    val filteredMessageList: List<MessageHistory> = messageList,
     val searchQuery: String = "",
+    val isSearchActive: Boolean = false,
     val selectedTabIndex: Int = 0,
     val friendsList: List<User> = emptyList(),
+    val filteredFriendsList: List<User> = friendsList,
 )
