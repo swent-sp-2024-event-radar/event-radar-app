@@ -35,8 +35,9 @@ data class Event(
       ticket =
           EventTicket(
               name = map["ticket_name"] as String,
-              price = (map["ticket_price"] as Long).toDouble(),
-              capacity = (map["ticket_quantity"] as Long).toInt()),
+              price = map["ticket_price"] as Double,
+              capacity = (map["ticket_capacity"] as Long).toInt(),
+              purchases = (map["ticket_purchases"] as Long).toInt()),
       mainOrganiser = map["main_organiser"] as String,
       organiserList = convertToMutableListOfStrings(map["organisers_list"]),
       attendeeList = convertToMutableListOfStrings(map["attendees_list"]),
@@ -55,7 +56,8 @@ data class Event(
     map["description"] = description
     map["ticket_name"] = ticket.name
     map["ticket_price"] = ticket.price
-    map["ticket_quantity"] = ticket.capacity
+    map["ticket_capacity"] = ticket.capacity
+    map["ticket_purchases"] = ticket.purchases
     map["main_organiser"] = mainOrganiser
     map["organisers_list"] = organiserList.toList()
     map["attendees_list"] = attendeeList.toList()
