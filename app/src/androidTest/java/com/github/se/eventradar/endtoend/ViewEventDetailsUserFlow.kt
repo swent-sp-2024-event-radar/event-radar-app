@@ -113,6 +113,7 @@ class ViewEventDetailsUserFlow : TestCase() {
         for (i in 0..2) {
           val card = onNode { hasText("Test $i") }
           if (i == 1) {
+            card.performScrollTo()
             card.assertIsDisplayed()
           } else {
             card.assertDoesNotExist()
