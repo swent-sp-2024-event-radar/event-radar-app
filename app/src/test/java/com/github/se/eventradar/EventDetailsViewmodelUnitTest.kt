@@ -50,7 +50,7 @@ class EventDetailsViewmodelUnitTest {
 
   val test: MutableSet<String> = mutableSetOf("Test Organiser", "Organiser2")
 
-  private val ticketCapacity = 1
+  private var ticketPurchases = 1
 
   private val mockEvent =
       Event(
@@ -60,7 +60,7 @@ class EventDetailsViewmodelUnitTest {
           end = LocalDateTime.now(),
           location = Location(0.0, 0.0, "Test Location"),
           description = "Test Description",
-          ticket = EventTicket("Test Ticket", 0.0, ticketCapacity, 0),
+          ticket = EventTicket("Test Ticket", 0.0, 10, ticketPurchases),
           mainOrganiser = "1",
           organiserList = mutableListOf("Test Organiser"),
           attendeeList = mutableListOf("Test Attendee"),
@@ -239,8 +239,28 @@ class EventDetailsViewmodelUnitTest {
 
     assert(mockUser.eventsAttendeeList.contains(mockEvent.fireBaseID))
     assert(mockEvent.attendeeList.contains(mockUser.userId))
-    assert(mockEvent.ticket.capacity == ticketCapacity - 1)
+    assert(mockEvent.ticket.purchases == ticketPurchases + 1)
     assert(viewModel.registrationSuccessful.value)
+
+    unmockkAll()
+  }
+
+  @Test
+  fun testJoinAnEventWithNoMoreTickets() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    // no more tickets, purchases = capacity
+    mockEvent.ticket = EventTicket(mockEvent.ticket.name, mockEvent.ticket.price, mockEvent.ticket.capacity, mockEvent.ticket.capacity)
+
+    eventRepository.addEvent(mockEvent)
+    userRepository.addUser(mockUser)
+
+    viewModel.getEventData()
+
+    viewModel.buyTicketForEvent()
+
+    assert(viewModel.errorOccurred.value)
 
     unmockkAll()
   }

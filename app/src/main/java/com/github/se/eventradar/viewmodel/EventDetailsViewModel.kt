@@ -120,8 +120,8 @@ constructor(
       event.attendeeList.add(currentUserId)
 
       // decrement ticket capacity
-      if (event.ticket.capacity > 0) {
-        event.ticket = EventTicket(event.ticket.name, event.ticket.price, event.ticket.capacity - 1)
+      if (event.ticket.purchases < event.ticket.capacity) {
+        event.ticket = EventTicket(event.ticket.name, event.ticket.price, event.ticket.capacity, event.ticket.purchases + 1)
 
         viewModelScope.launch {
           // update event data to the database
