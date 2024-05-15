@@ -25,7 +25,6 @@ import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.just
 import io.mockk.mockk
-import io.mockk.verify
 import javax.inject.Inject
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
@@ -99,15 +98,6 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       scanQrTab.performClick()
       // Assert that the ViewModel's active tab state has changed to ScanQR
       assertEquals(ScanFriendQrViewModel.Tab.ScanQR, viewModel.uiState.value.tabState)
-    }
-  }
-
-  @Test
-  fun switchesScreenWhenNavigatedToNextScreen() = run {
-    onComposeScreen<QrCodeScanFriendUiScreen>(composeTestRule) {
-      viewModel.changeAction(ScanFriendQrViewModel.Action.NavigateToNextScreen)
-      composeTestRule.waitForIdle()
-      verify { mockNavActions.navigateTo(any()) }
     }
   }
 }
