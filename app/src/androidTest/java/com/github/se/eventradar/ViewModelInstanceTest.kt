@@ -11,27 +11,21 @@ import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.model.event.EventTicket
-import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.ui.MainActivity
-import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import java.time.LocalDateTime
-import javax.inject.Inject
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 @HiltAndroidTest
-@OptIn(ExperimentalCoroutinesApi::class)
-class UITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
+class ViewModelInstanceTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
 
   @get:Rule var hiltRule = HiltAndroidRule(this)
 
@@ -39,9 +33,6 @@ class UITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport(
 
   // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
   @get:Rule val mockkRule = MockKRule(this)
-
-  // Relaxed mocks methods have a default implementation returning values
-  @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
   private val mockEvent =
       Event(
@@ -58,10 +49,7 @@ class UITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport(
           category = EventCategory.COMMUNITY,
           fireBaseID = "1")
 
-  @Inject lateinit var eventRepository: IEventRepository
-
   private lateinit var viewModel: EventDetailsViewModel
-
 
   @Before
   fun testSetup() {

@@ -13,12 +13,14 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
+import javax.inject.Singleton
 
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class], replaces = [FirebaseEventDatabaseModule::class])
 class MockEventDatabaseModule {
   @Provides
+  @Singleton
   fun provideMockEventRepository(): IEventRepository {
     return MockEventRepository()
   }
@@ -29,6 +31,7 @@ class MockEventDatabaseModule {
     components = [SingletonComponent::class], replaces = [FirebaseUserDatabaseModule::class])
 class MockUserDatabaseModule {
   @Provides
+  @Singleton
   fun provideMockUserRepository(): IUserRepository {
     return MockUserRepository()
   }
@@ -39,6 +42,7 @@ class MockUserDatabaseModule {
     components = [SingletonComponent::class], replaces = [FirebaseMessageDatabaseModule::class])
 class MockMessageDatabaseModule {
   @Provides
+  @Singleton
   fun provideMockMessageRepository(): IMessageRepository {
     return MockMessageRepository()
   }
