@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -43,10 +44,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -58,6 +61,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
@@ -146,29 +151,19 @@ fun EventCard(event: Event, onCardClick: (String) -> Unit) {
 @Composable
 fun SearchBarAndFilter(
     onSearchQueryChanged: (String) -> Unit,
-    uiState: EventsOverviewUiState,
+    searchQuery: String,
     onSearchActiveChanged: (Boolean) -> Unit,
     onFilterDialogOpen: () -> Unit,
     modifier: Modifier = Modifier,
+    placeholderStringResource: Int = R.string.search_placeholder,
 ) {
   Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
-    // Search bar
-    TextField(
-        value = uiState.searchQuery,
-        onValueChange = {
-          onSearchQueryChanged(it)
-          if (it == "") onSearchActiveChanged(false) else onSearchActiveChanged(true)
-        },
-        modifier = Modifier.weight(1f).testTag("searchBar"),
-        maxLines = 1,
-        shape = RoundedCornerShape(32.dp),
-        colors =
-            TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent),
-        placeholder = { Text(stringResource(id = R.string.home_search_placeholder)) },
-        trailingIcon = { Icon(Icons.Default.Search, contentDescription = null) })
+    SearchBarField(
+        searchQuery,
+        onSearchQueryChanged,
+        onSearchActiveChanged,
+        Modifier.weight(1f),
+        placeholderStringResource)
 
     // Filter button
     Button(
@@ -177,6 +172,33 @@ fun SearchBarAndFilter(
           Text(stringResource(id = R.string.filter))
         }
   }
+}
+
+@Composable
+fun SearchBarField(
+    searchQuery: String,
+    onSearchQueryChanged: (String) -> Unit,
+    onSearchActiveChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    placeholderStringResource: Int = R.string.search_placeholder,
+) {
+  // Search bar
+  TextField(
+      value = searchQuery,
+      onValueChange = {
+        onSearchQueryChanged(it)
+        if (it == "") onSearchActiveChanged(false) else onSearchActiveChanged(true)
+      },
+      modifier = modifier.fillMaxWidth().testTag("searchBar"),
+      maxLines = 1,
+      shape = RoundedCornerShape(32.dp),
+      colors =
+          TextFieldDefaults.colors(
+              focusedIndicatorColor = Color.Transparent,
+              unfocusedIndicatorColor = Color.Transparent,
+              disabledIndicatorColor = Color.Transparent),
+      placeholder = { Text(stringResource(id = placeholderStringResource)) },
+      trailingIcon = { Icon(Icons.Default.Search, contentDescription = null) })
 }
 
 @Composable
@@ -332,4 +354,19 @@ fun GoBackButton(modifier: Modifier, goBack: () -> Unit) {
         tint = MaterialTheme.colorScheme.onSurface,
         modifier = Modifier.width(24.dp).height(24.dp).align(Alignment.CenterVertically))
   }
+}
+
+@Composable
+fun ProfilePic(
+    profilePicUrl: String,
+    firstName: String,
+    lastName: String,
+    modifier: Modifier = Modifier
+) {
+  AsyncImage(
+      model = ImageRequest.Builder(LocalContext.current).data(profilePicUrl).build(),
+      placeholder = painterResource(id = R.drawable.placeholder),
+      contentDescription = "Profile picture of $firstName $lastName",
+      contentScale = ContentScale.Crop,
+      modifier = modifier.padding(start = 16.dp).clip(CircleShape).size(56.dp))
 }
