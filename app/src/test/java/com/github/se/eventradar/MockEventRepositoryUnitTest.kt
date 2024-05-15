@@ -8,6 +8,9 @@ import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import java.time.LocalDateTime
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -192,5 +195,67 @@ class MockEventRepositoryUnitTest {
     assert(
         (events as Resource.Failure).throwable.message ==
             "Event with id 100 is missing") // Shows id of first missing event
+  }
+
+  @Test
+  fun testObserveEventsReflectsChanges() = runTest {
+    val initialEvent = mockEvent.copy(fireBaseID = "1", eventName = "Initial Event")
+    eventRepository.addEvent(initialEvent)
+
+    val results = mutableListOf<Resource<List<Event>>>()
+    val job = launch { eventRepository.observeEvents().toList(results) }
+
+    val newEvent = mockEvent.copy(fireBaseID = "2", eventName = "New Event")
+    eventRepository.addEvent(newEvent)
+
+    (eventRepository as MockEventRepository).eventsFlow.value =
+        Resource.Success((eventRepository as MockEventRepository).mockEvents.toList())
+
+    delay(100)
+    // Check if state holds both events
+    assert(results[0] is Resource.Success && (results[0] as Resource.Success).data.size == 2)
+    assert((results[0] as Resource.Success).data.containsAll(listOf(initialEvent, newEvent)))
+
+    job.cancel()
+  }
+
+  @Test
+  fun testObserveUpcomingEventsReflectsChanges() = runTest {
+    val userId = "user1"
+    val initialEvent =
+        mockEvent.copy(
+            fireBaseID = "1",
+            eventName = "Initial Event User Attends",
+            attendeeList = mutableListOf(userId))
+    eventRepository.addEvent(initialEvent)
+
+    // Start observing upcoming events
+    val results = mutableListOf<Resource<List<Event>>>()
+    val job = launch {
+      (eventRepository as MockEventRepository).observeUpcomingEvents(userId).toList(results)
+    }
+
+    // Add a new upcoming event that the specified user will attend
+    val newEvent =
+        mockEvent.copy(
+            fireBaseID = "2",
+            eventName = "New Upcoming Event",
+            attendeeList = mutableListOf(userId))
+    // Add a new event that the specified user will not attend
+    val newEvent2 =
+        mockEvent.copy(fireBaseID = "2", eventName = "New Event", attendeeList = mutableListOf())
+    eventRepository.addEvent(newEvent)
+    eventRepository.addEvent(newEvent2)
+
+    (eventRepository as MockEventRepository).eventsFlow.value =
+        Resource.Success(listOf(initialEvent, newEvent, newEvent2))
+
+    delay(100)
+
+    // Assert that both the initial and new event are emitted
+    assert(results[0] is Resource.Success && (results[0] as Resource.Success).data.size == 2)
+    assert((results[0] as Resource.Success).data.containsAll(listOf(initialEvent, newEvent)))
+
+    job.cancel()
   }
 }
