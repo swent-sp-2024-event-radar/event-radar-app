@@ -84,7 +84,7 @@ fun EventDetails(
             FloatingActionButton(
                 onClick = {
                     navigationActions.navController.navigate(
-                        "${Route.EVENT_DETAILS_TICKETS}/${viewModel.getEventId()}"
+                        "${Route.EVENT_DETAILS_TICKETS}/${viewModel.eventId}"
                     )
                 },
                 modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("ticketButton"),
