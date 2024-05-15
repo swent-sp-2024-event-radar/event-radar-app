@@ -395,7 +395,7 @@ class EventsOverviewViewModelTest {
             mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
             mockEvent.copy(
                 eventName = "Event 2",
-                ticket = EventTicket("Test Ticket", 5.0, 1),
+                ticket = EventTicket("Test Ticket", 5.0, 1, 0),
                 fireBaseID = "2"),
             mockEvent.copy(eventName = "Event 3", fireBaseID = "3"))
 
