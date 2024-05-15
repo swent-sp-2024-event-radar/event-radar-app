@@ -10,7 +10,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
-import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.event.MockEventRepository
@@ -24,14 +23,12 @@ import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.theme.MyApplicationTheme
 import com.github.se.eventradar.viewmodel.EventDetailsViewModel
-import com.github.se.eventradar.viewmodel.EventsOverviewUiState
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import java.time.LocalDateTime
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -65,13 +62,6 @@ class ViewEventDetailsUserFlow : TestCase() {
           mutableListOf(),
           EventCategory.SOCIAL,
           "1")
-
-  private val uiState =
-      MutableStateFlow(
-          EventsOverviewUiState(
-              eventList =
-                  EventList(List(3) { mockEvent.copy(eventName = "Test $it", fireBaseID = "$it") }),
-          ))
 
   @Before
   fun setUp() = runBlocking {
@@ -109,6 +99,7 @@ class ViewEventDetailsUserFlow : TestCase() {
 
         for (i in 0..2) {
           val card = onNode { hasText("Test $i") }
+          card.performScrollTo()
           card.assertIsDisplayed()
         }
       }
