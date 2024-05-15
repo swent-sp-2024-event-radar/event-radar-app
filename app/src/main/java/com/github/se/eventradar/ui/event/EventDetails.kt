@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.FloatingActionButton
@@ -22,9 +23,14 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.github.se.eventradar.R
+import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventDetailsViewModel
+import com.github.se.eventradar.model.event.EventTicket
+import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.EventCategory
 import com.github.se.eventradar.ui.component.EventComponentsStyle
@@ -36,6 +42,7 @@ import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
+import java.time.LocalDateTime
 
 // Temporary sizes. Needs to be responsive...
 private val widthPadding = 34.dp
@@ -47,125 +54,157 @@ fun EventDetails(
     navigationActions: NavigationActions
 ) {
 
-  // TODO to be moved in viewModel init
-  LaunchedEffect(Unit) { // Using `Unit` as a key to run only once
-    viewModel.getEventData()
-  }
+    // TODO to be moved in viewModel init
+    LaunchedEffect(Unit) { // Using `Unit` as a key to run only once
+        viewModel.getEventData()
+    }
 
-  val eventUiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val eventUiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
-  val componentStyle =
-      EventComponentsStyle(
-          MaterialTheme.colorScheme.onSurface,
-          MaterialTheme.colorScheme.onSurfaceVariant,
-          MaterialTheme.colorScheme.onSurface,
-      )
+    val componentStyle =
+        EventComponentsStyle(
+            MaterialTheme.colorScheme.onSurface,
+            MaterialTheme.colorScheme.onSurfaceVariant,
+            MaterialTheme.colorScheme.onSurface,
+        )
 
-  Scaffold(
-      modifier = Modifier.testTag("eventDetailsScreen"),
-      topBar = {},
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelected = { tab -> navigationActions.navigateTo(tab) },
-            tabList = TOP_LEVEL_DESTINATIONS,
-            selectedItem = TOP_LEVEL_DESTINATIONS[2],
-            modifier = Modifier.testTag("bottomNavMenu"))
-      },
-      floatingActionButton = {
-        // view ticket button
-        FloatingActionButton(
-            onClick = {
-              navigationActions.navController.navigate(
-                  "${Route.EVENT_DETAILS_TICKETS}/${viewModel.getEventId()}")
-            },
-            modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("ticketButton"),
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-        ) {
-          Icon(
-              painter = painterResource(id = R.drawable.ticket),
-              contentDescription = "view tickets button",
-              modifier = Modifier.size(32.dp),
-              tint = MaterialTheme.colorScheme.onPrimaryContainer,
-          )
-        }
-      }) { innerPadding ->
+    Scaffold(
+        modifier = Modifier.testTag("eventDetailsScreen"),
+        topBar = {},
+        bottomBar = {
+            BottomNavigationMenu(
+                onTabSelected = { tab -> navigationActions.navigateTo(tab) },
+                tabList = TOP_LEVEL_DESTINATIONS,
+                selectedItem = TOP_LEVEL_DESTINATIONS[2],
+                modifier = Modifier.testTag("bottomNavMenu")
+            )
+        },
+        floatingActionButton = {
+            // view ticket button
+            FloatingActionButton(
+                onClick = {
+                    navigationActions.navController.navigate(
+                        "${Route.EVENT_DETAILS_TICKETS}/${viewModel.getEventId()}"
+                    )
+                },
+                modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("ticketButton"),
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ticket),
+                    contentDescription = "view tickets button",
+                    modifier = Modifier.size(32.dp),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            }
+        }) { innerPadding ->
         ConstraintLayout(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-          val (image, backButton, title, description, distance, category, dateAndTime) =
-              createRefs()
+            val (image, backButton, title, description, distance, category, dateAndTime) =
+                createRefs()
 
-          // TODO uncomment when image are implemented
-          // val imagePainter: Painter = rememberImagePainter(eventUiState.eventPhoto)
-          val imagePainter: Painter = rememberImagePainter(R.drawable.placeholderbig)
-          Image(
-              painter = imagePainter,
-              contentDescription = "Event banner image",
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .height(imageHeight)
-                      .constrainAs(image) {
+            // TODO uncomment when image are implemented
+            // val imagePainter: Painter = rememberImagePainter(eventUiState.eventPhoto)
+            val imagePainter: Painter = rememberImagePainter(R.drawable.placeholderbig)
+            Image(
+                painter = imagePainter,
+                contentDescription = "Event banner image",
+                modifier =
+                Modifier.fillMaxWidth()
+                    .height(imageHeight)
+                    .constrainAs(image) {
                         top.linkTo(parent.top, margin = 0.dp)
                         start.linkTo(parent.start, margin = 0.dp)
-                      }
-                      .testTag("eventImage"),
-              contentScale = ContentScale.FillWidth)
+                    }
+                    .testTag("eventImage"),
+                contentScale = ContentScale.FillWidth)
 
-          // Go back button
-          GoBackButton(
-              modifier =
-                  Modifier.wrapContentSize().constrainAs(backButton) {
+            // Go back button
+            GoBackButton(
+                modifier =
+                Modifier.wrapContentSize().constrainAs(backButton) {
                     top.linkTo(image.bottom, margin = 8.dp)
                     start.linkTo(image.start, margin = 4.dp)
-                  }) {
+                }) {
                 navigationActions.goBack()
-              }
+            }
 
-          EventTitle(
-              modifier =
-                  Modifier.constrainAs(title) {
+            EventTitle(
+                modifier =
+                Modifier.constrainAs(title) {
                     top.linkTo(image.bottom, margin = 32.dp)
                     start.linkTo(image.start)
                     end.linkTo(image.end)
-                  },
-              eventUiState = eventUiState,
-              style = componentStyle)
+                },
+                eventUiState = eventUiState,
+                style = componentStyle
+            )
 
-          EventDescription(
-              modifier =
-                  Modifier
-                      // .padding(start = widthPadding, end = widthPadding)
-                      .constrainAs(description) {
+            EventDescription(
+                modifier =
+                Modifier
+                    // .padding(start = widthPadding, end = widthPadding)
+                    .constrainAs(description) {
                         top.linkTo(title.bottom, margin = 32.dp)
                         start.linkTo(parent.start, margin = widthPadding)
-                      },
-              eventUiState,
-              componentStyle)
+                    },
+                eventUiState,
+                componentStyle
+            )
 
-          EventDistance(
-              modifier =
-                  Modifier.constrainAs(distance) {
+            EventDistance(
+                modifier =
+                Modifier.constrainAs(distance) {
                     top.linkTo(description.bottom, margin = 32.dp)
                     start.linkTo(parent.start, margin = widthPadding)
-                  },
-              eventUiState,
-              componentStyle)
+                },
+                eventUiState,
+                componentStyle
+            )
 
-          EventDateTime(
-              modifier =
-                  Modifier.constrainAs(dateAndTime) {
+            EventDateTime(
+                modifier =
+                Modifier.constrainAs(dateAndTime) {
                     top.linkTo(distance.bottom, margin = 32.dp)
                     start.linkTo(parent.start, margin = widthPadding)
-                  },
-              eventUiState,
-              componentStyle)
+                },
+                eventUiState,
+                componentStyle
+            )
 
-          EventCategory(
-              modifier =
-                  Modifier.constrainAs(category) {
+            EventCategory(
+                modifier =
+                Modifier.constrainAs(category) {
                     top.linkTo(dateAndTime.bottom, margin = 32.dp)
                     start.linkTo(parent.start, margin = widthPadding)
-                  },
-              eventUiState,
-              componentStyle)
+                },
+                eventUiState,
+                componentStyle
+            )
         }
-      }
+    }
 }
+
+ @Preview(showBackground = true)
+ @Composable
+ fun PreviewEventDetails() {
+  val eventRepository = MockEventRepository()
+     eventRepository.addEvent(
+         Event(
+         eventName = "Event 1",
+         eventPhoto = "",
+         start = LocalDateTime.now(),
+         end = LocalDateTime.now(),
+         location = Location(0.0, 0.0, "Test Location"),
+         description = "Test Description",
+         ticket = EventTicket("Test Ticket", 0.0, 1),
+         mainOrganiser = "1",
+         organiserList = mutableListOf("Test Organiser"),
+         attendeeList = mutableListOf("user1", "user2", "user3"),
+         category = com.github.se.eventradar.model.event.EventCategory.COMMUNITY,
+         fireBaseID = "1"
+     )
+     )
+  val viewModel = EventDetailsViewModel(eventRepository)
+  EventDetails(viewModel, NavigationActions(rememberNavController()))
+ }
+

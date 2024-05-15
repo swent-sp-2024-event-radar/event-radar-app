@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -122,7 +123,10 @@ fun QrCodeTicketUi(
         }
 
         if (qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent) {
+
             Toast.makeText(context, "My Host Event Details not available yet", Toast.LENGTH_SHORT).show()
+
+
         } else {
             when (qrScanUiState.value.action) {
                 ScanTicketQrViewModel.Action.ScanTicket -> {
