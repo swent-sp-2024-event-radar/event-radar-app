@@ -62,7 +62,7 @@ class EventsOverviewViewModelTest {
           end = LocalDateTime.now(),
           location = Location(0.0, 0.0, "Test Location"),
           description = "Test Description",
-          ticket = EventTicket("Test Ticket", 0.0, 1),
+          ticket = EventTicket("Test Ticket", 0.0, 1, 0),
           mainOrganiser = "1",
           organiserList = mutableListOf("Test Organiser"),
           attendeeList = mutableListOf("Test Attendee"),
@@ -397,7 +397,7 @@ class EventsOverviewViewModelTest {
             mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
             mockEvent.copy(
                 eventName = "Event 2",
-                ticket = EventTicket("Test Ticket", 5.0, 1),
+                ticket = EventTicket("Test Ticket", 5.0, 1, 0),
                 fireBaseID = "2"),
             mockEvent.copy(eventName = "Event 3", fireBaseID = "3"))
 

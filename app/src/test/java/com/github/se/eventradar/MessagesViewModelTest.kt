@@ -9,8 +9,10 @@ import com.github.se.eventradar.model.repository.message.MockMessageRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.viewmodel.MessagesUiState
 import com.github.se.eventradar.viewmodel.MessagesViewModel
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import io.mockk.verify
@@ -87,20 +89,22 @@ class MessagesViewModelTest {
 
     viewModel = MessagesViewModel(messagesRepository, userRepository)
 
+    viewModel.getMessages()
+
     assert(viewModel.uiState.value.messageList.size == 1)
     assert(viewModel.uiState.value.messageList[0].messages[0] == expectedMessage)
   }
 
   @Test
   fun testOnSearchQueryChange() = runTest {
-    viewModel.onSearchQueryChange("Hello", mockUiState)
+    viewModel.onSearchQueryChanged("Hello", mockUiState)
 
     assert(mockUiState.value.searchQuery == "Hello")
   }
 
   @Test
   fun testOnSelectedTabIndexChange() = runTest {
-    viewModel.onSelectedTabIndexChange(1, mockUiState)
+    viewModel.onSelectedTabIndexChanged(1, mockUiState)
 
     assert(mockUiState.value.selectedTabIndex == 1)
   }
@@ -144,6 +148,30 @@ class MessagesViewModelTest {
       return@runTest
     }
     fail("Expected exception to be thrown")
+  }
+
+  @Test
+  fun testGetMessagesWithEmptyMessages() = runTest {
+    viewModel.getMessages()
+
+    assert(viewModel.uiState.value.messageList.isEmpty())
+  }
+
+  @Test
+  fun testGetMessagesFailure() = runTest {
+    mockkStatic(Log::class)
+    messagesRepository = mockk()
+
+    val exception = "Test exception"
+
+    coEvery { messagesRepository.getMessages(any()) } returns Resource.Failure(Exception(exception))
+    every { Log.d(any(), any()) } returns 0
+
+    viewModel = MessagesViewModel(messagesRepository, userRepository)
+
+    viewModel.getMessages()
+
+    verify { Log.d("MessagesViewModel", "Error getting messages: $exception") }
   }
 
   @Test
@@ -297,14 +325,14 @@ class MessagesViewModelTest {
 
   @Test
   fun testOnSearchQueryChanged() = runTest {
-    viewModel.onSearchQueryChange("Hello", mockUiState)
+    viewModel.onSearchQueryChanged("Hello", mockUiState)
 
     assert(mockUiState.value.searchQuery == "Hello")
   }
 
   @Test
   fun testOnSelectedTabIndexChanged() = runTest {
-    viewModel.onSelectedTabIndexChange(1, mockUiState)
+    viewModel.onSelectedTabIndexChanged(1, mockUiState)
 
     assert(mockUiState.value.selectedTabIndex == 1)
   }
