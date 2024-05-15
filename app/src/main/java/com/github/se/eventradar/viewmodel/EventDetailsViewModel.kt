@@ -112,9 +112,13 @@ constructor(
       if (!isUserAttendingEvent()) {
         // TODO needs to be atomic to avoid concurrency issues
         registrationUpdateEvent()
-        registrationUpdateUser()
+        if (!errorOccurred.value) {
+          registrationUpdateUser()
+        }
       }
-      registrationSuccessful.value = true
+      if (!errorOccurred.value) {
+        registrationSuccessful.value = true
+      }
     }
   }
 
@@ -132,21 +136,26 @@ constructor(
     event.attendeeList.add(currentUserId)
 
     // decrement ticket capacity
-    event.ticket = EventTicket(event.ticket.name, event.ticket.price, event.ticket.capacity - 1)
+    if (event.ticket.capacity > 0) {
+      event.ticket = EventTicket(event.ticket.name, event.ticket.price, event.ticket.capacity - 1)
 
-    viewModelScope.launch {
-      // update event data to the database
-      when (val updateResponse = eventRepository.updateEvent(event)) {
-        is Resource.Success -> {
-          Log.i("EventDetailsViewModel", "Successfully updated event")
-        }
-        is Resource.Failure -> {
-          errorOccurred.value = true
-          Log.d(
-              "EventDetailsViewModel",
-              "Error updating event data: ${updateResponse.throwable.message}")
+      viewModelScope.launch {
+        // update event data to the database
+        when (val updateResponse = eventRepository.updateEvent(event)) {
+          is Resource.Success -> {
+            Log.i("EventDetailsViewModel", "Successfully updated event")
+          }
+          is Resource.Failure -> {
+            errorOccurred.value = true
+            Log.d(
+                "EventDetailsViewModel",
+                "Error updating event data: ${updateResponse.throwable.message}")
+          }
         }
       }
+    } else {
+      errorOccurred.value = true
+      Log.d("EventDetailsViewModel", "Error updating event data: No more tickets !}")
     }
   }
 
