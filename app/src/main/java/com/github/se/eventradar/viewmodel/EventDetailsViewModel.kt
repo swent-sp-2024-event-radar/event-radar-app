@@ -26,54 +26,54 @@ constructor(
     @Assisted val eventId: String,
 ) : ViewModel() {
 
-  init {
-    getEventData()
-  }
+    init {
+        getEventData()
+    }
 
-  private val _uiState = MutableStateFlow(EventUiState())
-  val uiState: StateFlow<EventUiState> = _uiState
+    private val _uiState = MutableStateFlow(EventUiState())
+    val uiState: StateFlow<EventUiState> = _uiState
 
-  fun getEventData() {
-    viewModelScope.launch {
-      when (val response = eventRepository.getEvent(eventId)) {
-        is Resource.Success -> {
-          _uiState.update {
-            it.copy(
-                eventName = response.data!!.eventName,
-                eventPhoto = response.data.eventPhoto,
-                start = response.data.start,
-                end = response.data.end,
-                location = response.data.location,
-                description = response.data.description,
-                ticket = response.data.ticket,
-                mainOrganiser = response.data.mainOrganiser,
-                category = response.data.category,
-            )
-          }
+    fun getEventData() {
+        viewModelScope.launch {
+            when (val response = eventRepository.getEvent(eventId)) {
+                is Resource.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            eventName = response.data!!.eventName,
+                            eventPhoto = response.data.eventPhoto,
+                            start = response.data.start,
+                            end = response.data.end,
+                            location = response.data.location,
+                            description = response.data.description,
+                            ticket = response.data.ticket,
+                            mainOrganiser = response.data.mainOrganiser,
+                            category = response.data.category,
+                        )
+                    }
+                }
+                is Resource.Failure ->
+                    Log.d("EventDetailsViewModel", "Error getting event: ${response.throwable.message}")
+            }
         }
-        is Resource.Failure ->
-            Log.d("EventDetailsViewModel", "Error getting event: ${response.throwable.message}")
-      }
     }
-  }
 
-  fun isTicketFree(): Boolean {
-    return !(_uiState.value.ticket.price > 0.0)
-  }
-
-  // Code for creating an instance of EventDetailsViewModel
-  @AssistedFactory
-  interface Factory {
-    fun create(eventId: String): EventDetailsViewModel
-  }
-
-  companion object {
-    @Composable
-    fun create(eventId: String): EventDetailsViewModel {
-      return hiltViewModel<EventDetailsViewModel, Factory>(
-          creationCallback = { factory -> factory.create(eventId = eventId) })
+    fun isTicketFree(): Boolean {
+        return !(_uiState.value.ticket.price > 0.0)
     }
-  }
+
+    // Code for creating an instance of EventDetailsViewModel
+    @AssistedFactory
+    interface Factory {
+        fun create(eventId: String): EventDetailsViewModel
+    }
+
+    companion object {
+        @Composable
+        fun create(eventId: String): EventDetailsViewModel {
+            return hiltViewModel<EventDetailsViewModel, Factory>(
+                creationCallback = { factory -> factory.create(eventId = eventId) })
+        }
+    }
 }
 
 data class EventUiState(
