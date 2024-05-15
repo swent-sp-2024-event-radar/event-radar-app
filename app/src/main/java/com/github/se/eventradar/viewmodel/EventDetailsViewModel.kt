@@ -71,7 +71,7 @@ data class EventUiState(
     val end: LocalDateTime = LocalDateTime.MAX,
     val location: Location = Location(0.0, 0.0, ""),
     val description: String = "",
-    val ticket: EventTicket = EventTicket("", 0.0, 0),
+    val ticket: EventTicket = EventTicket("", 0.0, 0, 0),
     val mainOrganiser: String = "",
     val category: EventCategory = EventCategory.MUSIC,
 )

@@ -54,7 +54,7 @@ class EventDetailsViewmodelUnitTest {
           end = LocalDateTime.now(),
           location = Location(0.0, 0.0, "Test Location"),
           description = "Test Description",
-          ticket = EventTicket("Test Ticket", 0.0, 1),
+          ticket = EventTicket("Test Ticket", 0.0, 1, 0),
           mainOrganiser = "1",
           organiserList = mutableListOf("Test Organiser"),
           attendeeList = mutableListOf("Test Attendee"),
@@ -113,7 +113,7 @@ class EventDetailsViewmodelUnitTest {
   @Test
   fun testTicketIsFree() = runTest {
     eventRepository.addEvent(mockEvent)
-    mockEvent.ticket = EventTicket("Paid", 0.0, 10)
+    mockEvent.ticket = EventTicket("Paid", 0.0, 10, 0)
     viewModel.getEventData()
     assert(viewModel.isTicketFree())
   }
@@ -122,7 +122,7 @@ class EventDetailsViewmodelUnitTest {
   fun testTicketIsNotFree() = runTest {
     eventRepository.addEvent(mockEvent)
     val randomPrice: Double = kotlin.random.Random.nextDouble(0.001, Double.MAX_VALUE)
-    mockEvent.ticket = EventTicket("Paid", randomPrice, 10)
+    mockEvent.ticket = EventTicket("Paid", randomPrice, 10, 0)
     viewModel.getEventData()
     assert(!viewModel.isTicketFree())
   }
