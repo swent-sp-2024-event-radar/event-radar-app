@@ -89,6 +89,8 @@ class MessagesViewModelTest {
 
     viewModel = MessagesViewModel(messagesRepository, userRepository)
 
+    viewModel.getMessages()
+
     assert(viewModel.uiState.value.messageList.size == 1)
     assert(viewModel.uiState.value.messageList[0].messages[0] == expectedMessage)
   }
