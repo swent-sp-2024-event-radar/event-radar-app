@@ -4,6 +4,13 @@ import com.github.se.eventradar.model.ConversionUtils.convertToMutableListOfStri
 import com.github.se.eventradar.model.Location
 import java.time.LocalDateTime
 
+private fun convertToDouble(value: Any?): Double {
+    return when (value) {
+        is Double -> value
+        is Long -> value.toDouble()
+        else -> 0.0 // Default value
+    }
+}
 data class Event(
     var eventName: String,
     var eventPhoto: String,
@@ -35,7 +42,7 @@ data class Event(
       ticket =
           EventTicket(
               name = map["ticket_name"] as String,
-              price = map["ticket_price"] as Double,
+              price = convertToDouble(map["ticket_price"]),
               capacity = (map["ticket_capacity"] as Long).toInt(),
               purchases = (map["ticket_purchases"] as Long).toInt()),
       mainOrganiser = map["main_organiser"] as String,
