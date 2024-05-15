@@ -22,13 +22,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -139,14 +135,6 @@ fun TextMessageInsideBubble(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,
-    fontSize: TextUnit = TextUnit.Unspecified,
-    letterSpacing: TextUnit = TextUnit.Unspecified,
-    textDecoration: TextDecoration? = null,
-    textAlign: TextAlign? = null,
-    lineHeight: TextUnit = TextUnit.Unspecified,
-    overflow: TextOverflow = TextOverflow.Clip,
-    softWrap: Boolean = true,
-    maxLines: Int = Int.MAX_VALUE,
     style: TextStyle = LocalTextStyle.current,
     onMeasure: ((ChatRowData) -> Unit)? = null
 ) {
@@ -157,15 +145,7 @@ fun TextMessageInsideBubble(
             modifier = modifier.wrapContentSize(),
             text = text,
             color = color,
-            fontSize = fontSize,
-            letterSpacing = letterSpacing,
-            textDecoration = textDecoration,
-            textAlign = textAlign,
-            lineHeight = lineHeight,
-            overflow = overflow,
-            softWrap = softWrap,
             style = style,
-            maxLines = maxLines,
             onTextLayout = { textLayoutResult: TextLayoutResult ->
               // maxWidth of text constraint returns parent maxWidth - horizontal padding
               chatRowData.lineCount = textLayoutResult.lineCount

@@ -6,6 +6,7 @@ import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.message.Message
 import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.model.repository.message.IMessageRepository
+import com.github.se.eventradar.model.repository.message.MockMessageRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.screens.ChatScreen
 import com.github.se.eventradar.ui.chat.ChatScreen
@@ -91,6 +92,13 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
 
   @Before
   fun testSetup() = runTest {
+    mockMessageRepository = MockMessageRepository()
+    mockUserRepository = MockUserRepository()
+
+    mockUserRepository.updateCurrentUserId("1")
+
+    mockChatViewModel = ChatViewModel(mockMessageRepository, mockUserRepository)
+
     // Properly mock the ChatViewModel
     mockChatViewModel = mockk(relaxed = true) { every { uiState } returns sampleChatUiState }
 
