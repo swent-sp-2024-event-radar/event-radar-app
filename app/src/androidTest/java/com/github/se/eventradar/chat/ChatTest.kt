@@ -116,7 +116,7 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
   @After fun testTeardown() = runTest { unmockkAll() }
 
   @Test
-  fun screenDisplaysAllElementsCorrectly() = run {
+  fun screenDisplaysAllElementsCorrectlyEmptyMessages() = run {
     onComposeScreen<ChatScreen>(composeTestRule) {
       step("Check if all elements are displayed") {
         chatAppBar { assertIsDisplayed() }
@@ -126,22 +126,14 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
           assertIsDisplayed()
           assertHasClickAction()
         }
-
         chatAppBarBackArrow {
           assertIsDisplayed()
           assertHasClickAction()
         }
 
-        bottomNav { assertIsDisplayed() }
         chatScreenMessagesList { assertIsDisplayed() }
-
-        //        receivedMessageText { assertIsDisplayed() }
-        //        messageTimeRowText { assertIsDisplayed() }
-        //
-        //        chatInputField {  }
-        //        chatInputPlaceholder { assertIsDisplayed() }
-        //        chatInputSendButtonIcon {  }
-        //        chatInputCameraButtonIcon { assertIsDisplayed() }
+        chatInput { assertIsDisplayed() }
+        bottomNav { assertIsDisplayed() }
       }
     }
   }

@@ -180,7 +180,6 @@ fun ChatScreenUi(
                     }
                   }
               ChatInput(
-                  modifier = Modifier.testTag("chatInput"),
                   uiState = uiState,
                   onMessageChange = { viewModel.onMessageBarInputChange(it) },
                   //            onMessageSend = { viewModel.onMessageSend() }
@@ -238,60 +237,62 @@ fun ChatAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatInput(
-    modifier: Modifier = Modifier,
     uiState: ChatUiState,
     onMessageChange: (String) -> Unit,
     //    onMessageSend: () -> Unit
 ) {
   val context = LocalContext.current
-  Row(modifier = modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.Bottom) {
-    TextField(
-        modifier =
-            Modifier.clip(MaterialTheme.shapes.extraLarge)
-                .weight(1f)
-                .focusable(true)
-                .testTag("chatInputField"),
-        value = uiState.messageBarInput,
-        onValueChange = { onMessageChange(it) },
-        colors =
-            TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent),
-        placeholder = {
-          Text(
-              text = stringResource(R.string.message_bar_placeholder),
-              modifier = Modifier.testTag("chatInputPlaceholder"))
-        },
-        trailingIcon = {
-          Row(
-              modifier = Modifier.padding(end = 8.dp).testTag("chatInputTrailingIcon"),
-              horizontalArrangement = Arrangement.End,
-              verticalAlignment = Alignment.CenterVertically) {
-                IconButton(
-                    // TO DO: Implement onMessageSend
-                    //                        onClick = { onMessageSend() }
-                    onClick = { null },
-                    modifier = Modifier.testTag("chatInputSendButton")) {
-                      Icon(
-                          imageVector = Icons.AutoMirrored.Filled.Send,
-                          contentDescription = "Send",
-                          modifier = Modifier.testTag("chatInputSendButtonIcon"))
-                    }
-                IconButton(
-                    onClick = {
-                      Toast.makeText(context, "Insert image not available yet", Toast.LENGTH_SHORT)
-                          .show()
-                    },
-                    modifier = Modifier.testTag("chatInputCameraButton")) {
-                      Icon(
-                          painter = painterResource(id = R.drawable.photo_camera),
-                          modifier = Modifier.size(24.dp).testTag("chatInputCameraButtonIcon"),
-                          contentDescription = "Camera")
-                    }
-              }
-        })
-  }
+  Row(
+      modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("chatInput"),
+      verticalAlignment = Alignment.Bottom) {
+        TextField(
+            modifier =
+                Modifier.clip(MaterialTheme.shapes.extraLarge)
+                    .weight(1f)
+                    .focusable(true)
+                    .testTag("chatInputField"),
+            value = uiState.messageBarInput,
+            onValueChange = { onMessageChange(it) },
+            colors =
+                TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent),
+            placeholder = {
+              Text(
+                  text = stringResource(R.string.message_bar_placeholder),
+                  modifier = Modifier.testTag("chatInputPlaceholder"))
+            },
+            trailingIcon = {
+              Row(
+                  modifier = Modifier.padding(end = 8.dp).testTag("chatInputTrailingIcon"),
+                  horizontalArrangement = Arrangement.End,
+                  verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(
+                        // TO DO: Implement onMessageSend
+                        //                        onClick = { onMessageSend() }
+                        onClick = { null },
+                        modifier = Modifier.testTag("chatInputSendButton")) {
+                          Icon(
+                              imageVector = Icons.AutoMirrored.Filled.Send,
+                              contentDescription = "Send",
+                              modifier = Modifier.testTag("chatInputSendButtonIcon"))
+                        }
+                    IconButton(
+                        onClick = {
+                          Toast.makeText(
+                                  context, "Insert image not available yet", Toast.LENGTH_SHORT)
+                              .show()
+                        },
+                        modifier = Modifier.testTag("chatInputCameraButton")) {
+                          Icon(
+                              painter = painterResource(id = R.drawable.photo_camera),
+                              modifier = Modifier.size(24.dp).testTag("chatInputCameraButtonIcon"),
+                              contentDescription = "Camera")
+                        }
+                  }
+            })
+      }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
