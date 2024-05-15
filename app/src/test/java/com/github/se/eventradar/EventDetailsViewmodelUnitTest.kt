@@ -251,7 +251,12 @@ class EventDetailsViewmodelUnitTest {
     every { Log.d(any(), any()) } returns 0
 
     // no more tickets, purchases = capacity
-    mockEvent.ticket = EventTicket(mockEvent.ticket.name, mockEvent.ticket.price, mockEvent.ticket.capacity, mockEvent.ticket.capacity)
+    mockEvent.ticket =
+        EventTicket(
+            mockEvent.ticket.name,
+            mockEvent.ticket.price,
+            mockEvent.ticket.capacity,
+            mockEvent.ticket.capacity)
 
     eventRepository.addEvent(mockEvent)
     userRepository.addUser(mockUser)
