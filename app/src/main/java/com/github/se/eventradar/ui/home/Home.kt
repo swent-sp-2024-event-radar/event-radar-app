@@ -145,7 +145,7 @@ fun HomeScreen(
 
     SearchBarAndFilter(
         onSearchQueryChanged = { viewModel.onSearchQueryChanged(it) },
-        uiState = uiState,
+        searchQuery = uiState.searchQuery,
         onSearchActiveChanged = { viewModel.onSearchActiveChanged(it) },
         onFilterDialogOpen = { viewModel.onFilterDialogOpen() },
         modifier =
@@ -155,7 +155,8 @@ fun HomeScreen(
                   top.linkTo(tabs.bottom, margin = 8.dp)
                   start.linkTo(parent.start)
                   end.linkTo(parent.end)
-                })
+                },
+        placeholderStringResource = R.string.home_search_placeholder)
 
     if (uiState.tab == Tab.BROWSE) {
       when {

@@ -184,27 +184,5 @@ fun EventDetails(
     }
 }
 
- @Preview(showBackground = true)
- @Composable
- fun PreviewEventDetails() {
-  val eventRepository = MockEventRepository()
-     eventRepository.addEvent(
-         Event(
-         eventName = "Event 1",
-         eventPhoto = "",
-         start = LocalDateTime.now(),
-         end = LocalDateTime.now(),
-         location = Location(0.0, 0.0, "Test Location"),
-         description = "Test Description",
-         ticket = EventTicket("Test Ticket", 0.0, 1),
-         mainOrganiser = "1",
-         organiserList = mutableListOf("Test Organiser"),
-         attendeeList = mutableListOf("user1", "user2", "user3"),
-         category = com.github.se.eventradar.model.event.EventCategory.COMMUNITY,
-         fireBaseID = "1"
-     )
-     )
-  val viewModel = EventDetailsViewModel(eventRepository)
-  EventDetails(viewModel, NavigationActions(rememberNavController()))
- }
+
 
