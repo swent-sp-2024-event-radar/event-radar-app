@@ -1,4 +1,4 @@
-package com.github.se.eventradar.event
+package com.github.se.eventradar
 
 import android.view.ViewGroup
 import androidx.compose.runtime.Composable
@@ -62,12 +62,6 @@ class UITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport(
 
   private lateinit var viewModel: EventDetailsViewModel
 
-  private val factory =
-      object : EventDetailsViewModel.Factory {
-        override fun create(eventId: String): EventDetailsViewModel {
-          return EventDetailsViewModel(eventRepository, eventId)
-        }
-      }
 
   @Before
   fun testSetup() {
