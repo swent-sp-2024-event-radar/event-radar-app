@@ -5,6 +5,7 @@ import com.github.se.eventradar.model.event.Event
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 
 class MockEventRepository : IEventRepository {
   private val mockEvents = mutableListOf<Event>()
@@ -63,4 +64,16 @@ class MockEventRepository : IEventRepository {
 
   override fun observeEvents(): Flow<Resource<List<Event>>> =
       eventsFlow.asStateFlow() // to be tested
+
+  override fun observeUpcomingEvents(userId: String): Flow<Resource<List<Event>>> {
+    return eventsFlow.asStateFlow().map { resource ->
+      when (resource) {
+        is Resource.Success -> {
+          val upcomingEvents = resource.data.filter { it.attendeeList.contains(userId) }
+          Resource.Success(upcomingEvents)
+        }
+        is Resource.Failure -> resource
+      }
+    }
+  }
 }

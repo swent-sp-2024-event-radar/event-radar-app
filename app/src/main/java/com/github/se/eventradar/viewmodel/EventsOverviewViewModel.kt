@@ -35,6 +35,7 @@ constructor(
   init {
     checkUserLoginStatus()
     observeEvents()
+    observeUpcomingEvents()
   }
 
   fun onSearchQueryChanged(
@@ -215,9 +216,47 @@ constructor(
                       EventList(
                           resource.data, resource.data, _uiState.value.eventList.selectedEvent))
             }
+            filterEvents()
           }
           is Resource.Failure ->
               Log.d("EventsOverviewViewModel", "Failed to fetch events: ${resource.throwable}")
+        }
+      }
+    }
+  }
+
+  private fun observeUpcomingEvents() {
+    viewModelScope.launch {
+      userRepository.getCurrentUserId().let { userIdResource ->
+        when (userIdResource) {
+          is Resource.Success -> {
+            val uid = userIdResource.data
+            eventRepository.observeUpcomingEvents(uid).collect { resource ->
+              when (resource) {
+                is Resource.Success -> {
+                  _uiState.update { currentState ->
+                    currentState.copy(
+                        upcomingEventList =
+                            EventList(
+                                allEvents = resource.data,
+                                filteredEvents = resource.data,
+                                selectedEvent = currentState.upcomingEventList.selectedEvent))
+                  }
+                  filterEvents()
+                }
+                is Resource.Failure -> {
+                  Log.d(
+                      "EventsOverviewViewModel",
+                      "Failed to fetch upcoming events: ${resource.throwable.message}")
+                }
+              }
+            }
+          }
+          is Resource.Failure -> {
+            Log.d(
+                "EventsOverviewViewModel",
+                "Error fetching user ID: ${userIdResource.throwable.message}")
+          }
         }
       }
     }

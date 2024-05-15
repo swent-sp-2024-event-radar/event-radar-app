@@ -97,4 +97,26 @@ class FirebaseEventRepository : IEventRepository {
         }
     awaitClose { listener.remove() }
   }
+
+  override fun observeUpcomingEvents(userId: String): Flow<Resource<List<Event>>> = callbackFlow {
+    val query = eventRef.whereArrayContains("attendees_list", userId)
+
+    val listener =
+        query.addSnapshotListener { snapshot, error ->
+          if (error != null) {
+            trySend(
+                Resource.Failure(
+                    Exception("Error listening to upcoming event updates: ${error.message}")))
+            return@addSnapshotListener
+          }
+
+          val upcomingEvents =
+              snapshot?.documents?.mapNotNull { it.data?.let { data -> Event(data, it.id) } }
+                  ?: listOf()
+
+          trySend(Resource.Success(upcomingEvents))
+        }
+
+    awaitClose { listener.remove() }
+  }
 }
