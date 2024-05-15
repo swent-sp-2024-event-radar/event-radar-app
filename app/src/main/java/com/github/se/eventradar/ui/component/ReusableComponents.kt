@@ -155,9 +155,15 @@ fun SearchBarAndFilter(
     onSearchActiveChanged: (Boolean) -> Unit,
     onFilterDialogOpen: () -> Unit,
     modifier: Modifier = Modifier,
+    placeholderStringResource: Int = R.string.search_placeholder,
 ) {
   Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
-    SearchBarField(searchQuery, onSearchQueryChanged, onSearchActiveChanged, Modifier.weight(1f))
+    SearchBarField(
+        searchQuery,
+        onSearchQueryChanged,
+        onSearchActiveChanged,
+        Modifier.weight(1f),
+        placeholderStringResource)
 
     // Filter button
     Button(
@@ -174,6 +180,7 @@ fun SearchBarField(
     onSearchQueryChanged: (String) -> Unit,
     onSearchActiveChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    placeholderStringResource: Int = R.string.search_placeholder,
 ) {
   // Search bar
   TextField(
@@ -190,7 +197,7 @@ fun SearchBarField(
               focusedIndicatorColor = Color.Transparent,
               unfocusedIndicatorColor = Color.Transparent,
               disabledIndicatorColor = Color.Transparent),
-      placeholder = { Text(stringResource(id = R.string.home_search_placeholder)) },
+      placeholder = { Text(stringResource(id = placeholderStringResource)) },
       trailingIcon = { Icon(Icons.Default.Search, contentDescription = null) })
 }
 
