@@ -2,6 +2,7 @@ package com.github.se.eventradar
 
 import android.util.Log
 import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
@@ -19,6 +20,7 @@ import io.mockk.verify
 import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -439,5 +441,104 @@ class EventsOverviewViewModelTest {
     (userRepository as MockUserRepository).updateCurrentUserId(null)
     viewModel.checkUserLoginStatus()
     assert(!viewModel.uiState.value.userLoggedIn)
+  }
+
+  @Test
+  fun testObserveEvents() = runTest {
+    val testEvent1 = mockEvent.copy(fireBaseID = "1", eventName = "Test Event 1")
+    val testEvent2 = mockEvent.copy(fireBaseID = "2", eventName = "Test Event 2")
+    eventRepository.addEvent(testEvent1)
+
+    // Setup your ViewModel with mocked dependencies
+    // automatically triggers the 'init' block, which calls 'observeEvents()'
+    val viewModel = EventsOverviewViewModel(eventRepository, userRepository)
+
+    eventRepository.addEvent(testEvent1)
+    delay(100)
+    eventRepository.addEvent(testEvent2)
+
+    (eventRepository as MockEventRepository)
+        .eventsFlow
+        .emit(Resource.Success(listOf(testEvent1, testEvent2)))
+
+    assert(viewModel.uiState.value.eventList.allEvents.containsAll(listOf(testEvent1, testEvent2)))
+  }
+
+  @Test
+  fun testObserveEventsFailure() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    val exception = Exception("Network error")
+
+    (eventRepository as MockEventRepository).eventsFlow.emit(Resource.Failure(exception))
+
+    EventsOverviewViewModel(eventRepository, userRepository)
+
+    delay(500)
+
+    val expectedLogMessage = "Failed to fetch events: $exception"
+
+    verify { Log.d("EventsOverviewViewModel", expectedLogMessage) }
+
+    unmockkAll()
+  }
+
+  @Test
+  fun testObserveUpcomingEventsSuccess() = runTest {
+    val testEvent1 = mockEvent.copy(fireBaseID = "1", attendeeList = mutableListOf("user1"))
+    val testEvent2 = mockEvent.copy(fireBaseID = "2", attendeeList = mutableListOf("user1"))
+    val testEvent3 = mockEvent.copy(fireBaseID = "3", attendeeList = mutableListOf("user2"))
+    eventRepository.addEvent(testEvent1)
+    eventRepository.addEvent(testEvent2)
+    eventRepository.addEvent(testEvent3)
+
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+
+    val viewModel = EventsOverviewViewModel(eventRepository, userRepository)
+
+    (eventRepository as MockEventRepository)
+        .eventsFlow
+        .emit(Resource.Success(listOf(testEvent1, testEvent2, testEvent3)))
+
+    assert(viewModel.uiState.value.upcomingEventList.allEvents.size == 2)
+    assert(
+        viewModel.uiState.value.upcomingEventList.allEvents.containsAll(
+            listOf(testEvent1, testEvent2)))
+  }
+
+  @Test
+  fun testObserveUpcomingEventsUserIdFetchFailure() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    val exception = Exception("No user currently signed in")
+    (userRepository as MockUserRepository).updateCurrentUserId(null)
+
+    EventsOverviewViewModel(eventRepository, userRepository)
+
+    delay(500)
+
+    verify { Log.d("EventsOverviewViewModel", "Error fetching user ID: ${exception.message}") }
+    unmockkAll()
+  }
+
+  @Test
+  fun testObserveUpcomingEventsFetchFailure() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    val exception = Exception("Network error")
+    (eventRepository as MockEventRepository).eventsFlow.emit(Resource.Failure(exception))
+
+    EventsOverviewViewModel(eventRepository, userRepository)
+
+    delay(500)
+
+    verify {
+      Log.d("EventsOverviewViewModel", "Failed to fetch upcoming events: ${exception.message}")
+    }
+    unmockkAll()
   }
 }
