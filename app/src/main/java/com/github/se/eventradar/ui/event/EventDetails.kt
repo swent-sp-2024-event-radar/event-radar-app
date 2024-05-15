@@ -12,7 +12,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -20,7 +19,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberImagePainter
 import com.github.se.eventradar.R
@@ -42,15 +40,7 @@ private val widthPadding = 34.dp
 private val imageHeight = 191.dp
 
 @Composable
-fun EventDetails(
-    viewModel: EventDetailsViewModel = hiltViewModel(),
-    navigationActions: NavigationActions
-) {
-
-  // TODO to be moved in viewModel init
-  LaunchedEffect(Unit) { // Using `Unit` as a key to run only once
-    viewModel.getEventData()
-  }
+fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: NavigationActions) {
 
   val eventUiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
@@ -76,7 +66,7 @@ fun EventDetails(
         FloatingActionButton(
             onClick = {
               navigationActions.navController.navigate(
-                  "${Route.EVENT_DETAILS_TICKETS}/${viewModel.getEventId()}")
+                  "${Route.EVENT_DETAILS_TICKETS}/${viewModel.eventId}")
             },
             modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("ticketButton"),
             containerColor = MaterialTheme.colorScheme.primaryContainer,

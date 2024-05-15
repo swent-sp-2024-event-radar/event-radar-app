@@ -61,11 +61,17 @@ class EventDetailsViewmodelUnitTest {
           category = EventCategory.COMMUNITY,
           fireBaseID = "1")
 
+  private val factory =
+      object : EventDetailsViewModel.Factory {
+        override fun create(eventId: String): EventDetailsViewModel {
+          return EventDetailsViewModel(eventRepository, eventId)
+        }
+      }
+
   @Before
   fun setUp() {
     eventRepository = MockEventRepository()
-    viewModel = EventDetailsViewModel(eventRepository)
-    viewModel.saveEventId(mockEvent.fireBaseID)
+    viewModel = factory.create(eventId = mockEvent.fireBaseID)
   }
 
   @Test
