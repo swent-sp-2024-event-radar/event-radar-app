@@ -69,16 +69,6 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
                                   content = "Test Message 2",
                                   dateTimeSent = LocalDateTime.now(),
                                   id = "2"),
-                              Message(
-                                  sender = "1",
-                                  content = "Test Message 3",
-                                  dateTimeSent = LocalDateTime.now(),
-                                  id = "3"),
-                              Message(
-                                  sender = "2",
-                                  content = "Test Message 4",
-                                  dateTimeSent = LocalDateTime.now(),
-                                  id = "4"),
                           )),
               opponentProfile =
                   User(
@@ -126,12 +116,18 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
         }
 
         chatScreenMessagesList { assertIsDisplayed() }
-        chatInput { assertIsDisplayed() }
         bottomNav { assertIsDisplayed() }
+
+        chatInput { assertIsDisplayed() }
+        chatInputPlaceholder { assertIsDisplayed() }
+        chatInputSendButton { assertIsDisplayed() }
+        chatInputSendButtonIcon { assertIsDisplayed() }
 
         // Check chat bubbles
         receivedChatBubble { assertIsDisplayed() }
+        receivedChatBubbleText { assertIsDisplayed() }
         sentChatBubble { assertIsDisplayed() }
+        sentChatBubbleText { assertIsDisplayed() }
       }
     }
   }
