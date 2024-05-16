@@ -69,7 +69,6 @@ class ViewEventDetailsUserFlow : TestCase() {
       eventRepository.addEvent(mockEvent.copy(eventName = "Test $i", fireBaseID = "$i"))
     }
 
-    // Launch the Signup screen
     // Launch the Home screen
     composeTestRule.setContent {
       val navController = rememberNavController()
