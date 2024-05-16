@@ -70,6 +70,7 @@ class ViewEventDetailsUserFlow : TestCase() {
     }
 
     // Launch the Signup screen
+    // Launch the Home screen
     composeTestRule.setContent {
       val navController = rememberNavController()
       mockNavActions = NavigationActions(navController)
