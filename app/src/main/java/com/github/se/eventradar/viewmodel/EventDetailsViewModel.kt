@@ -1,4 +1,4 @@
-package com.github.se.eventradar.model.event
+package com.github.se.eventradar.viewmodel
 
 import android.util.Log
 import androidx.compose.runtime.Composable
@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.Resource
+import com.github.se.eventradar.model.event.EventCategory
+import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -25,13 +27,12 @@ constructor(
     private val eventRepository: IEventRepository,
     @Assisted val eventId: String,
 ) : ViewModel() {
+  private val _uiState = MutableStateFlow(EventUiState())
+  val uiState: StateFlow<EventUiState> = _uiState
 
   init {
     getEventData()
   }
-
-  private val _uiState = MutableStateFlow(EventUiState())
-  val uiState: StateFlow<EventUiState> = _uiState
 
   fun getEventData() {
     viewModelScope.launch {

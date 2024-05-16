@@ -4,10 +4,10 @@ import android.util.Log
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
-import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.event.MockEventRepository
+import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
