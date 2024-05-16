@@ -48,7 +48,7 @@ class EventSelectTicketUITest :
               end = LocalDateTime.MAX,
               location = Location(0.0, 0.0, "base address"),
               description = "Let's debug some code together because we all enjoy kotlin !",
-              ticket = EventTicket("Luck", 0.0, 7),
+              ticket = EventTicket("Luck", 0.0, 7, 0),
               mainOrganiser = "some.name@host.com",
               category = EventCategory.COMMUNITY,
           ))

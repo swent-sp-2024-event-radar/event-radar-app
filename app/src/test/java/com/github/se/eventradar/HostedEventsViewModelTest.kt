@@ -58,7 +58,7 @@ class HostedEventsViewModelTest {
           end = LocalDateTime.now(),
           location = Location(0.0, 0.0, "Test Location"),
           description = "Test Description",
-          ticket = EventTicket("Test Ticket", 0.0, 1),
+          ticket = EventTicket("Test Ticket", 0.0, 1, 0),
           mainOrganiser = "1",
           organiserList = mutableListOf("userid1"),
           attendeeList = mutableListOf("Test Attendee"),

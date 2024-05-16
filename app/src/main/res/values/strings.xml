@@ -26,8 +26,10 @@
     <string name="homeScreen_events">Home</string>
     <string name="user_profile">Profile</string>
     <string name="hosting">Hosting</string>
+    <string name="message_bar_placeholder">Type here…</string>
     <string name="my_qr_code">My Qr Code</string>
-    <string name="no_message_found_string">You have no messages, go to \"Contacts\" to start messaging a friend!</string>
+    <string name="no_message_found_string">You have no messages, go to the Friends tab to start messaging a friend!</string>
+    <string name="no_friends_found_string">No friends found. Scan QR codes at events to add friends!</string>
 </resources>
 
 

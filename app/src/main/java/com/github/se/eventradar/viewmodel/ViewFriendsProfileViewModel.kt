@@ -18,48 +18,55 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = ViewFriendsProfileViewModel.Factory::class)
 class ViewFriendsProfileViewModel
-@AssistedInject constructor(
+@AssistedInject
+constructor(
     private val userRepository: IUserRepository,
     @Assisted val friendUserId: String,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ViewFriendsProfileUiState())
-    val uiState: StateFlow<ViewFriendsProfileUiState> = _uiState.asStateFlow()
+  private val _uiState = MutableStateFlow(ViewFriendsProfileUiState())
+  val uiState: StateFlow<ViewFriendsProfileUiState> = _uiState.asStateFlow()
 
-    fun getFriendProfileDetails(){
-        viewModelScope.launch {
-            when (val friendUserObj = userRepository.getUser(friendUserId)) {
-                is Resource.Success -> {
-                    _uiState.value =
-                        _uiState.value.copy(
-                            friendProfilePicLink = friendUserObj.data!!.profilePicUrl,
-                            friendName = friendUserObj.data.firstName,
-                            friendUserName = friendUserObj.data.username,
-                            bio = friendUserObj.data.bio
-                        )
-                }
-                is Resource.Failure ->
-                    Log.d("ViewFriendsProfileViewModel", "Error getting friend's user details for friendUserId ${friendUserId}")
-            }
-        }
-    }
-    @AssistedFactory
-    interface Factory {
-        fun create(friendUserId: String): ViewFriendsProfileViewModel
-    }
+  init {
+    getFriendProfileDetails()
+  }
 
-    companion object {
-        @Composable
-        fun create(friendUserId: String):  ViewFriendsProfileViewModel {
-            return hiltViewModel<ViewFriendsProfileViewModel, Factory>(
-                creationCallback = { factory -> factory.create(friendUserId = friendUserId) })
+  fun getFriendProfileDetails() {
+    viewModelScope.launch {
+      when (val friendUserObj = userRepository.getUser(friendUserId)) {
+        is Resource.Success -> {
+          _uiState.value =
+              _uiState.value.copy(
+                  friendProfilePicLink = friendUserObj.data!!.profilePicUrl,
+                  friendName = friendUserObj.data.firstName,
+                  friendUserName = friendUserObj.data.username,
+                  bio = friendUserObj.data.bio)
         }
+        is Resource.Failure ->
+            Log.d(
+                "ViewFriendsProfileViewModel",
+                "Error getting friend's user details for friendUserId ${friendUserId}")
+      }
     }
+  }
+
+  @AssistedFactory
+  interface Factory {
+    fun create(friendUserId: String): ViewFriendsProfileViewModel
+  }
+
+  companion object {
+    @Composable
+    fun create(friendUserId: String): ViewFriendsProfileViewModel {
+      return hiltViewModel<ViewFriendsProfileViewModel, Factory>(
+          creationCallback = { factory -> factory.create(friendUserId = friendUserId) })
+    }
+  }
 }
 
 data class ViewFriendsProfileUiState(
-    val friendProfilePicLink : String = "",
-    val friendName : String = "",
-    val friendUserName : String = "",
-    val bio : String = "",
+    val friendProfilePicLink: String = "",
+    val friendName: String = "",
+    val friendUserName: String = "",
+    val bio: String = "",
 )

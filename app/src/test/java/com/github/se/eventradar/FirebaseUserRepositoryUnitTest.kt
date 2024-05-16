@@ -295,6 +295,7 @@ class FirebaseUserRepositoryUnitTest {
                 "friendsList" to mutableListOf<String>(),
                 "profilePicUrl" to "",
                 "qrCodeUrl" to "",
+                "bio" to "",
                 "username" to "",
             ))
     assert(
@@ -364,6 +365,7 @@ class FirebaseUserRepositoryUnitTest {
                 "friendsList" to mutableListOf<String>(),
                 "profilePicUrl" to "",
                 "qrCodeUrl" to "",
+                "bio" to "",
                 "username" to "",
             ))
     assert(
