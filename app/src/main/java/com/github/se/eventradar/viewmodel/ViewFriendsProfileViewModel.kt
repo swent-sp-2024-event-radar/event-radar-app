@@ -35,7 +35,7 @@ class ViewFriendsProfileViewModel
                             friendProfilePicLink = friendUserObj.data!!.profilePicUrl,
                             friendName = friendUserObj.data.firstName,
                             friendUserName = friendUserObj.data.username,
-                            bio = friendUserObj.data.accountStatus
+                            bio = friendUserObj.data.bio
                         )
                 }
                 is Resource.Failure ->

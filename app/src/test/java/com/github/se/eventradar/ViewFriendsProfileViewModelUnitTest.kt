@@ -39,6 +39,7 @@ class ViewFriendsProfileViewModelUnitTest {
           friendsList = mutableListOf("2"),
           profilePicUrl = "http://example.com/Profile_Pictures/1",
           qrCodeUrl = "http://example.com/QR_Codes/1",
+          bio = "",
           username = "johndoe")
     private val mockFriend =
         User(
@@ -54,6 +55,7 @@ class ViewFriendsProfileViewModelUnitTest {
             friendsList = mutableListOf("1"),
             profilePicUrl = "http://example.com/Profile_Pictures/2",
             qrCodeUrl = "http://example.com/QR_Codes/2",
+            bio = "",
             username = "jimsmith")
 
     class MainDispatcherRule(
@@ -92,7 +94,7 @@ class ViewFriendsProfileViewModelUnitTest {
         viewModel.getFriendProfileDetails()
         assert(viewModel.friendUserId == mockFriend.userId)
         assert(viewModel.uiState.value.friendProfilePicLink == mockFriend.profilePicUrl)
-        assert(viewModel.uiState.value.bio == mockFriend.accountStatus)
+        assert(viewModel.uiState.value.bio == mockFriend.bio)
         assert(viewModel.uiState.value.friendUserName == mockFriend.username)
         assert(viewModel.uiState.value.friendName == mockFriend.firstName)
     }

@@ -349,6 +349,7 @@ fun PreviewMessagesScreen() {
             mutableListOf(),
             "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FYJP3bYiaGFPqx64CT6kHOpwvXnv1?alt=media&token=5587f942-efc7-4cbf-920c-7f24a76d7ad1",
             "",
+            "",
             "johndoe")
       })
 }
@@ -375,6 +376,7 @@ fun PreviewEmptyMessagesList() {
             mutableListOf(),
             mutableListOf(),
             "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FYJP3bYiaGFPqx64CT6kHOpwvXnv1?alt=media&token=5587f942-efc7-4cbf-920c-7f24a76d7ad1",
+            "",
             "",
             "johndoe")
       },

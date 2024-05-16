@@ -57,6 +57,7 @@ class FirebaseUserRepositoryUnitTest {
           friendsList = mutableListOf(),
           profilePicUrl = "",
           qrCodeUrl = "",
+          bio = "",
           username = "",
       )
 
@@ -114,6 +115,7 @@ class FirebaseUserRepositoryUnitTest {
             "eventsHostList" to emptyList<String>(),
             "profilePicUrl" to "",
             "qrCodeUrl" to "",
+            "bio" to "",
             "username" to "",
         )
     every { userRef.document(any()).collection("private").document("private").get() } returns
@@ -168,6 +170,7 @@ class FirebaseUserRepositoryUnitTest {
             "friendsList" to mutableListOf<String>(),
             "profilePicUrl" to "",
             "qrCodeUrl" to "",
+            "bio" to "",
             "username" to "",
         )
     every { mockDocumentSnapshot.id } returns uid
@@ -224,6 +227,7 @@ class FirebaseUserRepositoryUnitTest {
                 "friendsList" to mutableListOf<String>(),
                 "profilePicUrl" to "",
                 "qrCodeUrl" to "",
+                "bio" to "",
                 "username" to "",
             ))
     assert(
@@ -262,6 +266,7 @@ class FirebaseUserRepositoryUnitTest {
             "friendsList" to mutableListOf<String>(),
             "profilePicUrl" to "",
             "qrCodeUrl" to "",
+            "bio" to "",
             "username" to "",
             "private/birthDate" to "",
             "private/email" to "",
@@ -313,6 +318,7 @@ class FirebaseUserRepositoryUnitTest {
             "friendsList" to mutableListOf<String>(),
             "profilePicUrl" to "",
             "qrCodeUrl" to "",
+            "bio" to "",
             "username" to "",
             "private/birthDate" to "",
             "private/email" to "",
