@@ -48,7 +48,7 @@ class ViewEventDetailsUserFlow : TestCase() {
   private var userRepository: IUserRepository = MockUserRepository()
   private var eventRepository: IEventRepository = MockEventRepository()
 
-  val mockEvent =
+  private val mockEvent =
       Event(
           "Test 1",
           "",
@@ -99,7 +99,6 @@ class ViewEventDetailsUserFlow : TestCase() {
 
         for (i in 0..2) {
           val card = onNode { hasText("Test $i") }
-          card.performScrollTo()
           card.assertIsDisplayed()
         }
       }
@@ -109,11 +108,12 @@ class ViewEventDetailsUserFlow : TestCase() {
         searchBarAndFilter { assertIsDisplayed() }
         searchBar.performTextInput("Test 1")
 
+        filteredEventList { assertIsDisplayed() }
+
         // Check if only one event is displayed
         for (i in 0..2) {
           val card = onNode { hasText("Test $i") }
           if (i == 1) {
-            card.performScrollTo()
             card.assertIsDisplayed()
           } else {
             card.assertDoesNotExist()
