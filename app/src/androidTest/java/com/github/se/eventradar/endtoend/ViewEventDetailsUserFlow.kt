@@ -69,6 +69,8 @@ class ViewEventDetailsUserFlow : TestCase() {
       eventRepository.addEvent(mockEvent.copy(eventName = "Test $i", fireBaseID = "$i"))
     }
 
+    (userRepository as MockUserRepository).updateCurrentUserId("mock_user")
+
     // Launch the Home screen
     composeTestRule.setContent {
       val navController = rememberNavController()
