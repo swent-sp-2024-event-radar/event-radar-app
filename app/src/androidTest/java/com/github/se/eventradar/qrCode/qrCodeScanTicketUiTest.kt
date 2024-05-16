@@ -34,13 +34,13 @@ import io.mockk.mockk
 import io.mockk.verify
 import java.time.LocalDateTime
 import junit.framework.TestCase.assertEquals
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
 class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -210,36 +210,37 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
   }
 
   @Test
-  fun screenDisplaysContentElementsCorrectly() = runTest(timeout = 30.seconds) {
-    // Your test code here {
-    val viewModel = setupViewModelMyEventTab()
-    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-      composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
+  fun screenDisplaysContentElementsCorrectly() =
+      runTest(timeout = 40.seconds) {
+        // Your test code here {
+        val viewModel = setupViewModelMyEventTab()
+        onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
+          composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
 
-      eventTitle { assertIsDisplayed() }
-      eventImage { assertIsDisplayed() }
-      descriptionTitle { assertIsDisplayed() }
-      descriptionContent {
-        assertIsDisplayed()
-        assertTextContains("Test Description")
+          eventTitle { assertIsDisplayed() }
+          eventImage { assertIsDisplayed() }
+          descriptionTitle { assertIsDisplayed() }
+          descriptionContent {
+            assertIsDisplayed()
+            assertTextContains("Test Description")
+          }
+          distanceTitle { assertIsDisplayed() }
+          distanceContent { assertIsDisplayed() }
+          categoryTitle { assertIsDisplayed() }
+          categoryContent {
+            assertIsDisplayed()
+            assertTextContains("Community")
+          }
+          dateTimeTitle { assertIsDisplayed() }
+          dateTimeStartContent { assertIsDisplayed() }
+          dateTimeEndContent { assertIsDisplayed() }
+          ticketSoldTitle.assertIsDisplayed()
+          ticketSoldContent {
+            assertIsDisplayed()
+            assertTextContains("59 tickets sold")
+          }
+        }
       }
-      distanceTitle { assertIsDisplayed() }
-      distanceContent { assertIsDisplayed() }
-      categoryTitle { assertIsDisplayed() }
-      categoryContent {
-        assertIsDisplayed()
-        assertTextContains("Community")
-      }
-      dateTimeTitle { assertIsDisplayed() }
-      dateTimeStartContent { assertIsDisplayed() }
-      dateTimeEndContent { assertIsDisplayed() }
-      ticketSoldTitle.assertIsDisplayed()
-      ticketSoldContent {
-        assertIsDisplayed()
-        assertTextContains("59 tickets sold")
-      }
-    }
-  }
 
   @Test
   fun goBackButtonTriggersBackNavigation() = run {

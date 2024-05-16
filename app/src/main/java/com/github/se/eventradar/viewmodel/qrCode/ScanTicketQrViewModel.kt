@@ -25,10 +25,10 @@ import kotlinx.coroutines.launch
 class ScanTicketQrViewModel
 @AssistedInject // Dependency injection
 constructor(
-  private val userRepository: IUserRepository,
-  private val eventRepository: IEventRepository,
-  val qrCodeAnalyser: QrCodeAnalyser,
-  @Assisted private val myEventID: String
+    private val userRepository: IUserRepository,
+    private val eventRepository: IEventRepository,
+    val qrCodeAnalyser: QrCodeAnalyser,
+    @Assisted private val myEventID: String
 ) : ViewModel() {
 
   @AssistedFactory
@@ -40,7 +40,7 @@ constructor(
     @Composable
     fun create(eventId: String): ScanTicketQrViewModel {
       return hiltViewModel<ScanTicketQrViewModel, Factory>(
-        creationCallback = { factory -> factory.create(eventId = eventId) })
+          creationCallback = { factory -> factory.create(eventId = eventId) })
     }
   }
 
@@ -115,13 +115,13 @@ constructor(
       do {
         // Check if both updates were successful
         updateResult =
-          if (userUpdateResult is Resource.Success && eventUpdateResult is Resource.Success) {
-            changeAction(Action.ApproveEntry)
-            Resource.Success(Unit)
-          } else {
-            changeAction(Action.FirebaseUpdateError)
-            Resource.Failure(Exception("Failed to update user and event"))
-          }
+            if (userUpdateResult is Resource.Success && eventUpdateResult is Resource.Success) {
+              changeAction(Action.ApproveEntry)
+              Resource.Success(Unit)
+            } else {
+              changeAction(Action.FirebaseUpdateError)
+              Resource.Failure(Exception("Failed to update user and event"))
+            }
       } while ((updateResult !is Resource.Success) && (maxNumberOfRetries-- > 0))
     } else {
       println("one does not contain the other")
@@ -154,29 +154,29 @@ constructor(
         is Resource.Success -> {
           _uiState.update {
             it.copy(
-              eventUiState =
-              EventUiState(
-                eventName = response.data!!.eventName,
-                eventPhoto = response.data.eventPhoto,
-                start = response.data.start,
-                end = response.data.end,
-                location = response.data.location,
-                description = response.data.description,
-                ticket = response.data.ticket,
-                mainOrganiser = response.data.mainOrganiser,
-                category = response.data.category))
+                eventUiState =
+                    EventUiState(
+                        eventName = response.data!!.eventName,
+                        eventPhoto = response.data.eventPhoto,
+                        start = response.data.start,
+                        end = response.data.end,
+                        location = response.data.location,
+                        description = response.data.description,
+                        ticket = response.data.ticket,
+                        mainOrganiser = response.data.mainOrganiser,
+                        category = response.data.category))
           }
         }
         is Resource.Failure ->
-          Log.d("EventDetailsViewModel", "Error getting event: ${response.throwable.message}")
+            Log.d("EventDetailsViewModel", "Error getting event: ${response.throwable.message}")
       }
     }
   }
 
   data class QrCodeScanTicketState(
-    val decodedResult: String = "",
-    val action: Action = Action.ViewMyEvent,
-    val tabState: Tab = Tab.MyEvent,
-    val eventUiState: EventUiState = EventUiState()
+      val decodedResult: String = "",
+      val action: Action = Action.ViewMyEvent,
+      val tabState: Tab = Tab.MyEvent,
+      val eventUiState: EventUiState = EventUiState()
   )
 }
