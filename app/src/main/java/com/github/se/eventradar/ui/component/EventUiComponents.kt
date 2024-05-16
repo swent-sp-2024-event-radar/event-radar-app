@@ -112,8 +112,6 @@ fun EventCategory(modifier: Modifier, eventUiState: EventUiState, style: EventCo
         color = style.contentColor,
         modifier = Modifier.testTag("categoryContent"))
   }
-
-
 }
 
 @Composable

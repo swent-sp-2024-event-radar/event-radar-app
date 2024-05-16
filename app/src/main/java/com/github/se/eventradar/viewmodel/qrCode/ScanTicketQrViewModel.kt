@@ -5,12 +5,9 @@ import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
-import com.github.se.eventradar.model.event.EventCategory
-import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.event.EventUiState
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
@@ -18,13 +15,11 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 
 @HiltViewModel(assistedFactory = ScanTicketQrViewModel.Factory::class)
 class ScanTicketQrViewModel
@@ -36,7 +31,6 @@ constructor(
     @Assisted private val myEventID: String
 ) : ViewModel() {
 
-
   @AssistedFactory
   interface Factory {
     fun create(eventId: String): ScanTicketQrViewModel
@@ -44,17 +38,17 @@ constructor(
 
   companion object {
     @Composable
-    fun create(eventId: String): ScanTicketQrViewModel  {
+    fun create(eventId: String): ScanTicketQrViewModel {
       return hiltViewModel<ScanTicketQrViewModel, Factory>(
-        creationCallback = { factory -> factory.create(eventId = eventId) })
+          creationCallback = { factory -> factory.create(eventId = eventId) })
     }
-
   }
 
   private val _uiState = MutableStateFlow(QrCodeScanTicketState())
   val uiState: StateFlow<QrCodeScanTicketState> = _uiState
 
   enum class Action {
+    ViewMyEvent,
     ScanTicket,
     ApproveEntry,
     DenyEntry,
@@ -93,7 +87,7 @@ constructor(
 
     viewModelScope.launch {
       val attendeeUserDeferred = async { userRepository.getUser(attendeeID) }
-      val currentEventDeferred = async { eventRepository.getEvent(myEventID!!) }
+      val currentEventDeferred = async { eventRepository.getEvent(myEventID) }
 
       val attendeeUser = attendeeUserDeferred.await()
       val currentEvent = currentEventDeferred.await()
@@ -147,7 +141,6 @@ constructor(
     changeTabState(Tab.MyEvent)
   }
 
-
   fun changeTabState(tab: Tab) {
     _uiState.update { it.copy(tabState = tab) }
   }
@@ -162,31 +155,29 @@ constructor(
         is Resource.Success -> {
           _uiState.update {
             it.copy(
-              eventUiState = EventUiState(
-                eventName = response.data!!.eventName,
-                eventPhoto = response.data.eventPhoto,
-                start = response.data.start,
-                end = response.data.end,
-                location = response.data.location,
-                description = response.data.description,
-                ticket = response.data.ticket,
-                mainOrganiser = response.data.mainOrganiser,
-                category = response.data.category
-              )
-            )
+                eventUiState =
+                    EventUiState(
+                        eventName = response.data!!.eventName,
+                        eventPhoto = response.data.eventPhoto,
+                        start = response.data.start,
+                        end = response.data.end,
+                        location = response.data.location,
+                        description = response.data.description,
+                        ticket = response.data.ticket,
+                        mainOrganiser = response.data.mainOrganiser,
+                        category = response.data.category))
           }
         }
         is Resource.Failure ->
-          Log.d("EventDetailsViewModel", "Error getting event: ${response.throwable.message}")
+            Log.d("EventDetailsViewModel", "Error getting event: ${response.throwable.message}")
       }
     }
   }
 
   data class QrCodeScanTicketState(
-    val decodedResult: String = "",
-    val action: Action = Action.ScanTicket,
-    val tabState: Tab = Tab.MyEvent,
-    val eventUiState: EventUiState = EventUiState()
+      val decodedResult: String = "",
+      val action: Action = Action.ViewMyEvent,
+      val tabState: Tab = Tab.MyEvent,
+      val eventUiState: EventUiState = EventUiState()
   )
-
 }

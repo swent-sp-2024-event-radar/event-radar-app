@@ -1,10 +1,7 @@
 package com.github.se.eventradar.model.repository.event
 
-import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.event.Event
-import com.github.se.eventradar.model.event.EventTicket
-import java.time.LocalDateTime
 
 class MockEventRepository : IEventRepository {
   private val mockEvents = mutableListOf<Event>()
