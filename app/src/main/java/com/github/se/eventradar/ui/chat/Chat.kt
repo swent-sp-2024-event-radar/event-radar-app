@@ -44,7 +44,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.User
@@ -60,12 +59,11 @@ import com.github.se.eventradar.viewmodel.ChatViewModel
 import java.time.LocalDateTime
 
 @Composable
-fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), navigationActions: NavigationActions) {
+fun ChatScreen(viewModel: ChatViewModel, navigationActions: NavigationActions) {
   val uiState by viewModel.uiState.collectAsState()
-  // Note the opponentId should no longer be in the uiState but be accessible with
-  // viewModel.opponentId
-  // TO DO: Implement get messages between two users in VM
-  //    viewModel.getMessages(senderId, opponentId)
+
+  viewModel.initOpponent()
+  viewModel.getMessages()
 
   val context = LocalContext.current // only needed until message send is implemented
 
@@ -89,10 +87,6 @@ fun ChatScreenUi(
 ) {
   val messages = uiState.messageHistory.messages
 
-  // TO DO: Implement load opponent in VM
-  LaunchedEffect(key1 = Unit) {
-    //        viewModel.loadOpponentProfileFromFirebase(uiState.opponentId!!)
-  }
   val opponentName = uiState.opponentProfile.firstName
   val opponentSurname = uiState.opponentProfile.lastName
   val opponentPictureUrl = uiState.opponentProfile.profilePicUrl
@@ -149,7 +143,7 @@ fun ChatScreenUi(
                   modifier = Modifier.weight(1f).fillMaxWidth().testTag("chatScreenMessagesList"),
                   state = scrollState) {
                     items(messages) { message ->
-                      when (message.sender == uiState.opponentId) {
+                      when (message.sender == uiState.opponentProfile.userId) {
                         true -> {
                           ReceivedMessageRow(
                               text = message.content,
@@ -264,7 +258,6 @@ fun ChatScreenPreview() {
   val sampleUiState =
       ChatUiState(
           userId = "1",
-          opponentId = "2",
           messageHistory =
               MessageHistory(
                   user1 = "Default sender",

@@ -49,6 +49,7 @@ import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.ProfilePic
 import com.github.se.eventradar.ui.component.SearchBarField
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.TopLevelDestination
 import com.github.se.eventradar.viewmodel.MessagesUiState
@@ -85,9 +86,7 @@ fun MessagesScreen(
       onSelectedTabIndexChanged = viewModel::onSelectedTabIndexChanged,
       onSearchQueryChanged = viewModel::onSearchQueryChanged,
       onSearchActiveChanged = viewModel::onSearchActiveChanged,
-      onChatClicked = {
-        Toast.makeText(context, "Chat feature is not yet implemented", Toast.LENGTH_SHORT).show()
-      },
+      onChatClicked = { navigationActions.navController.navigate(Route.PRIVATE_CHAT + "/${it}") },
       onTabSelected = navigationActions::navigateTo,
       onFriendClicked = {
         Toast.makeText(context, "Profile feature is not yet implemented", Toast.LENGTH_SHORT).show()
@@ -101,7 +100,7 @@ fun MessagesScreenUi(
     onSelectedTabIndexChanged: (Int) -> Unit,
     onSearchQueryChanged: (String) -> Unit,
     onSearchActiveChanged: (Boolean) -> Unit,
-    onChatClicked: (MessageHistory) -> Unit,
+    onChatClicked: (String) -> Unit,
     onTabSelected: (TopLevelDestination) -> Unit,
     onFriendClicked: (User) -> Unit,
     getUser: (String) -> User
@@ -199,7 +198,7 @@ fun MessagesList(
     messageList: List<MessageHistory>,
     searchQuery: String,
     userId: String,
-    onChatClicked: (MessageHistory) -> Unit,
+    onChatClicked: (String) -> Unit,
     getUser: (String) -> User,
     modifier: Modifier = Modifier
 ) {
@@ -239,7 +238,7 @@ fun MessagePreviewItem(
     messageHistory: MessageHistory,
     recipient: User,
     currentUserReadLatestMessage: Boolean,
-    onChatClicked: (MessageHistory) -> Unit,
+    onChatClicked: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
   val mostRecentMessage = messageHistory.messages.last { it.id == messageHistory.latestMessageId }
@@ -248,7 +247,7 @@ fun MessagePreviewItem(
       modifier =
           modifier
               .fillMaxWidth()
-              .clickable { onChatClicked(messageHistory) }
+              .clickable { onChatClicked(recipient.userId) }
               .padding(vertical = 8.dp)
               .testTag("messagePreviewItem"),
       horizontalArrangement = Arrangement.Absolute.SpaceEvenly,

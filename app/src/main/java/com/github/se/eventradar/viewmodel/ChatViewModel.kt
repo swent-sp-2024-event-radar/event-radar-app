@@ -81,7 +81,7 @@ constructor(
     getMessages()
   }
 
-  private fun initOpponent() {
+  fun initOpponent() {
     viewModelScope.launch {
       _uiState.update {
         when (val opponentResource = userRepository.getUser(opponentId)) {
@@ -171,7 +171,6 @@ data class ChatUiState(
             user1ReadMostRecentMessage = false,
             user2ReadMostRecentMessage = false,
             messages = mutableListOf()),
-    val opponentId: String? = null, // To be deleted once VM is integrated with UI
     val opponentProfile: User =
         User(
             userId = "Default",
