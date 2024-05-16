@@ -96,11 +96,6 @@ class ViewEventDetailsUserFlow : TestCase() {
       step("Check if all events are present at the start") {
         // Test the UI elements
         eventList { assertIsDisplayed() }
-
-        //        for (i in 0..2) {
-        //          val card = onNode { hasText("Test $i") }
-        //          card { assertIsDisplayed() }
-        //        }
         eventCard { assertIsDisplayed() }
       }
 
@@ -110,19 +105,7 @@ class ViewEventDetailsUserFlow : TestCase() {
         searchBar { performTextInput("Test 1") }
 
         filteredEventList { assertIsDisplayed() }
-
-        // Check if only one event is displayed
-        for (i in 0..2) {
-          //          val card = onNode { hasText("Test $i") }
-          //          card {
-          //            if (i == 1) {
-          //              assertIsDisplayed()
-          //            } else {
-          //              assertDoesNotExist()
-          //            }
-          //          }
-          eventCard { assertIsDisplayed() }
-        }
+        eventCard { assertIsDisplayed() }
       }
 
       step("Click on the event card") { eventCard { performClick() } }
