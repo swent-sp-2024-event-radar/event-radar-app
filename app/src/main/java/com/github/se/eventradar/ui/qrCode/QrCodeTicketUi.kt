@@ -241,7 +241,7 @@ fun QrCodeTicketUi(
                 modifier = Modifier.testTag("ticketSoldTitle"))
             Text(
                 text =
-                    "${uiState.eventUiState.ticket.capacity} tickets left", // TODO CHNAGE TO SOLD
+                    "${uiState.eventUiState.ticket.purchases} tickets sold", // TODO CHNAGE TO SOLD
                 style = componentStyle.contentStyle,
                 color = componentStyle.contentColor,
                 modifier = Modifier.testTag("ticketSoldContent"))

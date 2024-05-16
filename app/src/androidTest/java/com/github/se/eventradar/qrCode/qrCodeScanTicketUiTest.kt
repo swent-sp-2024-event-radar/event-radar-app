@@ -70,7 +70,7 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
           end = LocalDateTime.now(),
           location = Location(0.0, 0.0, "Test Location"),
           description = "Test Description",
-          ticket = EventTicket("Test Ticket", 0.0, 1),
+          ticket = EventTicket("Test Ticket", 0.0, 100, 59),
           mainOrganiser = "1",
           organiserList = mutableListOf("Test Organiser"),
           attendeeList = mutableListOf("user1", "user2", "user3"),
@@ -234,7 +234,7 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       ticketSoldTitle.assertIsDisplayed()
       ticketSoldContent {
         assertIsDisplayed()
-        assertTextContains("1 tickets left")
+        assertTextContains("59 tickets sold")
       }
     }
   }
