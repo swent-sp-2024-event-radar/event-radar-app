@@ -38,7 +38,8 @@ constructor(
           _uiState.value =
               _uiState.value.copy(
                   friendProfilePicLink = friendUserObj.data!!.profilePicUrl,
-                  friendName = friendUserObj.data.firstName,
+                  friendFirstName = friendUserObj.data.firstName,
+                  friendLastName = friendUserObj.data.lastName,
                   friendUserName = friendUserObj.data.username,
                   bio = friendUserObj.data.bio)
         }
@@ -66,7 +67,8 @@ constructor(
 
 data class ViewFriendsProfileUiState(
     val friendProfilePicLink: String = "",
-    val friendName: String = "",
+    val friendFirstName: String = "",
+    val friendLastName: String = "",
     val friendUserName: String = "",
     val bio: String = "",
 )

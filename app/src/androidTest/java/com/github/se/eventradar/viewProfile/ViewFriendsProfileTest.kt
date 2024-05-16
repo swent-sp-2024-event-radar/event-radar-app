@@ -68,7 +68,7 @@ class ViewFriendsProfileTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       MutableStateFlow(
           ViewFriendsProfileUiState(
               friendProfilePicLink = "",
-              friendName = "Jim",
+              friendFirstName = "Jim",
               friendUserName = "Smith",
               bio = "I am Jim Smith and I love the Smiths (the band)."))
 

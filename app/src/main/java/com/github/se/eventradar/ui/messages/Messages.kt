@@ -36,14 +36,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.User
-import com.github.se.eventradar.model.message.Message
 import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.ProfilePic
@@ -394,6 +391,7 @@ fun FriendPreviewItem(
   }
 }
 
+/*
 @Preview(showSystemUi = true, showBackground = true)
 @ExcludeFromJacocoGeneratedReport
 @Composable
@@ -513,3 +511,4 @@ fun PreviewEmptyMessagesList() {
             "johndoe")
       })
 }
+*/

@@ -102,12 +102,14 @@ fun ViewFriendsProfileUi(
                 Alignment.CenterHorizontally) { // Horizontally center the content) {
               UserProfileImage(
                   uiState.friendProfilePicLink,
-                  uiState.friendName,
+                  uiState.friendFirstName,
                   Modifier.size(150.dp)
                       .testTag("friendProfilePic")
                       .padding(10.dp)
                       .clip(RoundedCornerShape(10.dp)))
-              NameText(name = uiState.friendName, modifier = Modifier.testTag("friendName"))
+              NameText(
+                  name = "${uiState.friendFirstName} ${uiState.friendLastName}",
+                  modifier = Modifier.testTag("friendName"))
               StandardProfileInformationText(
                   text = "@${uiState.friendUserName}",
                   modifier = Modifier.testTag("friendUserName"))

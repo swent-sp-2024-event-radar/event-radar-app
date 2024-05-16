@@ -95,7 +95,8 @@ class ViewFriendsProfileViewModelUnitTest {
     assert(viewModel.uiState.value.friendProfilePicLink == mockFriend.profilePicUrl)
     assert(viewModel.uiState.value.bio == mockFriend.bio)
     assert(viewModel.uiState.value.friendUserName == mockFriend.username)
-    assert(viewModel.uiState.value.friendName == mockFriend.firstName)
+    assert(viewModel.uiState.value.friendFirstName == mockFriend.firstName)
+    assert(viewModel.uiState.value.friendLastName == mockFriend.lastName)
   }
 
   @Test
