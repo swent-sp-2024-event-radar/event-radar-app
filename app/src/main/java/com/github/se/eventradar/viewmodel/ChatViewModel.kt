@@ -133,6 +133,7 @@ constructor(
       sendMessage(message)
       getMessages()
     }
+    _uiState.update { currentState -> currentState.copy(messageInserted = true) }
   }
 
   private fun sendMessage(message: String) {
@@ -166,7 +167,7 @@ data class ChatUiState(
             user1ReadMostRecentMessage = false,
             user2ReadMostRecentMessage = false,
             messages = mutableListOf()),
-    val opponentId: String? = null, // To be deleted when Chat is updated
+    val opponentId: String? = null, // To be deleted once VM is integrated with UI
     val opponentProfile: User =
         User(
             userId = "Default",
