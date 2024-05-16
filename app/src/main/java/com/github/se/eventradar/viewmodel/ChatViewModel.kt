@@ -71,13 +71,14 @@ constructor(
           it.copy(userId = userId.data)
         } else {
           Log.d(
-              "MessagesViewModel",
+              "ChatViewModel",
               "Error getting user ID: ${(userId as Resource.Failure).throwable.message}")
           it.copy(userId = null)
         }
       }
     }
     initOpponent()
+    getMessages()
   }
 
   private fun initOpponent() {
@@ -118,13 +119,15 @@ constructor(
           }
         }
       } else {
-        Log.d("ChatViewModel", "Invalid state: User ID or Opponent ID is null.")
+        Log.d("ChatViewModel", "Invalid state: User ID is null.")
       }
     }
   }
 
   fun onMessageBarInputChange(newInput: String) {
-    _uiState.update { currentState -> currentState.copy(messageBarInput = newInput) }
+    _uiState.update { currentState ->
+      currentState.copy(messageBarInput = newInput, messageInserted = false)
+    }
   }
 
   fun onMessageSend() {
@@ -132,8 +135,10 @@ constructor(
     if (message.isNotBlank()) {
       sendMessage(message)
       getMessages()
+      _uiState.update { currentState ->
+        currentState.copy(messageBarInput = "", messageInserted = true)
+      }
     }
-    _uiState.update { currentState -> currentState.copy(messageInserted = true) }
   }
 
   private fun sendMessage(message: String) {
@@ -146,12 +151,11 @@ constructor(
                 sender = userId,
                 content = message,
                 dateTimeSent = LocalDateTime.now(),
-                id = "", // Temporarily empty until Firebase assigns an ID
-            )
+                id = "") // Temporarily empty until Firebase assigns an ID
 
         messagesRepository.addMessage(newMessage, _uiState.value.messageHistory)
       } else {
-        Log.d("ChatViewModel", "Invalid state: User ID or Opponent ID is null.")
+        Log.d("ChatViewModel", "Invalid state: User ID")
       }
     }
   }

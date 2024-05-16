@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,8 +19,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -103,8 +100,8 @@ fun ChatScreenUi(
   val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = messages.size)
   val messagesLoadedFirstTime = uiState.messagesLoadedFirstTime
   val messageInserted = uiState.messageInserted
-  LaunchedEffect(key1 = messagesLoadedFirstTime, messages, messageInserted) {
-    if (messages.isNotEmpty()) {
+  LaunchedEffect(key1 = messagesLoadedFirstTime, messageInserted) {
+    if ((messagesLoadedFirstTime || messageInserted) && messages.isNotEmpty()) {
       scrollState.scrollToItem(index = messages.size - 1)
     }
   }

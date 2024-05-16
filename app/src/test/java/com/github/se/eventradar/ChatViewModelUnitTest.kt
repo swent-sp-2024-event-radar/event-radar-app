@@ -1,24 +1,29 @@
 package com.github.se.eventradar
 
-import com.github.se.eventradar.model.Location
+import android.util.Log
+import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
-import com.github.se.eventradar.model.event.Event
-import com.github.se.eventradar.model.event.EventCategory
-import com.github.se.eventradar.model.event.EventTicket
+import com.github.se.eventradar.model.message.Message
 import com.github.se.eventradar.model.repository.message.IMessageRepository
 import com.github.se.eventradar.model.repository.message.MockMessageRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.viewmodel.ChatViewModel
+import io.mockk.every
+import io.mockk.mockkStatic
+import io.mockk.unmockkAll
+import io.mockk.verify
 import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Rule
+import org.junit.Test
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
@@ -43,24 +48,33 @@ class ChatViewModelUnitTest {
 
   @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
-  private val mockEvent =
-      Event(
-          eventName = "Event 1",
-          eventPhoto = "",
-          start = LocalDateTime.now(),
-          end = LocalDateTime.now(),
-          location = Location(0.0, 0.0, "Test Location"),
-          description = "Test Description",
-          ticket = EventTicket("Test Ticket", 0.0, 1, 0),
-          mainOrganiser = "1",
-          organiserList = mutableListOf("Test Organiser"),
-          attendeeList = mutableListOf("Test Attendee"),
-          category = EventCategory.COMMUNITY,
-          fireBaseID = "1")
+  private val mockMessage =
+      Message(
+          sender = "1",
+          content = "Hello",
+          dateTimeSent = LocalDateTime.parse("2021-01-01T00:00:00"),
+          id = "1")
 
-  private val mockUser =
+  private val nullUser =
       User(
-          userId = "user1",
+          userId = "Default",
+          birthDate = "Default",
+          email = "Default",
+          firstName = "Default",
+          lastName = "Default",
+          phoneNumber = "Default",
+          accountStatus = "Default",
+          eventsAttendeeList = mutableListOf(),
+          eventsHostList = mutableListOf(),
+          friendsList = mutableListOf(),
+          profilePicUrl = "Default",
+          qrCodeUrl = "Default",
+          username = "Default")
+
+  private val opponentId = "user2"
+  private val opponent =
+      User(
+          userId = opponentId,
           birthDate = "01/01/2000",
           email = "test@example.com",
           firstName = "John",
@@ -73,12 +87,129 @@ class ChatViewModelUnitTest {
           profilePicUrl = "http://example.com/pic.jpg",
           qrCodeUrl = "http://example.com/qr.jpg",
           username = "john_doe")
-  private val opponentId = "user2"
 
   @Before
   fun setUp() {
     messageRepository = MockMessageRepository()
     userRepository = MockUserRepository()
     viewModel = ChatViewModel(messageRepository, userRepository, opponentId)
+  }
+
+  @Test
+  fun `init and getMessages successful`() = runTest {
+    // Set up user repo
+
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    userRepository.addUser(opponent)
+
+    val msg1 = mockMessage.copy(sender = "user1", id = "msg1")
+    val msg2 = mockMessage.copy(sender = "user2", id = "msg2")
+    val messageHistory = messageRepository.createNewMessageHistory("user1", "user2")
+
+    messageRepository.addMessage(msg1, (messageHistory as Resource.Success).data)
+    messageRepository.addMessage(msg2, messageHistory.data)
+
+    viewModel =
+        ChatViewModel(messageRepository, userRepository, opponentId) // Initialize view model
+    viewModel.getMessages()
+
+    val expectedMessages = mutableListOf(msg1, msg2)
+    val uiState = viewModel.uiState.value
+    assert(uiState.userId == "user1")
+    assert(uiState.messagesLoadedFirstTime)
+    assert(expectedMessages == uiState.messageHistory.messages)
+    assert(uiState.opponentProfile == opponent)
+  }
+
+  @Test
+  fun `init getCurrentUserId failure and getMessages with null UserId`() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+    (userRepository as MockUserRepository).updateCurrentUserId(null)
+
+    viewModel =
+        ChatViewModel(messageRepository, userRepository, opponentId) // Initialize view model
+
+    val uiState = viewModel.uiState.value
+    val userId = userRepository.getCurrentUserId()
+    assert(uiState.userId == null)
+    verify {
+      Log.d(
+          "ChatViewModel",
+          "Error getting user ID: ${(userId as Resource.Failure).throwable.message}")
+    }
+
+    viewModel.getMessages()
+
+    verify { Log.d("ChatViewModel", "Invalid state: User ID is null.") }
+    unmockkAll()
+  }
+
+  @Test
+  fun `initOpponent failure`() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+
+    viewModel =
+        ChatViewModel(messageRepository, userRepository, opponentId) // Initialize view model
+
+    val uiState = viewModel.uiState.value
+    val opponentResource = userRepository.getUser(opponentId)
+    assert(uiState.opponentProfile == nullUser)
+    verify {
+      Log.d(
+          "ChatViewModel",
+          "Error getting opponent details: ${(opponentResource as Resource.Failure).throwable.message}")
+    }
+    unmockkAll()
+  }
+
+  @Test
+  fun `onMessageBarInputChange test`() = runTest {
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    userRepository.addUser(opponent)
+
+    viewModel =
+        ChatViewModel(messageRepository, userRepository, opponentId) // Initialize view model
+
+    viewModel.onMessageBarInputChange("Hey")
+
+    val uiState = viewModel.uiState.value
+
+    assert(uiState.messageBarInput == "Hey")
+    assert(!uiState.messageInserted)
+  }
+
+  @Test
+  fun `onMessageSend success test`() = runTest {
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    userRepository.addUser(opponent)
+
+    val msg1 = mockMessage.copy(sender = "user1", id = "msg1")
+    val msg2 = mockMessage.copy(sender = "user2", id = "msg2")
+    val messageHistory = messageRepository.createNewMessageHistory("user1", "user2")
+
+    messageRepository.addMessage(msg1, (messageHistory as Resource.Success).data)
+    messageRepository.addMessage(msg2, messageHistory.data)
+
+    viewModel =
+        ChatViewModel(messageRepository, userRepository, opponentId) // Initialize view model
+    viewModel.getMessages()
+    viewModel.onMessageBarInputChange("Hey")
+
+    viewModel.onMessageSend()
+
+    val newMsg =
+        mockMessage.copy(
+            sender = "user1", content = "Hey", dateTimeSent = LocalDateTime.now(), id = "")
+    val expectedMessages = mutableListOf(msg1, msg2, newMsg)
+    val uiState = viewModel.uiState.value
+
+    assert(uiState.messageBarInput == "")
+    assert(uiState.messageInserted)
+    assert(uiState.messagesLoadedFirstTime)
+    assert(expectedMessages.size == uiState.messageHistory.messages.size)
+    assert(expectedMessages == uiState.messageHistory.messages)
   }
 }
