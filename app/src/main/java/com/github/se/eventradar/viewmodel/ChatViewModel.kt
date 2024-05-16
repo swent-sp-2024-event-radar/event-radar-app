@@ -32,7 +32,6 @@ constructor(
   private val _uiState = MutableStateFlow(ChatUiState())
   val uiState: StateFlow<ChatUiState> = _uiState
 
-  // Code for creating an instance of ChatViewModel
   @AssistedFactory
   interface Factory {
     fun create(opponentId: String): ChatViewModel
@@ -62,7 +61,6 @@ constructor(
           qrCodeUrl = "Default",
           username = "Default")
 
-  // TO DO: Complete VM functions for chat screen
   init {
     viewModelScope.launch {
       _uiState.update {
@@ -78,20 +76,21 @@ constructor(
         }
       }
     }
+    initOpponent()
   }
 
-  fun initOpponent() {
+  private fun initOpponent() {
     viewModelScope.launch {
       _uiState.update {
         when (val opponentResource = userRepository.getUser(opponentId)) {
           is Resource.Success -> {
-            it.copy(opponentProfile = opponentResource.data!!, opponentId = opponentId)
+            it.copy(opponentProfile = opponentResource.data!!)
           }
           is Resource.Failure -> {
             Log.d(
                 "ChatViewModel",
                 "Error getting opponent details: ${opponentResource.throwable.message}")
-            it.copy(opponentProfile = nullUser, opponentId = null)
+            it.copy(opponentProfile = nullUser)
           }
         }
       }
@@ -102,7 +101,7 @@ constructor(
     viewModelScope.launch {
       // Fetch messages
       val userId = _uiState.value.userId
-      if (userId != null && _uiState.value.opponentId != null) {
+      if (userId != null) {
         val messagesResource = messagesRepository.getMessages(userId, opponentId)
         _uiState.update { currentState ->
           when (messagesResource) {
@@ -138,15 +137,14 @@ constructor(
   private fun sendMessage(message: String) {
     viewModelScope.launch {
       val userId = _uiState.value.userId
-      val opponentId = _uiState.value.opponentId
-      if (userId != null && opponentId != null) {
+      if (userId != null) {
 
         val newMessage =
             Message(
                 sender = userId,
                 content = message,
                 dateTimeSent = LocalDateTime.now(),
-                id = "",
+                id = "", // Temporarily empty until Firebase assigns an ID
             )
 
         messagesRepository.addMessage(newMessage, _uiState.value.messageHistory)
@@ -159,7 +157,6 @@ constructor(
 
 data class ChatUiState(
     val userId: String? = null,
-    val opponentId: String? = null,
     val messageHistory: MessageHistory =
         MessageHistory(
             user1 = "Default sender",
