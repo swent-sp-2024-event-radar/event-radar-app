@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -49,7 +50,10 @@ private val imageHeight = 191.dp
 @Composable
 fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: NavigationActions) {
 
+  val isUserAttending = viewModel.isUserAttending.collectAsStateWithLifecycle().value
   val eventUiState = viewModel.uiState.collectAsStateWithLifecycle().value
+
+  LaunchedEffect(isUserAttending) { viewModel.refreshAttendance() }
 
   val componentStyle =
       EventComponentsStyle(
@@ -70,7 +74,7 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
       },
       floatingActionButton = {
         // view ticket button
-        if (!viewModel.isUserAttendingEvent()) {
+        if (!isUserAttending) {
           FloatingActionButton(
               onClick = {
                 navigationActions.navController.navigate(
@@ -166,15 +170,16 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
               eventUiState,
               componentStyle)
 
-          if (viewModel.isUserAttendingEvent()) {
+          if (isUserAttending) {
             Text(
                 text = stringResource(id = R.string.event_attendance_message),
                 modifier =
                     Modifier.constrainAs(joined) {
-                      top.linkTo(category.bottom, margin = 32.dp)
-                      start.linkTo(parent.start, margin = widthPadding)
-                      end.linkTo(parent.end, margin = widthPadding)
-                    },
+                          top.linkTo(category.bottom, margin = 32.dp)
+                          start.linkTo(parent.start, margin = widthPadding)
+                          end.linkTo(parent.end, margin = widthPadding)
+                        }
+                        .testTag("attendance"),
                 style =
                     TextStyle(
                         fontSize = 18.sp,

@@ -67,7 +67,7 @@ class EventSelectTicketUITest :
 
     every { mockViewModel.errorOccurred } returns error
     every { mockViewModel.registrationSuccessful } returns success
-    every { mockViewModel.isUserAttendingEvent() } returns isAttending
+    every { mockViewModel.isUserAttending } returns MutableStateFlow(isAttending)
     every { mockViewModel.uiState } returns sampleEventDetailsUiState
     every { mockViewModel.isTicketFree() } returns isTicketFree
 
@@ -146,12 +146,13 @@ class EventSelectTicketUITest :
         assertIsDisplayed()
         performClick()
       }
-      // assert: the buy has been triggered
-      verify { mockViewModel.buyTicketForEvent() }
-      // confirmVerified(mockViewModel)
+    }
+    // assert: the buy has been triggered
+    verify { mockViewModel.buyTicketForEvent() }
 
-      error.value = true
+    error.value = true
 
+    ComposeScreen.onComposeScreen<EventSelectTicketScreen>(composeTestRule) {
       errorDialog { assertIsDisplayed() }
     }
   }

@@ -58,7 +58,7 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   @Before
   fun testSetup() {
 
-    every { mockViewModel.isUserAttendingEvent() } returns false
+    every { mockViewModel.isUserAttending } returns MutableStateFlow(false)
     every { mockViewModel.uiState } returns sampleEventDetailsUiState
     every { mockViewModel.eventId } returns eventId
 

@@ -60,7 +60,7 @@ class EventDetailsAttendingUITest :
   @Before
   fun testSetup() {
 
-    every { mockViewModel.isUserAttendingEvent() } returns true
+    every { mockViewModel.isUserAttending } returns MutableStateFlow(true)
     every { mockViewModel.isTicketFree() } returns isTicketFree
     every { mockViewModel.uiState } returns sampleEventDetailsUiState
     every { mockViewModel.eventId } returns eventId
@@ -98,7 +98,7 @@ class EventDetailsAttendingUITest :
       dateTimeStartContent { assertIsDisplayed() }
       dateTimeEndContent { assertIsDisplayed() }
 
-      // TODO add you're attending Text
+      attendance { assertIsDisplayed() }
     }
   }
 

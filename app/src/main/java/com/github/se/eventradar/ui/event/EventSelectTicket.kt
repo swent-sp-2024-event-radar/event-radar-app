@@ -103,10 +103,7 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
       floatingActionButton = {
         // buy ticket button
         FloatingActionButton(
-            onClick = {
-              viewModel.buyTicketForEvent()
-              // context.toast("You registered to the event !")
-            },
+            onClick = { viewModel.buyTicketForEvent() },
             modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("buyButton"),
             containerColor = MaterialTheme.colorScheme.primaryContainer,
         ) {

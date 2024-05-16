@@ -32,8 +32,20 @@ constructor(
     @Assisted val eventId: String,
 ) : ViewModel() {
 
+  private val _uiState = MutableStateFlow(EventUiState())
+  val uiState: StateFlow<EventUiState> = _uiState
+
+  private val _isUserAttending = MutableStateFlow(false)
+  val isUserAttending: StateFlow<Boolean>
+    get() = _isUserAttending
+
+  val errorOccurred = mutableStateOf(false)
+  val registrationSuccessful = mutableStateOf(false)
+
+  private lateinit var currentUserId: String
+  private var displayedEvent: Event? = null
+
   init {
-    getEventData()
     viewModelScope.launch {
       when (val response = userRepository.getCurrentUserId()) {
         is Resource.Success -> {
@@ -44,16 +56,8 @@ constructor(
                 "EventDetailsViewModel", "Could not get the user Id: ${response.throwable.message}")
       }
     }
+    getEventData()
   }
-
-  private val _uiState = MutableStateFlow(EventUiState())
-  val uiState: StateFlow<EventUiState> = _uiState
-
-  val errorOccurred = mutableStateOf(false)
-  val registrationSuccessful = mutableStateOf(false)
-
-  private lateinit var currentUserId: String
-  private var displayedEvent: Event? = null
 
   fun getEventData() {
     viewModelScope.launch {
@@ -73,6 +77,7 @@ constructor(
             )
           }
           displayedEvent = response.data!!
+          _isUserAttending.update { response.data.attendeeList.contains(currentUserId) }
         }
         is Resource.Failure ->
             Log.d("EventDetailsViewModel", "Error getting event: ${response.throwable.message}")
@@ -92,7 +97,7 @@ constructor(
             "Paid tickets are not supported, all of them are considered free")
       }
 
-      if (!isUserAttendingEvent()) {
+      if (!_isUserAttending.value) {
         // TODO needs to be atomic to avoid concurrency issues
         registrationUpdateEvent()
         if (!errorOccurred.value) {
@@ -101,15 +106,13 @@ constructor(
       }
       if (!errorOccurred.value) {
         registrationSuccessful.value = true
+        _isUserAttending.update { true }
       }
     }
   }
 
-  fun isUserAttendingEvent(): Boolean {
-    if (displayedEvent == null) {
-      getEventData()
-    }
-    return displayedEvent?.attendeeList?.contains(currentUserId) ?: false
+  fun refreshAttendance() {
+    getEventData()
   }
 
   private fun registrationUpdateEvent() {
