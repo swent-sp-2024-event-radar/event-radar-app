@@ -62,6 +62,7 @@ constructor(
           username = "Default")
 
   init {
+
     viewModelScope.launch {
       _uiState.update {
         val userId = userRepository.getCurrentUserId()
@@ -165,6 +166,7 @@ data class ChatUiState(
             user1ReadMostRecentMessage = false,
             user2ReadMostRecentMessage = false,
             messages = mutableListOf()),
+    val opponentId: String? = null, // To be deleted when Chat is updated
     val opponentProfile: User =
         User(
             userId = "Default",
