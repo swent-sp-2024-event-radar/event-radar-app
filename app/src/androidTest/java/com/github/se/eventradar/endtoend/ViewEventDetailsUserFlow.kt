@@ -82,7 +82,6 @@ class ViewEventDetailsUserFlow : TestCase() {
               "${Route.EVENT_DETAILS}/{eventId}",
               arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
                 val eventId = it.arguments!!.getString("eventId")!!
-                //            val viewModel = EventDetailsViewModel.create(eventId = eventId)
                 EventDetails(EventDetailsViewModel(eventRepository, eventId), mockNavActions)
               }
         }
