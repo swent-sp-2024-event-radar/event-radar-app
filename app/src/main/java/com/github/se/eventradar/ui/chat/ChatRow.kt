@@ -52,7 +52,7 @@ fun SentMessageRow(text: String) {
             content = {
               TextMessageInsideBubble(
                   modifier =
-                      Modifier.padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 10.dp)
+                      Modifier.padding(start = 6.dp, end = 6.dp, top = 6.dp, bottom = 6.dp)
                           .testTag("sentChatBubbleText"),
                   text = text,
                   color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -87,7 +87,7 @@ fun ReceivedMessageRow(
             content = {
               TextMessageInsideBubble(
                   modifier =
-                      Modifier.padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 10.dp)
+                      Modifier.padding(start = 6.dp, end = 6.dp, top = 6.dp, bottom = 6.dp)
                           .testTag("receivedChatBubbleText"),
                   text = text,
                   color = MaterialTheme.colorScheme.onSurfaceVariant,

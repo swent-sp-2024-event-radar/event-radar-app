@@ -69,12 +69,17 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), navigationActions: Na
   // TO DO: Implement get messages between two users in VM
   //    viewModel.getMessages(senderId, opponentId)
 
+  val context = LocalContext.current // only needed until message send is implemented
+
   // TO DO: Implement changed function results
   ChatScreenUi(
       uiState = uiState,
       onBackArrowClick = navigationActions::goBack,
       onTabSelected = navigationActions::navigateTo,
       onMessageChange = viewModel::onMessageBarInputChange,
+      onMessageSend = {
+        Toast.makeText(context, "Send message to be implemented", Toast.LENGTH_SHORT).show()
+      }
       //        onSelectedTabIndexChange = viewModel::onSelectedTabIndexChange,
       //        onSearchQueryChange = viewModel::onSearchQueryChange,
       //        onChatClicked = {
@@ -82,7 +87,7 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), navigationActions: Na
       // Toast.LENGTH_SHORT).show()
       //        },
       //        getUser = viewModel::getUser
-  )
+      )
 }
 
 @Composable
@@ -91,6 +96,7 @@ fun ChatScreenUi(
     onBackArrowClick: () -> Unit,
     onTabSelected: (TopLevelDestination) -> Unit,
     onMessageChange: (String) -> Unit,
+    onMessageSend: () -> Unit,
     //    onSelectedTabIndexChange: (Int) -> Unit,
     //    onSearchQueryChange: (String) -> Unit,
     //    onChatClicked: (MessageHistory) -> Unit,
@@ -175,7 +181,7 @@ fun ChatScreenUi(
               ChatInput(
                   uiState = uiState,
                   onMessageChange = onMessageChange,
-                  //            onMessageSend = { viewModel.onMessageSend() }
+                  onMessageSend = onMessageSend,
               )
             }
       }
@@ -229,11 +235,7 @@ fun ChatAppBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatInput(
-    uiState: ChatUiState,
-    onMessageChange: (String) -> Unit,
-    //    onMessageSend: () -> Unit
-) {
+fun ChatInput(uiState: ChatUiState, onMessageChange: (String) -> Unit, onMessageSend: () -> Unit) {
   val context = LocalContext.current
   Row(
       modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("chatInput"),
@@ -259,8 +261,7 @@ fun ChatInput(
             trailingIcon = {
               IconButton(
                   // TO DO: Implement onMessageSend
-                  //                        onClick = { onMessageSend() }
-                  onClick = { null },
+                  onClick = { onMessageSend() },
                   modifier = Modifier.testTag("chatInputSendButton")) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Send,
@@ -345,5 +346,9 @@ fun ChatScreenPreview() {
           messagesLoadedFirstTime = true)
 
   ChatScreenUi(
-      uiState = sampleUiState, onBackArrowClick = {}, onTabSelected = {}, onMessageChange = {})
+      uiState = sampleUiState,
+      onBackArrowClick = {},
+      onTabSelected = {},
+      onMessageChange = {},
+      onMessageSend = {})
 }
