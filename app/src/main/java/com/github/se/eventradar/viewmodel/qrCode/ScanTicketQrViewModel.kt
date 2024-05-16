@@ -134,10 +134,9 @@ constructor(
   }
 
   fun resetConditions() {
-    changeAction(Action.ScanTicket)
     qrCodeAnalyser.onDecoded = null
+    changeAction(Action.ScanTicket)
     _uiState.update { it.copy(decodedResult = "") }
-    _uiState.update { it.copy(action = Action.ScanTicket) }
     changeTabState(Tab.MyEvent)
   }
 

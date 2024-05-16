@@ -192,7 +192,6 @@ class ScanFriendTicketViewModelTest {
   fun testGetEventSuccess() = runTest {
     eventRepository.addEvent(mockEvent)
     viewModel.getEventData()
-
     assert(viewModel.uiState.value.eventUiState.eventName == mockEvent.eventName)
     assert(viewModel.uiState.value.eventUiState.description == mockEvent.description)
     assert(viewModel.uiState.value.eventUiState.mainOrganiser == mockEvent.mainOrganiser)
@@ -214,5 +213,14 @@ class ScanFriendTicketViewModelTest {
 
     viewModel.getEventData()
     assert(viewModel.uiState.value.eventUiState.eventName == mockEvent.eventName)
+  }
+
+  @Test
+  fun resetConditions() = runTest {
+    viewModel.resetConditions()
+    assert(viewModel.uiState.value.action == ScanTicketQrViewModel.Action.ScanTicket)
+    assert(viewModel.uiState.value.decodedResult.isEmpty())
+    assert(viewModel.uiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent)
+    assert(qrCodeAnalyser.onDecoded == null)
   }
 }
