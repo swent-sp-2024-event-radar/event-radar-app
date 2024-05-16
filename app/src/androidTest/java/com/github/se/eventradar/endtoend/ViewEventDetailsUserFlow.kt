@@ -99,24 +99,26 @@ class ViewEventDetailsUserFlow : TestCase() {
 
         for (i in 0..2) {
           val card = onNode { hasText("Test $i") }
-          card.assertIsDisplayed()
+          card { assertIsDisplayed() }
         }
       }
 
       step("Filter to only show one event") {
         // Test the UI elements
         searchBarAndFilter { assertIsDisplayed() }
-        searchBar.performTextInput("Test 1")
+        searchBar { performTextInput("Test 1") }
 
         filteredEventList { assertIsDisplayed() }
 
         // Check if only one event is displayed
         for (i in 0..2) {
           val card = onNode { hasText("Test $i") }
-          if (i == 1) {
-            card.assertIsDisplayed()
-          } else {
-            card.assertDoesNotExist()
+          card {
+            if (i == 1) {
+              assertIsDisplayed()
+            } else {
+              assertDoesNotExist()
+            }
           }
         }
       }
