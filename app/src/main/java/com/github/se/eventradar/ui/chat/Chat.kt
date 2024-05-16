@@ -71,7 +71,6 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), navigationActions: Na
 
   val context = LocalContext.current // only needed until message send is implemented
 
-  // TO DO: Implement changed function results
   ChatScreenUi(
       uiState = uiState,
       onBackArrowClick = navigationActions::goBack,
@@ -79,15 +78,7 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), navigationActions: Na
       onMessageChange = viewModel::onMessageBarInputChange,
       onMessageSend = {
         Toast.makeText(context, "Send message to be implemented", Toast.LENGTH_SHORT).show()
-      }
-      //        onSelectedTabIndexChange = viewModel::onSelectedTabIndexChange,
-      //        onSearchQueryChange = viewModel::onSearchQueryChange,
-      //        onChatClicked = {
-      //            Toast.makeText(context, "Chat feature is not yet implemented",
-      // Toast.LENGTH_SHORT).show()
-      //        },
-      //        getUser = viewModel::getUser
-      )
+      })
 }
 
 @Composable
@@ -97,10 +88,6 @@ fun ChatScreenUi(
     onTabSelected: (TopLevelDestination) -> Unit,
     onMessageChange: (String) -> Unit,
     onMessageSend: () -> Unit,
-    //    onSelectedTabIndexChange: (Int) -> Unit,
-    //    onSearchQueryChange: (String) -> Unit,
-    //    onChatClicked: (MessageHistory) -> Unit,
-    //    getUser: (String) -> User
 ) {
   val messages = uiState.messageHistory.messages
 
