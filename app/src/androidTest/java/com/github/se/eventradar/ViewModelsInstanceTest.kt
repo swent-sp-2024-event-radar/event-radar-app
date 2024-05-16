@@ -1,11 +1,7 @@
 package com.github.se.eventradar
 
-import android.view.ViewGroup
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.test.ext.junit.rules.ActivityScenarioRule
+import com.github.se.eventradar.component.clearAndSetContent
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
@@ -20,6 +16,9 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import io.mockk.junit4.MockKRule
 import java.time.LocalDateTime
 import kotlinx.coroutines.test.runTest
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.`is`
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -54,23 +53,13 @@ class ViewModelInstanceTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   @Before
   fun testSetup() {
     hiltRule.inject()
+    composeTestRule.clearAndSetContent<MainActivity> {
+      viewModel = EventDetailsViewModel.create(eventId = mockEvent.fireBaseID)
+    }
   }
 
   @Test
   fun eventDetailsViewModelCorrectlyInstanced() = runTest {
-    composeTestRule.clearAndSetContent {
-      viewModel = EventDetailsViewModel.create(eventId = mockEvent.fireBaseID)
-      assert(mockEvent.fireBaseID == viewModel.eventId)
-    }
+    composeTestRule.runOnIdle { assertThat(viewModel.eventId, `is`(equalTo(mockEvent.fireBaseID))) }
   }
-}
-
-// Solution from here :
-// https://stackoverflow.com/questions/73191692/test-errormyactivity-has-already-set-content-if-you-have-populated-the-activit
-
-fun AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>.clearAndSetContent(
-    content: @Composable () -> Unit
-) {
-  (this.activity.findViewById<ViewGroup>(android.R.id.content)?.getChildAt(0) as? ComposeView)
-      ?.setContent(content) ?: this.setContent(content)
 }
