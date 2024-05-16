@@ -18,7 +18,6 @@ import com.github.se.eventradar.ui.login.SignUpScreen
 import com.github.se.eventradar.ui.messages.MessagesScreen
 import com.github.se.eventradar.ui.qrCode.QrCodeScreen
 import com.github.se.eventradar.util.toast
-import com.github.se.eventradar.viewmodel.qrCode.ScanTicketQrViewModel
 
 @Composable
 fun NavGraph(
@@ -44,16 +43,6 @@ fun NavGraph(
           val eventId = it.arguments!!.getString("eventId")!!
           val viewModel = EventDetailsViewModel.create(eventId = eventId)
           SelectTicket(viewModel = viewModel, navigationActions = navActions)
-        }
-
-    // TODO replace the Toast message with the corresponding screen function of the route
-
-    composable(
-        "${Route.MY_EVENT}/{eventId}",
-        arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
-          val eventId = it.arguments!!.getString("eventId")!!
-          val viewModel = ScanTicketQrViewModel.create(eventId = eventId)
-
         }
     composable(Route.MESSAGE) { MessagesScreen(navigationActions = navActions) }
     composable(Route.SCANNER) { QrCodeScreen(navigationActions = navActions) }
