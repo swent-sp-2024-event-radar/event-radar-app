@@ -48,11 +48,12 @@ fun NavGraph(
 
     // TODO replace the Toast message with the corresponding screen function of the route
 
-    composable ( "${Route.MY_EVENT}/{eventId}",
+    composable(
+        "${Route.MY_EVENT}/{eventId}",
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
           val eventId = it.arguments!!.getString("eventId")!!
           val viewModel = ScanTicketQrViewModel.create(eventId = eventId)
-        
+
         }
     composable(Route.MESSAGE) { MessagesScreen(navigationActions = navActions) }
     composable(Route.SCANNER) { QrCodeScreen(navigationActions = navActions) }
