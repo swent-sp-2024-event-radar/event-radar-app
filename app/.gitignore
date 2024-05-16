@@ -3,3 +3,4 @@
 app/.idea/misc.xml
 
 app/.gradle/config.properties
+app/src/main/AndroidManifest.xml
