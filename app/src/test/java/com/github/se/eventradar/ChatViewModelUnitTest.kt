@@ -183,6 +183,9 @@ class ChatViewModelUnitTest {
 
   @Test
   fun `onMessageSend success test`() = runTest {
+    mockkStatic(LocalDateTime::class)
+    val fixedDateTime = LocalDateTime.of(2024, 5, 16, 12, 0) // A fixed point in time
+    every { LocalDateTime.now() } returns fixedDateTime
     (userRepository as MockUserRepository).updateCurrentUserId("user1")
     userRepository.addUser(opponent)
 
@@ -211,5 +214,6 @@ class ChatViewModelUnitTest {
     assert(uiState.messagesLoadedFirstTime)
     assert(expectedMessages.size == uiState.messageHistory.messages.size)
     assert(expectedMessages == uiState.messageHistory.messages)
+    unmockkAll()
   }
 }
