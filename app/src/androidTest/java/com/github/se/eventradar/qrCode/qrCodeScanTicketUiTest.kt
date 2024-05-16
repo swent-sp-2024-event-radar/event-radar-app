@@ -40,6 +40,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
 class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -209,7 +210,8 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
   }
 
   @Test
-  fun screenDisplaysContentElementsCorrectly() = runTest {
+  fun screenDisplaysContentElementsCorrectly() = runTest(timeout = 30.seconds) {
+    // Your test code here {
     val viewModel = setupViewModelMyEventTab()
     onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
       composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
