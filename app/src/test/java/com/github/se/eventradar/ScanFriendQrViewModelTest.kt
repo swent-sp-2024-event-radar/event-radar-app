@@ -50,6 +50,7 @@ class ScanFriendQrViewModelTest {
           friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/Profile_Pics/1",
           qrCodeUrl = "http://example.com/QR_Codes/1",
+          bio = "",
           username = "johndoe")
 
   private val mockUser1 =
@@ -66,6 +67,7 @@ class ScanFriendQrViewModelTest {
           friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/Profile_Pics/user1",
           qrCodeUrl = "http://example.com/QR_Codes/user1",
+          bio = "",
           username = "john_doe")
 
   private val mockUser2 =
@@ -82,6 +84,7 @@ class ScanFriendQrViewModelTest {
           friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/Profile_Pics/user2",
           qrCodeUrl = "http://example.com/QR_Codes/user2",
+          bio = "",
           username = "john_doe2")
 
   private val mockUser1AF =
@@ -98,6 +101,7 @@ class ScanFriendQrViewModelTest {
           friendsList = mutableListOf("user2"),
           profilePicUrl = "http://example.com/Profile_Pics/user1",
           qrCodeUrl = "http://example.com/QR_Codes/user1",
+          bio = "",
           username = "john_doe")
 
   private val mockUser2AF =
@@ -114,6 +118,7 @@ class ScanFriendQrViewModelTest {
           friendsList = mutableListOf("user1"),
           profilePicUrl = "http://example.com/Profile_Pics/user2",
           qrCodeUrl = "http://example.com/QR_Codes/user2",
+          bio = "",
           username = "john_doe2")
 
   class MainDispatcherRule(
