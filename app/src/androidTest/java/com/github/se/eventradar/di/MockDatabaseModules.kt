@@ -1,4 +1,4 @@
-package com.github.se.eventradar
+package com.github.se.eventradar.di
 
 import com.github.se.eventradar.model.di.FirebaseEventDatabaseModule
 import com.github.se.eventradar.model.di.FirebaseMessageDatabaseModule
