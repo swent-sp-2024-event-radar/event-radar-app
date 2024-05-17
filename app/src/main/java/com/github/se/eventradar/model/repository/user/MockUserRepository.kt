@@ -130,6 +130,35 @@ class MockUserRepository : IUserRepository {
     }
   }
 
+  override suspend fun updateUserField(userId: String, field: String, value: Any): Resource<Unit> {
+    val index = mockUsers.indexOfFirst { it.userId == userId }
+    return if (index != -1) {
+      val user = mockUsers[index]
+      val updatedUser =
+          when (field) {
+            "username" -> user.copy(username = value as? String ?: user.username)
+            "firstName" -> user.copy(firstName = value as? String ?: user.firstName)
+            "lastName" -> user.copy(lastName = value as? String ?: user.lastName)
+            "phoneNumber" -> user.copy(phoneNumber = value as? String ?: user.phoneNumber)
+            "birthDate" -> user.copy(birthDate = value as? String ?: user.birthDate)
+            "accountStatus" -> user.copy(accountStatus = value as? String ?: user.accountStatus)
+            "eventsAttendeeList" ->
+                user.copy(
+                    eventsAttendeeList = value as? MutableList<String> ?: user.eventsAttendeeList)
+            "eventsHostList" ->
+                user.copy(eventsHostList = value as? MutableList<String> ?: user.eventsHostList)
+            "friendsList" ->
+                user.copy(friendsList = value as? MutableList<String> ?: user.friendsList)
+            "profilePicUrl" -> user.copy(profilePicUrl = value as? String ?: user.profilePicUrl)
+            "qrCodeUrl" -> user.copy(qrCodeUrl = value as? String ?: user.qrCodeUrl)
+            else -> user
+          }
+      updateUser(updatedUser)
+    } else {
+      Resource.Failure(Exception("User with id $userId not found"))
+    }
+  }
+
   // Helper method to set the current user ID for testing
   fun updateCurrentUserId(userId: String?) {
     currentUserId = userId
