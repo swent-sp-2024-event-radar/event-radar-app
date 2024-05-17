@@ -27,22 +27,23 @@ class QrCodeScanTicketUiScreen(semanticsProvider: SemanticsNodeInteractionsProvi
   val errorText: KNode = onNode { hasTestTag("ErrorText") }
 
   // MY EvENt TAB
-  val goBackButton: KNode = onNode { hasTestTag("goBackButton") }
-  val eventImage: KNode = onNode { hasTestTag("eventImage") }
+  val lazyEventDetails: KNode = child { hasTestTag("lazyEventDetails") }
+  val goBackButton: KNode = lazyEventDetails.child { hasTestTag("goBackButton") }
+  val eventImage: KNode = lazyEventDetails.child { hasTestTag("eventImage") }
 
   // Text fields
-  val eventTitle: KNode = child { hasTestTag("eventTitle") }
-  val descriptionTitle: KNode = child { hasTestTag("descriptionTitle") }
-  val descriptionContent: KNode = child { hasTestTag("descriptionContent") }
-  val distanceTitle: KNode = child { hasTestTag("distanceTitle") }
-  val distanceContent: KNode = child { hasTestTag("distanceContent") }
-  val dateTitle: KNode = child { hasTestTag("dateTitle") }
-  val dateTimeTitle: KNode = child { hasTestTag("timeTitle") }
-  val dateTimeStartContent: KNode = child { hasTestTag("timeStartContent") }
-  val dateTimeEndContent: KNode = child { hasTestTag("timeEndContent") }
-  val dateContent: KNode = child { hasTestTag("dateContent") }
-  val categoryTitle: KNode = child { hasTestTag("categoryTitle") }
-  val categoryContent: KNode = child { hasTestTag("categoryContent") }
-  val ticketSoldTitle: KNode = child { hasTestTag("ticketSoldTitle") }
-  val ticketSoldContent: KNode = child { hasTestTag("ticketSoldContent") }
+  val eventTitle: KNode = lazyEventDetails.child { hasTestTag("eventTitle") }
+  val descriptionTitle: KNode = lazyEventDetails.child { hasTestTag("descriptionTitle") }
+  val descriptionContent: KNode = lazyEventDetails.child { hasTestTag("descriptionContent") }
+  val distanceTitle: KNode = lazyEventDetails.child { hasTestTag("distanceTitle") }
+  val distanceContent: KNode = lazyEventDetails.child { hasTestTag("distanceContent") }
+  val dateTitle: KNode = lazyEventDetails.child { hasTestTag("dateTitle") }
+  val dateTimeTitle: KNode = lazyEventDetails.child { hasTestTag("timeTitle") }
+  val dateTimeStartContent: KNode = lazyEventDetails.child { hasTestTag("timeStartContent") }
+  val dateTimeEndContent: KNode = lazyEventDetails.child { hasTestTag("timeEndContent") }
+  val dateContent: KNode = lazyEventDetails.child { hasTestTag("dateContent") }
+  val categoryTitle: KNode = lazyEventDetails.child { hasTestTag("categoryTitle") }
+  val categoryContent: KNode = lazyEventDetails.child { hasTestTag("categoryContent") }
+  val ticketSoldTitle: KNode = lazyEventDetails.child { hasTestTag("ticketSoldTitle") }
+  val ticketSoldContent: KNode = lazyEventDetails.child { hasTestTag("ticketSoldContent") }
 }
