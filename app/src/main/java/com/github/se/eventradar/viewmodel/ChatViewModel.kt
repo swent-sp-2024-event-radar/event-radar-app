@@ -186,6 +186,7 @@ data class ChatUiState(
             friendsList = mutableListOf(),
             profilePicUrl = "Default",
             qrCodeUrl = "Default",
+            bio = "",
             username = "Default"),
     val messageInserted: Boolean = false,
     val messagesLoadedFirstTime: Boolean = false,

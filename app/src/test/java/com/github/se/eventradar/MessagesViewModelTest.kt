@@ -126,6 +126,7 @@ class MessagesViewModelTest {
                 friendsList = mutableListOf(),
                 profilePicUrl = "",
                 qrCodeUrl = "",
+                bio = "",
                 username = ""))
 
     assert(addUser is Resource.Success)
@@ -190,6 +191,7 @@ class MessagesViewModelTest {
             friendsList = mutableListOf(),
             profilePicUrl = "",
             qrCodeUrl = "",
+            bio = "",
             username = "")
 
     val addUser = userRepository.addUser(user)
@@ -235,6 +237,7 @@ class MessagesViewModelTest {
             friendsList = mutableListOf(),
             profilePicUrl = "",
             qrCodeUrl = "",
+            bio = "",
             username = "")
 
     val addUser = userRepository.addUser(user)
@@ -278,6 +281,7 @@ class MessagesViewModelTest {
             friendsList = mutableListOf(),
             profilePicUrl = "",
             qrCodeUrl = "",
+            bio = "",
             username = "")
 
     val addUser = userRepository.addUser(user)

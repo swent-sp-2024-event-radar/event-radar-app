@@ -85,6 +85,7 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
                   "private/email" to userEmail,
                   "profilePicUrl" to profilePicUrl,
                   "qrCodeUrl" to qrCodeUrl,
+                  "bio" to "",
                   "username" to state.value.username,
                   "accountStatus" to "active",
                   "eventsAttendeeList" to emptyList<String>(),
