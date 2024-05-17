@@ -71,6 +71,7 @@ class AuthenticationViewModelTest {
           friendsList = mutableListOf(),
           profilePicUrl = "",
           qrCodeUrl = "",
+          bio = "",
           username = "john_doe")
 
   @get:Rule val mainDispatcherRule = MainDispatcherRule()

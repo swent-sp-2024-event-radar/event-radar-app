@@ -222,6 +222,7 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
             "accountStatus" to user.accountStatus,
             "eventsAttendeeList" to user.eventsAttendeeList,
             "eventsHostList" to user.eventsHostList,
+            "bio" to user.bio,
             "friendsList" to user.friendsList,
         )
 

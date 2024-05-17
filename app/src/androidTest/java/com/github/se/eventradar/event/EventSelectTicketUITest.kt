@@ -1,15 +1,16 @@
 package com.github.se.eventradar.event
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.EventCategory
-import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.model.event.EventTicket
-import com.github.se.eventradar.model.event.EventUiState
 import com.github.se.eventradar.screens.EventSelectTicketScreen
 import com.github.se.eventradar.ui.event.SelectTicket
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.viewmodel.EventDetailsViewModel
+import com.github.se.eventradar.viewmodel.EventUiState
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -55,11 +56,18 @@ class EventSelectTicketUITest :
 
   private val eventId = "tdjWMT9Eon2ROTVakQb"
 
-  private val isTicketFree = true
+  private var isTicketFree = true
+
+  private val error = mutableStateOf(false)
+  private val success = mutableStateOf(false)
+  private var isAttending = false
 
   @Before
   fun testSetup() {
 
+    every { mockViewModel.errorOccurred } returns error
+    every { mockViewModel.registrationSuccessful } returns success
+    every { mockViewModel.isUserAttending } returns MutableStateFlow(isAttending)
     every { mockViewModel.uiState } returns sampleEventDetailsUiState
     every { mockViewModel.isTicketFree() } returns isTicketFree
 
@@ -68,6 +76,7 @@ class EventSelectTicketUITest :
 
   @Test
   fun screenDisplaysNavigationElementsCorrectly() = run {
+    isAttending = false
     ComposeScreen.onComposeScreen<EventSelectTicketScreen>(composeTestRule) {
       buyButton { assertIsDisplayed() }
       goBackButton { assertIsDisplayed() }
@@ -99,6 +108,52 @@ class EventSelectTicketUITest :
         assertIsDisplayed()
         assertTextContains("${sampleEventDetailsUiState.value.ticket.price}", substring = true)
       }*/
+    }
+  }
+
+  @Test
+  fun buyTicketSuccessful() = run {
+    ComposeScreen.onComposeScreen<EventSelectTicketScreen>(composeTestRule) {
+      step("Check buy action") {
+        buyButton {
+          assertIsDisplayed()
+          performClick()
+        }
+        // assert: the buy has been triggered
+        verify { mockViewModel.buyTicketForEvent() }
+      }
+
+      step("Check success dialog box appear") {
+        success.value = true
+
+        successDialog { assertIsDisplayed() }
+      }
+
+      step("Ok button back navigate to event details") {
+        okButton {
+          assertIsDisplayed()
+          performClick()
+        }
+        verify { mockNavActions.goBack() }
+      }
+    }
+  }
+
+  @Test
+  fun buyTicketFailure() = run {
+    ComposeScreen.onComposeScreen<EventSelectTicketScreen>(composeTestRule) {
+      buyButton {
+        assertIsDisplayed()
+        performClick()
+      }
+    }
+    // assert: the buy has been triggered
+    verify { mockViewModel.buyTicketForEvent() }
+
+    error.value = true
+
+    ComposeScreen.onComposeScreen<EventSelectTicketScreen>(composeTestRule) {
+      errorDialog { assertIsDisplayed() }
     }
   }
 

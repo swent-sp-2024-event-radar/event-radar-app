@@ -29,6 +29,7 @@ class MockUserRepositoryUnitTest {
           friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/Profile_Pictures/1",
           qrCodeUrl = "http://example.com/QR_Codes/1",
+          bio = "",
           username = "johndoe")
 
   @Before

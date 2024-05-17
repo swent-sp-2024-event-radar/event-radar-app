@@ -92,6 +92,7 @@ class LoginSuccessTest : TestCase() {
             friendsList = mutableListOf(),
             profilePicUrl = "",
             qrCodeUrl = "",
+            bio = "",
             username = "johndoe"))
     mockkStatic(FirebaseAuth::class)
     every { FirebaseAuth.getInstance() } returns mockk<FirebaseAuth>(relaxed = true)
