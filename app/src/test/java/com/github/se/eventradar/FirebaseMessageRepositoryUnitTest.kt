@@ -103,6 +103,46 @@ class FirebaseMessageRepositoryUnitTest {
   }
 
   @Test
+  fun `test getMessages for specific users`() = runTest {
+    val user1 = "1"
+    val user2 = "2"
+
+    every { messagesRef.where(any()).limit(1).get() } returns mockTask(mockQuerySnapshot)
+    every { mockQuerySnapshot.isEmpty } returns false
+    every { mockQuerySnapshot.documents } returns listOf(mockDocumentSnapshot)
+    every { mockDocumentSnapshot.id } returns uid
+    every { mockDocumentSnapshot.data } returns
+        mapOf(
+            "from_user" to user1,
+            "to_user" to user2,
+            "latest_message_id" to "1",
+            "from_user_read" to false,
+            "to_user_read" to false)
+
+    every { messagesRef.document(uid).collection("messages_list").get() } returns
+        mockTask(mockQuerySnapshotMessages)
+    every { mockQuerySnapshotMessages.documents } returns listOf(mockDocumentSnapshotMessages)
+    every { mockDocumentSnapshotMessages.id } returns uid
+    every { mockDocumentSnapshotMessages["content"] } returns ""
+    every { mockDocumentSnapshotMessages["sender"] } returns user1
+    every { mockDocumentSnapshotMessages["date_time_sent"] } returns "2021-01-01T00:00:00"
+
+    val result = firebaseMessageRepository.getMessages(user1, user2)
+
+    assert(result is Resource.Success)
+    val messageHistory = (result as Resource.Success).data
+
+    assert(messageHistory.id == uid)
+    assert(messageHistory.messages.size == 1)
+    val message = messageHistory.messages.first()
+    assert(message.sender == user1)
+    assert(message.content == "")
+    assert(message.dateTimeSent == LocalDateTime.parse("2021-01-01T00:00:00"))
+    assert(message.id == uid)
+    assert(messageHistory == expectedMessageHistory)
+  }
+
+  @Test
   fun `test getMessages() with empty result`() = runTest {
     every { messagesRef.where(any()).get() } returns mockTask(mockQuerySnapshot)
     every { mockQuerySnapshot.isEmpty } returns true

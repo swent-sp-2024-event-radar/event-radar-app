@@ -2,13 +2,11 @@ package com.github.se.eventradar.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.event.SelectTicket
 import com.github.se.eventradar.ui.home.HomeScreen
@@ -17,7 +15,10 @@ import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.login.SignUpScreen
 import com.github.se.eventradar.ui.messages.MessagesScreen
 import com.github.se.eventradar.ui.qrCode.QrCodeScreen
+import com.github.se.eventradar.ui.viewProfile.ViewFriendsProfileUi
 import com.github.se.eventradar.util.toast
+import com.github.se.eventradar.viewmodel.EventDetailsViewModel
+import com.github.se.eventradar.viewmodel.ViewFriendsProfileViewModel
 
 @Composable
 fun NavGraph(
@@ -44,6 +45,15 @@ fun NavGraph(
           val viewModel = EventDetailsViewModel.create(eventId = eventId)
           SelectTicket(viewModel = viewModel, navigationActions = navActions)
         }
+    composable(
+        "${Route.PROFILE}/{friendUserId}",
+        arguments = listOf(navArgument("friendUserId") { type = NavType.StringType })) {
+          val friendUserId = it.arguments!!.getString("friendUserId")!!
+          val viewModel = ViewFriendsProfileViewModel.create(friendUserId = friendUserId)
+          ViewFriendsProfileUi(viewModel = viewModel, navigationActions = navActions)
+        }
+
+    // TODO replace the Toast message with the corresponding screen function of the route
     composable(Route.MESSAGE) { MessagesScreen(navigationActions = navActions) }
     composable(Route.SCANNER) { QrCodeScreen(navigationActions = navActions) }
     composable(Route.PROFILE) {

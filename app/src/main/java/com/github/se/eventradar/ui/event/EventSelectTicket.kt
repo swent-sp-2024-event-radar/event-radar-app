@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -17,7 +18,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,12 +32,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.se.eventradar.R
-import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.EventComponentsStyle
 import com.github.se.eventradar.ui.component.EventTitle
@@ -41,6 +45,7 @@ import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.util.toast
+import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 
 @Composable
 fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: NavigationActions) {
@@ -56,6 +61,35 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
           MaterialTheme.colorScheme.onSurface,
       )
 
+  // Error
+  GenericDialogBox(
+      viewModel.errorOccurred,
+      modifier = Modifier.testTag("buyingTicketErrorDialog"),
+      "Registration Failure",
+      "We are sorry an error occurred during the registration process.") {
+        Icon(
+            painter = painterResource(id = R.drawable.ticket),
+            contentDescription = "ticket icon",
+            modifier = Modifier.size(32.dp),
+            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+        )
+      }
+
+  // Success
+  GenericDialogBox(
+      viewModel.registrationSuccessful,
+      modifier = Modifier.testTag("buyingTicketSuccessDialog"),
+      "Successful registration",
+      "You successfully joined that event",
+      { navigationActions.goBack() }) {
+        Icon(
+            painter = painterResource(id = R.drawable.check),
+            contentDescription = "ticket icon",
+            modifier = Modifier.size(32.dp),
+            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+        )
+      }
+
   Scaffold(
       modifier = Modifier.testTag("joinEventScreen"),
       topBar = {},
@@ -69,10 +103,7 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
       floatingActionButton = {
         // buy ticket button
         FloatingActionButton(
-            onClick = {
-              context.toast("Buy ticket needs to be implemented")
-              /*TODO launch action when buying a ticket */
-            },
+            onClick = { viewModel.buyTicketForEvent() },
             modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("buyButton"),
             containerColor = MaterialTheme.colorScheme.primaryContainer,
         ) {
@@ -161,4 +192,44 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
               }
         }
       }
+}
+
+@Composable
+fun GenericDialogBox(
+    openErrorDialog: MutableState<Boolean>,
+    modifier: Modifier = Modifier,
+    title: String,
+    message: String,
+    onClick: () -> Unit = {},
+    boxIcon: @Composable (() -> Unit)?,
+) {
+  val display by openErrorDialog
+  if (display) {
+    AlertDialog(
+        icon = boxIcon,
+        text = {
+          Text(
+              text = message,
+              textAlign = TextAlign.Center,
+              modifier = Modifier.testTag("ErrorDisplayText"))
+        },
+        title = {
+          Text(
+              text = title,
+              modifier = Modifier.testTag("ErrorTitle"),
+          )
+        },
+        onDismissRequest = { openErrorDialog.value = false },
+        confirmButton = {
+          TextButton(
+              onClick = {
+                openErrorDialog.value = false
+                onClick()
+              },
+              modifier = Modifier.testTag("dialogConfirmButton")) {
+                Text("Ok")
+              }
+        },
+        modifier = modifier)
+  }
 }
