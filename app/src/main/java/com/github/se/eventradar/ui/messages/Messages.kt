@@ -36,14 +36,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.User
-import com.github.se.eventradar.model.message.Message
 import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.ProfilePic
@@ -89,7 +86,7 @@ fun MessagesScreen(
       onChatClicked = { navigationActions.navController.navigate(Route.PRIVATE_CHAT + "/${it}") },
       onTabSelected = navigationActions::navigateTo,
       onFriendClicked = {
-        Toast.makeText(context, "Profile feature is not yet implemented", Toast.LENGTH_SHORT).show()
+        navigationActions.navController.navigate("${Route.PROFILE}/${it.userId}")
       },
       getUser = viewModel::getUser)
 }
@@ -392,6 +389,7 @@ fun FriendPreviewItem(
   }
 }
 
+/*
 @Preview(showSystemUi = true, showBackground = true)
 @ExcludeFromJacocoGeneratedReport
 @Composable
@@ -446,6 +444,7 @@ fun PreviewMessagesScreen() {
             mutableListOf(),
             "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FYJP3bYiaGFPqx64CT6kHOpwvXnv1?alt=media&token=5587f942-efc7-4cbf-920c-7f24a76d7ad1",
             "",
+            "",
             "test $it")
       }
   MessagesScreenUi(
@@ -477,7 +476,37 @@ fun PreviewMessagesScreen() {
             mutableListOf(),
             "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FYJP3bYiaGFPqx64CT6kHOpwvXnv1?alt=media&token=5587f942-efc7-4cbf-920c-7f24a76d7ad1",
             "",
+            "",
             "johndoe")
       },
       onFriendClicked = {})
 }
+
+@Preview(showSystemUi = true, showBackground = true)
+@ExcludeFromJacocoGeneratedReport
+@Composable
+fun PreviewEmptyMessagesList() {
+  MessagesList(
+      messageList = emptyList(),
+      searchQuery = "",
+      userId = "1",
+      onChatClicked = {},
+      getUser = {
+        User(
+            it,
+            "10/10/2003",
+            "test@test.com",
+            "John",
+            "Doe",
+            "1234567890",
+            "active",
+            mutableListOf(),
+            mutableListOf(),
+            mutableListOf(),
+            "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FYJP3bYiaGFPqx64CT6kHOpwvXnv1?alt=media&token=5587f942-efc7-4cbf-920c-7f24a76d7ad1",
+            "",
+            "",
+            "johndoe")
+      })
+}
+*/

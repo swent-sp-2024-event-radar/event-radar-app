@@ -52,6 +52,7 @@ import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.ProfilePic
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.TopLevelDestination
 import com.github.se.eventradar.viewmodel.ChatUiState
@@ -71,6 +72,7 @@ fun ChatScreen(viewModel: ChatViewModel, navigationActions: NavigationActions) {
       uiState = uiState,
       onBackArrowClick = navigationActions::goBack,
       onTabSelected = navigationActions::navigateTo,
+      onViewProfileClick = navigationActions.navController::navigate,
       onMessageChange = viewModel::onMessageBarInputChange,
       onMessageSend = {
         Toast.makeText(context, "Send message to be implemented", Toast.LENGTH_SHORT).show()
@@ -82,6 +84,7 @@ fun ChatScreenUi(
     uiState: ChatUiState,
     onBackArrowClick: () -> Unit,
     onTabSelected: (TopLevelDestination) -> Unit,
+    onViewProfileClick: (String) -> Unit,
     onMessageChange: (String) -> Unit,
     onMessageSend: () -> Unit,
 ) {
@@ -90,7 +93,7 @@ fun ChatScreenUi(
   val opponentName = uiState.opponentProfile.firstName
   val opponentSurname = uiState.opponentProfile.lastName
   val opponentPictureUrl = uiState.opponentProfile.profilePicUrl
-
+  val opponentUserId = uiState.opponentProfile.userId
   val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = messages.size)
   val messagesLoadedFirstTime = uiState.messagesLoadedFirstTime
   val messageInserted = uiState.messageInserted
@@ -117,10 +120,7 @@ fun ChatScreenUi(
             opponentName = opponentName,
             opponentSurname = opponentSurname,
             pictureUrl = opponentPictureUrl,
-            onUserNameClick = {
-              // TO DO : Implement user profile screen with private chat FAB
-              Toast.makeText(context, "User Profile to be implemented", Toast.LENGTH_SHORT).show()
-            },
+            onUserNameClick = { onViewProfileClick("${Route.PROFILE}/${opponentUserId}") },
             onBackArrowClick = onBackArrowClick,
         )
       },
@@ -319,6 +319,7 @@ fun ChatScreenPreview() {
                   profilePicUrl =
                       "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2Fplaceholder.png?alt=media&token=ba4b4efb-ff45-4617-b60f-3789e8fb75b6",
                   qrCodeUrl = "",
+                  bio = "",
                   username = "Test2"),
           messageInserted = true,
           messagesLoadedFirstTime = true)
@@ -328,5 +329,6 @@ fun ChatScreenPreview() {
       onBackArrowClick = {},
       onTabSelected = {},
       onMessageChange = {},
+      onViewProfileClick = {},
       onMessageSend = {})
 }

@@ -86,6 +86,7 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
                       profilePicUrl =
                           "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2Fplaceholder.png?alt=media&token=ba4b4efb-ff45-4617-b60f-3789e8fb75b6",
                       qrCodeUrl = "",
+                      bio = "",
                       username = "Test2"),
               messageInserted = true,
               messagesLoadedFirstTime = true))

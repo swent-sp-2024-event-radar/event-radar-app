@@ -55,7 +55,7 @@ fun BottomNavigationMenu(
             Text(
                 text = labelText,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 12.sp)
+                fontSize = 11.sp)
           },
           selected = selectedItem == tab,
           onClick = { onTabSelected(tab) },

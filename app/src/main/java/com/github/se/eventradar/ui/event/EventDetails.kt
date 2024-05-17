@@ -11,18 +11,25 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberImagePainter
 import com.github.se.eventradar.R
-import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.EventCategory
 import com.github.se.eventradar.ui.component.EventComponentsStyle
@@ -34,6 +41,7 @@ import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 
 // Temporary sizes. Needs to be responsive...
 private val widthPadding = 34.dp
@@ -42,7 +50,10 @@ private val imageHeight = 191.dp
 @Composable
 fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: NavigationActions) {
 
+  val isUserAttending = viewModel.isUserAttending.collectAsStateWithLifecycle().value
   val eventUiState = viewModel.uiState.collectAsStateWithLifecycle().value
+
+  LaunchedEffect(isUserAttending) { viewModel.refreshAttendance() }
 
   val componentStyle =
       EventComponentsStyle(
@@ -63,24 +74,26 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
       },
       floatingActionButton = {
         // view ticket button
-        FloatingActionButton(
-            onClick = {
-              navigationActions.navController.navigate(
-                  "${Route.EVENT_DETAILS_TICKETS}/${viewModel.eventId}")
-            },
-            modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("ticketButton"),
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-        ) {
-          Icon(
-              painter = painterResource(id = R.drawable.ticket),
-              contentDescription = "view tickets button",
-              modifier = Modifier.size(32.dp),
-              tint = MaterialTheme.colorScheme.onPrimaryContainer,
-          )
+        if (!isUserAttending) {
+          FloatingActionButton(
+              onClick = {
+                navigationActions.navController.navigate(
+                    "${Route.EVENT_DETAILS_TICKETS}/${viewModel.eventId}")
+              },
+              modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("ticketButton"),
+              containerColor = MaterialTheme.colorScheme.primaryContainer,
+          ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ticket),
+                contentDescription = "view tickets button",
+                modifier = Modifier.size(32.dp),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+          }
         }
       }) { innerPadding ->
         ConstraintLayout(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-          val (image, backButton, title, description, distance, category, dateAndTime) =
+          val (image, backButton, title, description, distance, category, dateAndTime, joined) =
               createRefs()
 
           // TODO uncomment when image are implemented
@@ -156,6 +169,25 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
                   },
               eventUiState,
               componentStyle)
+
+          if (isUserAttending) {
+            Text(
+                text = stringResource(id = R.string.event_attendance_message),
+                modifier =
+                    Modifier.constrainAs(joined) {
+                          top.linkTo(category.bottom, margin = 32.dp)
+                          start.linkTo(parent.start, margin = widthPadding)
+                          end.linkTo(parent.end, margin = widthPadding)
+                        }
+                        .testTag("attendance"),
+                style =
+                    TextStyle(
+                        fontSize = 18.sp,
+                        fontFamily = FontFamily(Font(R.font.roboto)),
+                        fontWeight = FontWeight.Bold,
+                    ),
+                color = MaterialTheme.colorScheme.primary)
+          }
         }
       }
 }
