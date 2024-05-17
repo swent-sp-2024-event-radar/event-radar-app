@@ -63,7 +63,8 @@ import java.time.LocalDateTime
 @Composable
 fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), navigationActions: NavigationActions) {
   val uiState by viewModel.uiState.collectAsState()
-
+  // Note the opponentId should no longer be in the uiState but be accessible with
+  // viewModel.opponentId
   // TO DO: Implement get messages between two users in VM
   //    viewModel.getMessages(senderId, opponentId)
 
@@ -102,8 +103,8 @@ fun ChatScreenUi(
   val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = messages.size)
   val messagesLoadedFirstTime = uiState.messagesLoadedFirstTime
   val messageInserted = uiState.messageInserted
-  LaunchedEffect(key1 = messagesLoadedFirstTime, messages, messageInserted) {
-    if (messages.isNotEmpty()) {
+  LaunchedEffect(key1 = messagesLoadedFirstTime, messageInserted) {
+    if ((messagesLoadedFirstTime || messageInserted) && messages.isNotEmpty()) {
       scrollState.scrollToItem(index = messages.size - 1)
     }
   }
