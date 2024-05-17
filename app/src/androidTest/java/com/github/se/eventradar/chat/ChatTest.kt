@@ -98,7 +98,7 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
 
     mockUserRepository.updateCurrentUserId("1")
 
-    mockChatViewModel = ChatViewModel(mockMessageRepository, mockUserRepository, "user1")
+    mockChatViewModel = ChatViewModel(mockMessageRepository, mockUserRepository, "2")
 
     // Properly mock the ChatViewModel
     mockChatViewModel = mockk(relaxed = true) { every { uiState } returns sampleChatUiState }
