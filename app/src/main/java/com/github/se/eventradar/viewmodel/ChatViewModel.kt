@@ -59,6 +59,7 @@ constructor(
           friendsList = mutableListOf(),
           profilePicUrl = "Default",
           qrCodeUrl = "Default",
+          bio = "",
           username = "Default")
 
   init {

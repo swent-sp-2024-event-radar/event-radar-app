@@ -69,6 +69,7 @@ class ChatViewModelUnitTest {
           friendsList = mutableListOf(),
           profilePicUrl = "Default",
           qrCodeUrl = "Default",
+          bio = "",
           username = "Default")
 
   private val opponentId = "user2"
@@ -86,6 +87,7 @@ class ChatViewModelUnitTest {
           friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/pic.jpg",
           qrCodeUrl = "http://example.com/qr.jpg",
+          bio = "",
           username = "john_doe")
 
   @Before
