@@ -315,20 +315,20 @@ fun FilterPopUp(
 fun CategorySelection(uiState: EventsOverviewUiState, modifier: Modifier) {
   LazyColumn(modifier = modifier) {
     items(EventCategory.entries.subList(0, EventCategory.entries.size / 2 + 1)) { category ->
-      CategoryRow(category, uiState)
+      CategoryDisplayColumn(category, uiState)
     }
   }
   LazyColumn(modifier = modifier) {
     items(
         EventCategory.entries.subList(
             EventCategory.entries.size / 2 + 1, EventCategory.entries.size)) { category ->
-          CategoryRow(category, uiState)
+          CategoryDisplayColumn(category, uiState)
         }
   }
 }
 
 @Composable
-fun CategoryRow(
+fun CategoryDisplayColumn(
     category: EventCategory,
     uiState: EventsOverviewUiState,
 ) {
@@ -397,18 +397,12 @@ fun ProfilePic(
 fun AppScaffold(
     modifier: Modifier = Modifier,
     topBar: @Composable () -> Unit = {
-      Row(
-          modifier = Modifier.fillMaxWidth().padding(top = 32.dp, start = 16.dp).testTag("logo"),
-          verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(id = R.drawable.event_logo),
-                contentDescription = "Event Radar Logo",
-                modifier = Modifier.size(width = 186.dp, height = 50.dp))
-          }
+      Logo(modifier = Modifier.fillMaxWidth().padding(top = 32.dp, start = 16.dp).testTag("logo"))
     },
     floatingActionButton: @Composable () -> Unit,
     navigationActions: NavigationActions,
-    content: @Composable (PaddingValues) -> Unit
+    selectedItem: String = Route.HOME,
+    content: @Composable (PaddingValues) -> Unit,
 ) {
   Scaffold(
       modifier = modifier,
@@ -417,7 +411,7 @@ fun AppScaffold(
         BottomNavigationMenu(
             onTabSelected = navigationActions::navigateTo,
             tabList = TOP_LEVEL_DESTINATIONS,
-            selectedItem = getTopLevelDestination(Route.HOME),
+            selectedItem = getTopLevelDestination(selectedItem),
             modifier = Modifier.testTag("bottomNavMenu"))
       },
       floatingActionButton = floatingActionButton,
