@@ -1,15 +1,10 @@
 package com.github.se.eventradar.ui.home
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -19,8 +14,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -29,14 +24,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
+import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
-import com.github.se.eventradar.ui.BottomNavigationMenu
+import com.github.se.eventradar.ui.component.AppScaffold
 import com.github.se.eventradar.ui.component.EventList
 import com.github.se.eventradar.ui.component.FilterPopUp
 import com.github.se.eventradar.ui.component.SearchBarAndFilter
@@ -45,8 +40,8 @@ import com.github.se.eventradar.ui.component.getIconFromViewListBool
 import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
-import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.eventradar.ui.navigation.getTopLevelDestination
+import com.github.se.eventradar.util.toast
+import com.github.se.eventradar.viewmodel.EventsOverviewUiState
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.github.se.eventradar.viewmodel.Tab
 
@@ -71,44 +66,24 @@ fun HomeScreen(
     }
   }
 
-  Scaffold(
+  AppScaffold(
       modifier = Modifier.testTag("homeScreen"),
-      topBar = {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 32.dp, start = 16.dp).testTag("logo"),
-            verticalAlignment = Alignment.CenterVertically) {
-              Image(
-                  painter = painterResource(id = R.drawable.event_logo),
-                  contentDescription = "Event Radar Logo",
-                  modifier = Modifier.size(width = 186.dp, height = 50.dp))
-            }
-      },
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelected = navigationActions::navigateTo,
-            tabList = TOP_LEVEL_DESTINATIONS,
-            selectedItem = getTopLevelDestination(Route.HOME),
-            modifier = Modifier.testTag("bottomNavMenu"))
-      },
       floatingActionButton = {
         ViewToggleFab(
             modifier = Modifier.padding(16.dp).testTag("viewToggleFab"),
             onClick = { viewModel.onViewListStatusChanged() },
             iconVector = getIconFromViewListBool(uiState.viewList))
-      }) {
-        ConstraintLayout(modifier = Modifier.fillMaxSize().padding(it).testTag("homeScreen")) {
-          val (tabs, searchAndFilter, filterPopUp, eventList, eventMap) = createRefs()
+      },
+      navigationActions = navigationActions,
+  ) {
+    val context = LocalContext.current
+
+    Column(
+        modifier = Modifier.fillMaxSize().padding(it).padding(top = 16.dp).testTag("homeScreen"),
+        horizontalAlignment = Alignment.CenterHorizontally) {
           TabRow(
               selectedTabIndex = getTabIndexFromTabEnum(uiState.tab),
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .padding(top = 8.dp)
-                      .constrainAs(tabs) {
-                        top.linkTo(parent.top, margin = 8.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                      }
-                      .testTag("tabs"),
+              modifier = Modifier.fillMaxWidth().testTag("tabs"),
               contentColor = MaterialTheme.colorScheme.primary) {
                 Tab(
                     selected = getTabIndexFromTabEnum(uiState.tab) == 0,
@@ -161,157 +136,74 @@ fun HomeScreen(
               onSearchActiveChanged = { viewModel.onSearchActiveChanged(it) },
               onFilterDialogOpen = { viewModel.onFilterDialogOpen() },
               modifier =
-                  Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                      .testTag("searchBarAndFilter")
-                      .constrainAs(searchAndFilter) {
-                        top.linkTo(tabs.bottom, margin = 8.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                      },
+                  Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
+                      .testTag("searchBarAndFilter"),
               placeholderStringResource = R.string.home_search_placeholder)
-
-          if (uiState.tab == Tab.BROWSE) {
-            when {
-              // In list view + search or filter is active
-              (uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
-                  EventList(
-                      uiState.eventList.filteredEvents,
-                      Modifier.testTag("filteredEventList").fillMaxWidth().constrainAs(eventList) {
-                        top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                      }) { eventId ->
-                        navigationActions.navController.navigate(
-                            "${Route.EVENT_DETAILS}/${eventId}")
-                      }
-              // In list view + neither search nor filter are active
-              (uiState.viewList) ->
-                  EventList(
-                      uiState.eventList.allEvents,
-                      Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
-                        top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                      }) { eventId ->
-                        navigationActions.navController.navigate(
-                            "${Route.EVENT_DETAILS}/${eventId}")
-                      }
-              // In map view + search or filter is active
-              (uiState.isSearchActive || uiState.isFilterActive) ->
-                  EventMap(
-                      uiState.eventList.filteredEvents,
-                      Modifier.testTag("filteredMap").fillMaxWidth().constrainAs(eventMap) {
-                        top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                      }) { eventId ->
-                        navigationActions.navController.navigate(
-                            "${Route.EVENT_DETAILS}/${eventId}")
-                      }
-              // In map view + neither search nor filter are active
-              else ->
-                  EventMap(
-                      uiState.eventList.allEvents,
-                      Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
-                        top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                      }) { eventId ->
-                        navigationActions.navController.navigate(
-                            "${Route.EVENT_DETAILS}/${eventId}")
-                      }
-            }
-          } else {
-            when {
-              (!uiState.userLoggedIn) ->
-                  Text(
-                      "Please log in",
-                      modifier =
-                          Modifier.testTag("pleaseLogInText").constrainAs(eventList) {
-                            top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                          })
-              (uiState.viewList && uiState.upcomingEventList.allEvents.isEmpty()) ->
-                  Text(
-                      "You have no upcoming events",
-                      modifier =
-                          Modifier.testTag("noUpcomingEventsText").constrainAs(eventList) {
-                            top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                          })
-              // In list view + search or filter is active
-              (uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
-                  EventList(
-                      events = uiState.upcomingEventList.filteredEvents,
-                      modifier =
-                          Modifier.testTag("filteredEventListUpcoming").fillMaxWidth().constrainAs(
-                              eventList) {
-                                top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                              }) { eventId ->
-                        navigationActions.navController.navigate(
-                            "${Route.EVENT_DETAILS}/${eventId}")
-                      }
-              // In list view + neither search nor filter are active
-              (uiState.viewList) ->
-                  EventList(
-                      events = uiState.upcomingEventList.allEvents,
-                      modifier =
-                          Modifier.testTag("eventListUpcoming").fillMaxWidth().constrainAs(
-                              eventList) {
-                                top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                              }) { eventId ->
-                        navigationActions.navController.navigate(
-                            "${Route.EVENT_DETAILS}/${eventId}")
-                      }
-              // In map view + search or filter is active
-              (uiState.isSearchActive || uiState.isFilterActive) ->
-                  EventMap(
-                      uiState.upcomingEventList.filteredEvents,
-                      Modifier.testTag("filteredMapUpcoming").fillMaxWidth().constrainAs(eventMap) {
-                        top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                      }) { eventId ->
-                        navigationActions.navController.navigate(
-                            "${Route.EVENT_DETAILS}/${eventId}")
-                      }
-              // In map view + neither search nor filter are active
-              else ->
-                  EventMap(
-                      uiState.upcomingEventList.allEvents,
-                      Modifier.testTag("mapUpcoming").fillMaxWidth().constrainAs(eventMap) {
-                        top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                      }) { eventId ->
-                        navigationActions.navController.navigate(
-                            "${Route.EVENT_DETAILS}/${eventId}")
-                      }
-            }
-          }
 
           if (uiState.isFilterDialogOpen) {
             FilterPopUp(
                 onFreeSwitchChanged = { viewModel.onFreeSwitchChanged() },
-                onFilterApply = { viewModel.onFilterApply() },
+                onFilterApply = {
+                  if (uiState.radiusQuery != "") {
+                    viewModel.onRadiusQueryChanged("")
+                    context.toast("Radius filtering not yet implemented")
+                  }
+                  viewModel.onFilterApply()
+                },
                 uiState = uiState,
                 onRadiusQueryChanged = { viewModel.onRadiusQueryChanged(it) },
-                modifier =
-                    Modifier.height(355.dp).width(230.dp).testTag("filterPopUp").constrainAs(
-                        filterPopUp) {
-                          top.linkTo(searchAndFilter.bottom)
-                          end.linkTo(parent.end)
-                        },
+                modifier = Modifier.testTag("filterPopUp"),
             )
           }
+
+          EventsOverview(
+              uiState = uiState,
+              navigationActions = navigationActions,
+          )
         }
-      }
+  }
+}
+
+@Composable
+fun EventsOverview(
+    uiState: EventsOverviewUiState,
+    navigationActions: NavigationActions,
+    modifier: Modifier = Modifier
+) {
+  val events = getEventsBasedOffUiState(uiState)
+  if (uiState.tab == Tab.BROWSE) {
+    when (uiState.viewList) {
+      true ->
+          EventList(events, modifier.testTag("eventList").fillMaxWidth()) { eventId ->
+            navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+          }
+      false ->
+          EventMap(events, modifier.testTag("eventMap").fillMaxWidth()) { eventId ->
+            navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+          }
+    }
+  } else {
+    when {
+      (!uiState.userLoggedIn) ->
+          Text("Please log in", modifier = modifier.testTag("pleaseLogInText"))
+      (uiState.viewList && uiState.upcomingEventList.allEvents.isEmpty()) ->
+          Text(
+              "You have no upcoming events",
+              textAlign = TextAlign.Center,
+              modifier = modifier.testTag("noUpcomingEventsText"))
+      // In list view + search or filter is active
+      uiState.viewList ->
+          EventList(
+              events = events, modifier = modifier.testTag("eventListUpcoming").fillMaxWidth()) {
+                  eventId ->
+                navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+              }
+      else ->
+          EventMap(events, modifier.testTag("eventMapUpcoming").fillMaxWidth()) { eventId ->
+            navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+          }
+    }
+  }
 }
 
 fun getTabIndexFromTabEnum(tab: Tab): Int {
@@ -322,6 +214,20 @@ fun getTabIndexFromTabEnum(tab: Tab): Int {
         1
       }
   return selectedTabIndex
+}
+
+fun getEventsBasedOffUiState(uiState: EventsOverviewUiState): List<Event> {
+  return if (uiState.tab == Tab.BROWSE) {
+    when {
+      uiState.isSearchActive || uiState.isFilterActive -> uiState.eventList.filteredEvents
+      else -> uiState.eventList.allEvents
+    }
+  } else {
+    when {
+      uiState.isSearchActive || uiState.isFilterActive -> uiState.upcomingEventList.filteredEvents
+      else -> uiState.upcomingEventList.allEvents
+    }
+  }
 }
 
 @Preview(showBackground = true, showSystemUi = true)

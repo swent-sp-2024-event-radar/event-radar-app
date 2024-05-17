@@ -13,6 +13,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.github.se.eventradar.R
 import com.github.se.eventradar.viewmodel.EventUiState
@@ -28,14 +29,13 @@ data class EventComponentsStyle(
             fontSize = 32.sp,
             fontFamily = FontFamily(Font(R.font.roboto)),
             fontWeight = FontWeight.Bold,
-            lineHeight = 20.sp,
+            textAlign = TextAlign.Center,
         ),
     val subTitleStyle: TextStyle =
         TextStyle(
             fontSize = 22.sp,
             fontFamily = FontFamily(Font(R.font.roboto)),
             fontWeight = FontWeight.Medium,
-            lineHeight = 20.sp,
         ),
     val fieldTitleStyle: TextStyle =
         TextStyle(

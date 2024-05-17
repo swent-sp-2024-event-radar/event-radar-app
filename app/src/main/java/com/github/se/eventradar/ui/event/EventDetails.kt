@@ -14,7 +14,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,7 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.eventradar.R
-import com.github.se.eventradar.ui.BottomNavigationMenu
+import com.github.se.eventradar.ui.component.AppScaffold
 import com.github.se.eventradar.ui.component.EventCategory
 import com.github.se.eventradar.ui.component.EventComponentsStyle
 import com.github.se.eventradar.ui.component.EventDate
@@ -45,7 +44,6 @@ import com.github.se.eventradar.ui.component.EventTitle
 import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
-import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 
 // Temporary sizes. Needs to be responsive...
@@ -66,17 +64,10 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
           MaterialTheme.colorScheme.onSurface,
       )
 
-  Scaffold(
+  AppScaffold(
       modifier = Modifier.testTag("eventDetailsScreen"),
       topBar = {
         GoBackButton(modifier = Modifier.wrapContentSize()) { navigationActions.goBack() }
-      },
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelected = { tab -> navigationActions.navigateTo(tab) },
-            tabList = TOP_LEVEL_DESTINATIONS,
-            selectedItem = TOP_LEVEL_DESTINATIONS[2],
-            modifier = Modifier.testTag("bottomNavMenu"))
       },
       floatingActionButton = {
         // view ticket button
@@ -97,7 +88,8 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
             )
           }
         }
-      }) {
+      },
+      navigationActions = navigationActions) {
         Column(
             modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(it)) {
               // TODO uncomment when image are implemented
@@ -117,11 +109,11 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
               Spacer(modifier = Modifier.height(8.dp))
 
               Column(
-                  modifier = Modifier.padding(horizontal = 8.dp),
+                  modifier = Modifier.padding(horizontal = 16.dp),
                   horizontalAlignment = Alignment.CenterHorizontally) {
                     EventDescription(modifier = Modifier, eventUiState, componentStyle)
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     Row(modifier = Modifier.fillMaxWidth()) {
                       EventDistance(modifier = Modifier.weight(2f), eventUiState, componentStyle)

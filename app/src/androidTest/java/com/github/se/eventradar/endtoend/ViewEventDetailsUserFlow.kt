@@ -106,7 +106,7 @@ class ViewEventDetailsUserFlow : TestCase() {
         searchBarAndFilter { assertIsDisplayed() }
         searchBar { performTextInput("Test 1") }
 
-        filteredEventList { assertIsDisplayed() }
+        eventList { assertIsDisplayed() }
         eventCard { assertIsDisplayed() }
       }
 
