@@ -34,8 +34,11 @@ import io.mockk.mockk
 import io.mockk.verify
 import java.time.LocalDateTime
 import junit.framework.TestCase.assertEquals
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -211,12 +214,12 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
   @OptIn(ExperimentalCoroutinesApi::class)
   @Test
   fun screenDisplaysContentElementsCorrectly() =
-      //  Test(timeout = 45.seconds) {
-      // Your test code here {
-      run {
+      runTest(timeout = 45.seconds) {
+        // Your test code here {
         val viewModel = setupViewModelMyEventTab()
         onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
           composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
+          advanceUntilIdle()
           eventTitle { assertIsDisplayed() }
           eventImage { assertIsDisplayed() }
           descriptionTitle { assertIsDisplayed() }
@@ -238,6 +241,7 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
           //          ticketSoldContent {
           //            assertIsDisplayed()
           //            assertTextContains("59 tickets sold")
+          //          }
           //          }
         }
       }
