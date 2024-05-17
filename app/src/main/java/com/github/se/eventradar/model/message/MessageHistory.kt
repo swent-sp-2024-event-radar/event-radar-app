@@ -29,7 +29,6 @@ data class MessageHistory(
     map["latest_message_id"] = latestMessageId
     map["from_user_read"] = user1ReadMostRecentMessage
     map["to_user_read"] = user2ReadMostRecentMessage
-    map["messages"] = messages.map { it.toMap() }
     return map
   }
 }

@@ -1,6 +1,5 @@
 package com.github.se.eventradar.ui.chat
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
@@ -66,17 +65,13 @@ fun ChatScreen(viewModel: ChatViewModel, navigationActions: NavigationActions) {
   viewModel.initOpponent()
   viewModel.getMessages()
 
-  val context = LocalContext.current // only needed until message send is implemented
-
   ChatScreenUi(
       uiState = uiState,
       onBackArrowClick = navigationActions::goBack,
       onTabSelected = navigationActions::navigateTo,
       onViewProfileClick = navigationActions.navController::navigate,
       onMessageChange = viewModel::onMessageBarInputChange,
-      onMessageSend = {
-        Toast.makeText(context, "Send message to be implemented", Toast.LENGTH_SHORT).show()
-      })
+      onMessageSend = viewModel::onMessageSend)
 }
 
 @Composable
@@ -110,8 +105,6 @@ fun ChatScreenUi(
       scrollState.scrollToItem(index = messages.size - 1)
     }
   }
-
-  val context = LocalContext.current // only needed until view profile is implemented
 
   Scaffold(
       modifier = Modifier.testTag("chatScreen"),
@@ -239,7 +232,6 @@ fun ChatInput(uiState: ChatUiState, onMessageChange: (String) -> Unit, onMessage
             },
             trailingIcon = {
               IconButton(
-                  // TO DO: Implement onMessageSend
                   onClick = { onMessageSend() },
                   modifier = Modifier.testTag("chatInputSendButton")) {
                     Icon(

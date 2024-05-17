@@ -54,7 +54,7 @@ fun NavGraph(
           val viewModel = ChatViewModel.create(opponentId = opponentId)
           ChatScreen(viewModel = viewModel, navigationActions = navActions)
         }
-      composable(
+    composable(
         "${Route.PROFILE}/{friendUserId}",
         arguments = listOf(navArgument("friendUserId") { type = NavType.StringType })) {
           val friendUserId = it.arguments!!.getString("friendUserId")!!

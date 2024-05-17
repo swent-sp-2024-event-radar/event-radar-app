@@ -1,6 +1,5 @@
 package com.github.se.eventradar.ui.viewProfile
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -76,8 +75,8 @@ fun ViewFriendsProfileUi(
       floatingActionButton = {
         FloatingActionButton(
             onClick = {
-              // To Be Implemented
-              Toast.makeText(context, "Chat not implemented yet", Toast.LENGTH_SHORT).show()
+              navigationActions.navController.navigate(
+                  Route.PRIVATE_CHAT + "/${viewModel.friendUserId}")
             },
             modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("chatButton"),
             containerColor = MaterialTheme.colorScheme.primaryContainer,

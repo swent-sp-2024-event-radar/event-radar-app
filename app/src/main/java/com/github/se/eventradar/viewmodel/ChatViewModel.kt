@@ -59,6 +59,7 @@ constructor(
           friendsList = mutableListOf(),
           profilePicUrl = "Default",
           qrCodeUrl = "Default",
+          bio = "Default bio",
           username = "Default")
 
   init {
@@ -108,13 +109,28 @@ constructor(
         _uiState.update { currentState ->
           when (messagesResource) {
             is Resource.Success -> {
+              // Sort messages by dateTimeSent in place
+              messagesResource.data.messages.sortBy { it.dateTimeSent }
+
               currentState.copy(
                   messageHistory = messagesResource.data, messagesLoadedFirstTime = true)
             }
             is Resource.Failure -> {
               Log.d(
                   "ChatViewModel", "Error fetching messages: ${messagesResource.throwable.message}")
-              currentState
+
+              // Message history doesn't exist between two users.
+              // Record an empty message history with the two user id's,
+              // so that a new message history can be created for them when addMessage is called
+              currentState.copy(
+                  messageHistory =
+                      MessageHistory(
+                          user1 = userId,
+                          user2 = opponentId,
+                          latestMessageId = "",
+                          user1ReadMostRecentMessage = false,
+                          user2ReadMostRecentMessage = false,
+                          messages = mutableListOf()))
             }
           }
         }
@@ -152,7 +168,6 @@ constructor(
                 content = message,
                 dateTimeSent = LocalDateTime.now(),
                 id = "") // Temporarily empty until Firebase assigns an ID
-
         messagesRepository.addMessage(newMessage, _uiState.value.messageHistory)
       } else {
         Log.d("ChatViewModel", "Invalid state: User ID")
