@@ -48,7 +48,6 @@ constructor(
   val uiState: StateFlow<QrCodeScanTicketState> = _uiState
 
   enum class Action {
-    ViewMyEvent,
     ScanTicket,
     ApproveEntry,
     DenyEntry,
@@ -65,11 +64,14 @@ constructor(
   init {
     qrCodeAnalyser.onDecoded = { decodedString ->
       val result = decodedString ?: "Failed to decode QR Code"
-      updateDecodedString(result)
+      updateDecodedString(result) // Update state flow
       if (result != "Failed to decode QR Code") {
-        updatePermissions(result)
+        //        println("correctly decoded")
+        updatePermissions(result) // Directly call updateFriendList
       } else {
+        //      println("wrongly decoded")
         changeAction(Action.AnalyserError)
+        //        println("checkpoint 2")
       }
     }
     getEventData()
@@ -172,7 +174,7 @@ constructor(
 
   data class QrCodeScanTicketState(
       val decodedResult: String = "",
-      val action: Action = Action.ViewMyEvent,
+      val action: Action = Action.ScanTicket,
       val tabState: Tab = Tab.MyEvent,
       val eventUiState: EventUiState = EventUiState()
   )
