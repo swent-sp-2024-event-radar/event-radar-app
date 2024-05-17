@@ -234,11 +234,11 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
           dateTimeTitle { assertIsDisplayed() }
           dateTimeStartContent { assertIsDisplayed() }
           dateTimeEndContent { assertIsDisplayed() }
-          //          ticketSoldTitle.assertIsDisplayed()
-          //          ticketSoldContent {
-          //            assertIsDisplayed()
-          //            assertTextContains("59 tickets sold")
-
+                    ticketSoldTitle.assertIsDisplayed()
+                    ticketSoldContent {
+                      assertIsDisplayed()
+                      assertTextContains("59 tickets sold")
+                    }
         }
       }
 

@@ -1,10 +1,30 @@
 package com.github.se.eventradar.model.repository.event
 
+import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.event.Event
+import com.github.se.eventradar.model.event.EventCategory
+import com.github.se.eventradar.model.event.EventTicket
+import java.time.LocalDateTime
 
 class MockEventRepository : IEventRepository {
-  private val mockEvents = mutableListOf<Event>()
+  private val mockEvents = mutableListOf <Event>()
+//    ( Event(
+//      eventName = "Event 1",
+//      eventPhoto = "",
+//      start = LocalDateTime.now(),
+//      end = LocalDateTime.now(),
+//      location = Location(0.0, 0.0, "Test Location"),
+//      description = "Hey,Because of the grace period until Sunday, actually the real deadline is Sunday 23:59pm. Do you think it would be feasible to have your branche merged and taken into account for the team submission ? I added a timeout because the CI originally failed with a timeout error, so I need to setup a different EMulator when testing locally? advance till idle was just a thing i added to try and make it work",
+//      ticket = EventTicket("Test Ticket", 0.0, 100, 59),
+//      mainOrganiser = "1",
+//      organiserList = mutableListOf("Test Organiser"),
+//      attendeeList = mutableListOf("user1", "user2", "user3"),
+//      category = EventCategory.COMMUNITY,
+//      fireBaseID = "1")
+//  )
+
+
 
   override suspend fun getEvents(): Resource<List<Event>> {
     return Resource.Success(mockEvents)

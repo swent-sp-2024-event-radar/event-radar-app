@@ -48,7 +48,6 @@ constructor(
   val uiState: StateFlow<QrCodeScanTicketState> = _uiState
 
   enum class Action {
-    ViewMyEvent,
     ScanTicket,
     ApproveEntry,
     DenyEntry,
@@ -175,7 +174,7 @@ constructor(
 
   data class QrCodeScanTicketState(
       val decodedResult: String = "",
-      val action: Action = Action.ViewMyEvent,
+      val action: Action = Action.ScanTicket,
       val tabState: Tab = Tab.MyEvent,
       val eventUiState: EventUiState = EventUiState()
   )
