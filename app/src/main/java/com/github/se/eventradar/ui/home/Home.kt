@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -56,6 +57,7 @@ fun HomeScreen(
 ) {
   // Ui States handled by viewModel
   val uiState by viewModel.uiState.collectAsState()
+
   LaunchedEffect(key1 = uiState.isSearchActive, key2 = uiState.isFilterActive) {
     if (uiState.isSearchActive || uiState.isFilterActive) {
       viewModel.filterEvents()
@@ -69,247 +71,247 @@ fun HomeScreen(
     }
   }
 
-  ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("homeScreen")) {
-    val (logo, tabs, searchAndFilter, filterPopUp, eventList, eventMap, bottomNav, viewToggle) =
-        createRefs()
-    Row(
-        modifier =
-            Modifier.fillMaxWidth()
-                .constrainAs(logo) {
-                  top.linkTo(parent.top, margin = 32.dp)
-                  start.linkTo(parent.start, margin = 16.dp)
+  Scaffold(
+      modifier = Modifier.testTag("homeScreen"),
+      topBar = {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 32.dp, start = 16.dp).testTag("logo"),
+            verticalAlignment = Alignment.CenterVertically) {
+              Image(
+                  painter = painterResource(id = R.drawable.event_logo),
+                  contentDescription = "Event Radar Logo",
+                  modifier = Modifier.size(width = 186.dp, height = 50.dp))
+            }
+      },
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelected = navigationActions::navigateTo,
+            tabList = TOP_LEVEL_DESTINATIONS,
+            selectedItem = getTopLevelDestination(Route.HOME),
+            modifier = Modifier.testTag("bottomNavMenu"))
+      },
+      floatingActionButton = {
+        ViewToggleFab(
+            modifier = Modifier.padding(16.dp).testTag("viewToggleFab"),
+            onClick = { viewModel.onViewListStatusChanged() },
+            iconVector = getIconFromViewListBool(uiState.viewList))
+      }) {
+        ConstraintLayout(modifier = Modifier.fillMaxSize().padding(it).testTag("homeScreen")) {
+          val (tabs, searchAndFilter, filterPopUp, eventList, eventMap) = createRefs()
+          TabRow(
+              selectedTabIndex = getTabIndexFromTabEnum(uiState.tab),
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .padding(top = 8.dp)
+                      .constrainAs(tabs) {
+                        top.linkTo(parent.top, margin = 8.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                      }
+                      .testTag("tabs"),
+              contentColor = MaterialTheme.colorScheme.primary) {
+                Tab(
+                    selected = getTabIndexFromTabEnum(uiState.tab) == 0,
+                    onClick = {
+                      viewModel.onTabChanged(Tab.BROWSE)
+                      viewModel.getEvents()
+                    },
+                    modifier = Modifier.testTag("browseTab"),
+                ) {
+                  Text(
+                      text = "Browse",
+                      style =
+                          TextStyle(
+                              fontSize = 19.sp,
+                              lineHeight = 17.sp,
+                              fontFamily = FontFamily(Font(R.font.roboto)),
+                              fontWeight = FontWeight(500),
+                              color = MaterialTheme.colorScheme.onPrimaryContainer,
+                              textAlign = TextAlign.Center,
+                              letterSpacing = 0.25.sp,
+                          ),
+                      modifier = Modifier.padding(bottom = 8.dp))
                 }
-                .testTag("logo"),
-        verticalAlignment = Alignment.CenterVertically) {
-          Image(
-              painter = painterResource(id = R.drawable.event_logo),
-              contentDescription = "Event Radar Logo",
-              modifier = Modifier.size(width = 186.dp, height = 50.dp))
-        }
-    TabRow(
-        selectedTabIndex = getTabIndexFromTabEnum(uiState.tab),
-        modifier =
-            Modifier.fillMaxWidth()
-                .padding(top = 8.dp)
-                .constrainAs(tabs) {
-                  top.linkTo(logo.bottom, margin = 16.dp)
-                  start.linkTo(parent.start)
-                  end.linkTo(parent.end)
-                }
-                .testTag("tabs"),
-        contentColor = MaterialTheme.colorScheme.primary) {
-          Tab(
-              selected = getTabIndexFromTabEnum(uiState.tab) == 0,
-              onClick = {
-                viewModel.onTabChanged(Tab.BROWSE)
-                viewModel.getEvents()
-              },
-              modifier = Modifier.testTag("browseTab"),
-          ) {
-            Text(
-                text = "Browse",
-                style =
-                    TextStyle(
-                        fontSize = 19.sp,
-                        lineHeight = 17.sp,
-                        fontFamily = FontFamily(Font(R.font.roboto)),
-                        fontWeight = FontWeight(500),
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        textAlign = TextAlign.Center,
-                        letterSpacing = 0.25.sp,
-                    ),
-                modifier = Modifier.padding(bottom = 8.dp))
-          }
-          Tab(
-              selected = getTabIndexFromTabEnum(uiState.tab) == 1,
-              onClick = {
-                viewModel.onTabChanged(Tab.UPCOMING)
-                viewModel.getUpcomingEvents()
-              },
-              modifier = Modifier.testTag("upcomingTab")) {
-                Text(
-                    text = "Upcoming",
-                    style =
-                        TextStyle(
-                            fontSize = 19.sp,
-                            lineHeight = 17.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto)),
-                            fontWeight = FontWeight(500),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            textAlign = TextAlign.Center,
-                            letterSpacing = 0.25.sp,
-                        ),
-                    modifier = Modifier.padding(bottom = 8.dp))
+                Tab(
+                    selected = getTabIndexFromTabEnum(uiState.tab) == 1,
+                    onClick = {
+                      viewModel.onTabChanged(Tab.UPCOMING)
+                      viewModel.getUpcomingEvents()
+                    },
+                    modifier = Modifier.testTag("upcomingTab")) {
+                      Text(
+                          text = "Upcoming",
+                          style =
+                              TextStyle(
+                                  fontSize = 19.sp,
+                                  lineHeight = 17.sp,
+                                  fontFamily = FontFamily(Font(R.font.roboto)),
+                                  fontWeight = FontWeight(500),
+                                  color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                  textAlign = TextAlign.Center,
+                                  letterSpacing = 0.25.sp,
+                              ),
+                          modifier = Modifier.padding(bottom = 8.dp))
+                    }
               }
-        }
 
-    SearchBarAndFilter(
-        onSearchQueryChanged = { viewModel.onSearchQueryChanged(it) },
-        searchQuery = uiState.searchQuery,
-        onSearchActiveChanged = { viewModel.onSearchActiveChanged(it) },
-        onFilterDialogOpen = { viewModel.onFilterDialogOpen() },
-        modifier =
-            Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                .testTag("searchBarAndFilter")
-                .constrainAs(searchAndFilter) {
-                  top.linkTo(tabs.bottom, margin = 8.dp)
-                  start.linkTo(parent.start)
-                  end.linkTo(parent.end)
-                },
-        placeholderStringResource = R.string.home_search_placeholder)
+          SearchBarAndFilter(
+              onSearchQueryChanged = { viewModel.onSearchQueryChanged(it) },
+              searchQuery = uiState.searchQuery,
+              onSearchActiveChanged = { viewModel.onSearchActiveChanged(it) },
+              onFilterDialogOpen = { viewModel.onFilterDialogOpen() },
+              modifier =
+                  Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                      .testTag("searchBarAndFilter")
+                      .constrainAs(searchAndFilter) {
+                        top.linkTo(tabs.bottom, margin = 8.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                      },
+              placeholderStringResource = R.string.home_search_placeholder)
 
-    if (uiState.tab == Tab.BROWSE) {
-      when {
-        // In list view + search or filter is active
-        (uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
-            EventList(
-                uiState.eventList.filteredEvents,
-                Modifier.testTag("filteredEventList").fillMaxWidth().constrainAs(eventList) {
-                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                  start.linkTo(parent.start)
-                  end.linkTo(parent.end)
-                }) { eventId ->
-                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-                }
-        // In list view + neither search nor filter are active
-        (uiState.viewList) ->
-            EventList(
-                uiState.eventList.allEvents,
-                Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
-                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                  start.linkTo(parent.start)
-                  end.linkTo(parent.end)
-                }) { eventId ->
-                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-                }
-        // In map view + search or filter is active
-        (uiState.isSearchActive || uiState.isFilterActive) ->
-            EventMap(
-                uiState.eventList.filteredEvents,
-                Modifier.testTag("filteredMap").fillMaxWidth().constrainAs(eventMap) {
-                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                  start.linkTo(parent.start)
-                  end.linkTo(parent.end)
-                }) { eventId ->
-                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-                }
-        // In map view + neither search nor filter are active
-        else ->
-            EventMap(
-                uiState.eventList.allEvents,
-                Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
-                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                  start.linkTo(parent.start)
-                  end.linkTo(parent.end)
-                }) { eventId ->
-                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-                }
-      }
-    } else {
-      when {
-        (!uiState.userLoggedIn) ->
-            Text(
-                "Please log in",
+          if (uiState.tab == Tab.BROWSE) {
+            when {
+              // In list view + search or filter is active
+              (uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
+                  EventList(
+                      uiState.eventList.filteredEvents,
+                      Modifier.testTag("filteredEventList").fillMaxWidth().constrainAs(eventList) {
+                        top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                      }) { eventId ->
+                        navigationActions.navController.navigate(
+                            "${Route.EVENT_DETAILS}/${eventId}")
+                      }
+              // In list view + neither search nor filter are active
+              (uiState.viewList) ->
+                  EventList(
+                      uiState.eventList.allEvents,
+                      Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
+                        top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                      }) { eventId ->
+                        navigationActions.navController.navigate(
+                            "${Route.EVENT_DETAILS}/${eventId}")
+                      }
+              // In map view + search or filter is active
+              (uiState.isSearchActive || uiState.isFilterActive) ->
+                  EventMap(
+                      uiState.eventList.filteredEvents,
+                      Modifier.testTag("filteredMap").fillMaxWidth().constrainAs(eventMap) {
+                        top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                      }) { eventId ->
+                        navigationActions.navController.navigate(
+                            "${Route.EVENT_DETAILS}/${eventId}")
+                      }
+              // In map view + neither search nor filter are active
+              else ->
+                  EventMap(
+                      uiState.eventList.allEvents,
+                      Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
+                        top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                      }) { eventId ->
+                        navigationActions.navController.navigate(
+                            "${Route.EVENT_DETAILS}/${eventId}")
+                      }
+            }
+          } else {
+            when {
+              (!uiState.userLoggedIn) ->
+                  Text(
+                      "Please log in",
+                      modifier =
+                          Modifier.testTag("pleaseLogInText").constrainAs(eventList) {
+                            top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                          })
+              (uiState.viewList && uiState.upcomingEventList.allEvents.isEmpty()) ->
+                  Text(
+                      "You have no upcoming events",
+                      modifier =
+                          Modifier.testTag("noUpcomingEventsText").constrainAs(eventList) {
+                            top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                          })
+              // In list view + search or filter is active
+              (uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
+                  EventList(
+                      events = uiState.upcomingEventList.filteredEvents,
+                      modifier =
+                          Modifier.testTag("filteredEventListUpcoming").fillMaxWidth().constrainAs(
+                              eventList) {
+                                top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                              }) { eventId ->
+                        navigationActions.navController.navigate(
+                            "${Route.EVENT_DETAILS}/${eventId}")
+                      }
+              // In list view + neither search nor filter are active
+              (uiState.viewList) ->
+                  EventList(
+                      events = uiState.upcomingEventList.allEvents,
+                      modifier =
+                          Modifier.testTag("eventListUpcoming").fillMaxWidth().constrainAs(
+                              eventList) {
+                                top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                              }) { eventId ->
+                        navigationActions.navController.navigate(
+                            "${Route.EVENT_DETAILS}/${eventId}")
+                      }
+              // In map view + search or filter is active
+              (uiState.isSearchActive || uiState.isFilterActive) ->
+                  EventMap(
+                      uiState.upcomingEventList.filteredEvents,
+                      Modifier.testTag("filteredMapUpcoming").fillMaxWidth().constrainAs(eventMap) {
+                        top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                      }) { eventId ->
+                        navigationActions.navController.navigate(
+                            "${Route.EVENT_DETAILS}/${eventId}")
+                      }
+              // In map view + neither search nor filter are active
+              else ->
+                  EventMap(
+                      uiState.upcomingEventList.allEvents,
+                      Modifier.testTag("mapUpcoming").fillMaxWidth().constrainAs(eventMap) {
+                        top.linkTo(searchAndFilter.bottom, margin = 8.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                      }) { eventId ->
+                        navigationActions.navController.navigate(
+                            "${Route.EVENT_DETAILS}/${eventId}")
+                      }
+            }
+          }
+
+          if (uiState.isFilterDialogOpen) {
+            FilterPopUp(
+                onFreeSwitchChanged = { viewModel.onFreeSwitchChanged() },
+                onFilterApply = { viewModel.onFilterApply() },
+                uiState = uiState,
+                onRadiusQueryChanged = { viewModel.onRadiusQueryChanged(it) },
                 modifier =
-                    Modifier.testTag("pleaseLogInText").constrainAs(eventList) {
-                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                      start.linkTo(parent.start)
-                      end.linkTo(parent.end)
-                    })
-        (uiState.viewList && uiState.upcomingEventList.allEvents.isEmpty()) ->
-            Text(
-                "You have no upcoming events",
-                modifier =
-                    Modifier.testTag("noUpcomingEventsText").constrainAs(eventList) {
-                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                      start.linkTo(parent.start)
-                      end.linkTo(parent.end)
-                    })
-        // In list view + search or filter is active
-        (uiState.viewList && (uiState.isSearchActive || uiState.isFilterActive)) ->
-            EventList(
-                events = uiState.upcomingEventList.filteredEvents,
-                modifier =
-                    Modifier.testTag("filteredEventListUpcoming").fillMaxWidth().constrainAs(
-                        eventList) {
-                          top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                          start.linkTo(parent.start)
+                    Modifier.height(355.dp).width(230.dp).testTag("filterPopUp").constrainAs(
+                        filterPopUp) {
+                          top.linkTo(searchAndFilter.bottom)
                           end.linkTo(parent.end)
-                        }) { eventId ->
-                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-                }
-        // In list view + neither search nor filter are active
-        (uiState.viewList) ->
-            EventList(
-                events = uiState.upcomingEventList.allEvents,
-                modifier =
-                    Modifier.testTag("eventListUpcoming").fillMaxWidth().constrainAs(eventList) {
-                      top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                      start.linkTo(parent.start)
-                      end.linkTo(parent.end)
-                    }) { eventId ->
-                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-                }
-        // In map view + search or filter is active
-        (uiState.isSearchActive || uiState.isFilterActive) ->
-            EventMap(
-                uiState.upcomingEventList.filteredEvents,
-                Modifier.testTag("filteredMapUpcoming").fillMaxWidth().constrainAs(eventMap) {
-                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                  start.linkTo(parent.start)
-                  end.linkTo(parent.end)
-                }) { eventId ->
-                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-                }
-        // In map view + neither search nor filter are active
-        else ->
-            EventMap(
-                uiState.upcomingEventList.allEvents,
-                Modifier.testTag("mapUpcoming").fillMaxWidth().constrainAs(eventMap) {
-                  top.linkTo(searchAndFilter.bottom, margin = 8.dp)
-                  start.linkTo(parent.start)
-                  end.linkTo(parent.end)
-                }) { eventId ->
-                  navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-                }
+                        },
+            )
+          }
+        }
       }
-    }
-
-    if (uiState.isFilterDialogOpen) {
-      FilterPopUp(
-          onFreeSwitchChanged = { viewModel.onFreeSwitchChanged() },
-          onFilterApply = { viewModel.onFilterApply() },
-          uiState = uiState,
-          onRadiusQueryChanged = { viewModel.onRadiusQueryChanged(it) },
-          modifier =
-              Modifier.height(355.dp).width(230.dp).testTag("filterPopUp").constrainAs(
-                  filterPopUp) {
-                    top.linkTo(searchAndFilter.bottom)
-                    end.linkTo(parent.end)
-                  },
-      )
-    }
-
-    ViewToggleFab(
-        modifier =
-            Modifier.padding(16.dp).testTag("viewToggleFab").constrainAs(viewToggle) {
-              bottom.linkTo(bottomNav.top)
-              absoluteRight.linkTo(parent.absoluteRight)
-            },
-        onClick = { viewModel.onViewListStatusChanged() },
-        iconVector = getIconFromViewListBool(uiState.viewList))
-
-    BottomNavigationMenu(
-        onTabSelected = { tab -> navigationActions.navigateTo(tab) },
-        tabList = TOP_LEVEL_DESTINATIONS,
-        selectedItem = getTopLevelDestination(Route.HOME),
-        modifier =
-            Modifier.testTag("bottomNavMenu").constrainAs(bottomNav) {
-              bottom.linkTo(parent.bottom)
-              start.linkTo(parent.start)
-              end.linkTo(parent.end)
-            })
-  }
 }
 
 fun getTabIndexFromTabEnum(tab: Tab): Int {

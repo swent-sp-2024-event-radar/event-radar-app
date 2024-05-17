@@ -52,7 +52,7 @@ data class EventComponentsStyle(
 )
 
 fun formatDateTime(dateTime: LocalDateTime): String {
-  val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy - HH:mm")
+  val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
   return dateTime.format(formatter)
 }
 
@@ -115,23 +115,43 @@ fun EventCategory(modifier: Modifier, eventUiState: EventUiState, style: EventCo
 }
 
 @Composable
-fun EventDateTime(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
+fun EventDate(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
   Column(modifier = modifier) {
     Text(
-        text = stringResource(id = R.string.event_date_and_time),
+        text = stringResource(id = R.string.event_date),
         style = style.fieldTitleStyle,
-        color = style.titleColor,
+        color = style.fieldTitleColor,
+        modifier = Modifier.testTag("dateTitle"))
+
+    if (eventUiState.start.dayOfYear == eventUiState.end.dayOfYear) {
+      Text(
+          text = formatDateTime(eventUiState.start),
+          style = style.contentStyle,
+          color = style.contentColor,
+          modifier = Modifier.testTag("dateContent"))
+      return
+    } else {
+      Text(
+          text = "${formatDateTime(eventUiState.start)} - ${formatDateTime(eventUiState.end)}",
+          style = style.contentStyle,
+          color = style.contentColor,
+          modifier = Modifier.testTag("dateContent"))
+    }
+  }
+}
+
+@Composable
+fun EventTime(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
+  Column(modifier = modifier) {
+    Text(
+        text = stringResource(id = R.string.event_time),
+        style = style.fieldTitleStyle,
+        color = style.fieldTitleColor,
         modifier = Modifier.testTag("timeTitle"))
     Text(
-        text =
-            "${stringResource(id = R.string.event_dt_start)}: ${formatDateTime(eventUiState.start)}",
+        text = "${eventUiState.start.toLocalTime()} - ${eventUiState.end.toLocalTime()}",
         style = style.contentStyle,
         color = style.contentColor,
-        modifier = Modifier.testTag("timeStartContent"))
-    Text(
-        text = "${stringResource(id = R.string.event_dt_end)}: ${formatDateTime(eventUiState.end)}",
-        style = style.contentStyle,
-        color = style.contentColor,
-        modifier = Modifier.testTag("timeEndContent"))
+        modifier = Modifier.testTag("timeContent"))
   }
 }

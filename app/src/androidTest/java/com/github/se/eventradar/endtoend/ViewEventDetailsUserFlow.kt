@@ -130,9 +130,10 @@ class ViewEventDetailsUserFlow : TestCase() {
           assertIsDisplayed()
           assertTextContains("Social")
         }
-        dateTimeTitle { assertIsDisplayed() }
-        dateTimeStartContent { assertIsDisplayed() }
-        dateTimeEndContent { assertIsDisplayed() }
+        dateTitle { assertIsDisplayed() }
+        dateContent { assertIsDisplayed() }
+        timeTitle { assertIsDisplayed() }
+        timeContent { assertIsDisplayed() }
       }
     }
   }

@@ -1,12 +1,16 @@
 package com.github.se.eventradar.ui.event
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -14,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -26,16 +31,16 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.EventCategory
 import com.github.se.eventradar.ui.component.EventComponentsStyle
-import com.github.se.eventradar.ui.component.EventDateTime
+import com.github.se.eventradar.ui.component.EventDate
 import com.github.se.eventradar.ui.component.EventDescription
 import com.github.se.eventradar.ui.component.EventDistance
+import com.github.se.eventradar.ui.component.EventTime
 import com.github.se.eventradar.ui.component.EventTitle
 import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.navigation.NavigationActions
@@ -44,7 +49,6 @@ import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 
 // Temporary sizes. Needs to be responsive...
-private val widthPadding = 34.dp
 private val imageHeight = 191.dp
 
 @Composable
@@ -64,7 +68,9 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
 
   Scaffold(
       modifier = Modifier.testTag("eventDetailsScreen"),
-      topBar = {},
+      topBar = {
+        GoBackButton(modifier = Modifier.wrapContentSize()) { navigationActions.goBack() }
+      },
       bottomBar = {
         BottomNavigationMenu(
             onTabSelected = { tab -> navigationActions.navigateTo(tab) },
@@ -80,7 +86,7 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
                 navigationActions.navController.navigate(
                     "${Route.EVENT_DETAILS_TICKETS}/${viewModel.eventId}")
               },
-              modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("ticketButton"),
+              modifier = Modifier.testTag("ticketButton"),
               containerColor = MaterialTheme.colorScheme.primaryContainer,
           ) {
             Icon(
@@ -91,103 +97,62 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
             )
           }
         }
-      }) { innerPadding ->
-        ConstraintLayout(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-          val (image, backButton, title, description, distance, category, dateAndTime, joined) =
-              createRefs()
+      }) {
+        Column(
+            modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(it)) {
+              // TODO uncomment when image are implemented
+              // val imagePainter: Painter = rememberAsyncImagePainter(eventUiState.eventPhoto)
+              val imagePainter: Painter = rememberAsyncImagePainter(R.drawable.placeholderbig)
+              Image(
+                  painter = imagePainter,
+                  contentDescription = "Event banner image",
+                  modifier = Modifier.fillMaxWidth().height(imageHeight).testTag("eventImage"),
+                  contentScale = ContentScale.FillWidth)
 
-          // TODO uncomment when image are implemented
-          // val imagePainter: Painter = rememberImagePainter(eventUiState.eventPhoto)
-          val imagePainter: Painter = rememberImagePainter(R.drawable.placeholderbig)
-          Image(
-              painter = imagePainter,
-              contentDescription = "Event banner image",
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .height(imageHeight)
-                      .constrainAs(image) {
-                        top.linkTo(parent.top, margin = 0.dp)
-                        start.linkTo(parent.start, margin = 0.dp)
-                      }
-                      .testTag("eventImage"),
-              contentScale = ContentScale.FillWidth)
+              EventTitle(
+                  modifier = Modifier.align(Alignment.CenterHorizontally),
+                  eventUiState = eventUiState,
+                  style = componentStyle)
 
-          // Go back button
-          GoBackButton(
-              modifier =
-                  Modifier.wrapContentSize().constrainAs(backButton) {
-                    top.linkTo(image.bottom, margin = 8.dp)
-                    start.linkTo(image.start, margin = 4.dp)
-                  }) {
-                navigationActions.goBack()
-              }
+              Spacer(modifier = Modifier.height(8.dp))
 
-          EventTitle(
-              modifier =
-                  Modifier.constrainAs(title) {
-                    top.linkTo(image.bottom, margin = 32.dp)
-                    start.linkTo(image.start)
-                    end.linkTo(image.end)
-                  },
-              eventUiState = eventUiState,
-              style = componentStyle)
+              Column(
+                  modifier = Modifier.padding(horizontal = 8.dp),
+                  horizontalAlignment = Alignment.CenterHorizontally) {
+                    EventDescription(modifier = Modifier, eventUiState, componentStyle)
 
-          EventDescription(
-              modifier =
-                  Modifier
-                      // .padding(start = widthPadding, end = widthPadding)
-                      .constrainAs(description) {
-                        top.linkTo(title.bottom, margin = 32.dp)
-                        start.linkTo(parent.start, margin = widthPadding)
-                      },
-              eventUiState,
-              componentStyle)
+                    Spacer(modifier = Modifier.height(8.dp))
 
-          EventDistance(
-              modifier =
-                  Modifier.constrainAs(distance) {
-                    top.linkTo(description.bottom, margin = 32.dp)
-                    start.linkTo(parent.start, margin = widthPadding)
-                  },
-              eventUiState,
-              componentStyle)
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                      EventDistance(modifier = Modifier.weight(2f), eventUiState, componentStyle)
 
-          EventDateTime(
-              modifier =
-                  Modifier.constrainAs(dateAndTime) {
-                    top.linkTo(distance.bottom, margin = 32.dp)
-                    start.linkTo(parent.start, margin = widthPadding)
-                  },
-              eventUiState,
-              componentStyle)
+                      EventDate(modifier = Modifier.weight(1f), eventUiState, componentStyle)
+                    }
 
-          EventCategory(
-              modifier =
-                  Modifier.constrainAs(category) {
-                    top.linkTo(dateAndTime.bottom, margin = 32.dp)
-                    start.linkTo(parent.start, margin = widthPadding)
-                  },
-              eventUiState,
-              componentStyle)
+                    Spacer(modifier = Modifier.height(8.dp))
 
-          if (isUserAttending) {
-            Text(
-                text = stringResource(id = R.string.event_attendance_message),
-                modifier =
-                    Modifier.constrainAs(joined) {
-                          top.linkTo(category.bottom, margin = 32.dp)
-                          start.linkTo(parent.start, margin = widthPadding)
-                          end.linkTo(parent.end, margin = widthPadding)
-                        }
-                        .testTag("attendance"),
-                style =
-                    TextStyle(
-                        fontSize = 18.sp,
-                        fontFamily = FontFamily(Font(R.font.roboto)),
-                        fontWeight = FontWeight.Bold,
-                    ),
-                color = MaterialTheme.colorScheme.primary)
-          }
-        }
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                      EventCategory(modifier = Modifier.weight(2f), eventUiState, componentStyle)
+
+                      EventTime(modifier = Modifier.weight(1f), eventUiState, componentStyle)
+                    }
+
+                    if (isUserAttending) {
+                      Spacer(modifier = Modifier.height(16.dp))
+                      Text(
+                          text = stringResource(id = R.string.event_attendance_message),
+                          modifier = Modifier.testTag("attendance"),
+                          style =
+                              TextStyle(
+                                  fontSize = 18.sp,
+                                  fontFamily = FontFamily(Font(R.font.roboto)),
+                                  fontWeight = FontWeight.Bold,
+                              ),
+                          color = MaterialTheme.colorScheme.primary)
+                    }
+
+                    // TODO: Add a cancel registration button
+                  }
+            }
       }
 }
