@@ -2,27 +2,14 @@ package com.github.se.eventradar.model.repository.event
 
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.event.Event
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 
 class MockEventRepository : IEventRepository {
-  private val mockEvents = mutableListOf<Event>()
-  //    ( Event(
-  //      eventName = "Event 1",
-  //      eventPhoto = "",
-  //      start = LocalDateTime.now(),
-  //      end = LocalDateTime.now(),
-  //      location = Location(0.0, 0.0, "Test Location"),
-  //      description = "Hey,Because of the grace period until Sunday, actually the real deadline is
-  // Sunday 23:59pm. Do you think it would be feasible to have your branche merged and taken into
-  // account for the team submission ? I added a timeout because the CI originally failed with a
-  // timeout error, so I need to setup a different EMulator when testing locally? advance till idle
-  // was just a thing i added to try and make it work",
-  //      ticket = EventTicket("Test Ticket", 0.0, 100, 59),
-  //      mainOrganiser = "1",
-  //      organiserList = mutableListOf("Test Organiser"),
-  //      attendeeList = mutableListOf("user1", "user2", "user3"),
-  //      category = EventCategory.COMMUNITY,
-  //      fireBaseID = "1")
-  //  )
+  val mockEvents = mutableListOf<Event>()
+  val eventsFlow = MutableStateFlow<Resource<List<Event>>>(Resource.Success(mockEvents))
 
   override suspend fun getEvents(): Resource<List<Event>> {
     return Resource.Success(mockEvents)
@@ -73,5 +60,20 @@ class MockEventRepository : IEventRepository {
       }
     }
     return Resource.Success(events)
+  }
+
+  override fun observeAllEvents(): Flow<Resource<List<Event>>> =
+      eventsFlow.asStateFlow() // to be tested
+
+  override fun observeUpcomingEvents(userId: String): Flow<Resource<List<Event>>> {
+    return eventsFlow.asStateFlow().map { resource ->
+      when (resource) {
+        is Resource.Success -> {
+          val upcomingEvents = resource.data.filter { it.attendeeList.contains(userId) }
+          Resource.Success(upcomingEvents)
+        }
+        is Resource.Failure -> resource
+      }
+    }
   }
 }
