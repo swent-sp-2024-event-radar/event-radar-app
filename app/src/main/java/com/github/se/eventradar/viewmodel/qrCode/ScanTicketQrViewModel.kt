@@ -66,12 +66,9 @@ constructor(
       val result = decodedString ?: "Failed to decode QR Code"
       updateDecodedString(result) // Update state flow
       if (result != "Failed to decode QR Code") {
-        //        println("correctly decoded")
         updatePermissions(result) // Directly call updateFriendList
       } else {
-        //      println("wrongly decoded")
         changeAction(Action.AnalyserError)
-        //        println("checkpoint 2")
       }
     }
     getEventData()
@@ -123,7 +120,7 @@ constructor(
             }
       } while ((updateResult !is Resource.Success) && (maxNumberOfRetries-- > 0))
     } else {
-      println("one does not contain the other")
+      Log.d("error one does not contain the other", "one does not contain the other")
       changeAction(Action.DenyEntry)
     }
   }
