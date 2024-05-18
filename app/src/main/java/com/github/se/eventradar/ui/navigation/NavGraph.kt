@@ -22,7 +22,6 @@ import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.viewmodel.ViewFriendsProfileViewModel
 import com.github.se.eventradar.viewmodel.qrCode.ScanTicketQrViewModel
 
-
 @Composable
 fun NavGraph(
     navController: NavHostController,
