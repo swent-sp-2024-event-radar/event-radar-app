@@ -2,12 +2,15 @@ package com.github.se.eventradar
 
 import android.util.Log
 import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
-import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.event.MockEventRepository
+import com.github.se.eventradar.model.repository.user.IUserRepository
+import com.github.se.eventradar.model.repository.user.MockUserRepository
+import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
@@ -29,6 +32,7 @@ import org.junit.runner.Description
 class EventDetailsViewmodelUnitTest {
   private lateinit var viewModel: EventDetailsViewModel
   private lateinit var eventRepository: IEventRepository
+  private lateinit var userRepository: IUserRepository
 
   class MainDispatcherRule(
       private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
@@ -46,6 +50,8 @@ class EventDetailsViewmodelUnitTest {
 
   val test: MutableSet<String> = mutableSetOf("Test Organiser", "Organiser2")
 
+  private var ticketPurchases = 1
+
   private val mockEvent =
       Event(
           eventName = "Event 1",
@@ -54,23 +60,59 @@ class EventDetailsViewmodelUnitTest {
           end = LocalDateTime.now(),
           location = Location(0.0, 0.0, "Test Location"),
           description = "Test Description",
-          ticket = EventTicket("Test Ticket", 0.0, 1, 0),
+          ticket = EventTicket("Test Ticket", 0.0, 10, ticketPurchases),
           mainOrganiser = "1",
           organiserList = mutableListOf("Test Organiser"),
           attendeeList = mutableListOf("Test Attendee"),
           category = EventCategory.COMMUNITY,
-          fireBaseID = "1")
+          fireBaseID = "event1")
+
+  private val corruptedEvent =
+      Event(
+          eventName = mockEvent.eventName,
+          eventPhoto = mockEvent.eventPhoto,
+          start = mockEvent.start,
+          end = mockEvent.end,
+          location = mockEvent.location,
+          description = mockEvent.description,
+          ticket = mockEvent.ticket,
+          mainOrganiser = mockEvent.mainOrganiser,
+          organiserList = mockEvent.organiserList,
+          attendeeList = mockEvent.attendeeList,
+          category = mockEvent.category,
+          fireBaseID = "corrupted_id")
+
+  private val mockUser =
+      User(
+          userId = "user1",
+          birthDate = "01/01/2000",
+          email = "test@example.com",
+          firstName = "John",
+          lastName = "Doe",
+          phoneNumber = "1234567890",
+          accountStatus = "active",
+          eventsAttendeeList = mutableListOf("event2"),
+          eventsHostList = mutableListOf("event3"),
+          friendsList = mutableListOf(),
+          profilePicUrl = "http://example.com/Profile_Pictures/pic.jpg",
+          qrCodeUrl = "http://example.com/QR_Codes/qr.jpg",
+          bio = "",
+          username = "johndoe")
 
   private val factory =
       object : EventDetailsViewModel.Factory {
         override fun create(eventId: String): EventDetailsViewModel {
-          return EventDetailsViewModel(eventRepository, eventId)
+          return EventDetailsViewModel(eventRepository, userRepository, eventId)
         }
       }
 
   @Before
   fun setUp() {
     eventRepository = MockEventRepository()
+
+    userRepository = MockUserRepository()
+    (userRepository as MockUserRepository).updateCurrentUserId(mockUser.userId)
+
     viewModel = factory.create(eventId = mockEvent.fireBaseID)
   }
 
@@ -131,5 +173,101 @@ class EventDetailsViewmodelUnitTest {
     mockEvent.ticket = EventTicket("Paid", randomPrice, 10, 0)
     viewModel.getEventData()
     assert(!viewModel.isTicketFree())
+  }
+
+  @Test
+  fun testJoinEventNoUser() = runTest {
+    mockkStatic(Log::class)
+
+    eventRepository.addEvent(mockEvent)
+    // userRepository.addUser(mockUser)
+
+    viewModel.getEventData()
+
+    viewModel.buyTicketForEvent()
+
+    assert(viewModel.errorOccurred.value)
+
+    unmockkAll()
+  }
+
+  @Test
+  fun testJoinEventNoEvent() = runTest {
+    mockkStatic(Log::class)
+
+    // eventRepository.addEvent(mockEvent)
+    userRepository.addUser(mockUser)
+
+    viewModel.getEventData()
+    viewModel.buyTicketForEvent()
+
+    assert(viewModel.errorOccurred.value)
+
+    unmockkAll()
+  }
+
+  @Test
+  fun testCorruptEventIdInDb() = runTest {
+    mockkStatic(Log::class)
+
+    eventRepository.addEvent(mockEvent)
+    userRepository.addUser(mockUser)
+
+    viewModel.getEventData()
+
+    // corrupt db
+    eventRepository.deleteEvent(mockEvent)
+    eventRepository.addEvent(corruptedEvent)
+
+    // assert error
+    viewModel.buyTicketForEvent()
+    assert(viewModel.errorOccurred.value)
+
+    unmockkAll()
+  }
+
+  @Test
+  fun testJoinAnEvent() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    eventRepository.addEvent(mockEvent)
+    userRepository.addUser(mockUser)
+
+    viewModel.getEventData()
+
+    viewModel.buyTicketForEvent()
+
+    assert(mockUser.eventsAttendeeList.contains(mockEvent.fireBaseID))
+    assert(mockEvent.attendeeList.contains(mockUser.userId))
+    assert(mockEvent.ticket.purchases == ticketPurchases + 1)
+    assert(viewModel.registrationSuccessful.value)
+
+    unmockkAll()
+  }
+
+  @Test
+  fun testJoinAnEventWithNoMoreTickets() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    // no more tickets, purchases = capacity
+    mockEvent.ticket =
+        EventTicket(
+            mockEvent.ticket.name,
+            mockEvent.ticket.price,
+            mockEvent.ticket.capacity,
+            mockEvent.ticket.capacity)
+
+    eventRepository.addEvent(mockEvent)
+    userRepository.addUser(mockUser)
+
+    viewModel.getEventData()
+
+    viewModel.buyTicketForEvent()
+
+    assert(viewModel.errorOccurred.value)
+
+    unmockkAll()
   }
 }

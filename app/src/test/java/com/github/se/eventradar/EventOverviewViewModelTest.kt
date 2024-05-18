@@ -83,6 +83,7 @@ class EventsOverviewViewModelTest {
           friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/pic.jpg",
           qrCodeUrl = "http://example.com/qr.jpg",
+          bio = "",
           username = "john_doe")
 
   @Before

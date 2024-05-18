@@ -15,6 +15,7 @@ data class User(
     val friendsList: MutableList<String>,
     val profilePicUrl: String,
     val qrCodeUrl: String,
+    val bio: String,
     val username: String,
 ) {
   constructor(
@@ -33,6 +34,7 @@ data class User(
       friendsList = convertToMutableListOfStrings(map["friendsList"]),
       profilePicUrl = map["profilePicUrl"] as String,
       qrCodeUrl = map["qrCodeUrl"] as String,
+      bio = map["bio"] as String,
       username = map["username"] as String)
 
   fun toMap(): HashMap<String, Any> {
@@ -48,6 +50,7 @@ data class User(
     map["friendsList"] = friendsList
     map["profilePicUrl"] = profilePicUrl
     map["qrCodeUrl"] = qrCodeUrl
+    map["bio"] = bio
     map["username"] = username
     return map
   }

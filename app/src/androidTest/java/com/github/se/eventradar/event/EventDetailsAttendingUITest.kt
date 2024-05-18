@@ -8,7 +8,6 @@ import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.screens.EventDetailsScreen
 import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.navigation.NavigationActions
-import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.viewmodel.EventUiState
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -28,7 +27,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
+class EventDetailsAttendingUITest :
+    TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -44,8 +44,8 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
           EventUiState(
               eventName = "Debugging",
               eventPhoto = "path",
-              start = LocalDateTime.parse("2022-01-01T10:00:00"),
-              end = LocalDateTime.parse("2022-01-01T12:00:00"),
+              start = LocalDateTime.MIN,
+              end = LocalDateTime.MAX,
               location = Location(0.0, 0.0, "base address"),
               description = "Let's debug some code together because we all enjoy kotlin !",
               ticket = EventTicket("Luck", 0.0, 7, 0),
@@ -55,10 +55,13 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
 
   private val eventId = "tdjWMT9Eon2ROTVakQb"
 
+  private var isTicketFree = true
+
   @Before
   fun testSetup() {
 
-    every { mockViewModel.isUserAttending } returns MutableStateFlow(false)
+    every { mockViewModel.isUserAttending } returns MutableStateFlow(true)
+    every { mockViewModel.isTicketFree() } returns isTicketFree
     every { mockViewModel.uiState } returns sampleEventDetailsUiState
     every { mockViewModel.eventId } returns eventId
 
@@ -68,7 +71,7 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   @Test
   fun screenDisplaysNavigationElementsCorrectly() = run {
     ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
-      ticketButton { assertIsDisplayed() }
+      ticketButton { assertIsNotDisplayed() }
       goBackButton { assertIsDisplayed() }
       bottomNav { assertIsDisplayed() }
     }
@@ -95,6 +98,8 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
       dateContent { assertIsDisplayed() }
       timeTitle { assertIsDisplayed() }
       timeContent { assertIsDisplayed() }
+
+      attendance { assertIsDisplayed() }
     }
   }
 
@@ -112,22 +117,6 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
     }
     // assert: the nav action has been called
     verify { mockNavActions.goBack() }
-    confirmVerified(mockNavActions)
-  }
-
-  @Test
-  fun ticketButtonTriggersNavigation() = run {
-    ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
-      ticketButton {
-        // arrange: verify the pre-conditions
-        assertIsDisplayed()
-        assertIsEnabled()
-
-        performClick()
-      }
-    }
-    // assert: the nav action has been called
-    verify { mockNavActions.navController.navigate("${Route.EVENT_DETAILS_TICKETS}/$eventId") }
     confirmVerified(mockNavActions)
   }
 }
