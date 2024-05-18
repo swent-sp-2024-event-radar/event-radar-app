@@ -34,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -87,8 +86,7 @@ fun ChatScreenUi(
   val opponentUserId = uiState.opponentProfile.userId
   val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = messages.size)
 
-  LaunchedEffect(key1 = messages.size, key2 = messages.isNotEmpty()) {
-    //    if ((messagesLoadedFirstTime || messageInserted) && messages.isNotEmpty()) {
+  LaunchedEffect(key1 = messages.size) {
     if (messages.isNotEmpty()) {
       scrollState.animateScrollToItem(index = messages.size - 1)
     }
@@ -193,10 +191,8 @@ fun ChatAppBar(
       })
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatInput(uiState: ChatUiState, onMessageChange: (String) -> Unit, onMessageSend: () -> Unit) {
-  val context = LocalContext.current
   Row(
       modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("chatInput"),
       verticalAlignment = Alignment.Bottom) {
@@ -300,9 +296,7 @@ fun ChatScreenPreview() {
                       "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2Fplaceholder.png?alt=media&token=ba4b4efb-ff45-4617-b60f-3789e8fb75b6",
                   qrCodeUrl = "",
                   bio = "",
-                  username = "Test2"),
-          messageInserted = true,
-          messagesLoadedFirstTime = true)
+                  username = "Test2"))
 
   ChatScreenUi(
       uiState = sampleUiState,

@@ -118,7 +118,6 @@ class ChatViewModelUnitTest {
     val expectedMessages = mutableListOf(msg1, msg2)
     val uiState = viewModel.uiState.value
     assert(uiState.userId == "user1")
-    assert(uiState.messagesLoadedFirstTime)
     assert(expectedMessages == uiState.messageHistory.messages)
     assert(uiState.opponentProfile == opponent)
   }
@@ -180,7 +179,6 @@ class ChatViewModelUnitTest {
     val uiState = viewModel.uiState.value
 
     assert(uiState.messageBarInput == "Hey")
-    assert(!uiState.messageInserted)
   }
 
   @Test
@@ -212,8 +210,6 @@ class ChatViewModelUnitTest {
     val uiState = viewModel.uiState.value
 
     assert(uiState.messageBarInput == "")
-    assert(uiState.messageInserted)
-    assert(uiState.messagesLoadedFirstTime)
     assert(expectedMessages.size == uiState.messageHistory.messages.size)
     assert(expectedMessages == uiState.messageHistory.messages)
     unmockkAll()
