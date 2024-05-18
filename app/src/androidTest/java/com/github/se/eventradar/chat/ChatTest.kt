@@ -2,27 +2,30 @@ package com.github.se.eventradar.chat
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.message.Message
-import com.github.se.eventradar.model.repository.message.IMessageRepository
-import com.github.se.eventradar.model.repository.message.MockMessageRepository
-import com.github.se.eventradar.model.repository.user.MockUserRepository
+import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.screens.ChatScreen
 import com.github.se.eventradar.ui.chat.ChatScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
+import com.github.se.eventradar.viewmodel.ChatUiState
 import com.github.se.eventradar.viewmodel.ChatViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen.Companion.onComposeScreen
+import io.mockk.Runs
+import io.mockk.coEvery
 import io.mockk.confirmVerified
+import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
+import io.mockk.just
 import io.mockk.unmockkAll
 import io.mockk.verify
 import java.time.LocalDateTime
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -40,10 +43,7 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
 
   // Relaxed mocks methods have a default implementation returning values
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
-
-  private lateinit var mockMessageRepository: IMessageRepository
-  private lateinit var mockUserRepository: MockUserRepository
-  private lateinit var chatViewModel: ChatViewModel
+  @RelaxedMockK lateinit var chatViewModel: ChatViewModel
 
   private val opponentUser =
       User(
@@ -63,31 +63,55 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
           bio = "",
           username = "Test2")
 
+  private val chatUIState =
+      MutableStateFlow(
+          ChatUiState(
+              userId = "1",
+              messageHistory =
+                  MessageHistory(
+                      "1",
+                      "2",
+                      "2",
+                      true,
+                      false,
+                      mutableListOf(
+                          Message(
+                              sender = "1",
+                              content = "Test Message 1",
+                              dateTimeSent = LocalDateTime.now(),
+                              id = "1"),
+                          Message(
+                              sender = "2",
+                              content = "Test Message 2",
+                              dateTimeSent = LocalDateTime.now(),
+                              id = "2"),
+                      ),
+                      "1"),
+              opponentUser,
+          ))
+
   @Before
-  fun testSetup() = runTest {
-    mockMessageRepository = MockMessageRepository()
-    mockUserRepository = MockUserRepository()
-
-    mockUserRepository.updateCurrentUserId("1")
-
-    mockUserRepository.addUser(opponentUser)
-
-    var messageHistory = mockMessageRepository.createNewMessageHistory("1", "2")
-
-    messageHistory = messageHistory as Resource.Success
-
-    // TODO: fix logic with add tests
-    messageHistory.data.messages.add(
-        Message(
-            sender = "1", content = "Test Message 1", dateTimeSent = LocalDateTime.now(), id = "1"),
-    )
-
-    mockMessageRepository.addMessage(
-        Message(
-            sender = "2", content = "Test Message 2", dateTimeSent = LocalDateTime.now(), id = "2"),
-        messageHistory.data)
-
-    chatViewModel = ChatViewModel(mockMessageRepository, mockUserRepository, "2")
+  fun testSetup() {
+    every { chatViewModel.uiState } returns chatUIState
+    every { chatViewModel.onMessageBarInputChange(any()) } answers
+        {
+          chatUIState.value = chatUIState.value.copy(messageBarInput = firstArg())
+        }
+    every { chatViewModel.onMessageSend() } answers
+        {
+          val newMessages = chatUIState.value.messageHistory.messages
+          newMessages.add(
+              Message(
+                  sender = "1",
+                  content = chatUIState.value.messageBarInput,
+                  dateTimeSent = LocalDateTime.now(),
+                  id = "3"))
+          chatUIState.value =
+              chatUIState.value.copy(
+                  messageHistory = chatUIState.value.messageHistory.copy(messages = newMessages))
+          chatUIState.value = chatUIState.value.copy(messageBarInput = "")
+        }
+    coEvery { chatViewModel.getMessages() } just Runs
 
     composeTestRule.setContent { ChatScreen(chatViewModel, mockNavActions) }
   }
