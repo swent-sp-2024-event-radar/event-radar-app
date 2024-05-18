@@ -66,12 +66,9 @@ constructor(
       val result = decodedString ?: "Failed to decode QR Code"
       updateDecodedString(result) // Update state flow
       if (result != "Failed to decode QR Code") {
-        //        println("correctly decoded")
         updatePermissions(result) // Directly call updateFriendList
       } else {
-        //      println("wrongly decoded")
         changeAction(Action.AnalyserError)
-        //        println("checkpoint 2")
       }
     }
     getEventData()

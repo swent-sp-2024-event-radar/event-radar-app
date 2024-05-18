@@ -52,9 +52,10 @@ import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.EventCategory
 import com.github.se.eventradar.ui.component.EventComponentsStyle
-import com.github.se.eventradar.ui.component.EventDateTime
+import com.github.se.eventradar.ui.component.EventDate
 import com.github.se.eventradar.ui.component.EventDescription
 import com.github.se.eventradar.ui.component.EventDistance
+import com.github.se.eventradar.ui.component.EventTime
 import com.github.se.eventradar.ui.component.EventTitle
 import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.component.Logo
@@ -160,7 +161,8 @@ fun QrCodeTicketUi(
           description,
           distance,
           category,
-          dateAndTime,
+          date,
+          time,
           ticketSold,
           lazyEventDetails) =
           createRefs()
@@ -240,10 +242,22 @@ fun QrCodeTicketUi(
             }
             item { Spacer(modifier = Modifier.height(32.dp)) }
             item {
-              EventDateTime(
+              EventDate(
                   modifier =
-                      Modifier.constrainAs(dateAndTime) {
+                      Modifier.constrainAs(date) {
                         top.linkTo(distance.bottom, margin = 32.dp)
+                        start.linkTo(parent.start, margin = widthPadding)
+                      },
+                  eventUiState = uiState.eventUiState,
+                  componentStyle)
+            }
+            item { Spacer(modifier = Modifier.height(32.dp)) }
+
+            item {
+              EventTime(
+                  modifier =
+                      Modifier.constrainAs(time) {
+                        top.linkTo(date.bottom, margin = 32.dp)
                         start.linkTo(parent.start, margin = widthPadding)
                       },
                   eventUiState = uiState.eventUiState,
@@ -254,7 +268,7 @@ fun QrCodeTicketUi(
               EventCategory(
                   modifier =
                       Modifier.constrainAs(category) {
-                        top.linkTo(dateAndTime.bottom, margin = 32.dp)
+                        top.linkTo(time.bottom, margin = 32.dp)
                         start.linkTo(parent.start, margin = widthPadding)
                       },
                   eventUiState = uiState.eventUiState,

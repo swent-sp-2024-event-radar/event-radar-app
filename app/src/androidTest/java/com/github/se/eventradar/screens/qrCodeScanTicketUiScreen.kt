@@ -30,18 +30,15 @@ class QrCodeScanTicketUiScreen(semanticsProvider: SemanticsNodeInteractionsProvi
   val lazyEventDetails: KNode = child { hasTestTag("lazyEventDetails") }
   val goBackButton: KNode = lazyEventDetails.child { hasTestTag("goBackButton") }
   val eventImage: KNode = lazyEventDetails.child { hasTestTag("eventImage") }
-
-  // Text fields
   val eventTitle: KNode = lazyEventDetails.child { hasTestTag("eventTitle") }
   val descriptionTitle: KNode = lazyEventDetails.child { hasTestTag("descriptionTitle") }
   val descriptionContent: KNode = lazyEventDetails.child { hasTestTag("descriptionContent") }
   val distanceTitle: KNode = lazyEventDetails.child { hasTestTag("distanceTitle") }
   val distanceContent: KNode = lazyEventDetails.child { hasTestTag("distanceContent") }
   val dateTitle: KNode = lazyEventDetails.child { hasTestTag("dateTitle") }
-  val dateTimeTitle: KNode = lazyEventDetails.child { hasTestTag("timeTitle") }
-  val dateTimeStartContent: KNode = lazyEventDetails.child { hasTestTag("timeStartContent") }
-  val dateTimeEndContent: KNode = lazyEventDetails.child { hasTestTag("timeEndContent") }
   val dateContent: KNode = lazyEventDetails.child { hasTestTag("dateContent") }
+  val timeTitle: KNode = lazyEventDetails.child { hasTestTag("timeTitle") }
+  val timeContent: KNode = lazyEventDetails.child { hasTestTag("timeContent") }
   val categoryTitle: KNode = lazyEventDetails.child { hasTestTag("categoryTitle") }
   val categoryContent: KNode = lazyEventDetails.child { hasTestTag("categoryContent") }
   val ticketSoldTitle: KNode = lazyEventDetails.child { hasTestTag("ticketSoldTitle") }
