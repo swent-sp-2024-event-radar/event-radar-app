@@ -83,7 +83,7 @@ constructor(
     runBlocking { getMessages() }
   }
 
-  fun initOpponent() {
+  private fun initOpponent() {
     viewModelScope.launch {
       _uiState.update {
         when (val opponentResource = userRepository.getUser(opponentId)) {
@@ -112,8 +112,7 @@ constructor(
             // Sort messages by dateTimeSent in place
             messagesResource.data.messages.sortBy { it.dateTimeSent }
 
-            currentState.copy(
-                messageHistory = messagesResource.data, messagesLoadedFirstTime = true)
+            currentState.copy(messageHistory = messagesResource.data)
           }
           is Resource.Failure -> {
             Log.d("ChatViewModel", "Error fetching messages: ${messagesResource.throwable.message}")
@@ -139,9 +138,7 @@ constructor(
   }
 
   fun onMessageBarInputChange(newInput: String) {
-    _uiState.update { currentState ->
-      currentState.copy(messageBarInput = newInput, messageInserted = false)
-    }
+    _uiState.update { currentState -> currentState.copy(messageBarInput = newInput) }
   }
 
   fun onMessageSend() {
@@ -151,9 +148,7 @@ constructor(
 
       viewModelScope.launch {
         getMessages()
-        _uiState.update { currentState ->
-          currentState.copy(messageBarInput = "", messageInserted = true)
-        }
+        _uiState.update { currentState -> currentState.copy(messageBarInput = "") }
       }
     }
   }
@@ -203,7 +198,5 @@ data class ChatUiState(
             qrCodeUrl = "Default",
             bio = "",
             username = "Default"),
-    val messageInserted: Boolean = false,
-    val messagesLoadedFirstTime: Boolean = false,
     val messageBarInput: String = "",
 )
