@@ -94,9 +94,10 @@ class EventDetailsAttendingUITest :
         assertIsDisplayed()
         assertTextContains("Community")
       }
-      dateTimeTitle { assertIsDisplayed() }
-      dateTimeStartContent { assertIsDisplayed() }
-      dateTimeEndContent { assertIsDisplayed() }
+      dateTitle { assertIsDisplayed() }
+      dateContent { assertIsDisplayed() }
+      timeTitle { assertIsDisplayed() }
+      timeContent { assertIsDisplayed() }
 
       attendance { assertIsDisplayed() }
     }

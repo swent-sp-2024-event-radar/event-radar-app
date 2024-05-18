@@ -148,7 +148,6 @@ class ScanFriendQrViewModelTest {
     userRepository.addUser(mockUser1)
     userRepository.addUser(mockUser2)
     val testDecodedString = "user2"
-    println("onDecodedInvoked")
     qrCodeAnalyser.onDecoded?.invoke(testDecodedString)
     assertEquals(testDecodedString, viewModel.uiState.value.decodedResult)
   }

@@ -18,6 +18,7 @@ object Route {
   const val EVENT_DETAILS_TICKETS = "event_details_tickets"
   const val PRIVATE_CHAT = "private_chat"
 
+  const val MY_EVENT = "my_event"
   const val LOGIN = "login/Login"
   const val SIGNUP = "login/SignUp"
 }

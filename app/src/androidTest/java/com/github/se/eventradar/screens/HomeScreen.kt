@@ -15,20 +15,16 @@ class HomeScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   val eventCard: KNode = onNode { hasTestTag("eventCard") }
   val bottomNav: KNode = child { hasTestTag("bottomNavMenu") }
   val viewToggleFab: KNode = child { hasTestTag("viewToggleFab") }
-  val map: KNode = child { hasTestTag("map") }
+  val map: KNode = child { hasTestTag("eventMap") }
   val eventList: KNode = child { hasTestTag("eventList") }
   val searchBarAndFilter: KNode = child { hasTestTag("searchBarAndFilter") }
   val filterButton: KNode = searchBarAndFilter.child { hasTestTag("filterButton") }
   val searchBar: KNode = searchBarAndFilter.child { hasTestTag("searchBar") }
   val filterPopUp: KNode = child { hasTestTag("filterPopUp") }
-  val filteredEventList: KNode = child { hasTestTag("filteredEventList") }
-  val filteredEventListUpcoming: KNode = child { hasTestTag("filteredEventListUpcoming") }
-  val filteredMap: KNode = child { hasTestTag("filteredMap") }
-  val filteredMapUpcoming: KNode = child { hasTestTag("filteredMapUpcoming") }
   val noUpcomingEventsText: KNode = child { hasTestTag("noUpcomingEventsText") }
   val pleaseLogInText: KNode = child { hasTestTag("pleaseLogInText") }
   val eventListUpcoming: KNode = child { hasTestTag("eventListUpcoming") }
-  val mapUpcoming: KNode = child { hasTestTag("mapUpcoming") }
+  val mapUpcoming: KNode = child { hasTestTag("eventMapUpcoming") }
 
   private val filterCard: KNode = filterPopUp.child { hasTestTag("filterCard") }
   private val filterCardColumn: KNode = filterCard.child { hasTestTag("filterCardColumn") }
