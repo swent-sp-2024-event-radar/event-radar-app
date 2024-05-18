@@ -237,7 +237,7 @@ constructor(
     when (userIdResource) {
       is Resource.Success -> {
         val uid = userIdResource.data
-        eventRepository.observeUpcomingEvents(uid).collect() { eventsResource ->
+        eventRepository.observeUpcomingEvents(uid).collect { eventsResource ->
           handleEventsResource(eventsResource)
         }
       }
@@ -249,7 +249,7 @@ constructor(
     }
   }
 
-  private suspend fun handleEventsResource(eventsResource: Resource<List<Event>>) {
+  private fun handleEventsResource(eventsResource: Resource<List<Event>>) {
     when (eventsResource) {
       is Resource.Success -> {
         updateUiState(eventsResource.data)
