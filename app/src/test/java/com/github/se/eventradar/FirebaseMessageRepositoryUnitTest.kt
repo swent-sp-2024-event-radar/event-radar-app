@@ -156,6 +156,17 @@ class FirebaseMessageRepositoryUnitTest {
   }
 
   @Test
+  fun `test getMessages() for specific users with empty result`() = runTest {
+    every { messagesRef.where(any()).limit(1).get() } returns mockTask(mockQuerySnapshot)
+    every { mockQuerySnapshot.isEmpty } returns true
+
+    val result = firebaseMessageRepository.getMessages(uid, "2")
+    val exceptionMessage = ("No message history found between users")
+    assert(result is Resource.Failure)
+    assert((result as Resource.Failure).throwable.message == exceptionMessage)
+  }
+
+  @Test
   fun `test getMessages() with empty messages`() = runTest {
     every { messagesRef.where(any()).get() } returns mockTask(mockQuerySnapshot)
     every { mockQuerySnapshot.isEmpty } returns false
@@ -188,6 +199,17 @@ class FirebaseMessageRepositoryUnitTest {
     every { messagesRef.where(any()).get() } throws Exception(exceptionMessage)
 
     val result = firebaseMessageRepository.getMessages(uid)
+
+    assert(result is Resource.Failure)
+    assert((result as Resource.Failure).throwable.message == exceptionMessage)
+  }
+
+  @Test
+  fun `test getMessages() for specific users with exception`() = runTest {
+    val exceptionMessage = "Exception"
+    every { messagesRef.where(any()).limit(1).get() } throws Exception(exceptionMessage)
+
+    val result = firebaseMessageRepository.getMessages(uid, "2")
 
     assert(result is Resource.Failure)
     assert((result as Resource.Failure).throwable.message == exceptionMessage)
@@ -317,6 +339,7 @@ class FirebaseMessageRepositoryUnitTest {
 
     assert(result is Resource.Success)
     assert(captureAdd.captured == expectedAddValues)
+    assert((result as Resource.Success).data.id == "1")
   }
 
   @Test

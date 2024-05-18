@@ -1,6 +1,5 @@
 package com.github.se.eventradar.model.repository.message
 
-import android.util.Log
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.message.Message
 import com.github.se.eventradar.model.message.MessageHistory
@@ -52,26 +51,25 @@ class FirebaseMessageRepository(db: FirebaseFirestore = Firebase.firestore) : IM
 
   override suspend fun getMessages(user1: String, user2: String): Resource<MessageHistory> {
     // From and to user are interchangeable
-    val resultDocument =
-        messageRef
-            .where(
-                Filter.or(
-                    Filter.and(
-                        Filter.equalTo("from_user", user1), Filter.equalTo("to_user", user2)),
-                    Filter.and(
-                        Filter.equalTo("from_user", user2), Filter.equalTo("to_user", user1)),
-                ))
-            .limit(1)
-            .get()
-            .await()
-
-    if (resultDocument == null || resultDocument.isEmpty) {
-      return Resource.Failure(Exception("No message history found between users"))
-    }
-
     return try {
+      val resultDocument =
+          messageRef
+              .where(
+                  Filter.or(
+                      Filter.and(
+                          Filter.equalTo("from_user", user1), Filter.equalTo("to_user", user2)),
+                      Filter.and(
+                          Filter.equalTo("from_user", user2), Filter.equalTo("to_user", user1)),
+                  ))
+              .limit(1)
+              .get()
+              .await()
+
+      if (resultDocument == null || resultDocument.isEmpty) {
+        return Resource.Failure(Exception("No message history found between users"))
+      }
+
       val result = resultDocument.documents[0]
-      Log.d("FirebaseMessageRepository", "messages: $result")
       val messageHistoryMap = result.data!!
 
       val messages = messageRef.document(result.id).collection("messages_list").get().await()
@@ -100,19 +98,20 @@ class FirebaseMessageRepository(db: FirebaseFirestore = Firebase.firestore) : IM
     return try {
       // Check if the message history exists based on the `messages` field
       // If messages field is empty, then message history doesn't exist in Firestore
-      val messageHistoryId: String
-      if (messageHistory.messages.isEmpty()) {
-        val newHistoryResource = createNewMessageHistory(messageHistory.user1, messageHistory.user2)
-        if (newHistoryResource is Resource.Failure) {
-          return Resource.Failure(newHistoryResource.throwable)
-        }
+      val messageHistoryId =
+          if (messageHistory.messages.isEmpty()) {
+            val newHistoryResource =
+                createNewMessageHistory(messageHistory.user1, messageHistory.user2)
+            if (newHistoryResource is Resource.Failure) {
+              return Resource.Failure(newHistoryResource.throwable)
+            }
 
-        val newHistory = (newHistoryResource as Resource.Success).data
-        messageHistoryId = newHistory.id
-      } else {
-        // Use the existing message history ID
-        messageHistoryId = messageHistory.id
-      }
+            val newHistory = (newHistoryResource as Resource.Success).data
+            newHistory.id
+          } else {
+            // Use the existing message history ID
+            messageHistory.id
+          }
 
       val newMessage =
           messageRef
@@ -136,13 +135,11 @@ class FirebaseMessageRepository(db: FirebaseFirestore = Firebase.firestore) : IM
   }
 
   override suspend fun updateReadStateForUser(
-      userid: String,
+      id: String,
       messageHistory: MessageHistory
   ): Resource<Unit> {
     val updatedValue =
-        mapOf(
-            if (userid == messageHistory.user1) "from_user_read" to true
-            else "to_user_read" to true)
+        mapOf(if (id == messageHistory.user1) "from_user_read" to true else "to_user_read" to true)
 
     return try {
       messageRef.document(messageHistory.id).update(updatedValue).await()
