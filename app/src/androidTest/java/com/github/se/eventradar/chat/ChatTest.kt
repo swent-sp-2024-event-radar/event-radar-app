@@ -160,7 +160,9 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
           assertIsDisplayed()
           performTextInput("Test Message 3")
         }
+        chatViewModel.onMessageBarInputChange("Test Message 3")
         chatInputSendButton { performClick() }
+        chatViewModel.onMessageSend()
       }
       step("Check if message is displayed") {
         chatScreenMessagesList { assertIsDisplayed() }
