@@ -71,6 +71,7 @@ class ScanFriendTicketViewModelTest {
           friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/Profile_Pictures/1",
           qrCodeUrl = "http://example.com/QR_Codes/1",
+          bio = "Hi, I am MockUser1",
           username = "johndoe")
 
   private val mockUser2 =
@@ -87,6 +88,7 @@ class ScanFriendTicketViewModelTest {
           friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/Profile_Pictures/1",
           qrCodeUrl = "http://example.com/QR_Codes/1",
+          bio = "Hi, I am MockUser2",
           username = "johndoe")
 
   class MainDispatcherRule(
