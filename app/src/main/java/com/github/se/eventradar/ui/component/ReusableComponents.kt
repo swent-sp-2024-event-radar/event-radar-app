@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -33,6 +36,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -66,6 +70,11 @@ import coil.request.ImageRequest
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
+import com.github.se.eventradar.ui.BottomNavigationMenu
+import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.Route
+import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 import com.github.se.eventradar.viewmodel.EventsOverviewUiState
 
 fun getIconFromViewListBool(viewList: Boolean): ImageVector {
@@ -214,70 +223,70 @@ fun FilterPopUp(
         modifier = Modifier.padding(12.dp).testTag("filterCard"),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
-      Column(modifier = Modifier.fillMaxSize().padding(12.dp).testTag("filterCardColumn")) {
+      Column(modifier = Modifier.padding(12.dp).testTag("filterCardColumn")) {
         // Text input for radius
-        Row(modifier = Modifier.fillMaxWidth().testTag("filterCardColumnRow")) {
-          Box(modifier = Modifier.weight(1f).testTag("filterCardColumnRowRadius")) {
-            Text(
-                text = stringResource(id = R.string.radius_label),
-                style = TextStyle(fontSize = 16.sp),
-                modifier = Modifier.testTag("radiusLabel"))
-          }
-          Box(modifier = Modifier.weight(1f).testTag("radiusInputBox")) {
-            BasicTextField(
-                value = uiState.radiusQuery,
-                onValueChange = { onRadiusQueryChanged(it) },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            shape = RoundedCornerShape(10))
-                        .testTag("radiusInput"),
-                textStyle = TextStyle.Default.copy(fontSize = 16.sp),
-                singleLine = true)
-          }
-          Box(modifier = Modifier.weight(1f).testTag("filterCardColumnRowKm")) {
-            Text(
-                text = stringResource(id = R.string.radius_km_label),
-                style = TextStyle(fontSize = 16.sp),
-                modifier = Modifier.testTag("kmLabel"))
-          }
-        }
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        // Slider for free selection
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start,
-            modifier = Modifier.testTag("freeSwitchRow")) {
-              Text(
-                  text = stringResource(id = R.string.free_events_label),
-                  style =
-                      TextStyle(
-                          fontSize = 16.sp,
-                      ),
-                  modifier = Modifier.testTag("freeSwitchLabel"))
-              Switch(
-                  checked = uiState.isFreeSwitchOn,
-                  onCheckedChange = { onFreeSwitchChanged() },
-                  modifier = Modifier.testTag("freeSwitch"))
+            modifier = Modifier.wrapContentWidth().testTag("filterCardColumnRow"),
+            verticalAlignment = Alignment.CenterVertically) {
+              Row(modifier = Modifier.weight(1f)) {
+                Box(modifier = Modifier.testTag("filterCardColumnRowRadius")) {
+                  Text(
+                      text = stringResource(id = R.string.radius_label),
+                      style = TextStyle(fontSize = 16.sp),
+                      modifier = Modifier.testTag("radiusLabel"))
+                }
+                Box(modifier = Modifier.testTag("radiusInputBox")) {
+                  BasicTextField(
+                      value = uiState.radiusQuery,
+                      onValueChange = { onRadiusQueryChanged(it) },
+                      keyboardOptions =
+                          KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                      modifier =
+                          Modifier.widthIn(max = 36.dp)
+                              .border(
+                                  width = 1.dp,
+                                  color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                  shape = RoundedCornerShape(10))
+                              .testTag("radiusInput"),
+                      textStyle = TextStyle.Default.copy(fontSize = 16.sp),
+                      singleLine = true)
+                }
+                Box(modifier = Modifier.testTag("filterCardColumnRowKm")) {
+                  Text(
+                      text = stringResource(id = R.string.radius_km_label),
+                      style = TextStyle(fontSize = 16.sp),
+                      modifier = Modifier.testTag("kmLabel"))
+                }
+              }
+              // Slider for free selection
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.weight(1.5f).testTag("freeSwitchRow")) {
+                    Text(
+                        text = stringResource(id = R.string.free_events_label),
+                        style =
+                            TextStyle(
+                                fontSize = 16.sp,
+                            ),
+                        modifier = Modifier.testTag("freeSwitchLabel"))
+                    Switch(
+                        checked = uiState.isFreeSwitchOn,
+                        onCheckedChange = { onFreeSwitchChanged() },
+                        modifier = Modifier.widthIn(32.dp).testTag("freeSwitch"))
+                  }
             }
 
         // Buttons for category selection
         Text(
             text = stringResource(id = R.string.category_label),
-            modifier = Modifier.weight(1f).testTag("categoryLabel"),
+            modifier = Modifier.testTag("categoryLabel"),
             style =
                 TextStyle(
                     fontSize = 16.sp,
                 ))
 
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start,
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.testTag("categoryRow"),
         ) {
           CategorySelection(
@@ -290,7 +299,7 @@ fun FilterPopUp(
 
         // Button to apply filter
         Row(
-            modifier = Modifier.fillMaxWidth().testTag("filterApplyRow"),
+            modifier = Modifier.testTag("filterApplyRow"),
             horizontalArrangement = Arrangement.Center) {
               Button(
                   onClick = { onFilterApply() }, modifier = Modifier.testTag("filterApplyButton")) {
@@ -305,36 +314,49 @@ fun FilterPopUp(
 @Composable
 fun CategorySelection(uiState: EventsOverviewUiState, modifier: Modifier) {
   LazyColumn(modifier = modifier) {
-    items(EventCategory.entries) { category ->
-      var isChecked by remember { mutableStateOf(uiState.categoriesCheckedList.contains(category)) }
-      Row(
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.Start,
-          modifier =
-              Modifier.padding(vertical = 0.dp)
-                  .testTag("categoryOptionRow-${category.displayName}")) {
-            Checkbox(
-                checked = isChecked,
-                onCheckedChange = {
-                  isChecked = it
-                  if (isChecked) {
-                    uiState.categoriesCheckedList.add(category)
-                  } else {
-                    uiState.categoriesCheckedList.remove(category)
-                  }
-                },
-                modifier =
-                    Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp).testTag("checkbox"))
-            Text(
-                text = category.displayName,
-                style =
-                    TextStyle(
-                        fontSize = 16.sp,
-                    ),
-                modifier = Modifier.padding(start = 16.dp).testTag("checkboxText"))
-          }
+    items(EventCategory.entries.subList(0, EventCategory.entries.size / 2 + 1)) { category ->
+      CategoryDisplayColumn(category, uiState)
     }
   }
+  LazyColumn(modifier = modifier) {
+    items(
+        EventCategory.entries.subList(
+            EventCategory.entries.size / 2 + 1, EventCategory.entries.size)) { category ->
+          CategoryDisplayColumn(category, uiState)
+        }
+  }
+}
+
+@Composable
+fun CategoryDisplayColumn(
+    category: EventCategory,
+    uiState: EventsOverviewUiState,
+) {
+  var isChecked by remember { mutableStateOf(uiState.categoriesCheckedList.contains(category)) }
+  Row(
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.Start,
+      modifier =
+          Modifier.padding(vertical = 0.dp).testTag("categoryOptionRow-${category.displayName}")) {
+        Checkbox(
+            checked = isChecked,
+            onCheckedChange = {
+              isChecked = it
+              if (isChecked) {
+                uiState.categoriesCheckedList.add(category)
+              } else {
+                uiState.categoriesCheckedList.remove(category)
+              }
+            },
+            modifier = Modifier.scale(0.6f).size(10.dp).padding(start = 10.dp).testTag("checkbox"))
+        Text(
+            text = category.displayName,
+            style =
+                TextStyle(
+                    fontSize = 16.sp,
+                ),
+            modifier = Modifier.padding(start = 16.dp).testTag("checkboxText"))
+      }
 }
 
 @Composable
@@ -369,4 +391,31 @@ fun ProfilePic(
       contentDescription = "Profile picture of $firstName $lastName",
       contentScale = ContentScale.Crop,
       modifier = modifier.padding(start = 16.dp).clip(CircleShape).size(56.dp))
+}
+
+@Composable
+fun AppScaffold(
+    modifier: Modifier = Modifier,
+    topBar: @Composable () -> Unit = {
+      Logo(modifier = Modifier.fillMaxWidth().padding(top = 32.dp, start = 16.dp).testTag("logo"))
+    },
+    floatingActionButton: @Composable () -> Unit,
+    navigationActions: NavigationActions,
+    selectedItem: String = Route.HOME,
+    content: @Composable (PaddingValues) -> Unit,
+) {
+  Scaffold(
+      modifier = modifier,
+      topBar = topBar,
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelected = navigationActions::navigateTo,
+            tabList = TOP_LEVEL_DESTINATIONS,
+            selectedItem = getTopLevelDestination(selectedItem),
+            modifier = Modifier.testTag("bottomNavMenu"))
+      },
+      floatingActionButton = floatingActionButton,
+  ) {
+    content(it)
+  }
 }
