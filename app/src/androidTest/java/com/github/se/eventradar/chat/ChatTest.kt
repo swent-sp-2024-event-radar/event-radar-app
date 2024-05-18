@@ -76,10 +76,11 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
 
     messageHistory = messageHistory as Resource.Success
 
-    mockMessageRepository.addMessage(
+    // TODO: fix logic with add tests
+    messageHistory.data.messages.add(
         Message(
             sender = "1", content = "Test Message 1", dateTimeSent = LocalDateTime.now(), id = "1"),
-        messageHistory.data)
+    )
 
     mockMessageRepository.addMessage(
         Message(
