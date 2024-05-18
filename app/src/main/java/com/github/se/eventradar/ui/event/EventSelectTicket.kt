@@ -1,10 +1,11 @@
 package com.github.se.eventradar.ui.event
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -35,7 +36,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.BottomNavigationMenu
@@ -92,7 +92,9 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
 
   Scaffold(
       modifier = Modifier.testTag("joinEventScreen"),
-      topBar = {},
+      topBar = {
+        GoBackButton(modifier = Modifier.wrapContentSize()) { navigationActions.goBack() }
+      },
       bottomBar = {
         BottomNavigationMenu(
             onTabSelected = { tab -> navigationActions.navigateTo(tab) },
@@ -104,7 +106,7 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
         // buy ticket button
         FloatingActionButton(
             onClick = { viewModel.buyTicketForEvent() },
-            modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("buyButton"),
+            modifier = Modifier.testTag("buyButton"),
             containerColor = MaterialTheme.colorScheme.primaryContainer,
         ) {
           val icon = if (viewModel.isTicketFree()) R.drawable.check else R.drawable.credit_card
@@ -115,50 +117,28 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
               tint = MaterialTheme.colorScheme.onPrimaryContainer,
           )
         }
-      }) { innerPadding ->
-        ConstraintLayout(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-          val (backButton, title, ticketTitle, ticketCard) = createRefs()
-
-          GoBackButton(
-              modifier =
-                  Modifier.wrapContentSize().constrainAs(backButton) {
-                    top.linkTo(parent.top, margin = 12.dp)
-                    start.linkTo(parent.start)
-                  }) {
-                navigationActions.goBack()
-              }
-
+      }) {
+        Column(modifier = Modifier.fillMaxWidth().padding(it).padding(horizontal = 8.dp)) {
           EventTitle(
-              modifier =
-                  Modifier.constrainAs(title) {
-                    top.linkTo(backButton.bottom, margin = 42.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                  },
+              modifier = Modifier.align(Alignment.CenterHorizontally),
               eventUiState = eventUiState,
               style = componentStyle)
 
+          Spacer(modifier = Modifier.height(24.dp))
+
           Text(
               text = stringResource(id = R.string.tickets_title),
-              modifier =
-                  Modifier.constrainAs(ticketTitle) {
-                        top.linkTo(title.bottom, margin = 32.dp)
-                        start.linkTo(parent.start, margin = 32.dp)
-                      }
-                      .testTag("ticketsTitle"),
+              modifier = Modifier.testTag("ticketsTitle"),
               style = componentStyle.subTitleStyle)
+
+          Spacer(modifier = Modifier.height(8.dp))
 
           Card(
               modifier =
-                  Modifier.padding(horizontal = 32.dp, vertical = 8.dp)
+                  Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                       .height(IntrinsicSize.Min)
                       .fillMaxWidth()
-                      .testTag("ticketCard")
-                      .constrainAs(ticketCard) {
-                        top.linkTo(ticketTitle.bottom, margin = 32.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                      },
+                      .testTag("ticketCard"),
               colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
               elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
               onClick = {
