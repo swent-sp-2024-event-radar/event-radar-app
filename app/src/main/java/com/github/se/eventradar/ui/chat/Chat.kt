@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,10 +22,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -62,9 +61,6 @@ import java.time.LocalDateTime
 fun ChatScreen(viewModel: ChatViewModel, navigationActions: NavigationActions) {
   val uiState by viewModel.uiState.collectAsState()
 
-  viewModel.initOpponent()
-  viewModel.getMessages()
-
   ChatScreenUi(
       uiState = uiState,
       onBackArrowClick = navigationActions::goBack,
@@ -90,19 +86,11 @@ fun ChatScreenUi(
   val opponentPictureUrl = uiState.opponentProfile.profilePicUrl
   val opponentUserId = uiState.opponentProfile.userId
   val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = messages.size)
-  val messagesLoadedFirstTime = uiState.messagesLoadedFirstTime
-  val messageInserted = uiState.messageInserted
-  LaunchedEffect(key1 = messagesLoadedFirstTime, messageInserted) {
-    if ((messagesLoadedFirstTime || messageInserted) && messages.isNotEmpty()) {
-      scrollState.scrollToItem(index = messages.size - 1)
-    }
-  }
 
-  val imePaddingValues = PaddingValues()
-  val imeBottomPadding = imePaddingValues.calculateBottomPadding().value.toInt()
-  LaunchedEffect(key1 = imeBottomPadding) {
+  LaunchedEffect(key1 = messages.size, key2 = messages.isNotEmpty()) {
+    //    if ((messagesLoadedFirstTime || messageInserted) && messages.isNotEmpty()) {
     if (messages.isNotEmpty()) {
-      scrollState.scrollToItem(index = messages.size - 1)
+      scrollState.animateScrollToItem(index = messages.size - 1)
     }
   }
 
@@ -168,8 +156,7 @@ fun ChatAppBar(
     onUserNameClick: (() -> Unit)? = null,
     onBackArrowClick: (() -> Unit)? = null,
 ) {
-  SmallTopAppBar(
-      modifier = Modifier.height(72.dp).fillMaxWidth().padding(top = 8.dp).testTag("chatAppBar"),
+  TopAppBar(
       title = {
         Row(modifier = Modifier.testTag("chatAppBarTitle")) {
           ProfilePic(
@@ -193,6 +180,7 @@ fun ChatAppBar(
               }
         }
       },
+      modifier = Modifier.height(72.dp).fillMaxWidth().padding(top = 8.dp).testTag("chatAppBar"),
       navigationIcon = {
         IconButton(
             onClick = { onBackArrowClick?.invoke() },
@@ -221,7 +209,7 @@ fun ChatInput(uiState: ChatUiState, onMessageChange: (String) -> Unit, onMessage
             value = uiState.messageBarInput,
             onValueChange = { onMessageChange(it) },
             colors =
-                TextFieldDefaults.textFieldColors(
+                TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent),

@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @HiltViewModel(assistedFactory = ChatViewModel.Factory::class)
 class ChatViewModel
@@ -79,7 +80,7 @@ constructor(
       }
     }
     initOpponent()
-    getMessages()
+    runBlocking { getMessages() }
   }
 
   fun initOpponent() {
@@ -100,43 +101,40 @@ constructor(
     }
   }
 
-  fun getMessages() {
-    viewModelScope.launch {
-      // Fetch messages
-      val userId = _uiState.value.userId
-      if (userId != null) {
-        val messagesResource = messagesRepository.getMessages(userId, opponentId)
-        _uiState.update { currentState ->
-          when (messagesResource) {
-            is Resource.Success -> {
-              // Sort messages by dateTimeSent in place
-              messagesResource.data.messages.sortBy { it.dateTimeSent }
+  suspend fun getMessages() {
+    // Fetch messages
+    val userId = _uiState.value.userId
+    if (userId != null) {
+      val messagesResource = messagesRepository.getMessages(userId, opponentId)
+      _uiState.update { currentState ->
+        when (messagesResource) {
+          is Resource.Success -> {
+            // Sort messages by dateTimeSent in place
+            messagesResource.data.messages.sortBy { it.dateTimeSent }
 
-              currentState.copy(
-                  messageHistory = messagesResource.data, messagesLoadedFirstTime = true)
-            }
-            is Resource.Failure -> {
-              Log.d(
-                  "ChatViewModel", "Error fetching messages: ${messagesResource.throwable.message}")
+            currentState.copy(
+                messageHistory = messagesResource.data, messagesLoadedFirstTime = true)
+          }
+          is Resource.Failure -> {
+            Log.d("ChatViewModel", "Error fetching messages: ${messagesResource.throwable.message}")
 
-              // Message history doesn't exist between two users.
-              // Record an empty message history with the two user id's,
-              // so that a new message history can be created for them when addMessage is called
-              currentState.copy(
-                  messageHistory =
-                      MessageHistory(
-                          user1 = userId,
-                          user2 = opponentId,
-                          latestMessageId = "",
-                          user1ReadMostRecentMessage = false,
-                          user2ReadMostRecentMessage = false,
-                          messages = mutableListOf()))
-            }
+            // Message history doesn't exist between two users.
+            // Record an empty message history with the two user id's,
+            // so that a new message history can be created for them when addMessage is called
+            currentState.copy(
+                messageHistory =
+                    MessageHistory(
+                        user1 = userId,
+                        user2 = opponentId,
+                        latestMessageId = "",
+                        user1ReadMostRecentMessage = false,
+                        user2ReadMostRecentMessage = false,
+                        messages = mutableListOf()))
           }
         }
-      } else {
-        Log.d("ChatViewModel", "Invalid state: User ID is null.")
       }
+    } else {
+      Log.d("ChatViewModel", "Invalid state: User ID is null.")
     }
   }
 
@@ -150,9 +148,12 @@ constructor(
     val message = _uiState.value.messageBarInput
     if (message.isNotBlank()) {
       sendMessage(message)
-      getMessages()
-      _uiState.update { currentState ->
-        currentState.copy(messageBarInput = "", messageInserted = true)
+
+      viewModelScope.launch {
+        getMessages()
+        _uiState.update { currentState ->
+          currentState.copy(messageBarInput = "", messageInserted = true)
+        }
       }
     }
   }
