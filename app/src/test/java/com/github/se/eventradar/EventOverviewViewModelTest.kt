@@ -445,14 +445,15 @@ class EventsOverviewViewModelTest {
   }
 
   @Test
-  fun testObserveEvents() = runTest {
+  fun testObserveAllEvents() = runTest {
     val testEvent1 = mockEvent.copy(fireBaseID = "1", eventName = "Test Event 1")
     val testEvent2 = mockEvent.copy(fireBaseID = "2", eventName = "Test Event 2")
 
-    // Setup your ViewModel with mocked dependencies
-    // automatically triggers the 'init' block, which calls 'observeEvents()'
-
     eventRepository.addEvent(testEvent1)
+
+    // Setup your ViewModel with mocked dependencies
+    // automatically triggers the 'init' block, which calls 'observeAllEvents()'
+
     val viewModel = EventsOverviewViewModel(eventRepository, userRepository)
 
     delay(100)
@@ -466,7 +467,7 @@ class EventsOverviewViewModelTest {
   }
 
   @Test
-  fun testObserveEventsFailure() = runTest {
+  fun testObserveAllEventsFailure() = runTest {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
 

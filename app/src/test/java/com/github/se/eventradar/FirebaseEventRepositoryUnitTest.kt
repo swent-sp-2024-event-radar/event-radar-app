@@ -53,7 +53,7 @@ class FirebaseEventRepositoryUnitTest {
   }
 
   @Test
-  fun `observeEvents emits Resource_Success with events on snapshot changes`() = runTest {
+  fun `observeAllEvents emits Resource_Success with events on snapshot changes`() = runTest {
     val mockEventMap =
         mapOf(
             "name" to "Sample Event",
@@ -87,7 +87,7 @@ class FirebaseEventRepositoryUnitTest {
           mockListenerRegistration
         }
     val results = mutableListOf<Resource<List<Event>>>()
-    val job = launch { firebaseEventRepository.observeEvents().collect { results.add(it) } }
+    val job = launch { firebaseEventRepository.observeAllEvents().collect { results.add(it) } }
     delay(500)
 
     assert(results.size == 1)
@@ -105,7 +105,7 @@ class FirebaseEventRepositoryUnitTest {
   }
 
   @Test
-  fun `observeEvents emits Resource_Failure on snapshot listener error`() = runTest {
+  fun `observeAllEvents emits Resource_Failure on snapshot listener error`() = runTest {
     val errorMessage = "Network error"
     val mockFirestoreException = mockk<FirebaseFirestoreException>()
     every { mockFirestoreException.message } returns errorMessage
@@ -121,7 +121,7 @@ class FirebaseEventRepositoryUnitTest {
         }
 
     val results = mutableListOf<Resource<List<Event>>>()
-    val job = launch { firebaseEventRepository.observeEvents().collect { results.add(it) } }
+    val job = launch { firebaseEventRepository.observeAllEvents().collect { results.add(it) } }
     delay(500)
 
     assert(results.size == 1)

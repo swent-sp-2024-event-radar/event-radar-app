@@ -198,12 +198,12 @@ class MockEventRepositoryUnitTest {
   }
 
   @Test
-  fun testObserveEventsReflectsChanges() = runTest {
+  fun testObserveAllEventsReflectsChanges() = runTest {
     val initialEvent = mockEvent.copy(fireBaseID = "1", eventName = "Initial Event")
     eventRepository.addEvent(initialEvent)
 
     val results = mutableListOf<Resource<List<Event>>>()
-    val job = launch { eventRepository.observeEvents().toList(results) }
+    val job = launch { eventRepository.observeAllEvents().toList(results) }
 
     val newEvent = mockEvent.copy(fireBaseID = "2", eventName = "New Event")
     eventRepository.addEvent(newEvent)

@@ -35,7 +35,7 @@ constructor(
 
   init {
     checkUserLoginStatus()
-    observeEvents()
+    observeAllEvents()
     observeUpcomingEvents()
   }
 
@@ -206,9 +206,9 @@ constructor(
     }
   }
 
-  private fun observeEvents() {
+  private fun observeAllEvents() {
     viewModelScope.launch {
-      eventRepository.observeEvents().collect { resource ->
+      eventRepository.observeAllEvents().collect { resource ->
         when (resource) {
           is Resource.Success -> {
             _uiState.update { currentState ->

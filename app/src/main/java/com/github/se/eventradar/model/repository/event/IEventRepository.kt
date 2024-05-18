@@ -17,7 +17,7 @@ interface IEventRepository {
 
   suspend fun getEventsByIds(ids: List<String>): Resource<List<Event>>
 
-  fun observeEvents(): Flow<Resource<List<Event>>>
+  fun observeAllEvents(): Flow<Resource<List<Event>>>
 
   fun observeUpcomingEvents(userId: String): Flow<Resource<List<Event>>>
 }
