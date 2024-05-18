@@ -16,7 +16,7 @@ object Route {
   // Event radar secondary screens
   const val EVENT_DETAILS = "event_details"
   const val EVENT_DETAILS_TICKETS = "event_details_tickets"
-
+  const val MY_EVENT = "my_event"
   const val LOGIN = "login/Login"
   const val SIGNUP = "login/SignUp"
 }
