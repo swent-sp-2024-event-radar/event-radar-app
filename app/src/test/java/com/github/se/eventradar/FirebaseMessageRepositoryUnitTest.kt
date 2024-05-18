@@ -308,7 +308,6 @@ class FirebaseMessageRepositoryUnitTest {
             "latest_message_id" to "",
             "from_user_read" to false,
             "to_user_read" to false,
-            "messages" to emptyList<Message>(),
         )
 
     every { messagesRef.add(capture(captureAdd)) } returns mockTask(mockDocumentReference)
