@@ -451,9 +451,10 @@ class EventsOverviewViewModelTest {
 
     // Setup your ViewModel with mocked dependencies
     // automatically triggers the 'init' block, which calls 'observeEvents()'
-    val viewModel = EventsOverviewViewModel(eventRepository, userRepository)
 
     eventRepository.addEvent(testEvent1)
+    val viewModel = EventsOverviewViewModel(eventRepository, userRepository)
+
     delay(100)
     eventRepository.addEvent(testEvent2)
 

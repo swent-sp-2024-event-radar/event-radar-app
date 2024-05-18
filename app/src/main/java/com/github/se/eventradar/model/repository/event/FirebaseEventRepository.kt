@@ -11,8 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-class FirebaseEventRepository : IEventRepository {
-  private val db: FirebaseFirestore = Firebase.firestore
+class FirebaseEventRepository(db: FirebaseFirestore = Firebase.firestore) : IEventRepository {
   private val eventRef: CollectionReference = db.collection("events")
 
   override suspend fun getEvents(): Resource<List<Event>> {

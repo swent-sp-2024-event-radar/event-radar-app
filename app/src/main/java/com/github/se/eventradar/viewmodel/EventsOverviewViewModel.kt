@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.Resource
+import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.repository.event.IEventRepository
@@ -236,8 +237,9 @@ constructor(
     when (userIdResource) {
       is Resource.Success -> {
         val uid = userIdResource.data
-        val eventsResource = eventRepository.observeUpcomingEvents(uid).collect()
-        handleEventsResource(eventsResource)
+        eventRepository.observeUpcomingEvents(uid).collect() { eventsResource ->
+          handleEventsResource(eventsResource)
+        }
       }
       is Resource.Failure -> {
         Log.d(
