@@ -243,7 +243,7 @@ class MockEventRepositoryUnitTest {
             attendeeList = mutableListOf(userId))
     // Add a new event that the specified user will not attend
     val newEvent2 =
-        mockEvent.copy(fireBaseID = "2", eventName = "New Event", attendeeList = mutableListOf())
+        mockEvent.copy(fireBaseID = "3", eventName = "New Event", attendeeList = mutableListOf())
     eventRepository.addEvent(newEvent)
     eventRepository.addEvent(newEvent2)
 

@@ -448,7 +448,6 @@ class EventsOverviewViewModelTest {
   fun testObserveEvents() = runTest {
     val testEvent1 = mockEvent.copy(fireBaseID = "1", eventName = "Test Event 1")
     val testEvent2 = mockEvent.copy(fireBaseID = "2", eventName = "Test Event 2")
-    eventRepository.addEvent(testEvent1)
 
     // Setup your ViewModel with mocked dependencies
     // automatically triggers the 'init' block, which calls 'observeEvents()'
