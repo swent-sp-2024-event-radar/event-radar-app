@@ -120,7 +120,7 @@ constructor(
             }
       } while ((updateResult !is Resource.Success) && (maxNumberOfRetries-- > 0))
     } else {
-      println("one does not contain the other")
+      Log.d("error one does not contain the other", "one does not contain the other")
       changeAction(Action.DenyEntry)
     }
   }
