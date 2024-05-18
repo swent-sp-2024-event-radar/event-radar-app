@@ -22,6 +22,7 @@ import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.viewmodel.ViewFriendsProfileViewModel
 import com.github.se.eventradar.viewmodel.qrCode.ScanTicketQrViewModel
 
+
 @Composable
 fun NavGraph(
     navController: NavHostController,
@@ -56,6 +57,7 @@ fun NavGraph(
           ViewFriendsProfileUi(viewModel = viewModel, navigationActions = navActions)
         }
     // TODO replace the Toast message with the corresponding screen function of the route
+
     composable(
         "${Route.MY_EVENT}/{eventId}",
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
@@ -63,6 +65,7 @@ fun NavGraph(
           val viewModel = ScanTicketQrViewModel.create(eventId = eventId)
           QrCodeTicketUi(viewModel, navigationActions = navActions)
         }
+
     composable(Route.MESSAGE) { MessagesScreen(navigationActions = navActions) }
     composable(Route.SCANNER) { QrCodeScreen(navigationActions = navActions) }
     composable(Route.PROFILE) {
