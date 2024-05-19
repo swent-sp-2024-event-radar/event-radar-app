@@ -1,6 +1,5 @@
 package com.github.se.eventradar.ui.messages
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -83,9 +82,7 @@ fun MessagesScreen(
       onSelectedTabIndexChanged = viewModel::onSelectedTabIndexChanged,
       onSearchQueryChanged = viewModel::onSearchQueryChanged,
       onSearchActiveChanged = viewModel::onSearchActiveChanged,
-      onChatClicked = {
-        Toast.makeText(context, "Chat feature is not yet implemented", Toast.LENGTH_SHORT).show()
-      },
+      onChatClicked = { navigationActions.navController.navigate(Route.PRIVATE_CHAT + "/${it}") },
       onTabSelected = navigationActions::navigateTo,
       onFriendClicked = {
         navigationActions.navController.navigate("${Route.PROFILE}/${it.userId}")
@@ -99,7 +96,7 @@ fun MessagesScreenUi(
     onSelectedTabIndexChanged: (Int) -> Unit,
     onSearchQueryChanged: (String) -> Unit,
     onSearchActiveChanged: (Boolean) -> Unit,
-    onChatClicked: (MessageHistory) -> Unit,
+    onChatClicked: (String) -> Unit,
     onTabSelected: (TopLevelDestination) -> Unit,
     onFriendClicked: (User) -> Unit,
     getUser: (String) -> User
@@ -197,7 +194,7 @@ fun MessagesList(
     messageList: List<MessageHistory>,
     searchQuery: String,
     userId: String,
-    onChatClicked: (MessageHistory) -> Unit,
+    onChatClicked: (String) -> Unit,
     getUser: (String) -> User,
     modifier: Modifier = Modifier
 ) {
@@ -237,7 +234,7 @@ fun MessagePreviewItem(
     messageHistory: MessageHistory,
     recipient: User,
     currentUserReadLatestMessage: Boolean,
-    onChatClicked: (MessageHistory) -> Unit,
+    onChatClicked: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
   val mostRecentMessage = messageHistory.messages.last { it.id == messageHistory.latestMessageId }
@@ -246,7 +243,7 @@ fun MessagePreviewItem(
       modifier =
           modifier
               .fillMaxWidth()
-              .clickable { onChatClicked(messageHistory) }
+              .clickable { onChatClicked(recipient.userId) }
               .padding(vertical = 8.dp)
               .testTag("messagePreviewItem"),
       horizontalArrangement = Arrangement.Absolute.SpaceEvenly,

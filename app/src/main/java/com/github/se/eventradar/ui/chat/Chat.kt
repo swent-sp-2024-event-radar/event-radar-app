@@ -1,11 +1,9 @@
 package com.github.se.eventradar.ui.chat
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,10 +22,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -44,7 +41,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.User
@@ -61,14 +57,8 @@ import com.github.se.eventradar.viewmodel.ChatViewModel
 import java.time.LocalDateTime
 
 @Composable
-fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), navigationActions: NavigationActions) {
+fun ChatScreen(viewModel: ChatViewModel, navigationActions: NavigationActions) {
   val uiState by viewModel.uiState.collectAsState()
-  // Note the opponentId should no longer be in the uiState but be accessible with
-  // viewModel.opponentId
-  // TO DO: Implement get messages between two users in VM
-  //    viewModel.getMessages(senderId, opponentId)
-
-  val context = LocalContext.current // only needed until message send is implemented
 
   ChatScreenUi(
       uiState = uiState,
@@ -76,9 +66,7 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), navigationActions: Na
       onTabSelected = navigationActions::navigateTo,
       onViewProfileClick = navigationActions.navController::navigate,
       onMessageChange = viewModel::onMessageBarInputChange,
-      onMessageSend = {
-        Toast.makeText(context, "Send message to be implemented", Toast.LENGTH_SHORT).show()
-      })
+      onMessageSend = viewModel::onMessageSend)
 }
 
 @Composable
@@ -92,32 +80,17 @@ fun ChatScreenUi(
 ) {
   val messages = uiState.messageHistory.messages
 
-  // TO DO: Implement load opponent in VM
-  LaunchedEffect(key1 = Unit) {
-    //        viewModel.loadOpponentProfileFromFirebase(uiState.opponentId!!)
-  }
   val opponentName = uiState.opponentProfile.firstName
   val opponentSurname = uiState.opponentProfile.lastName
   val opponentPictureUrl = uiState.opponentProfile.profilePicUrl
   val opponentUserId = uiState.opponentProfile.userId
   val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = messages.size)
-  val messagesLoadedFirstTime = uiState.messagesLoadedFirstTime
-  val messageInserted = uiState.messageInserted
-  LaunchedEffect(key1 = messagesLoadedFirstTime, messageInserted) {
-    if ((messagesLoadedFirstTime || messageInserted) && messages.isNotEmpty()) {
-      scrollState.scrollToItem(index = messages.size - 1)
-    }
-  }
 
-  val imePaddingValues = PaddingValues()
-  val imeBottomPadding = imePaddingValues.calculateBottomPadding().value.toInt()
-  LaunchedEffect(key1 = imeBottomPadding) {
+  LaunchedEffect(key1 = messages.size) {
     if (messages.isNotEmpty()) {
-      scrollState.scrollToItem(index = messages.size - 1)
+      scrollState.animateScrollToItem(index = messages.size - 1)
     }
   }
-
-  val context = LocalContext.current // only needed until view profile is implemented
 
   Scaffold(
       modifier = Modifier.testTag("chatScreen"),
@@ -149,7 +122,7 @@ fun ChatScreenUi(
                   modifier = Modifier.weight(1f).fillMaxWidth().testTag("chatScreenMessagesList"),
                   state = scrollState) {
                     items(messages) { message ->
-                      when (message.sender == uiState.opponentId) {
+                      when (message.sender == uiState.opponentProfile.userId) {
                         true -> {
                           ReceivedMessageRow(
                               text = message.content,
@@ -181,8 +154,7 @@ fun ChatAppBar(
     onUserNameClick: (() -> Unit)? = null,
     onBackArrowClick: (() -> Unit)? = null,
 ) {
-  SmallTopAppBar(
-      modifier = Modifier.height(72.dp).fillMaxWidth().padding(top = 8.dp).testTag("chatAppBar"),
+  TopAppBar(
       title = {
         Row(modifier = Modifier.testTag("chatAppBarTitle")) {
           ProfilePic(
@@ -206,6 +178,7 @@ fun ChatAppBar(
               }
         }
       },
+      modifier = Modifier.height(72.dp).fillMaxWidth().padding(top = 8.dp).testTag("chatAppBar"),
       navigationIcon = {
         IconButton(
             onClick = { onBackArrowClick?.invoke() },
@@ -218,10 +191,8 @@ fun ChatAppBar(
       })
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatInput(uiState: ChatUiState, onMessageChange: (String) -> Unit, onMessageSend: () -> Unit) {
-  val context = LocalContext.current
   Row(
       modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("chatInput"),
       verticalAlignment = Alignment.Bottom) {
@@ -234,7 +205,7 @@ fun ChatInput(uiState: ChatUiState, onMessageChange: (String) -> Unit, onMessage
             value = uiState.messageBarInput,
             onValueChange = { onMessageChange(it) },
             colors =
-                TextFieldDefaults.textFieldColors(
+                TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent),
@@ -245,7 +216,6 @@ fun ChatInput(uiState: ChatUiState, onMessageChange: (String) -> Unit, onMessage
             },
             trailingIcon = {
               IconButton(
-                  // TO DO: Implement onMessageSend
                   onClick = { onMessageSend() },
                   modifier = Modifier.testTag("chatInputSendButton")) {
                     Icon(
@@ -264,7 +234,6 @@ fun ChatScreenPreview() {
   val sampleUiState =
       ChatUiState(
           userId = "1",
-          opponentId = "2",
           messageHistory =
               MessageHistory(
                   user1 = "Default sender",
@@ -327,9 +296,7 @@ fun ChatScreenPreview() {
                       "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2Fplaceholder.png?alt=media&token=ba4b4efb-ff45-4617-b60f-3789e8fb75b6",
                   qrCodeUrl = "",
                   bio = "",
-                  username = "Test2"),
-          messageInserted = true,
-          messagesLoadedFirstTime = true)
+                  username = "Test2"))
 
   ChatScreenUi(
       uiState = sampleUiState,

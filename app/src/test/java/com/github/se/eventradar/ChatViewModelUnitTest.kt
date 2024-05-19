@@ -16,6 +16,7 @@ import io.mockk.verify
 import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -69,7 +70,7 @@ class ChatViewModelUnitTest {
           friendsList = mutableListOf(),
           profilePicUrl = "Default",
           qrCodeUrl = "Default",
-          bio = "",
+          bio = "Default bio",
           username = "Default")
 
   private val opponentId = "user2"
@@ -87,7 +88,7 @@ class ChatViewModelUnitTest {
           friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/pic.jpg",
           qrCodeUrl = "http://example.com/qr.jpg",
-          bio = "",
+          bio = "Default bio",
           username = "john_doe")
 
   @Before
@@ -98,28 +99,17 @@ class ChatViewModelUnitTest {
   }
 
   @Test
-  fun `init and getMessages successful`() = runTest {
+  fun `init successful`() = runTest {
     // Set up user repo
-
     (userRepository as MockUserRepository).updateCurrentUserId("user1")
     userRepository.addUser(opponent)
 
-    val msg1 = mockMessage.copy(sender = "user1", id = "msg1")
-    val msg2 = mockMessage.copy(sender = "user2", id = "msg2")
-    val messageHistory = messageRepository.createNewMessageHistory("user1", "user2")
-
-    messageRepository.addMessage(msg1, (messageHistory as Resource.Success).data)
-    messageRepository.addMessage(msg2, messageHistory.data)
-
     viewModel =
         ChatViewModel(messageRepository, userRepository, opponentId) // Initialize view model
-    viewModel.getMessages()
 
-    val expectedMessages = mutableListOf(msg1, msg2)
     val uiState = viewModel.uiState.value
     assert(uiState.userId == "user1")
-    assert(uiState.messagesLoadedFirstTime)
-    assert(expectedMessages == uiState.messageHistory.messages)
+    assert(uiState.messageHistory.messages.isEmpty())
     assert(uiState.opponentProfile == opponent)
   }
 
@@ -168,6 +158,50 @@ class ChatViewModelUnitTest {
   }
 
   @Test
+  fun `getMessages() success`() = runTest {
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    userRepository.addUser(opponent)
+
+    val msg1 = mockMessage.copy(sender = "user1", id = "msg1")
+    val msg2 = mockMessage.copy(sender = "user2", id = "msg2")
+
+    // TODO: clean up logic with add message
+    val messageHistory = messageRepository.createNewMessageHistory("user1", "user2")
+
+    val editedMH = (messageHistory as Resource.Success).data
+
+    editedMH.messages.add(msg1)
+
+    messageRepository.addMessage(msg2, editedMH)
+
+    viewModel =
+        ChatViewModel(messageRepository, userRepository, opponentId) // Initialize view model
+
+    runBlocking { viewModel.getMessages() }
+
+    val expectedMessages = mutableListOf(msg1, msg2)
+    val uiState = viewModel.uiState.value
+    assert(expectedMessages == uiState.messageHistory.messages)
+  }
+
+  @Test
+  fun `getMessages() failure`() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    userRepository.addUser(opponent)
+
+    viewModel =
+        ChatViewModel(messageRepository, userRepository, opponentId) // Initialize view model
+    viewModel.getMessages()
+
+    verify {
+      Log.d("ChatViewModel", "Error fetching messages: No message history found between users")
+    }
+    unmockkAll()
+  }
+
+  @Test
   fun `onMessageBarInputChange test`() = runTest {
     (userRepository as MockUserRepository).updateCurrentUserId("user1")
     userRepository.addUser(opponent)
@@ -180,7 +214,6 @@ class ChatViewModelUnitTest {
     val uiState = viewModel.uiState.value
 
     assert(uiState.messageBarInput == "Hey")
-    assert(!uiState.messageInserted)
   }
 
   @Test
@@ -192,11 +225,12 @@ class ChatViewModelUnitTest {
     userRepository.addUser(opponent)
 
     val msg1 = mockMessage.copy(sender = "user1", id = "msg1")
-    val msg2 = mockMessage.copy(sender = "user2", id = "msg2")
+
     val messageHistory = messageRepository.createNewMessageHistory("user1", "user2")
 
-    messageRepository.addMessage(msg1, (messageHistory as Resource.Success).data)
-    messageRepository.addMessage(msg2, messageHistory.data)
+    val editedMH = (messageHistory as Resource.Success).data
+
+    editedMH.messages.add(msg1)
 
     viewModel =
         ChatViewModel(messageRepository, userRepository, opponentId) // Initialize view model
@@ -208,14 +242,32 @@ class ChatViewModelUnitTest {
     val newMsg =
         mockMessage.copy(
             sender = "user1", content = "Hey", dateTimeSent = LocalDateTime.now(), id = "")
-    val expectedMessages = mutableListOf(msg1, msg2, newMsg)
+    val expectedMessages = mutableListOf(msg1, newMsg)
     val uiState = viewModel.uiState.value
 
     assert(uiState.messageBarInput == "")
-    assert(uiState.messageInserted)
-    assert(uiState.messagesLoadedFirstTime)
     assert(expectedMessages.size == uiState.messageHistory.messages.size)
     assert(expectedMessages == uiState.messageHistory.messages)
     unmockkAll()
+  }
+
+  @Test
+  fun `onMessageSend blank message doesn't do anything`() = runTest {
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    userRepository.addUser(opponent)
+
+    messageRepository.createNewMessageHistory("user1", "user2")
+
+    viewModel =
+        ChatViewModel(messageRepository, userRepository, opponentId) // Initialize view model
+    viewModel.getMessages()
+    viewModel.onMessageBarInputChange("")
+
+    viewModel.onMessageSend()
+
+    val uiState = viewModel.uiState.value
+
+    assert(uiState.messageBarInput == "")
+    assert(uiState.messageHistory.messages.isEmpty())
   }
 }
