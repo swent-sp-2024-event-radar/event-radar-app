@@ -9,7 +9,10 @@ import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.eventradar.ui.qrCode.QrCodeScreen
+import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,13 +26,13 @@ import kotlinx.coroutines.launch
 // firebase operations take a long time
 // TODO ViewModel & UI can be improved to error message for each different type of Error ?
 
-@HiltViewModel
+@HiltViewModel(assistedFactory = ScanFriendQrViewModel.Factory::class)
 class ScanFriendQrViewModel
 @AssistedInject
 constructor(
   private val userRepository: IUserRepository, // Dependency injection
-  val qrCodeAnalyser: QrCodeAnalyser, // Dependency injection
-  private val navigationActions: NavigationActions,
+  val qrCodeAnalyser: QrCodeAnalyser,// Dependency injection
+  @Assisted private val navigationActions: NavigationActions
 ) : ViewModel() {
 
   @AssistedFactory
@@ -150,10 +153,6 @@ constructor(
     return updateResult is Resource.Success
   }
 
-  fun resetNavigationEvent() {
-    _uiState.value = _uiState.value.copy(action = Action.None)
-  }
-
   fun changeTabState(tab: Tab) {
     _uiState.value = _uiState.value.copy(tabState = tab)
   }
@@ -161,13 +160,11 @@ constructor(
   fun changeAction(action: Action) {
     _uiState.value = _uiState.value.copy(action = action)
     if (action == Action.NavigateToNextScreen) {
-      navigationActions.navigateTo(
-        TOP_LEVEL_DESTINATIONS[1]) // TODO change to private message screen with friend // Adjust according to your
-      resetNavigationEvent() // Reset the navigation event in the ViewModel to prevent
-      changeTabState(ScanFriendQrViewModel.Tab.MyQR) // TODO add test for this
+      navigationActions.navController.navigate("${Route.PRIVATE_CHAT}/${_uiState.value.decodedResult}") //TODO check correct
+      _uiState.value = _uiState.value.copy(action = Action.None)
+      changeTabState(Tab.MyQR) // TODO add test for this
     }
   }
-
 
   fun getUserDetails() {
     viewModelScope.launch {
