@@ -1,11 +1,17 @@
 package com.github.se.eventradar.viewmodel.qrCode
 
 import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.IUserRepository
+import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.async
@@ -19,14 +25,25 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ScanFriendQrViewModel
-@Inject
+@AssistedInject
 constructor(
-    private val userRepository: IUserRepository, // Dependency injection
-    val qrCodeAnalyser: QrCodeAnalyser, // Dependency injection
+  private val userRepository: IUserRepository, // Dependency injection
+  val qrCodeAnalyser: QrCodeAnalyser, // Dependency injection
+  private val navigationActions: NavigationActions,
 ) : ViewModel() {
 
-  private val _uiState = MutableStateFlow(QrCodeScanFriendState())
-  val uiState: StateFlow<QrCodeScanFriendState> = _uiState
+  @AssistedFactory
+  interface Factory {
+    fun create(navigationActions: NavigationActions): ScanFriendQrViewModel
+  }
+
+  companion object {
+    @Composable
+    fun create(navigationActions: NavigationActions): ScanFriendQrViewModel {
+      return hiltViewModel<ScanFriendQrViewModel, Factory>(
+        creationCallback = { factory -> factory.create(navigationActions = navigationActions) })
+    }
+  }
 
   enum class Action {
     None,
@@ -41,6 +58,18 @@ constructor(
     MyQR,
     ScanQR
   }
+
+  data class QrCodeScanFriendState(
+    val decodedResult: String = "",
+    val action: Action = Action.None,
+    val tabState: Tab = Tab.MyQR,
+    val username: String = "",
+    val qrCodeLink: String = ""
+  )
+
+  private val _uiState = MutableStateFlow(QrCodeScanFriendState())
+  val uiState: StateFlow<QrCodeScanFriendState> = _uiState
+
 
   private var myUID = ""
 
@@ -107,15 +136,15 @@ constructor(
     var updateResult: Resource<Any>?
     do {
       updateResult =
-          if (user.friendsList.contains(friendIDToAdd)) {
-            Resource.Success(Unit)
-          } else {
-            user.friendsList.add(friendIDToAdd)
-            when (userRepository.updateUser(user)) {
-              is Resource.Success -> Resource.Success(Unit)
-              is Resource.Failure -> Resource.Failure(Exception("Failed to update user"))
-            }
+        if (user.friendsList.contains(friendIDToAdd)) {
+          Resource.Success(Unit)
+        } else {
+          user.friendsList.add(friendIDToAdd)
+          when (userRepository.updateUser(user)) {
+            is Resource.Success -> Resource.Success(Unit)
+            is Resource.Failure -> Resource.Failure(Exception("Failed to update user"))
           }
+        }
     } while ((updateResult !is Resource.Success) && (maxNumberOfRetries-- > 0))
 
     return updateResult is Resource.Success
@@ -131,7 +160,14 @@ constructor(
 
   fun changeAction(action: Action) {
     _uiState.value = _uiState.value.copy(action = action)
+    if (action == Action.NavigateToNextScreen) {
+      navigationActions.navigateTo(
+        TOP_LEVEL_DESTINATIONS[1]) // TODO change to private message screen with friend // Adjust according to your
+      resetNavigationEvent() // Reset the navigation event in the ViewModel to prevent
+      changeTabState(ScanFriendQrViewModel.Tab.MyQR) // TODO add test for this
+    }
   }
+
 
   fun getUserDetails() {
     viewModelScope.launch {
@@ -142,30 +178,24 @@ constructor(
           when (val userResult = userRepository.getUser(userId)) {
             is Resource.Success -> {
               _uiState.value =
-                  _uiState.value.copy(
-                      username = userResult.data!!.username, qrCodeLink = userResult.data.qrCodeUrl)
+                _uiState.value.copy(
+                  username = userResult.data!!.username, qrCodeLink = userResult.data.qrCodeUrl)
             }
             is Resource.Failure -> {
               Log.d(
-                  "ScanFriendQrViewModel",
-                  "Error fetching user details: ${userResult.throwable.message}")
+                "ScanFriendQrViewModel",
+                "Error fetching user details: ${userResult.throwable.message}")
             }
           }
         }
         is Resource.Failure -> {
           Log.d(
-              "ScanFriendQrViewModel",
-              "Error fetching user ID: ${userIdResource.throwable.message}")
+            "ScanFriendQrViewModel",
+            "Error fetching user ID: ${userIdResource.throwable.message}")
         }
       }
     }
   }
 
-  data class QrCodeScanFriendState(
-      val decodedResult: String = "",
-      val action: Action = Action.None,
-      val tabState: Tab = Tab.MyQR,
-      val username: String = "",
-      val qrCodeLink: String = "",
-  )
+
 }
