@@ -22,10 +22,9 @@ public class EventDetailsScreen(semanticsProvider: SemanticsNodeInteractionsProv
   val distanceContent: KNode = onNode { hasTestTag("distanceContent") }
   val dateTitle: KNode = onNode { hasTestTag("dateTitle") }
   val dateContent: KNode = onNode { hasTestTag("dateContent") }
+  val timeTitle: KNode = onNode { hasTestTag("timeTitle") }
+  val timeContent: KNode = onNode { hasTestTag("timeContent") }
   val categoryTitle: KNode = onNode { hasTestTag("categoryTitle") }
   val categoryContent: KNode = onNode { hasTestTag("categoryContent") }
-  val dateTimeTitle: KNode = onNode { hasTestTag("timeTitle") }
-  val dateTimeStartContent: KNode = onNode { hasTestTag("timeStartContent") }
-  val dateTimeEndContent: KNode = onNode { hasTestTag("timeEndContent") }
   val attendance: KNode = onNode { hasTestTag("attendance") }
 }

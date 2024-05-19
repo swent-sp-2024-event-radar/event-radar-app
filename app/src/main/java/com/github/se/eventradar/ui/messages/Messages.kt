@@ -1,6 +1,5 @@
 package com.github.se.eventradar.ui.messages
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,19 +35,17 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.User
-import com.github.se.eventradar.model.message.Message
 import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.ProfilePic
 import com.github.se.eventradar.ui.component.SearchBarField
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.TopLevelDestination
 import com.github.se.eventradar.viewmodel.MessagesUiState
@@ -85,12 +82,10 @@ fun MessagesScreen(
       onSelectedTabIndexChanged = viewModel::onSelectedTabIndexChanged,
       onSearchQueryChanged = viewModel::onSearchQueryChanged,
       onSearchActiveChanged = viewModel::onSearchActiveChanged,
-      onChatClicked = {
-        Toast.makeText(context, "Chat feature is not yet implemented", Toast.LENGTH_SHORT).show()
-      },
+      onChatClicked = { navigationActions.navController.navigate(Route.PRIVATE_CHAT + "/${it}") },
       onTabSelected = navigationActions::navigateTo,
       onFriendClicked = {
-        Toast.makeText(context, "Profile feature is not yet implemented", Toast.LENGTH_SHORT).show()
+        navigationActions.navController.navigate("${Route.PROFILE}/${it.userId}")
       },
       getUser = viewModel::getUser)
 }
@@ -101,7 +96,7 @@ fun MessagesScreenUi(
     onSelectedTabIndexChanged: (Int) -> Unit,
     onSearchQueryChanged: (String) -> Unit,
     onSearchActiveChanged: (Boolean) -> Unit,
-    onChatClicked: (MessageHistory) -> Unit,
+    onChatClicked: (String) -> Unit,
     onTabSelected: (TopLevelDestination) -> Unit,
     onFriendClicked: (User) -> Unit,
     getUser: (String) -> User
@@ -199,7 +194,7 @@ fun MessagesList(
     messageList: List<MessageHistory>,
     searchQuery: String,
     userId: String,
-    onChatClicked: (MessageHistory) -> Unit,
+    onChatClicked: (String) -> Unit,
     getUser: (String) -> User,
     modifier: Modifier = Modifier
 ) {
@@ -239,7 +234,7 @@ fun MessagePreviewItem(
     messageHistory: MessageHistory,
     recipient: User,
     currentUserReadLatestMessage: Boolean,
-    onChatClicked: (MessageHistory) -> Unit,
+    onChatClicked: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
   val mostRecentMessage = messageHistory.messages.last { it.id == messageHistory.latestMessageId }
@@ -248,7 +243,7 @@ fun MessagePreviewItem(
       modifier =
           modifier
               .fillMaxWidth()
-              .clickable { onChatClicked(messageHistory) }
+              .clickable { onChatClicked(recipient.userId) }
               .padding(vertical = 8.dp)
               .testTag("messagePreviewItem"),
       horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
@@ -393,6 +388,7 @@ fun FriendPreviewItem(
   }
 }
 
+/*
 @Preview(showSystemUi = true, showBackground = true)
 @ExcludeFromJacocoGeneratedReport
 @Composable
@@ -447,6 +443,7 @@ fun PreviewMessagesScreen() {
             mutableListOf(),
             "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FYJP3bYiaGFPqx64CT6kHOpwvXnv1?alt=media&token=5587f942-efc7-4cbf-920c-7f24a76d7ad1",
             "",
+            "",
             "test $it")
       }
   MessagesScreenUi(
@@ -478,7 +475,37 @@ fun PreviewMessagesScreen() {
             mutableListOf(),
             "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FYJP3bYiaGFPqx64CT6kHOpwvXnv1?alt=media&token=5587f942-efc7-4cbf-920c-7f24a76d7ad1",
             "",
+            "",
             "johndoe")
       },
       onFriendClicked = {})
 }
+
+@Preview(showSystemUi = true, showBackground = true)
+@ExcludeFromJacocoGeneratedReport
+@Composable
+fun PreviewEmptyMessagesList() {
+  MessagesList(
+      messageList = emptyList(),
+      searchQuery = "",
+      userId = "1",
+      onChatClicked = {},
+      getUser = {
+        User(
+            it,
+            "10/10/2003",
+            "test@test.com",
+            "John",
+            "Doe",
+            "1234567890",
+            "active",
+            mutableListOf(),
+            mutableListOf(),
+            mutableListOf(),
+            "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FYJP3bYiaGFPqx64CT6kHOpwvXnv1?alt=media&token=5587f942-efc7-4cbf-920c-7f24a76d7ad1",
+            "",
+            "",
+            "johndoe")
+      })
+}
+*/

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.Resource
+import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.repository.event.IEventRepository
@@ -34,6 +35,8 @@ constructor(
 
   init {
     checkUserLoginStatus()
+    observeAllEvents()
+    observeUpcomingEvents()
   }
 
   fun onSearchQueryChanged(
@@ -200,6 +203,74 @@ constructor(
         _uiState.value =
             _uiState.value.copy(upcomingEventList = EventList(emptyList(), emptyList(), null))
       }
+    }
+  }
+
+  private fun observeAllEvents() {
+    viewModelScope.launch {
+      eventRepository.observeAllEvents().collect { resource ->
+        when (resource) {
+          is Resource.Success -> {
+            _uiState.update { currentState ->
+              currentState.copy(
+                  eventList =
+                      EventList(
+                          resource.data, resource.data, _uiState.value.eventList.selectedEvent))
+            }
+            filterEvents()
+          }
+          is Resource.Failure ->
+              Log.d("EventsOverviewViewModel", "Failed to fetch events: ${resource.throwable}")
+        }
+      }
+    }
+  }
+
+  private fun observeUpcomingEvents() {
+    viewModelScope.launch {
+      val userIdResource = userRepository.getCurrentUserId()
+      handleUserIdResource(userIdResource)
+    }
+  }
+
+  private suspend fun handleUserIdResource(userIdResource: Resource<String>) {
+    when (userIdResource) {
+      is Resource.Success -> {
+        val uid = userIdResource.data
+        eventRepository.observeUpcomingEvents(uid).collect { eventsResource ->
+          handleEventsResource(eventsResource)
+        }
+      }
+      is Resource.Failure -> {
+        Log.d(
+            "EventsOverviewViewModel",
+            "Error fetching user ID: ${userIdResource.throwable.message}")
+      }
+    }
+  }
+
+  private fun handleEventsResource(eventsResource: Resource<List<Event>>) {
+    when (eventsResource) {
+      is Resource.Success -> {
+        updateUiState(eventsResource.data)
+        filterEvents()
+      }
+      is Resource.Failure -> {
+        Log.d(
+            "EventsOverviewViewModel",
+            "Failed to fetch upcoming events: ${eventsResource.throwable.message}")
+      }
+    }
+  }
+
+  private fun updateUiState(events: List<Event>) {
+    _uiState.update { currentState ->
+      currentState.copy(
+          upcomingEventList =
+              EventList(
+                  allEvents = events,
+                  filteredEvents = events,
+                  selectedEvent = currentState.upcomingEventList.selectedEvent))
     }
   }
 

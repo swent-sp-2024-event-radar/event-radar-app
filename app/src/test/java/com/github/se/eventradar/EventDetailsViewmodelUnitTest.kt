@@ -96,6 +96,7 @@ class EventDetailsViewmodelUnitTest {
           friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/Profile_Pictures/pic.jpg",
           qrCodeUrl = "http://example.com/QR_Codes/qr.jpg",
+          bio = "",
           username = "johndoe")
 
   private val factory =
