@@ -153,6 +153,7 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
   GenericDialogBox(
       openDialog = viewModel.showCancelRegistrationDialog,
       title = "Confirm cancellation",
+      modifier = Modifier.testTag("cancelRegistrationDialog"),
       message = stringResource(id = R.string.cancel_registration_message),
       onClickConfirmButton = { viewModel.removeUserFromEvent() },
       boxIcon = null)
