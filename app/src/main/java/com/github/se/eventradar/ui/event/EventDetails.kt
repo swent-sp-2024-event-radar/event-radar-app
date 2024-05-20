@@ -41,6 +41,7 @@ import com.github.se.eventradar.ui.component.EventDescription
 import com.github.se.eventradar.ui.component.EventDistance
 import com.github.se.eventradar.ui.component.EventTime
 import com.github.se.eventradar.ui.component.EventTitle
+import com.github.se.eventradar.ui.component.GenericDialogBox
 import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
@@ -71,22 +72,25 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
       },
       floatingActionButton = {
         // view ticket button
-        if (!isUserAttending) {
-          FloatingActionButton(
-              onClick = {
+        val icon = if (isUserAttending) R.drawable.cancel else R.drawable.ticket
+        FloatingActionButton(
+            onClick = {
+              if (isUserAttending) {
+                viewModel.showCancelRegistrationDialog.value = true
+              } else {
                 navigationActions.navController.navigate(
                     "${Route.EVENT_DETAILS_TICKETS}/${viewModel.eventId}")
-              },
-              modifier = Modifier.testTag("ticketButton"),
-              containerColor = MaterialTheme.colorScheme.primaryContainer,
-          ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ticket),
-                contentDescription = "view tickets button",
-                modifier = Modifier.size(32.dp),
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-          }
+              }
+            },
+            modifier = Modifier.testTag("ticketButton"),
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+        ) {
+          Icon(
+              painter = painterResource(id = icon),
+              contentDescription = "Event details FAB",
+              modifier = Modifier.size(32.dp),
+              tint = MaterialTheme.colorScheme.onPrimaryContainer,
+          )
         }
       },
       navigationActions = navigationActions) {
@@ -142,9 +146,14 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
                               ),
                           color = MaterialTheme.colorScheme.primary)
                     }
-
-                    // TODO: Add a cancel registration button
                   }
             }
       }
+
+  GenericDialogBox(
+      openDialog = viewModel.showCancelRegistrationDialog,
+      title = "Confirm cancellation",
+      message = stringResource(id = R.string.cancel_registration_message),
+      onClickConfirmButton = { viewModel.removeUserFromEvent() },
+      boxIcon = null)
 }

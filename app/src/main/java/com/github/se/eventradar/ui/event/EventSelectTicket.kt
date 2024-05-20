@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -19,10 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,7 +29,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -41,6 +36,7 @@ import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.EventComponentsStyle
 import com.github.se.eventradar.ui.component.EventTitle
+import com.github.se.eventradar.ui.component.GenericDialogBox
 import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
@@ -172,44 +168,4 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
               }
         }
       }
-}
-
-@Composable
-fun GenericDialogBox(
-    openErrorDialog: MutableState<Boolean>,
-    modifier: Modifier = Modifier,
-    title: String,
-    message: String,
-    onClick: () -> Unit = {},
-    boxIcon: @Composable (() -> Unit)?,
-) {
-  val display by openErrorDialog
-  if (display) {
-    AlertDialog(
-        icon = boxIcon,
-        text = {
-          Text(
-              text = message,
-              textAlign = TextAlign.Center,
-              modifier = Modifier.testTag("ErrorDisplayText"))
-        },
-        title = {
-          Text(
-              text = title,
-              modifier = Modifier.testTag("ErrorTitle"),
-          )
-        },
-        onDismissRequest = { openErrorDialog.value = false },
-        confirmButton = {
-          TextButton(
-              onClick = {
-                openErrorDialog.value = false
-                onClick()
-              },
-              modifier = Modifier.testTag("dialogConfirmButton")) {
-                Text("Ok")
-              }
-        },
-        modifier = modifier)
-  }
 }

@@ -41,6 +41,7 @@ constructor(
 
   val errorOccurred = mutableStateOf(false)
   val registrationSuccessful = mutableStateOf(false)
+  val showCancelRegistrationDialog = mutableStateOf(false)
 
   private lateinit var currentUserId: String
   private var displayedEvent: Event? = null
@@ -244,6 +245,8 @@ constructor(
             Log.d("EventDetailsViewModel", "Error getting user: ${userResponse.throwable.message}")
           }
         }
+
+        getEventData()
       }
     } else {
       errorOccurred.value = true

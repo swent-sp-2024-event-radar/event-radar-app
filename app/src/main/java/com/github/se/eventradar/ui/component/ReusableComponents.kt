@@ -28,6 +28,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -39,9 +40,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,6 +65,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -109,7 +113,6 @@ fun EventList(events: List<Event>, modifier: Modifier = Modifier, onCardClick: (
 
 @Composable
 fun EventCard(event: Event, onCardClick: (String) -> Unit) {
-  // val context = LocalContext.current
   Card(
       modifier =
           Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
@@ -117,10 +120,7 @@ fun EventCard(event: Event, onCardClick: (String) -> Unit) {
               .testTag("eventCard"),
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
       elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-      onClick = {
-        onCardClick(event.fireBaseID)
-        // Toast.makeText(context, "Event details not yet available", Toast.LENGTH_SHORT).show()
-      }) {
+      onClick = { onCardClick(event.fireBaseID) }) {
         Row(modifier = Modifier.fillMaxSize()) {
           Column(
               modifier =
@@ -135,7 +135,9 @@ fun EventCard(event: Event, onCardClick: (String) -> Unit) {
                             fontFamily = FontFamily(Font(R.font.roboto)),
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        ))
+                        ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis)
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = event.description,
@@ -417,5 +419,45 @@ fun AppScaffold(
       floatingActionButton = floatingActionButton,
   ) {
     content(it)
+  }
+}
+
+@Composable
+fun GenericDialogBox(
+  openDialog: MutableState<Boolean>,
+  modifier: Modifier = Modifier,
+  title: String,
+  message: String,
+  onClickConfirmButton: () -> Unit = {},
+  boxIcon: @Composable (() -> Unit)?,
+) {
+  val display by openDialog
+  if (display) {
+    AlertDialog(
+      icon = boxIcon,
+      text = {
+        Text(
+          text = message,
+          textAlign = TextAlign.Center,
+          modifier = Modifier.testTag("ErrorDisplayText"))
+      },
+      title = {
+        Text(
+          text = title,
+          modifier = Modifier.testTag("ErrorTitle"),
+        )
+      },
+      onDismissRequest = { openDialog.value = false },
+      confirmButton = {
+        TextButton(
+          onClick = {
+            openDialog.value = false
+            onClickConfirmButton()
+          },
+          modifier = Modifier.testTag("dialogConfirmButton")) {
+          Text("Ok")
+        }
+      },
+      modifier = modifier)
   }
 }
