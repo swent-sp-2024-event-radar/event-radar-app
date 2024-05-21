@@ -4,13 +4,13 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.EventCategory
-import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.model.event.EventTicket
-import com.github.se.eventradar.model.event.EventUiState
 import com.github.se.eventradar.screens.EventDetailsScreen
 import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
+import com.github.se.eventradar.viewmodel.EventDetailsViewModel
+import com.github.se.eventradar.viewmodel.EventUiState
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -44,8 +44,8 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
           EventUiState(
               eventName = "Debugging",
               eventPhoto = "path",
-              start = LocalDateTime.MIN,
-              end = LocalDateTime.MAX,
+              start = LocalDateTime.parse("2022-01-01T10:00:00"),
+              end = LocalDateTime.parse("2022-01-01T12:00:00"),
               location = Location(0.0, 0.0, "base address"),
               description = "Let's debug some code together because we all enjoy kotlin !",
               ticket = EventTicket("Luck", 0.0, 7, 0),
@@ -58,6 +58,7 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   @Before
   fun testSetup() {
 
+    every { mockViewModel.isUserAttending } returns MutableStateFlow(false)
     every { mockViewModel.uiState } returns sampleEventDetailsUiState
     every { mockViewModel.eventId } returns eventId
 
@@ -90,9 +91,10 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
         assertIsDisplayed()
         assertTextContains("Community")
       }
-      dateTimeTitle { assertIsDisplayed() }
-      dateTimeStartContent { assertIsDisplayed() }
-      dateTimeEndContent { assertIsDisplayed() }
+      dateTitle { assertIsDisplayed() }
+      dateContent { assertIsDisplayed() }
+      timeTitle { assertIsDisplayed() }
+      timeContent { assertIsDisplayed() }
     }
   }
 
