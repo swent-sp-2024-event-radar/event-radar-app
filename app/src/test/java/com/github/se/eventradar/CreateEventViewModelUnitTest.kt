@@ -71,6 +71,7 @@ class CreateEventViewModelUnitTest {
             friendsList = mutableListOf(),
             profilePicUrl = "",
             qrCodeUrl = "",
+            bio = "",
             username = "john_doe")
 
     private val mockEvent =
@@ -104,12 +105,15 @@ class CreateEventViewModelUnitTest {
         //every { Log.d(any(), any()) } returns 0
         val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         val timeFormat = DateTimeFormatter.ofPattern("HH:mm")
+        //test using MockUserRepository and MockEventRepository
         viewModel.onEventNameChanged(mockEvent.eventName, mockUiState)
         viewModel.onEventDescriptionChanged(mockEvent.description, mockUiState)
         viewModel.onStartDateChanged(mockEvent.start.format(dateFormat), mockUiState)
         viewModel.onStartTimeChanged(mockEvent.start.format(timeFormat), mockUiState)
         viewModel.onEndDateChanged(mockEvent.end.format(dateFormat), mockUiState)
         viewModel.onEndTimeChanged(mockEvent.end.format(timeFormat), mockUiState)
+
+        //need to mock the getLocation Function?
         viewModel.onLocationChanged(mockEvent.location.address, mockUiState)
         viewModel.onTicketNameChanged(mockEvent.ticket.name, mockUiState)
         viewModel.onTicketCapacityChanged(mockEvent.ticket.capacity.toString(), mockUiState)

@@ -36,6 +36,13 @@ constructor(
   private val _uiState = MutableStateFlow(CreateEventUiState())
   val uiState: StateFlow<CreateEventUiState> = _uiState
 
+    /*
+    This function adds a new event based on the user input.
+    It firstly generates a new eventId.
+    Next, it uploads the event photo given by the user onto firestore and retrieves the link to this image.
+    Afterward, a hashmap is generated based on the user information.
+    Finally, the event firestore database is updated with the new event, and the user's event_hosting list is updated.
+     */
   fun addEvent(state: MutableStateFlow<CreateEventUiState> = _uiState) {
     viewModelScope.launch {
       userRepository.getCurrentUserId().let { userIdResource ->
@@ -70,14 +77,14 @@ constructor(
                   }
             val eventHashMap =
                 hashMapOf(
-                    "name" to state.value.eventName,
+                    "name" to state.value.eventName, //
                     "photo_url" to eventPhotoUrl,
-                    "start" to state.value.startDate + "T" + state.value.startTime,
-                    "end" to state.value.endDate + "T" + state.value.endTime,
+                    "start" to state.value.startDate + "T" + state.value.startTime, //
+                    "end" to state.value.endDate + "T" + state.value.endTime, //
                     "location_lat" to fetchedLocation.latitude, // convert location into lat and long
-                    "location_lng" to fetchedLocation.longitude,
+                    "location_lng" to fetchedLocation.longitude, //
                     "location_name" to fetchedLocation.address,
-                    "description" to state.value.eventDescription,
+                    "description" to state.value.eventDescription, //
                     "ticket_name" to state.value.ticketName,
                     "ticket_price" to state.value.ticketPrice,
                     "ticket_capacity" to state.value.ticketCapacity,
