@@ -248,8 +248,6 @@ constructor(
 
         getEventData()
       }
-      
-      getEventData()
     } else {
       errorOccurred.value = true
       Log.d("EventDetailsViewModel", "Error getting event data: no event displayed")
