@@ -143,10 +143,10 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
 
   override suspend fun uploadImage(
       selectedImageUri: Uri,
-      uid: String,
+      imageId: String,
       folderName: String
   ): Resource<Unit> {
-    val storageRef = Firebase.storage.reference.child("$folderName/$uid")
+    val storageRef = Firebase.storage.reference.child("$folderName/$imageId")
     try {
       val result = storageRef.putFile(selectedImageUri).await()
       Resource.Success(Unit)

@@ -76,18 +76,18 @@ class MockUserRepository : IUserRepository {
   }
 
   override suspend fun uploadImage(
-      selectedImageUri: Uri,
-      uid: String,
-      folderName: String
+    selectedImageUri: Uri,
+    imageId: String,
+    folderName: String
   ): Resource<Unit> {
-    val userList = mockImagesDatabase.keys.filter { user -> user.userId == uid }
+    val userList = mockImagesDatabase.keys.filter { user -> user.userId == imageId }
     return if (userList.isEmpty()) {
-      Resource.Failure(Exception("User with id $uid not found"))
+      Resource.Failure(Exception("User with id $imageId not found"))
     } else if (folderName != "QR_Codes" && folderName != "Profile_Pictures") {
       Resource.Failure(Exception("Folder $folderName does not exist"))
     } else {
       val user = userList[0]
-      mockImagesDatabase[user]?.replace(folderName, "http://example.com/$folderName/$uid")
+      mockImagesDatabase[user]?.replace(folderName, "http://example.com/$folderName/$imageId")
       Resource.Success(Unit)
     }
   }

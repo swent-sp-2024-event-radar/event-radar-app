@@ -5,6 +5,7 @@ import com.github.se.eventradar.model.event.Event
 
 class MockEventRepository : IEventRepository {
   private val mockEvents = mutableListOf<Event>()
+  private var ticker = 0
 
   override suspend fun getEvents(): Resource<List<Event>> {
     return Resource.Success(mockEvents)
@@ -18,6 +19,10 @@ class MockEventRepository : IEventRepository {
     } else {
       Resource.Failure(Exception("Event with id $id not found"))
     }
+  }
+
+  override suspend fun getUniqueEventId(): Resource<String> {
+    return Resource.Success(ticker++.toString())
   }
 
   override suspend fun addEvent(event: Event): Resource<Unit> {

@@ -41,27 +41,37 @@ constructor(
       userRepository.getCurrentUserId().let { userIdResource ->
         when (userIdResource) {
           is Resource.Success -> {
+              val newEventId =
+                  when (val result = eventRepository.getUniqueEventId()){
+                      is Resource.Success -> {
+                          result.data
+                      }
+                      is Resource.Failure -> {
+                          Log.d("CreateEventViewModel", "Error Generating Event Id")
+                          ""
+                      }
+                  }
+
             val uid = userIdResource.data
             val fetchedLocation = fetchLocation(state.value.location, state)!! //fields will always be validated before, so this cannot be null.
               val eventPhotoUri =
                   state.value.eventPhotoUri
                       ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder")
-              //event name?
-              userRepository.uploadImage(eventPhotoUri, uid, "Event_Pictures") //uid_event_name?
+              userRepository.uploadImage(eventPhotoUri, newEventId, "Event_Pictures") //uid_event_name?
               val eventPhotoUrl =
-                  when (val result = userRepository.getImage(uid, "Profile_Pictures")) {
+                  when (val result = userRepository.getImage(newEventId, "Profile_Pictures")) {
                       is Resource.Success -> {
                           result.data
                       }
                       is Resource.Failure -> {
-                          Log.d("LoginScreenViewModel", "Fetching Profile Picture Error")
+                          Log.d("CreateEventViewModel", "Fetching Profile Picture Error")
                           ""
                       }
                   }
             val eventHashMap =
                 hashMapOf(
                     "name" to state.value.eventName,
-                    "photo_url" to state.value.eve,
+                    "photo_url" to eventPhotoUrl,
                     "start" to state.value.startDate + "T" + state.value.startTime,
                     "end" to state.value.endDate + "T" + state.value.endTime,
                     "location_lat" to fetchedLocation.latitude, // convert location into lat and long
@@ -77,7 +87,7 @@ constructor(
                     "attendees_list" to mutableListOf<String>(),
                     "category" to state.value.eventCategory,
                 )
-            val newEvent = Event(eventHashMap)
+            val newEvent = Event(eventHashMap, newEventId)
             addUserEvent(uid, newEvent)
           }
           is Resource.Failure -> {
