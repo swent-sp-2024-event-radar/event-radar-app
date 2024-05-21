@@ -245,9 +245,9 @@ constructor(
             Log.d("EventDetailsViewModel", "Error getting user: ${userResponse.throwable.message}")
           }
         }
+
+        getEventData()
       }
-      
-      getEventData()
     } else {
       errorOccurred.value = true
       Log.d("EventDetailsViewModel", "Error getting event data: no event displayed")
