@@ -70,17 +70,21 @@ class MessagesTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
               username = "Test$i"))
 
       // Add messages to the mock repository (except for the first user)
+      // TODO: fix logic with add message
       if (i > 1) {
         val mh = mockMessageRepository.createNewMessageHistory("1", "$i")
 
-        mockMessageRepository.addMessage(
-            Message(
-                sender = "$i",
-                content = "Test Message",
-                dateTimeSent = LocalDateTime.parse("2021-01-01T00:00:00"),
-                id = "1"),
-            (mh as Resource.Success).data,
-        )
+        (mh as Resource.Success)
+            .data
+            .messages
+            .add(
+                Message(
+                    sender = "$i",
+                    content = "Test Message",
+                    dateTimeSent = LocalDateTime.parse("2021-01-01T00:00:00"),
+                    id = "1"),
+            )
+        mh.data.latestMessageId = "1"
       }
     }
 

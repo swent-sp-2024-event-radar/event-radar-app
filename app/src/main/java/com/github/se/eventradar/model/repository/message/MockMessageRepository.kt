@@ -27,7 +27,7 @@ class MockMessageRepository : IMessageRepository {
     return if (messageHistory != null) {
       Resource.Success(messageHistory)
     } else {
-      createNewMessageHistory(user1, user2)
+      Resource.Failure(Exception("No message history found between users"))
     }
   }
 
@@ -35,11 +35,24 @@ class MockMessageRepository : IMessageRepository {
       message: Message,
       messageHistory: MessageHistory
   ): Resource<Unit> {
-    val addMessage = mockMessageHistory.find { it.id == messageHistory.id }?.messages?.add(message)
+    val messageHistoryId: String
+    if (messageHistory.messages.isEmpty()) {
+      val newHistoryResource = createNewMessageHistory(messageHistory.user1, messageHistory.user2)
+      if (newHistoryResource is Resource.Failure) {
+        return Resource.Failure(newHistoryResource.throwable)
+      }
+
+      val newHistory = (newHistoryResource as Resource.Success).data
+      messageHistoryId = newHistory.id
+    } else {
+      // Use the existing message history ID
+      messageHistoryId = messageHistory.id
+    }
+    val addMessage = mockMessageHistory.find { it.id == messageHistoryId }?.messages?.add(message)
 
     return if (addMessage != null && addMessage) {
       mockMessageHistory
-          .find { it.id == messageHistory.id }
+          .find { it.id == messageHistoryId }
           ?.let {
             it.latestMessageId = message.id
             it.user1ReadMostRecentMessage = message.sender == it.user1
@@ -47,7 +60,7 @@ class MockMessageRepository : IMessageRepository {
           }
       Resource.Success(Unit)
     } else {
-      Resource.Failure(Exception("MessageHistory with id ${messageHistory.id} not found"))
+      Resource.Failure(Exception("MessageHistory with id $messageHistoryId not found"))
     }
   }
 

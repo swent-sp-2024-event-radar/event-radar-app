@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @HiltViewModel(assistedFactory = ChatViewModel.Factory::class)
 class ChatViewModel
@@ -59,6 +60,7 @@ constructor(
           friendsList = mutableListOf(),
           profilePicUrl = "Default",
           qrCodeUrl = "Default",
+          bio = "Default bio",
           username = "Default")
 
   init {
@@ -78,7 +80,7 @@ constructor(
       }
     }
     initOpponent()
-    getMessages()
+    runBlocking { getMessages() }
   }
 
   private fun initOpponent() {
@@ -99,44 +101,54 @@ constructor(
     }
   }
 
-  fun getMessages() {
-    viewModelScope.launch {
-      // Fetch messages
-      val userId = _uiState.value.userId
-      if (userId != null) {
-        val messagesResource = messagesRepository.getMessages(userId, opponentId)
-        _uiState.update { currentState ->
-          when (messagesResource) {
-            is Resource.Success -> {
-              currentState.copy(
-                  messageHistory = messagesResource.data, messagesLoadedFirstTime = true)
-            }
-            is Resource.Failure -> {
-              Log.d(
-                  "ChatViewModel", "Error fetching messages: ${messagesResource.throwable.message}")
-              currentState
-            }
+  suspend fun getMessages() {
+    // Fetch messages
+    val userId = _uiState.value.userId
+    if (userId != null) {
+      val messagesResource = messagesRepository.getMessages(userId, opponentId)
+      _uiState.update { currentState ->
+        when (messagesResource) {
+          is Resource.Success -> {
+            // Sort messages by dateTimeSent in place
+            messagesResource.data.messages.sortBy { it.dateTimeSent }
+
+            currentState.copy(messageHistory = messagesResource.data)
+          }
+          is Resource.Failure -> {
+            Log.d("ChatViewModel", "Error fetching messages: ${messagesResource.throwable.message}")
+
+            // Message history doesn't exist between two users.
+            // Record an empty message history with the two user id's,
+            // so that a new message history can be created for them when addMessage is called
+            currentState.copy(
+                messageHistory =
+                    MessageHistory(
+                        user1 = userId,
+                        user2 = opponentId,
+                        latestMessageId = "",
+                        user1ReadMostRecentMessage = false,
+                        user2ReadMostRecentMessage = false,
+                        messages = mutableListOf()))
           }
         }
-      } else {
-        Log.d("ChatViewModel", "Invalid state: User ID is null.")
       }
+    } else {
+      Log.d("ChatViewModel", "Invalid state: User ID is null.")
     }
   }
 
   fun onMessageBarInputChange(newInput: String) {
-    _uiState.update { currentState ->
-      currentState.copy(messageBarInput = newInput, messageInserted = false)
-    }
+    _uiState.update { currentState -> currentState.copy(messageBarInput = newInput) }
   }
 
   fun onMessageSend() {
     val message = _uiState.value.messageBarInput
     if (message.isNotBlank()) {
       sendMessage(message)
-      getMessages()
-      _uiState.update { currentState ->
-        currentState.copy(messageBarInput = "", messageInserted = true)
+
+      viewModelScope.launch {
+        getMessages()
+        _uiState.update { currentState -> currentState.copy(messageBarInput = "") }
       }
     }
   }
@@ -152,7 +164,6 @@ constructor(
                 content = message,
                 dateTimeSent = LocalDateTime.now(),
                 id = "") // Temporarily empty until Firebase assigns an ID
-
         messagesRepository.addMessage(newMessage, _uiState.value.messageHistory)
       } else {
         Log.d("ChatViewModel", "Invalid state: User ID")
@@ -171,7 +182,6 @@ data class ChatUiState(
             user1ReadMostRecentMessage = false,
             user2ReadMostRecentMessage = false,
             messages = mutableListOf()),
-    val opponentId: String? = null, // To be deleted once VM is integrated with UI
     val opponentProfile: User =
         User(
             userId = "Default",
@@ -188,7 +198,5 @@ data class ChatUiState(
             qrCodeUrl = "Default",
             bio = "",
             username = "Default"),
-    val messageInserted: Boolean = false,
-    val messagesLoadedFirstTime: Boolean = false,
     val messageBarInput: String = "",
 )
