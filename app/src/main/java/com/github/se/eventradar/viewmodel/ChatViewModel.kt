@@ -70,6 +70,7 @@ constructor(
         val userId = userRepository.getCurrentUserId()
 
         if (userId is Resource.Success) {
+          observeMessages(userId.data, opponentId)
           it.copy(userId = userId.data)
         } else {
           Log.d(
@@ -79,6 +80,7 @@ constructor(
         }
       }
     }
+
     initOpponent()
     runBlocking { getMessages() }
   }
@@ -95,6 +97,33 @@ constructor(
                 "ChatViewModel",
                 "Error getting opponent details: ${opponentResource.throwable.message}")
             it.copy(opponentProfile = nullUser)
+          }
+        }
+      }
+    }
+  }
+
+  private fun observeMessages(userId: String, opponentId: String) {
+    viewModelScope.launch {
+      messagesRepository.observeMessages(userId, opponentId).collect { resource ->
+        when (resource) {
+          is Resource.Success -> {
+            _uiState.update { currentState -> currentState.copy(messageHistory = resource.data) }
+          }
+          is Resource.Failure -> {
+            Log.d("ChatViewModel", "Failed to fetch messages: ${resource.throwable.message}")
+            _uiState.update { currentState
+              -> // Following the current logic in getMessages, may be updated
+              currentState.copy(
+                  messageHistory =
+                      MessageHistory(
+                          user1 = userId,
+                          user2 = opponentId,
+                          latestMessageId = "",
+                          user1ReadMostRecentMessage = false,
+                          user2ReadMostRecentMessage = false,
+                          messages = mutableListOf()))
+            }
           }
         }
       }
