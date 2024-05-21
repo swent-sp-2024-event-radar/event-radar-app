@@ -123,7 +123,7 @@ class EventDetailsAttendingUITest :
     verify { mockNavActions.goBack() }
     confirmVerified(mockNavActions)
   }
-  
+
   @Test
   fun cancelRegistrationShowsConfirmationDialog() = run {
     ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
@@ -133,12 +133,8 @@ class EventDetailsAttendingUITest :
           performClick()
         }
       }
-      
-      step("Check if the dialog is displayed") {
-        cancelRegistrationDialog {
-          assertIsDisplayed()
-        }
-      }
+
+      step("Check if the dialog is displayed") { cancelRegistrationDialog { assertIsDisplayed() } }
     }
   }
 }

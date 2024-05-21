@@ -424,40 +424,40 @@ fun AppScaffold(
 
 @Composable
 fun GenericDialogBox(
-  openDialog: MutableState<Boolean>,
-  modifier: Modifier = Modifier,
-  title: String,
-  message: String,
-  onClickConfirmButton: () -> Unit = {},
-  boxIcon: @Composable (() -> Unit)?,
+    openDialog: MutableState<Boolean>,
+    modifier: Modifier = Modifier,
+    title: String,
+    message: String,
+    onClickConfirmButton: () -> Unit = {},
+    boxIcon: @Composable (() -> Unit)?,
 ) {
   val display by openDialog
   if (display) {
     AlertDialog(
-      icon = boxIcon,
-      text = {
-        Text(
-          text = message,
-          textAlign = TextAlign.Center,
-          modifier = Modifier.testTag("ErrorDisplayText"))
-      },
-      title = {
-        Text(
-          text = title,
-          modifier = Modifier.testTag("ErrorTitle"),
-        )
-      },
-      onDismissRequest = { openDialog.value = false },
-      confirmButton = {
-        TextButton(
-          onClick = {
-            openDialog.value = false
-            onClickConfirmButton()
-          },
-          modifier = Modifier.testTag("dialogConfirmButton")) {
-          Text("Ok")
-        }
-      },
-      modifier = modifier)
+        icon = boxIcon,
+        text = {
+          Text(
+              text = message,
+              textAlign = TextAlign.Center,
+              modifier = Modifier.testTag("ErrorDisplayText"))
+        },
+        title = {
+          Text(
+              text = title,
+              modifier = Modifier.testTag("ErrorTitle"),
+          )
+        },
+        onDismissRequest = { openDialog.value = false },
+        confirmButton = {
+          TextButton(
+              onClick = {
+                openDialog.value = false
+                onClickConfirmButton()
+              },
+              modifier = Modifier.testTag("dialogConfirmButton")) {
+                Text("Ok")
+              }
+        },
+        modifier = modifier)
   }
 }
