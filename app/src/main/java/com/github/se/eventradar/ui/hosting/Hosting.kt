@@ -59,7 +59,7 @@ fun HostingScreen(
   val uiState by viewModel.uiState.collectAsState()
   LaunchedEffect(key1 = uiState.isSearchActive, key2 = uiState.isFilterActive) {
     if (uiState.isSearchActive || uiState.isFilterActive) {
-      viewModel.filterEvents()
+      viewModel.filterHostedEvents()
     }
   }
   LaunchedEffect(Unit) { viewModel.getHostedEvents() }

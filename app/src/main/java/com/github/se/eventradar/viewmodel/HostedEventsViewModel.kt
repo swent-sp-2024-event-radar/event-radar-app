@@ -61,7 +61,7 @@ constructor(
                       eventList =
                           EventList(
                               events.data, events.data, _uiState.value.eventList.selectedEvent))
-              filterEvents()
+              filterHostedEvents()
             }
             is Resource.Failure -> {
               Log.d("HostedEventsViewModel", "Error getting hosted events for $uid")
@@ -88,7 +88,7 @@ constructor(
 
   fun onSearchQueryChanged(query: String, state: MutableStateFlow<HostedEventsUiState> = _uiState) {
     state.value = state.value.copy(searchQuery = query)
-    filterEvents()
+    filterHostedEvents()
   }
 
   fun onSearchActiveChanged(
@@ -116,10 +116,10 @@ constructor(
 
   fun onFilterApply(state: MutableStateFlow<HostedEventsUiState> = _uiState) {
     state.value = state.value.copy(isFilterActive = true)
-    filterEvents()
+    filterHostedEvents()
   }
 
-  fun filterEvents() {
+  fun filterHostedEvents() {
     val eventList = _uiState.value.eventList.allEvents
 
     // User location should ideally be dynamic but is fixed for the purpose of this example
