@@ -7,14 +7,22 @@ import com.github.se.eventradar.model.repository.message.FirebaseMessageReposito
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
+import io.mockk.Runs
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.unmockkAll
 import java.time.LocalDateTime
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -401,5 +409,111 @@ class FirebaseMessageRepositoryUnitTest {
 
     assert(result is Resource.Failure)
     assert((result as Resource.Failure).throwable.message == exceptionMessage)
+  }
+
+  @Test
+  fun `observeMessages emits Resource_Success on snapshot changes`() = runTest {
+    every { mockDocumentSnapshot.id } returns uid
+    every { mockDocumentSnapshot.data } returns
+        mapOf(
+            "from_user" to "1",
+            "to_user" to "2",
+            "latest_message_id" to "1",
+            "from_user_read" to false,
+            "to_user_read" to false,
+        )
+    every { mockQuerySnapshot.documents } returns listOf(mockDocumentSnapshot)
+    every { mockQuerySnapshot.isEmpty } returns false
+
+    val queryMock = mockk<Query>()
+    every { messagesRef.where(any()).limit(1) } returns queryMock
+
+    val slot = slot<EventListener<QuerySnapshot>>()
+    val mockListenerRegistration = mockk<ListenerRegistration>()
+    every { mockListenerRegistration.remove() } just Runs
+
+    every { queryMock.addSnapshotListener(capture(slot)) } answers
+        {
+          slot.captured.onEvent(mockQuerySnapshot, null)
+          mockListenerRegistration
+        }
+    val results = mutableListOf<Resource<MessageHistory>>()
+    val job = launch {
+      firebaseMessageRepository.observeMessages("1", "2").collect { results.add(it) }
+    }
+    delay(500)
+
+    assert(results.size == 1)
+    assert(results.first() is Resource.Success)
+    val mH = (results.first() as Resource.Success<MessageHistory>).data
+    assert(mH.user1 == "1")
+    assert(mH.user2 == "2")
+    assert(mH.latestMessageId == "1")
+    assert(!mH.user1ReadMostRecentMessage)
+    assert(!mH.user2ReadMostRecentMessage)
+
+    job.cancel()
+  }
+
+  @Test
+  fun `observeMessages emits Resource_Failure when snapshot is empty`() = runTest {
+    every { mockQuerySnapshot.documents } returns emptyList()
+    every { mockQuerySnapshot.isEmpty } returns true
+
+    val queryMock = mockk<Query>()
+    every { messagesRef.where(any()).limit(1) } returns queryMock
+
+    val slot = slot<EventListener<QuerySnapshot>>()
+    val mockListenerRegistration = mockk<ListenerRegistration>()
+    every { mockListenerRegistration.remove() } just Runs
+    every { queryMock.addSnapshotListener(capture(slot)) } answers
+        {
+          slot.captured.onEvent(mockQuerySnapshot, null)
+          mockListenerRegistration
+        }
+
+    val results = mutableListOf<Resource<MessageHistory>>()
+    val job = launch {
+      firebaseMessageRepository.observeMessages("1", "2").collect { results.add(it) }
+    }
+    delay(500)
+
+    assert(results.size == 1)
+    assert(results.first() is Resource.Failure)
+    assert((results.first() as Resource.Failure).throwable.message == "No message history found")
+
+    job.cancel()
+  }
+
+  @Test
+  fun `observeMessages emits Resource_Failure on snapshot listener error`() = runTest {
+    val mockError = mockk<FirebaseFirestoreException>()
+    every { mockError.message } returns "Network error"
+
+    val queryMock = mockk<Query>()
+    every { messagesRef.where(any()).limit(1) } returns queryMock
+
+    val slot = slot<EventListener<QuerySnapshot>>()
+    val mockListenerRegistration = mockk<ListenerRegistration>()
+    every { mockListenerRegistration.remove() } just Runs
+    every { queryMock.addSnapshotListener(capture(slot)) } answers
+        {
+          slot.captured.onEvent(null, mockError)
+          mockListenerRegistration
+        }
+
+    val results = mutableListOf<Resource<MessageHistory>>()
+    val job = launch {
+      firebaseMessageRepository.observeMessages("1", "2").collect { results.add(it) }
+    }
+    delay(500)
+
+    assert(results.size == 1)
+    assert(results.first() is Resource.Failure)
+    assert(
+        (results.first() as Resource.Failure).throwable.message ==
+            "Error listening to message updates: Network error")
+
+    job.cancel()
   }
 }
