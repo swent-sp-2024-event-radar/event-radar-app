@@ -2,6 +2,7 @@ package com.github.se.eventradar
 
 import android.util.Log
 import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
@@ -11,9 +12,12 @@ import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.viewmodel.EventDetailsViewModel
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockkStatic
+import io.mockk.spyk
 import io.mockk.unmockkAll
+import io.mockk.verify
 import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -267,6 +271,136 @@ class EventDetailsViewmodelUnitTest {
     viewModel.buyTicketForEvent()
 
     assert(viewModel.errorOccurred.value)
+
+    unmockkAll()
+  }
+
+  @Test
+  fun testRemoveUserFromEvent() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    eventRepository.addEvent(mockEvent)
+    userRepository.addUser(mockUser)
+
+    viewModel.getEventData()
+
+    viewModel.buyTicketForEvent()
+
+    assert(mockUser.eventsAttendeeList.contains(mockEvent.fireBaseID))
+    assert(mockEvent.attendeeList.contains(mockUser.userId))
+    assert(mockEvent.ticket.purchases == ticketPurchases + 1)
+    assert(viewModel.registrationSuccessful.value)
+
+    viewModel.removeUserFromEvent()
+
+    assert(!mockUser.eventsAttendeeList.contains(mockEvent.fireBaseID))
+    assert(!mockEvent.attendeeList.contains(mockUser.userId))
+    assert(mockEvent.ticket.purchases == ticketPurchases)
+
+    unmockkAll()
+  }
+
+  @Test
+  fun testRemoveUserFromEventUpdateEventFailure() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    eventRepository.addEvent(mockEvent)
+    userRepository.addUser(mockUser)
+
+    viewModel.getEventData()
+
+    viewModel.buyTicketForEvent()
+
+    assert(mockUser.eventsAttendeeList.contains(mockEvent.fireBaseID))
+    assert(mockEvent.attendeeList.contains(mockUser.userId))
+    assert(mockEvent.ticket.purchases == ticketPurchases + 1)
+    assert(viewModel.registrationSuccessful.value)
+
+    // corrupt db
+    eventRepository.deleteEvent(mockEvent)
+
+    viewModel.removeUserFromEvent()
+
+    assert(viewModel.errorOccurred.value)
+
+    verify {
+      Log.d(
+          "EventDetailsViewModel",
+          "Error updating event: Event with id ${mockEvent.fireBaseID} not found")
+    }
+
+    unmockkAll()
+  }
+
+  @Test
+  fun testRemoveUserFromEventGetUserFailure() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    eventRepository.addEvent(mockEvent)
+    userRepository.addUser(mockUser)
+
+    viewModel.getEventData()
+
+    viewModel.buyTicketForEvent()
+
+    assert(mockUser.eventsAttendeeList.contains(mockEvent.fireBaseID))
+    assert(mockEvent.attendeeList.contains(mockUser.userId))
+    assert(mockEvent.ticket.purchases == ticketPurchases + 1)
+    assert(viewModel.registrationSuccessful.value)
+
+    // corrupt db
+    userRepository.deleteUser(mockUser)
+
+    viewModel.removeUserFromEvent()
+
+    assert(viewModel.errorOccurred.value)
+
+    verify {
+      Log.d(
+          "EventDetailsViewModel", "Error getting user: User with id ${mockUser.userId} not found")
+    }
+
+    unmockkAll()
+  }
+
+  @Test
+  fun testRemoveUserFromEventUpdateUserFailure() = runTest {
+    mockkStatic(Log::class)
+
+    userRepository = spyk(MockUserRepository())
+    (userRepository as MockUserRepository).updateCurrentUserId(mockUser.userId)
+
+    viewModel = factory.create(eventId = mockEvent.fireBaseID)
+
+    every { Log.d(any(), any()) } returns 0
+
+    eventRepository.addEvent(mockEvent)
+    userRepository.addUser(mockUser)
+
+    viewModel.getEventData()
+
+    viewModel.buyTicketForEvent()
+
+    assert(mockUser.eventsAttendeeList.contains(mockEvent.fireBaseID))
+    assert(mockEvent.attendeeList.contains(mockUser.userId))
+    assert(mockEvent.ticket.purchases == ticketPurchases + 1)
+    assert(viewModel.registrationSuccessful.value)
+
+    // must mock the method here to avoid mocking it during the call to `buyTicketForEvent()`
+    coEvery { userRepository.updateUser(any()) } returns
+        Resource.Failure(Exception("User with id ${mockUser.userId} not found"))
+
+    viewModel.removeUserFromEvent()
+
+    assert(viewModel.errorOccurred.value)
+
+    verify {
+      Log.d(
+          "EventDetailsViewModel", "Error updating user: User with id ${mockUser.userId} not found")
+    }
 
     unmockkAll()
   }
