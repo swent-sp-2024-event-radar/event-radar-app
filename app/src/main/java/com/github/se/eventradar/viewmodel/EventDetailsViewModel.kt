@@ -41,6 +41,7 @@ constructor(
 
   val errorOccurred = mutableStateOf(false)
   val registrationSuccessful = mutableStateOf(false)
+  val showCancelRegistrationDialog = mutableStateOf(false)
 
   private lateinit var currentUserId: String
   private var displayedEvent: Event? = null
@@ -245,9 +246,11 @@ constructor(
           }
         }
       }
+      
+      getEventData()
     } else {
       errorOccurred.value = true
-      Log.d("EventDetailsViewModel", "Error updating event data: No more tickets!}")
+      Log.d("EventDetailsViewModel", "Error getting event data: no event displayed")
     }
   }
 
