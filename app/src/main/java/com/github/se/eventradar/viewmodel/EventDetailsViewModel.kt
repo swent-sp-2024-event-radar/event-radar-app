@@ -248,9 +248,11 @@ constructor(
 
         getEventData()
       }
+      
+      getEventData()
     } else {
       errorOccurred.value = true
-      Log.d("EventDetailsViewModel", "Error updating event data: No more tickets!}")
+      Log.d("EventDetailsViewModel", "Error getting event data: no event displayed")
     }
   }
 
