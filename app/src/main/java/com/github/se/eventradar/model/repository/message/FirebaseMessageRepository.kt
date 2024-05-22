@@ -12,6 +12,7 @@ import java.time.LocalDateTime
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class FirebaseMessageRepository(db: FirebaseFirestore = Firebase.firestore) : IMessageRepository {
@@ -204,8 +205,25 @@ class FirebaseMessageRepository(db: FirebaseFirestore = Firebase.firestore) : IM
 
               if (snapshot != null && !snapshot.isEmpty) {
                 val doc = snapshot.documents.first()
-                val messageHistory = MessageHistory(doc.data!!, doc.id)
-                trySend(Resource.Success(messageHistory))
+
+                val messageHistoryMap = doc.data!!
+
+                launch {
+                  val messages =
+                      messageRef.document(doc.id).collection("messages_list").get().await()
+                  messageHistoryMap["messages"] =
+                      messages.documents.map { message ->
+                        Message(
+                            sender = message["sender"] as String,
+                            content = message["content"] as String,
+                            dateTimeSent = LocalDateTime.parse(message["date_time_sent"] as String),
+                            id = message.id,
+                        )
+                      }
+
+                  val messageHistory = MessageHistory(messageHistoryMap, doc.id)
+                  trySend(Resource.Success(messageHistory))
+                }
               } else {
                 trySend(Resource.Failure(Exception("No message history found")))
               }
