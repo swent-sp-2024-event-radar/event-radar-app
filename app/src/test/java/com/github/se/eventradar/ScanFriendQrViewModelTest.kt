@@ -150,7 +150,15 @@ class ScanFriendQrViewModelTest {
     (userRepository as MockUserRepository).updateCurrentUserId(myUID)
     qrCodeAnalyser = QrCodeAnalyser()
     viewModel = ScanFriendQrViewModel(userRepository, qrCodeAnalyser, mockNavActions)
+    //      waitForLoadingToComplete()
   }
+
+  //    private fun waitForLoadingToComplete() {
+  //        while (viewModel.uiState.value.isLoading) {
+  //            // Small sleep to avoid busy waiting
+  //            Thread.sleep(50)
+  //        }
+  //    }
 
   //    @Test
   //    fun switchesScreenWhenNavigatedToNextScreen() = run {

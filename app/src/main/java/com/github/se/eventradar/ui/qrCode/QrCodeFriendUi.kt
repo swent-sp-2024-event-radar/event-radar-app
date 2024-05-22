@@ -131,7 +131,8 @@ fun QrCodeScreen(
                     modifier = Modifier.padding(bottom = 8.dp))
               }
         }
-
+    //
+    //        if (!qrScanUiState.value.isLoading) { //TODO okay to do this?
     if (qrScanUiState.value.tabState == ScanFriendQrViewModel.Tab.MyQR) {
       Column(
           modifier =
@@ -150,6 +151,7 @@ fun QrCodeScreen(
         QrCodeScanner(analyser = viewModel.qrCodeAnalyser)
       }
     }
+    //        }
     BottomNavigationMenu(
         onTabSelected = { tab -> navigationActions.navigateTo(tab) },
         tabList = TOP_LEVEL_DESTINATIONS,

@@ -86,7 +86,7 @@ constructor(
             when (val userIdResult = userRepository.getCurrentUserId()) {
               is Resource.Success -> {
                 val getMyUID = userIdResult.data
-                emit(QrCodeScanFriendState(isLoading = true))
+                //                emit(QrCodeScanFriendState(isLoading = true))
                 myUID = getMyUID
               }
               is Resource.Failure -> {
@@ -120,9 +120,6 @@ constructor(
               QrCodeScanFriendState(isLoading = true))
 
   init {
-    while (initialUiState.value.isLoading) {
-      Log.d("waiting", "wait")
-    } // wait for the initial state to finish loading}
     viewModelScope.launch { initialUiState.collect { newState -> _uiState.value = newState } }
   }
 
