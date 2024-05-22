@@ -6,6 +6,9 @@ import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.model.repository.message.IMessageRepository
 import com.github.se.eventradar.model.repository.message.MockMessageRepository
 import java.time.LocalDateTime
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -186,5 +189,88 @@ class MockMessageRepositoryUnitTest {
     assert(updatedMessageHistory is Resource.Success)
 
     assert((updatedMessageHistory as Resource.Success).data.latestMessageId == "2")
+  }
+
+  @Test
+  fun testObserveMessagesFailsWhenNoHistoryExists() = runTest {
+    val user1 = "3"
+    val user2 = "4"
+
+    val results = mutableListOf<Resource<MessageHistory>>()
+    val job = launch { messageRepository.observeMessages(user1, user2).toList(results) }
+
+    delay(500)
+
+    assert(results.isNotEmpty())
+    assert(
+        results.last() is Resource.Failure &&
+            (results.last() as Resource.Failure).throwable.message ==
+                "No message history found for specified users")
+    job.cancel()
+  }
+
+  @Test
+  fun testObserveMessagesResourceFailure() = runTest {
+    val user1 = "1"
+    val user2 = "2"
+    (messageRepository as MockMessageRepository).messagesFlow.value =
+        Resource.Failure(Exception("Error retrieving message histories"))
+    val results = mutableListOf<Resource<MessageHistory>>()
+    val job = launch { messageRepository.observeMessages(user1, user2).toList(results) }
+
+    delay(500)
+
+    assert(results.isNotEmpty())
+    assert(
+        results.last() is Resource.Failure &&
+            (results.last() as Resource.Failure).throwable.message ==
+                "Error retrieving message histories")
+    job.cancel()
+  }
+
+  @Test
+  fun testObserveMessagesSuccess() = runTest {
+    val user1 = "1"
+    val user2 = "2"
+
+    val messageHistory =
+        MessageHistory(
+            user1 = user1,
+            user2 = user2,
+            user1ReadMostRecentMessage = false,
+            user2ReadMostRecentMessage = false,
+            latestMessageId = "",
+            messages = mutableListOf(),
+            id = "")
+    var addMessage = messageRepository.addMessage(mockMessage, messageHistory)
+
+    assert(addMessage is Resource.Success)
+
+    var updatedMessageHistory = messageRepository.getMessages(user1, user2)
+
+    assert(updatedMessageHistory is Resource.Success)
+
+    (messageRepository as MockMessageRepository).messagesFlow.value =
+        Resource.Success((updatedMessageHistory as Resource.Success).data)
+
+    val results = mutableListOf<Resource<MessageHistory>>()
+    val job = launch { messageRepository.observeMessages(user1, user2).toList(results) }
+    addMessage = messageRepository.addMessage(mockMessage, updatedMessageHistory.data)
+
+    assert(addMessage is Resource.Success)
+
+    updatedMessageHistory = messageRepository.getMessages(user1, user2)
+
+    assert(updatedMessageHistory is Resource.Success)
+
+    (messageRepository as MockMessageRepository).messagesFlow.value =
+        Resource.Success((updatedMessageHistory as Resource.Success).data)
+
+    delay(100)
+    assert(
+        results[0] is Resource.Success && (results[0] as Resource.Success).data.messages.size == 2)
+    assert((results[0] as Resource.Success).data == updatedMessageHistory.data)
+
+    job.cancel()
   }
 }

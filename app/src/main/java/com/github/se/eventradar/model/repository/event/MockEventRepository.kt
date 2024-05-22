@@ -67,8 +67,7 @@ class MockEventRepository : IEventRepository {
     return Resource.Success(events)
   }
 
-  override fun observeAllEvents(): Flow<Resource<List<Event>>> =
-      eventsFlow.asStateFlow() // to be tested
+  override fun observeAllEvents(): Flow<Resource<List<Event>>> = eventsFlow.asStateFlow()
 
   override fun observeUpcomingEvents(userId: String): Flow<Resource<List<Event>>> {
     return eventsFlow.asStateFlow().map { resource ->

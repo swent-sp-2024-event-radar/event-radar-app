@@ -9,6 +9,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDateTime
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class FirebaseMessageRepository(db: FirebaseFirestore = Firebase.firestore) : IMessageRepository {
@@ -135,11 +139,13 @@ class FirebaseMessageRepository(db: FirebaseFirestore = Firebase.firestore) : IM
   }
 
   override suspend fun updateReadStateForUser(
-      id: String,
+      userId: String,
       messageHistory: MessageHistory
   ): Resource<Unit> {
     val updatedValue =
-        mapOf(if (id == messageHistory.user1) "from_user_read" to true else "to_user_read" to true)
+        mapOf(
+            if (userId == messageHistory.user1) "from_user_read" to true
+            else "to_user_read" to true)
 
     return try {
       messageRef.document(messageHistory.id).update(updatedValue).await()
@@ -174,4 +180,55 @@ class FirebaseMessageRepository(db: FirebaseFirestore = Firebase.firestore) : IM
       Resource.Failure(e)
     }
   }
+
+  override fun observeMessages(user1: String, user2: String): Flow<Resource<MessageHistory>> =
+      callbackFlow {
+        val query =
+            messageRef
+                .where(
+                    Filter.or(
+                        Filter.and(
+                            Filter.equalTo("from_user", user1), Filter.equalTo("to_user", user2)),
+                        Filter.and(
+                            Filter.equalTo("from_user", user2), Filter.equalTo("to_user", user1)),
+                    ))
+                .limit(1)
+
+        val listener =
+            query.addSnapshotListener { snapshot, error ->
+              if (error != null) {
+                trySend(
+                    Resource.Failure(
+                        Exception("Error listening to message updates: ${error.message}")))
+                return@addSnapshotListener
+              }
+
+              if (snapshot != null && !snapshot.isEmpty) {
+                val doc = snapshot.documents.first()
+
+                val messageHistoryMap = doc.data!!
+
+                launch {
+                  val messages =
+                      messageRef.document(doc.id).collection("messages_list").get().await()
+                  messageHistoryMap["messages"] =
+                      messages.documents.map { message ->
+                        Message(
+                            sender = message["sender"] as String,
+                            content = message["content"] as String,
+                            dateTimeSent = LocalDateTime.parse(message["date_time_sent"] as String),
+                            id = message.id,
+                        )
+                      }
+
+                  val messageHistory = MessageHistory(messageHistoryMap, doc.id)
+                  trySend(Resource.Success(messageHistory))
+                }
+              } else {
+                trySend(Resource.Failure(Exception("No message history found")))
+              }
+            }
+
+        awaitClose { listener.remove() }
+      }
 }

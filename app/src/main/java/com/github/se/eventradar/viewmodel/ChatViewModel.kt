@@ -66,35 +66,59 @@ constructor(
   init {
 
     viewModelScope.launch {
-      _uiState.update {
-        val userId = userRepository.getCurrentUserId()
-
-        if (userId is Resource.Success) {
-          it.copy(userId = userId.data)
-        } else {
-          Log.d(
-              "ChatViewModel",
-              "Error getting user ID: ${(userId as Resource.Failure).throwable.message}")
-          it.copy(userId = null)
-        }
+      val userId = userRepository.getCurrentUserId()
+      if (userId is Resource.Success) {
+        _uiState.update { it.copy(userId = userId.data) }
+        initOpponent()
+        runBlocking { getMessages() }
+        observeMessages(userId.data, opponentId)
+      } else {
+        Log.d(
+            "ChatViewModel",
+            "Error getting user ID: ${(userId as Resource.Failure).throwable.message}")
+        _uiState.update { it.copy(userId = null) }
       }
     }
-    initOpponent()
-    runBlocking { getMessages() }
   }
 
   private fun initOpponent() {
     viewModelScope.launch {
-      _uiState.update {
-        when (val opponentResource = userRepository.getUser(opponentId)) {
+      when (val opponentResource = userRepository.getUser(opponentId)) {
+        is Resource.Success -> {
+          _uiState.update { it.copy(opponentProfile = opponentResource.data!!) }
+        }
+        is Resource.Failure -> {
+          Log.d(
+              "ChatViewModel",
+              "Error getting opponent details: ${opponentResource.throwable.message}")
+          _uiState.update { it.copy(opponentProfile = nullUser) }
+        }
+      }
+    }
+  }
+
+  private fun observeMessages(userId: String, opponentId: String) {
+    viewModelScope.launch {
+      messagesRepository.observeMessages(userId, opponentId).collect { resource ->
+        when (resource) {
           is Resource.Success -> {
-            it.copy(opponentProfile = opponentResource.data!!)
+            resource.data.messages.sortBy { it.dateTimeSent }
+            _uiState.update { currentState -> currentState.copy(messageHistory = resource.data) }
           }
           is Resource.Failure -> {
-            Log.d(
-                "ChatViewModel",
-                "Error getting opponent details: ${opponentResource.throwable.message}")
-            it.copy(opponentProfile = nullUser)
+            Log.d("ChatViewModel", "Failed to fetch messages: ${resource.throwable.message}")
+            _uiState.update { currentState
+              -> // Following the current logic in getMessages, may be updated
+              currentState.copy(
+                  messageHistory =
+                      MessageHistory(
+                          user1 = userId,
+                          user2 = opponentId,
+                          latestMessageId = "",
+                          user1ReadMostRecentMessage = false,
+                          user2ReadMostRecentMessage = false,
+                          messages = mutableListOf()))
+            }
           }
         }
       }
