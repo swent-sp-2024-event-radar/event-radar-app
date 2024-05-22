@@ -9,24 +9,22 @@ import org.junit.Before
 import org.junit.Test
 
 class MockLocationRepositoryUnitTest {
-    private lateinit var locationRepository : ILocationRepository
-    private val mockLocation =
-        Location(100.0,100.0,"EPFL")
+  private lateinit var locationRepository: ILocationRepository
+  private val mockLocation = Location(100.0, 100.0, "EPFL")
 
-    @Before
-    fun setUp() {
-        locationRepository = MockLocationRepository()
-    }
+  @Before
+  fun setUp() {
+    locationRepository = MockLocationRepository()
+  }
 
-    @Test
-    fun testGetEventsEmptyAtConstruction() = runTest {
-        val location = locationRepository.fetchLocation("EPFL")
+  @Test
+  fun testGetEventsEmptyAtConstruction() = runTest {
+    val location = locationRepository.fetchLocation("EPFL")
 
-        assert(location is Resource.Success)
+    assert(location is Resource.Success)
 
-        assert((location as Resource.Success).data.address == mockLocation.address)
-        assert(location.data.latitude == mockLocation.latitude)
-        assert(location.data.longitude == mockLocation.longitude)
-    }
-
+    assert((location as Resource.Success).data.address == mockLocation.address)
+    assert(location.data.latitude == mockLocation.latitude)
+    assert(location.data.longitude == mockLocation.longitude)
+  }
 }
