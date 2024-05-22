@@ -68,6 +68,7 @@ constructor(
       val userId = userRepository.getCurrentUserId()
       if (userId is Resource.Success) {
         _uiState.update { it.copy(userId = userId.data) }
+        observeMessages(userId.data, opponentId)
       } else {
         Log.d(
             "ChatViewModel",
@@ -76,7 +77,6 @@ constructor(
       }
     }
     initOpponent()
-    observeMessages(_uiState.value.userId!!, opponentId)
   }
 
   private fun initOpponent() {

@@ -427,6 +427,14 @@ class FirebaseMessageRepositoryUnitTest {
 
     val queryMock = mockk<Query>()
     every { messagesRef.where(any()).limit(1) } returns queryMock
+    every { messagesRef.document(any()) } returns mockDocumentReference
+    every { mockDocumentReference.collection(any()).get() } returns
+        mockTask(mockQuerySnapshotMessages)
+    every { mockQuerySnapshotMessages.documents } returns listOf(mockDocumentSnapshotMessages)
+    every { mockDocumentSnapshotMessages.id } returns uid
+    every { mockDocumentSnapshotMessages["content"] } returns ""
+    every { mockDocumentSnapshotMessages["sender"] } returns "user1"
+    every { mockDocumentSnapshotMessages["date_time_sent"] } returns "2021-01-01T00:00:00"
 
     val slot = slot<EventListener<QuerySnapshot>>()
     val mockListenerRegistration = mockk<ListenerRegistration>()
