@@ -3,10 +3,24 @@ package com.github.se.eventradar.model.repository.message
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.message.Message
 import com.github.se.eventradar.model.message.MessageHistory
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 
 class MockMessageRepository : IMessageRepository {
   private val mockMessageHistory = mutableListOf<MessageHistory>()
   private var ticker = 0
+  val messagesFlow =
+      MutableStateFlow<Resource<MessageHistory>>(
+          Resource.Success(
+              MessageHistory(
+                  user1 = "1",
+                  user2 = "2",
+                  user1ReadMostRecentMessage = false,
+                  user2ReadMostRecentMessage = false,
+                  latestMessageId = "",
+                  messages = mutableListOf(),
+                  id = "")))
 
   override suspend fun getMessages(uid: String): Resource<List<MessageHistory>> {
     val messageHistories =
@@ -105,4 +119,21 @@ class MockMessageRepository : IMessageRepository {
 
     return Resource.Success(messageHistory)
   }
+
+  override fun observeMessages(user1: String, user2: String): Flow<Resource<MessageHistory>> =
+      messagesFlow.map { resource ->
+        when (resource) {
+          is Resource.Success -> {
+            if ((resource.data.user1 == user1 && resource.data.user2 == user2) ||
+                (resource.data.user1 == user2 && resource.data.user2 == user1)) {
+              Resource.Success(resource.data)
+            } else {
+              Resource.Failure(Exception("No message history found for specified users"))
+            }
+          }
+          is Resource.Failure -> {
+            Resource.Failure(Exception(resource.throwable.message))
+          }
+        }
+      }
 }
