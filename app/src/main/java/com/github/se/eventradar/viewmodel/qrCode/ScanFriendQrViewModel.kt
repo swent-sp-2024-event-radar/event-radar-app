@@ -74,15 +74,12 @@ constructor(
       val isLoading: Boolean = true, // Indicates loading state
   )
 
-  var myUID: String = ""
+  private var myUID: String = ""
 
   private val _uiState = MutableStateFlow(QrCodeScanFriendState())
   val uiState: StateFlow<QrCodeScanFriendState> = _uiState
 
-  //  private val _uiState = MutableStateFlow(QrCodeScanFriendState())
-  //  val uiState: StateFlow<QrCodeScanFriendState> = _uiState
-
-  val initialUiState: StateFlow<QrCodeScanFriendState> =
+  private val initialUiState: StateFlow<QrCodeScanFriendState> =
       flow {
             emit(QrCodeScanFriendState(isLoading = true))
 
@@ -123,6 +120,7 @@ constructor(
               QrCodeScanFriendState(isLoading = true))
 
   init {
+    while (initialUiState.value.isLoading) { Log.d("waiting", "wait") }//wait for the initial state to finish loading}
     viewModelScope.launch { initialUiState.collect { newState -> _uiState.value = newState } }
   }
 
