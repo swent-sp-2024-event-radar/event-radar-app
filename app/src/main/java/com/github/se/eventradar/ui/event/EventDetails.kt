@@ -82,7 +82,7 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
                     "${Route.EVENT_DETAILS_TICKETS}/${viewModel.eventId}")
               }
             },
-            modifier = Modifier.testTag("ticketButton"),
+            modifier = Modifier.testTag("registrationButton"),
             containerColor = MaterialTheme.colorScheme.primaryContainer,
         ) {
           Icon(

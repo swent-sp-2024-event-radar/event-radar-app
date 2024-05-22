@@ -74,7 +74,7 @@ class EventDetailsAttendingUITest :
   fun screenDisplaysNavigationElementsCorrectly() = run {
     ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
       step("Check if navigation elements are displayed correctly") {
-        ticketButton { assertIsDisplayed() }
+        registrationButton { assertIsDisplayed() }
         goBackButton { assertIsDisplayed() }
         bottomNav { assertIsDisplayed() }
       }
@@ -128,7 +128,7 @@ class EventDetailsAttendingUITest :
   fun cancelRegistrationShowsConfirmationDialog() = run {
     ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
       step("Click on the cancel registration button") {
-        ticketButton {
+        registrationButton {
           assertIsDisplayed()
           performClick()
         }

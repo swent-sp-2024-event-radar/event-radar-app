@@ -9,7 +9,7 @@ public class EventDetailsScreen(semanticsProvider: SemanticsNodeInteractionsProv
         semanticsProvider = semanticsProvider,
         viewBuilderAction = { hasTestTag("eventDetailsScreen") }) {
 
-  val ticketButton: KNode = onNode { hasTestTag("ticketButton") }
+  val registrationButton: KNode = onNode { hasTestTag("registrationButton") }
   val goBackButton: KNode = onNode { hasTestTag("goBackButton") }
   val bottomNav: KNode = onNode { hasTestTag("bottomNavMenu") }
   val eventImage: KNode = onNode { hasTestTag("eventImage") }
