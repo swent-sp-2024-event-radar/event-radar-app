@@ -431,7 +431,7 @@ class FirebaseMessageRepositoryUnitTest {
     every { mockDocumentReference.collection(any()).get() } returns
         mockTask(mockQuerySnapshotMessages)
     every { mockQuerySnapshotMessages.documents } returns listOf(mockDocumentSnapshotMessages)
-    every { mockDocumentSnapshotMessages.id } returns uid
+    every { mockDocumentSnapshotMessages.id } returns "1"
     every { mockDocumentSnapshotMessages["content"] } returns ""
     every { mockDocumentSnapshotMessages["sender"] } returns "user1"
     every { mockDocumentSnapshotMessages["date_time_sent"] } returns "2021-01-01T00:00:00"
@@ -451,6 +451,12 @@ class FirebaseMessageRepositoryUnitTest {
     }
     delay(500)
 
+    val expectedMessage =
+        Message(
+            sender = "user1",
+            content = "",
+            dateTimeSent = LocalDateTime.parse("2021-01-01T00:00:00"),
+            id = "1")
     assert(results.size == 1)
     assert(results.first() is Resource.Success)
     val mH = (results.first() as Resource.Success<MessageHistory>).data
@@ -459,6 +465,7 @@ class FirebaseMessageRepositoryUnitTest {
     assert(mH.latestMessageId == "1")
     assert(!mH.user1ReadMostRecentMessage)
     assert(!mH.user2ReadMostRecentMessage)
+    assert(mH.messages == mutableListOf(expectedMessage))
 
     job.cancel()
   }
