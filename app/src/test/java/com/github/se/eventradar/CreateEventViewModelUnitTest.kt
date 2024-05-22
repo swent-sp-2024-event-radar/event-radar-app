@@ -8,6 +8,7 @@ import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.event.MockEventRepository
+import com.github.se.eventradar.model.repository.location.ILocationRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.viewmodel.CreateEventUiState
@@ -36,6 +37,7 @@ import java.util.Locale
 
 class CreateEventViewModelUnitTest {
     private lateinit var viewModel: CreateEventViewModel
+    private lateinit var locationRepository: ILocationRepository
     private lateinit var eventRepository: IEventRepository
     private lateinit var userRepository: IUserRepository
     private lateinit var mockUiState: MutableStateFlow<CreateEventUiState>
@@ -96,13 +98,11 @@ class CreateEventViewModelUnitTest {
         mockUiState = MutableStateFlow(CreateEventUiState())
         runBlocking {userRepository.addUser(mockUser)}
         runBlocking{userRepository.updateUser(mockUser)}
-        viewModel = CreateEventViewModel(eventRepository, userRepository)
+        viewModel = CreateEventViewModel(locationRepository, eventRepository, userRepository)
     }
     //failure cases.
     @Test
     fun testCreateEventSuccessful() = runTest {
-        //mockkStatic(Log::class)
-        //every { Log.d(any(), any()) } returns 0
         val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         val timeFormat = DateTimeFormatter.ofPattern("HH:mm")
         //test using MockUserRepository and MockEventRepository
@@ -113,31 +113,26 @@ class CreateEventViewModelUnitTest {
         viewModel.onEndDateChanged(mockEvent.end.format(dateFormat), mockUiState)
         viewModel.onEndTimeChanged(mockEvent.end.format(timeFormat), mockUiState)
 
-        //need to mock the getLocation Function?
         viewModel.onLocationChanged(mockEvent.location.address, mockUiState)
         viewModel.onTicketNameChanged(mockEvent.ticket.name, mockUiState)
         viewModel.onTicketCapacityChanged(mockEvent.ticket.capacity.toString(), mockUiState)
         viewModel.onTicketPriceChanged(mockEvent.ticket.price.toString(), mockUiState)
 
         assert(viewModel.validateFields(mockUiState))
-//        viewModel.addEvent()
-//        coVerify { eventRepository.addEvent(any()) }
-//        coVerify { userRepository.updateUser(any()) }
-//        //longtitude and latitude?!
-//
-//        //check the eventRepository and userRepository
-//        assert(viewModel.uiState.value.eventName == mockEvent.eventName)
-//        assert(viewModel.uiState.value.eventDescription == mockEvent.description)
-//        assert(viewModel.uiState.value.startDate == mockEvent.start.format(dateFormat))
-//        assert(viewModel.uiState.value.startTime == mockEvent.start.format(timeFormat))
-//        assert(viewModel.uiState.value.endDate == mockEvent.end.format(dateFormat))
-//        assert(viewModel.uiState.value.endDate == mockEvent.end.format(timeFormat))
-//        assert(viewModel.uiState.value.location == mockEvent.location.address)
-//        assert(viewModel.uiState.value.ticketCapacity.toInt() == mockEvent.ticket.capacity)
-//        assert(viewModel.uiState.value.ticketPrice.toDouble() == mockEvent.ticket.price)
-//        assert(viewModel.uiState.value.ticketName == mockEvent.ticket.name)
-//        assert(viewModel.uiState.value.eventCategory == mockEvent.category)
+        viewModel.addEvent()
+        coVerify { eventRepository.addEvent(any()) }
+        coVerify { userRepository.updateUser(any()) }
 
-        //unmockkAll()
+        assert(viewModel.uiState.value.eventName == mockEvent.eventName)
+        assert(viewModel.uiState.value.eventDescription == mockEvent.description)
+        assert(viewModel.uiState.value.startDate == mockEvent.start.format(dateFormat))
+        assert(viewModel.uiState.value.startTime == mockEvent.start.format(timeFormat))
+        assert(viewModel.uiState.value.endDate == mockEvent.end.format(dateFormat))
+        assert(viewModel.uiState.value.endDate == mockEvent.end.format(timeFormat))
+        assert(viewModel.uiState.value.location == mockEvent.location.address)
+        assert(viewModel.uiState.value.ticketCapacity.toInt() == mockEvent.ticket.capacity)
+        assert(viewModel.uiState.value.ticketPrice.toDouble() == mockEvent.ticket.price)
+        assert(viewModel.uiState.value.ticketName == mockEvent.ticket.name)
+        assert(viewModel.uiState.value.eventCategory == mockEvent.category)
     }
 }

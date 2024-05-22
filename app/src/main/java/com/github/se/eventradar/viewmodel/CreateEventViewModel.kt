@@ -10,6 +10,7 @@ import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.repository.event.IEventRepository
+import com.github.se.eventradar.model.repository.location.ILocationRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.IOException
@@ -30,6 +31,7 @@ import org.json.JSONArray
 class CreateEventViewModel
 @Inject
 constructor(
+    private val locationRepository : ILocationRepository,
     private val eventRepository: IEventRepository,
     private val userRepository: IUserRepository
 ) : ViewModel() {
@@ -60,7 +62,16 @@ constructor(
                   }
 
             val uid = userIdResource.data
-            val fetchedLocation = fetchLocation(state.value.location, state)!! //fields will always be validated before, so this cannot be null.
+            val fetchedLocation =
+                when (val result = locationRepository.fetchLocation(state.value.location)){
+                    is Resource.Success -> {
+                        result.data
+                    }
+                    is Resource.Failure -> {
+                        Log.d("CreateEventViewModel", "Location Fetching Failed")
+                        Location(0.0,0.0,"")
+                    }
+                }
               val eventPhotoUri =
                   state.value.eventPhotoUri
                       ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder")
@@ -108,48 +119,13 @@ constructor(
     }
   }
 
-  private fun fetchLocation(locationName: String, state: MutableStateFlow<CreateEventUiState>) : Location? {
-    val client = OkHttpClient()
-    val url = "https://nominatim.openstreetmap.org/search?q=${locationName}&format=json"
-    val request = Request.Builder().url(url).build()
-      var fetchedLocationName = ""
-      var latitude = 0.0
-      var longitude = 0.0
-    client
-        .newCall(request)
-        .enqueue(
-            object : Callback {
-              override fun onFailure(call: Call, e: IOException) {
-                Log.d("CreateEventViewModel", "OnFailure IOException ${e.message}")
-              }
-
-              override fun onResponse(call: Call, response: Response) {
-                response.use {
-                  if (!response.isSuccessful) {
-                      Log.d("CreateEventViewModel", "OnResponse IOException ${response}")
-                  }
-                  val jsonArray = JSONArray(response.body!!.string())
-                  val firstObject = jsonArray.getJSONObject(0)
-                  fetchedLocationName = firstObject.getString("name")
-                    latitude = firstObject.getString("lat").toDouble()
-                    longitude = firstObject.getString("lon").toDouble()
-                  state.value = state.value.copy(location = fetchedLocationName)
-                }
-              }
-            })
-      return when (fetchedLocationName.isBlank() && latitude == 0.0 && longitude == 0.0){
-          false -> {null}
-          true ->{Location(latitude,longitude,fetchedLocationName)}
-      }
-  }
 
   private suspend fun addUserEvent(
       uid: String,
       newEvent: Event,
       state: MutableStateFlow<CreateEventUiState> = _uiState
   ) {
-    // update the user event list
-    // add the event.
+    //Adds the event
     viewModelScope.launch {
       when (eventRepository.addEvent(newEvent)) {
         is Resource.Success -> {
@@ -169,6 +145,7 @@ constructor(
       newEventId: String,
       state: MutableStateFlow<CreateEventUiState> = _uiState
   ) {
+      //Updates the user list
     when (val userResource = userRepository.getUser(uid)) {
       is Resource.Success -> {
         val user = userResource.data!!
@@ -194,6 +171,21 @@ constructor(
     }
   }
 
+    //Upon clicking Search Icon, the location is updated in the CreateEvent Screen
+    fun updateLocationName(state: MutableStateFlow<CreateEventUiState> = _uiState){
+        viewModelScope.launch{
+            when (val result = locationRepository.fetchLocation(state.value.location)){
+                is Resource.Success -> {
+                    state.value = state.value.copy(location = result.data.address)
+                }
+                is Resource.Failure -> {
+                    state.value = state.value.copy(locationIsError = true)
+                }
+            }
+        }
+
+    }
+
   fun validateFields(state: MutableStateFlow<CreateEventUiState>): Boolean {
     state.value =
         state.value.copy(
@@ -203,7 +195,7 @@ constructor(
             endDateIsError = !isValidDate(state.value.endDate),
             startTimeIsError = !isValidTime(state.value.startTime),
             endTimeIsError = !isValidTime(state.value.endTime),
-            locationIsError = state.value.location.isBlank() || (fetchLocation(state.value.location, state) == null),
+            locationIsError = state.value.location.isBlank(),
             ticketNameIsError = state.value.ticketName.isBlank(),
             ticketCapacityIsError = !isValidNumber(state.value.ticketCapacity),
             ticketPriceIsError = !isValidNumber(state.value.ticketPrice))
