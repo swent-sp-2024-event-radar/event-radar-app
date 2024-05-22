@@ -120,7 +120,9 @@ constructor(
               QrCodeScanFriendState(isLoading = true))
 
   init {
-    while (initialUiState.value.isLoading) { Log.d("waiting", "wait") }//wait for the initial state to finish loading}
+    while (initialUiState.value.isLoading) {
+      Log.d("waiting", "wait")
+    } // wait for the initial state to finish loading}
     viewModelScope.launch { initialUiState.collect { newState -> _uiState.value = newState } }
   }
 
