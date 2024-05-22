@@ -66,38 +66,32 @@ constructor(
   init {
 
     viewModelScope.launch {
-      _uiState.update {
-        val userId = userRepository.getCurrentUserId()
-
-        if (userId is Resource.Success) {
-          observeMessages(userId.data, opponentId)
-          it.copy(userId = userId.data)
-        } else {
-          Log.d(
-              "ChatViewModel",
-              "Error getting user ID: ${(userId as Resource.Failure).throwable.message}")
-          it.copy(userId = null)
-        }
+      val userId = userRepository.getCurrentUserId()
+      if (userId is Resource.Success) {
+        _uiState.update { it.copy(userId = userId.data) }
+        observeMessages(userId.data, opponentId)
+      } else {
+        Log.d(
+            "ChatViewModel",
+            "Error getting user ID: ${(userId as Resource.Failure).throwable.message}")
+        _uiState.update { it.copy(userId = null) }
       }
     }
-
     initOpponent()
     runBlocking { getMessages() }
   }
 
   private fun initOpponent() {
     viewModelScope.launch {
-      _uiState.update {
-        when (val opponentResource = userRepository.getUser(opponentId)) {
-          is Resource.Success -> {
-            it.copy(opponentProfile = opponentResource.data!!)
-          }
-          is Resource.Failure -> {
-            Log.d(
-                "ChatViewModel",
-                "Error getting opponent details: ${opponentResource.throwable.message}")
-            it.copy(opponentProfile = nullUser)
-          }
+      when (val opponentResource = userRepository.getUser(opponentId)) {
+        is Resource.Success -> {
+          _uiState.update { it.copy(opponentProfile = opponentResource.data!!) }
+        }
+        is Resource.Failure -> {
+          Log.d(
+              "ChatViewModel",
+              "Error getting opponent details: ${opponentResource.throwable.message}")
+          _uiState.update { it.copy(opponentProfile = nullUser) }
         }
       }
     }
