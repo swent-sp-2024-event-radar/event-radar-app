@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @HiltViewModel(assistedFactory = ChatViewModel.Factory::class)
 class ChatViewModel
@@ -68,6 +69,8 @@ constructor(
       val userId = userRepository.getCurrentUserId()
       if (userId is Resource.Success) {
         _uiState.update { it.copy(userId = userId.data) }
+        initOpponent()
+        runBlocking { getMessages() }
         observeMessages(userId.data, opponentId)
       } else {
         Log.d(
@@ -76,7 +79,6 @@ constructor(
         _uiState.update { it.copy(userId = null) }
       }
     }
-    initOpponent()
   }
 
   private fun initOpponent() {
