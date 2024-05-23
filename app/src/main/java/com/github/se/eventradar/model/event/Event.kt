@@ -3,6 +3,7 @@ package com.github.se.eventradar.model.event
 import com.github.se.eventradar.model.ConversionUtils.convertToMutableListOfStrings
 import com.github.se.eventradar.model.Location
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 data class Event(
     var eventName: String,
@@ -24,8 +25,14 @@ data class Event(
   ) : this(
       eventName = map["name"] as String,
       eventPhoto = map["photo_url"] as String,
-      start = LocalDateTime.parse(map["start"] as String),
-      end = LocalDateTime.parse(map["end"] as String),
+      start =
+          LocalDateTime.parse(
+              map["start"] as String, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"))
+              as LocalDateTime,
+      end =
+          LocalDateTime.parse(
+              map["end"] as String, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"))
+              as LocalDateTime,
       location =
           Location(
               latitude = map["location_lat"] as Double,
@@ -37,11 +44,11 @@ data class Event(
               name = map["ticket_name"] as String,
               price = convertToDouble(map["ticket_price"]),
               capacity = (map["ticket_capacity"] as Long).toInt(),
-              purchases = (map["ticket_purchases"] as Long).toInt()),
+              purchases = (map["ticket_capacity"] as Long).toInt()),
       mainOrganiser = map["main_organiser"] as String,
       organiserList = convertToMutableListOfStrings(map["organisers_list"]),
       attendeeList = convertToMutableListOfStrings(map["attendees_list"]),
-      category = EventCategory.valueOf(map["category"] as String),
+      category = EventCategory.fromDisplayName(map["category"] as String) as EventCategory,
       fireBaseID = id)
 
   fun toMap(): HashMap<String, Any> {

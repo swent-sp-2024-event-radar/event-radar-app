@@ -12,6 +12,7 @@ class MockEventRepository : IEventRepository {
   val mockEvents = mutableListOf<Event>()
   private var ticker = 0
   val eventsFlow = MutableStateFlow<Resource<List<Event>>>(Resource.Success(mockEvents))
+
   override suspend fun getEvents(): Resource<List<Event>> {
     return Resource.Success(mockEvents)
   }

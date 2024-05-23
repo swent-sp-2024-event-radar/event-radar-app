@@ -7,12 +7,15 @@ import com.github.se.eventradar.model.User
 class MockUserRepository : IUserRepository {
   private val mockUsers = mutableListOf<User>()
   /*
-  Map that associates a user to:
-   String 1. profilePictureLink
-   String 2. qrCodePictureLink
+  Map of FolderNames, to their corresponding photoNames
    */
   // associate folderName to
-  private val mockImagesDatabase = mutableMapOf<User, MutableMap<String, String>>()
+  private val mockImagesDatabase =
+      mutableMapOf(
+          "QR_Codes" to mutableListOf<String>(),
+          "Profile_Pictures" to mutableListOf<String>(),
+          "Event_Pictures" to mutableListOf<String>())
+
   private var currentUserId: String? = null // Simulate current user ID
 
   override suspend fun getUsers(): Resource<List<User>> {
@@ -31,10 +34,6 @@ class MockUserRepository : IUserRepository {
 
   override suspend fun addUser(user: User): Resource<Unit> {
     mockUsers.add(user)
-    mockImagesDatabase[user] =
-        mutableMapOf(
-            "Profile_Pictures" to user.profilePicUrl,
-            "QR_Codes" to user.qrCodeUrl) // Add user to Database too
     return Resource.Success(Unit)
   }
 
@@ -47,11 +46,6 @@ class MockUserRepository : IUserRepository {
     val index = mockUsers.indexOfFirst { it.userId == user.userId }
 
     return if (index != -1) {
-      // Update the user in mockImagesDatabase
-      val oldUser = mockUsers[index]
-      mockImagesDatabase.remove(oldUser)
-      mockImagesDatabase[user] =
-          mutableMapOf("Profile_Pictures" to user.profilePicUrl, "QR_Codes" to user.qrCodeUrl)
       // Update the user in mockUsers
       mockUsers[index] = user
       Resource.Success(Unit)
@@ -62,7 +56,6 @@ class MockUserRepository : IUserRepository {
 
   override suspend fun deleteUser(user: User): Resource<Unit> {
     return if (mockUsers.remove(user)) {
-      mockImagesDatabase.remove(user) // Remove from mockImagesDatabase
       Resource.Success(Unit)
     } else {
       Resource.Failure(Exception("User with id ${user.userId} not found"))
@@ -76,36 +69,40 @@ class MockUserRepository : IUserRepository {
   }
 
   override suspend fun uploadImage(
-    selectedImageUri: Uri,
-    imageId: String,
-    folderName: String
+      selectedImageUri: Uri,
+      imageId: String,
+      folderName: String
   ): Resource<Unit> {
-    println("Uploading Image")
-    return if (currentUserId == null) {
-      Resource.Failure(Exception("User with id $imageId not found"))
-    } else if (folderName != "QR_Codes" && folderName != "Profile_Pictures" && folderName != "Event_Pictures") {
+    return if (currentUserId == null ||
+        mockUsers.indexOfFirst { it.userId == currentUserId } == -1) {
+      Resource.Failure(Exception("No user has been found"))
+    } else if (folderName != "QR_Codes" &&
+        folderName != "Profile_Pictures" &&
+        folderName != "Event_Pictures") {
       Resource.Failure(Exception("Folder $folderName does not exist"))
     } else {
-      val user = mockImagesDatabase.keys.filter { user -> user.userId == currentUserId }[0]
-      mockImagesDatabase[user]?.replace(folderName, "http://example.com/$folderName/$imageId")
+      mockImagesDatabase[folderName]!!.add(imageId)
       Resource.Success(Unit)
     }
   }
 
-  override suspend fun getImage(uid: String, folderName: String): Resource<String> {
-    val userList = mockImagesDatabase.keys.filter { user -> user.userId == uid }
-    return if (userList.isEmpty()) {
-      Resource.Failure(Exception("User with id $uid not found"))
-    } else if (folderName != "QR_Codes" && folderName != "Profile_Pictures" && folderName != "Event_Pictures") {
+  override suspend fun getImage(imageId: String, folderName: String): Resource<String> {
+    return if (currentUserId == null ||
+        mockUsers.indexOfFirst { it.userId == currentUserId } == -1) {
+      Resource.Failure(Exception("No user has been found"))
+    } else if (folderName != "QR_Codes" &&
+        folderName != "Profile_Pictures" &&
+        folderName != "Event_Pictures") {
       Resource.Failure(Exception("Folder $folderName does not exist"))
     } else {
-      val user = userList[0]
-      val folderLinks = mockImagesDatabase[user]
-      val imageUrl = folderLinks?.get(folderName)
-      if (imageUrl != null && imageUrl != "") {
-        Resource.Success(imageUrl)
+      val databaseFolderList = mockImagesDatabase[folderName]!!.filter { id -> id == imageId }
+      if (databaseFolderList.isEmpty() || databaseFolderList[0] != imageId) {
+        Resource.Failure(
+            Exception("Image from folder $folderName not found for user $currentUserId"))
       } else {
-        Resource.Failure(Exception("Image from folder $folderName not found for user $uid"))
+        val databaseImageId = databaseFolderList[0]
+        val imageUrl = "http://example.com/$folderName/$imageId"
+        Resource.Success(imageUrl)
       }
     }
   }
@@ -113,9 +110,7 @@ class MockUserRepository : IUserRepository {
   override suspend fun uploadQRCode(data: ByteArray, userId: String): Resource<Unit> {
     val index = mockUsers.indexOfFirst { it.userId == userId }
     return if (index != -1) {
-      val userList = mockImagesDatabase.keys.filter { user -> user.userId == userId }
-      val user = userList[0]
-      mockImagesDatabase[user]?.replace("QR_Codes", "http://example.com/QR_Codes/$userId")
+      mockImagesDatabase["QR_Codes"]!!.add(userId)
       Resource.Success(Unit)
     } else {
       Resource.Failure(Exception("User with id $userId not found"))

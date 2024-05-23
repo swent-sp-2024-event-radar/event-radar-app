@@ -12,6 +12,12 @@ enum class EventCategory(val displayName: String) {
   SOCIAL("Social"),
   PARTY("Party");
 
+  companion object {
+    fun fromDisplayName(displayName: String): EventCategory? {
+      return entries.firstOrNull { it.displayName.equals(displayName, ignoreCase = true) }
+    }
+  }
+
   fun convertToResString(context: Context): String {
     return when (this) {
       MUSIC -> context.getString(R.string.event_category_music)
