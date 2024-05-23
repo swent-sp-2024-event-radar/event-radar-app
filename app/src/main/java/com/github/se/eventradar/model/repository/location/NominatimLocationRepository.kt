@@ -16,6 +16,9 @@ class NominatimLocationRepository(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ILocationRepository {
   override suspend fun fetchLocation(locationName: String): Resource<List<Location>> {
+    if (locationName.isBlank()) {
+      return Resource.Failure(Exception("Empty location name is invalid"))
+    }
     return try {
       val locationList = mutableListOf<Location>()
       val url = "https://nominatim.openstreetmap.org/search?q=${locationName}&format=json"

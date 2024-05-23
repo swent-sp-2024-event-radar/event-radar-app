@@ -18,7 +18,7 @@ class MockLocationRepositoryUnitTest {
   }
 
   @Test
-  fun testGetEventsEmptyAtConstruction() = runTest {
+  fun testLocationRepositorySuccess() = runTest {
     val location = locationRepository.fetchLocation("EPFL")
 
     assert(location is Resource.Success)
@@ -26,5 +26,15 @@ class MockLocationRepositoryUnitTest {
     assert((location as Resource.Success).data[0].address == mockLocation.address)
     assert(location.data[0].latitude == mockLocation.latitude)
     assert(location.data[0].longitude == mockLocation.longitude)
+  }
+
+  @Test
+  fun testLocationRepositoryFailure() = runTest {
+    val location = locationRepository.fetchLocation("")
+
+    assert(location is Resource.Failure)
+
+    assert(
+        (location as Resource.Failure).throwable.message.equals("Empty location name is invalid"))
   }
 }
