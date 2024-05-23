@@ -312,11 +312,11 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
         onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
           composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
           ticketSoldTitle {
-            performScrollTo()
+//            performScrollTo()
             assertIsDisplayed()
           }
           ticketSoldContent {
-            performScrollTo()
+//            performScrollTo()
             assertIsDisplayed()
             assertTextContains("59 tickets sold")
           }
