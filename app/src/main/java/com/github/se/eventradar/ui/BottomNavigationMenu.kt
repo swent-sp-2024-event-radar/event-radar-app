@@ -39,9 +39,6 @@ fun BottomNavigationMenu(
     selectedItem: TopLevelDestination,
     modifier: Modifier = Modifier,
 ) {
-  val isKeyboardOpen by keyboardAsState() // Keyboard.Opened or Keyboard.Closed
-
-  if (isKeyboardOpen == Keyboard.Closed) {
     BottomNavigation(
         backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
         modifier = modifier,
@@ -84,7 +81,6 @@ fun BottomNavigationMenu(
                         }))
       }
     }
-  }
 }
 
 @Composable
@@ -97,35 +93,4 @@ fun NavBarIcon(tab: TopLevelDestination, modifier: Modifier, iconColor: Color) {
         modifier = Modifier.width(24.dp).height(24.dp),
     )
   }
-}
-
-enum class Keyboard {
-  Opened,
-  Closed
-}
-
-@Composable
-fun keyboardAsState(): State<Keyboard> {
-  val keyboardState = remember { mutableStateOf(Keyboard.Closed) }
-  val view = LocalView.current
-  DisposableEffect(view) {
-    val onGlobalListener =
-        ViewTreeObserver.OnGlobalLayoutListener {
-          val rect = Rect()
-          view.getWindowVisibleDisplayFrame(rect)
-          val screenHeight = view.rootView.height
-          val keypadHeight = screenHeight - rect.bottom
-          keyboardState.value =
-              if (keypadHeight > screenHeight * 0.15) {
-                Keyboard.Opened
-              } else {
-                Keyboard.Closed
-              }
-        }
-    view.viewTreeObserver.addOnGlobalLayoutListener(onGlobalListener)
-
-    onDispose { view.viewTreeObserver.removeOnGlobalLayoutListener(onGlobalListener) }
-  }
-
-  return keyboardState
 }

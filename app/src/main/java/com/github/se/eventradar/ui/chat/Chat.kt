@@ -103,13 +103,7 @@ fun ChatScreenUi(
             onBackArrowClick = onBackArrowClick,
         )
       },
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelected = onTabSelected,
-            tabList = TOP_LEVEL_DESTINATIONS,
-            selectedItem = TOP_LEVEL_DESTINATIONS[1],
-            modifier = Modifier.testTag("bottomNavMenu"))
-      }) {
+  ) {
         Column(
             modifier =
                 Modifier.padding(it)
