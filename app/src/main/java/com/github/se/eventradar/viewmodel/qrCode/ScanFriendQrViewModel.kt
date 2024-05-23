@@ -211,7 +211,7 @@ constructor(
     return updateResult is Resource.Success
   }
 
-  fun changeAction(action: Action) {
+  private fun changeAction(action: Action) {
     _uiState.value = uiState.value.copy(action = action)
     if (action == Action.NavigateToNextScreen) {
       navigationActions.navController.navigate(
