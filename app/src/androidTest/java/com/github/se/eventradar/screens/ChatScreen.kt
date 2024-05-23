@@ -17,7 +17,6 @@ public class ChatScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   private val chatScreenColumn: KNode = child { hasTestTag("chatScreenColumn") }
   val chatScreenMessagesList: KNode =
       chatScreenColumn.child { hasTestTag("chatScreenMessagesList") }
-  val bottomNav: KNode = child { hasTestTag("bottomNavMenu") }
 
   val chatInput: KNode = chatScreenColumn.child { hasTestTag("chatInput") }
   val chatInputField: KNode = chatInput.child { hasTestTag("chatInputField") }

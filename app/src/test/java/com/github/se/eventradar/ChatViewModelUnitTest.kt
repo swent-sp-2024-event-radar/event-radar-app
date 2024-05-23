@@ -300,6 +300,25 @@ class ChatViewModelUnitTest {
   }
 
   @Test
+  fun `observeMessages Success No Existing Message History`() = runTest {
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    userRepository.addUser(opponent)
+
+    val messageHistory = messageRepository.createNewMessageHistory("user1", "user2")
+
+    val editedMH = (messageHistory as Resource.Success).data
+
+    // Init calls observeMessages()
+    viewModel = ChatViewModel(messageRepository, userRepository, opponentId)
+
+    val expected = messageRepository.getMessages("user1", "user2")
+
+    (messageRepository as MockMessageRepository).messagesFlow.emit(expected)
+
+    assert(viewModel.uiState.value.messageHistory == (expected as Resource.Success).data)
+  }
+
+  @Test
   fun `observeMessages Failure`() = runTest {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
@@ -316,9 +335,9 @@ class ChatViewModelUnitTest {
 
     val expectedMH =
         MessageHistory(
-            user1 = "user1",
-            user2 = opponentId,
-            latestMessageId = "",
+            user1 = "Default sender",
+            user2 = "Default recipient",
+            latestMessageId = "DefaultId",
             user1ReadMostRecentMessage = false,
             user2ReadMostRecentMessage = false,
             messages = mutableListOf())
