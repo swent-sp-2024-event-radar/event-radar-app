@@ -21,7 +21,8 @@ class NominatimLocationRepository(
       val request = requestBuilder.url(url).build()
       val response = withContext(ioDispatcher) { client.newCall(request).execute() }
       if (!response.isSuccessful) {
-        throw IOException("Request to get location data failed due to IOException ${response}")
+        return Resource.Failure(
+            IOException("Request to get location data failed due to IOException ${response}"))
       }
       val jsonArray = JSONArray(response.body!!.string())
       val firstObject = jsonArray.getJSONObject(0)
