@@ -28,7 +28,7 @@ class ViewFriendsProfileViewModelUnitTest {
   private val mockUser =
       User(
           userId = "1",
-          birthDate = "01/01/2000",
+          birthDate = "01.01.2000",
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",
@@ -44,7 +44,7 @@ class ViewFriendsProfileViewModelUnitTest {
   private val mockFriend =
       User(
           userId = "2",
-          birthDate = "02/02/2002",
+          birthDate = "02.02.2002",
           email = "friend@example.com",
           firstName = "Jim",
           lastName = "Smith",

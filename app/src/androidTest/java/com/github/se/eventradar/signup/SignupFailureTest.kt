@@ -87,7 +87,7 @@ class SignupFailureTest : TestCase() {
         }
         birthDateTextField {
           performScrollTo()
-          performTextInput("01/01/2000")
+          performTextInput("01.01.2000")
         }
       }
 
