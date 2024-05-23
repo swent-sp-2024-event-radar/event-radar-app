@@ -46,11 +46,9 @@ import com.github.se.eventradar.R
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.message.Message
 import com.github.se.eventradar.model.message.MessageHistory
-import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.ProfilePic
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
-import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.TopLevelDestination
 import com.github.se.eventradar.viewmodel.ChatUiState
 import com.github.se.eventradar.viewmodel.ChatViewModel
@@ -104,39 +102,39 @@ fun ChatScreenUi(
         )
       },
   ) {
-        Column(
-            modifier =
-                Modifier.padding(it)
-                    .fillMaxSize()
-                    .focusable()
-                    .wrapContentHeight()
-                    .imePadding()
-                    .testTag("chatScreenColumn")) {
-              LazyColumn(
-                  modifier = Modifier.weight(1f).fillMaxWidth().testTag("chatScreenMessagesList"),
-                  state = scrollState) {
-                    items(messages) { message ->
-                      when (message.sender == uiState.opponentProfile.userId) {
-                        true -> {
-                          ReceivedMessageRow(
-                              text = message.content,
-                          )
-                        }
-                        false -> {
-                          SentMessageRow(
-                              text = message.content,
-                          )
-                        }
-                      }
+    Column(
+        modifier =
+            Modifier.padding(it)
+                .fillMaxSize()
+                .focusable()
+                .wrapContentHeight()
+                .imePadding()
+                .testTag("chatScreenColumn")) {
+          LazyColumn(
+              modifier = Modifier.weight(1f).fillMaxWidth().testTag("chatScreenMessagesList"),
+              state = scrollState) {
+                items(messages) { message ->
+                  when (message.sender == uiState.opponentProfile.userId) {
+                    true -> {
+                      ReceivedMessageRow(
+                          text = message.content,
+                      )
+                    }
+                    false -> {
+                      SentMessageRow(
+                          text = message.content,
+                      )
                     }
                   }
-              ChatInput(
-                  uiState = uiState,
-                  onMessageChange = onMessageChange,
-                  onMessageSend = onMessageSend,
-              )
-            }
-      }
+                }
+              }
+          ChatInput(
+              uiState = uiState,
+              onMessageChange = onMessageChange,
+              onMessageSend = onMessageSend,
+          )
+        }
+  }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
