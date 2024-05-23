@@ -261,21 +261,21 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
         }
       }
 
-  //  @Test
-  //  fun screenDisplaysContentElementsCorrectly3() =
-  //      //  Test(timeout = 45.seconds) {
-  //      run {
-  //        //      val viewModel = setupViewModelMyEventTab()
-  //        every { mockViewModel.uiState } returns MyEventTabDetailsUiState
-  //        onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-  //          composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
-  //          categoryTitle { assertIsDisplayed() }
-  //          categoryContent {
-  //            assertIsDisplayed()
-  //            assertTextContains("Community")
-  //          }
-  //        }
-  //      }
+  @Test
+  fun screenDisplaysContentElementsCorrectly3() =
+      //  Test(timeout = 45.seconds) {
+      run {
+        //      val viewModel = setupViewModelMyEventTab()
+        every { mockViewModel.uiState } returns MyEventTabDetailsUiState
+        onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
+          composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
+          categoryTitle { assertIsDisplayed() }
+          categoryContent {
+            assertIsDisplayed()
+            assertTextContains("Community")
+          }
+        }
+      }
 
   @Test
   fun screenDisplaysContentElementsCorrectly4() =
@@ -290,38 +290,38 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
         }
       }
 
-  //  @Test
-  //  fun screenDisplaysContentElementsCorrectly5() =
-  //      //  Test(timeout = 45.seconds) {
-  //      run {
-  //        //      val viewModel = setupViewModelMyEventTab()
-  //        every { mockViewModel.uiState } returns MyEventTabDetailsUiState
-  //        onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-  //          composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
-  //          timeTitle { assertIsDisplayed() }
-  //          timeContent { assertIsDisplayed() }
-  //        }
-  //      }
+  @Test
+  fun screenDisplaysContentElementsCorrectly5() =
+      //  Test(timeout = 45.seconds) {
+      run {
+        //      val viewModel = setupViewModelMyEventTab()
+        every { mockViewModel.uiState } returns MyEventTabDetailsUiState
+        onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
+          composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
+          timeTitle { assertIsDisplayed() }
+          timeContent { assertIsDisplayed() }
+        }
+      }
 
-  //  @Test
-  //  fun screenDisplaysContentElementsCorrectly6() =
-  //      //  Test(timeout = 45.seconds) {
-  //      run {
-  //        //      val viewModel = setupViewModelMyEventTab()
-  //        every { mockViewModel.uiState } returns MyEventTabDetailsUiState
-  //        onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-  //          composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
-  //          ticketSoldTitle {
-  //            performScrollTo()
-  //            assertIsDisplayed()
-  //          }
-  //          ticketSoldContent {
-  //            performScrollTo()
-  //            assertIsDisplayed()
-  //            assertTextContains("59 tickets sold")
-  //          }
-  //        }
-  //      }
+  @Test
+  fun screenDisplaysContentElementsCorrectly6() =
+      //  Test(timeout = 45.seconds) {
+      run {
+        //      val viewModel = setupViewModelMyEventTab()
+        every { mockViewModel.uiState } returns MyEventTabDetailsUiState
+        onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
+          composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
+          ticketSoldTitle {
+            performScrollTo()
+            assertIsDisplayed()
+          }
+          ticketSoldContent {
+            performScrollTo()
+            assertIsDisplayed()
+            assertTextContains("59 tickets sold")
+          }
+        }
+      }
 
   @Test
   fun goBackButtonTriggersBackNavigation() = run {
