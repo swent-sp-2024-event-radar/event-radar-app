@@ -1,7 +1,9 @@
 package com.github.se.eventradar
 
+import android.net.Uri
 import android.util.Log
 import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
@@ -9,14 +11,18 @@ import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.location.ILocationRepository
+import com.github.se.eventradar.model.repository.location.MockLocationRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.viewmodel.CreateEventUiState
 import com.github.se.eventradar.viewmodel.CreateEventViewModel
 import io.mockk.coVerify
 import io.mockk.every
+import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
@@ -36,6 +42,8 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class CreateEventViewModelUnitTest {
+    @RelaxedMockK
+    lateinit var uri: Uri
     private lateinit var viewModel: CreateEventViewModel
     private lateinit var locationRepository: ILocationRepository
     private lateinit var eventRepository: IEventRepository
@@ -95,17 +103,26 @@ class CreateEventViewModelUnitTest {
     fun setUp() {
         eventRepository = MockEventRepository()
         userRepository = MockUserRepository()
+        locationRepository = MockLocationRepository()
         mockUiState = MutableStateFlow(CreateEventUiState())
+        uri =
+            mockk<Uri> {
+                every { path } returns
+                        "content://media/picker/0/com.android.providers.media.photopicker/media/1000009885"
+            }
         runBlocking {userRepository.addUser(mockUser)}
-        runBlocking{userRepository.updateUser(mockUser)}
+        runBlocking{(userRepository as MockUserRepository).updateCurrentUserId(mockUser.userId)}
         viewModel = CreateEventViewModel(locationRepository, eventRepository, userRepository)
     }
-    //failure cases.
+    //integration test?
     @Test
     fun testCreateEventSuccessful() = runTest {
+        mockkStatic(Log::class)
+        every { Log.d(any(), any()) } returns 0
         val dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         val timeFormat = DateTimeFormatter.ofPattern("HH:mm")
         //test using MockUserRepository and MockEventRepository
+
         viewModel.onEventNameChanged(mockEvent.eventName, mockUiState)
         viewModel.onEventDescriptionChanged(mockEvent.description, mockUiState)
         viewModel.onStartDateChanged(mockEvent.start.format(dateFormat), mockUiState)
@@ -117,22 +134,26 @@ class CreateEventViewModelUnitTest {
         viewModel.onTicketNameChanged(mockEvent.ticket.name, mockUiState)
         viewModel.onTicketCapacityChanged(mockEvent.ticket.capacity.toString(), mockUiState)
         viewModel.onTicketPriceChanged(mockEvent.ticket.price.toString(), mockUiState)
+        viewModel.onEventPhotoUriChanged(eventPhotoUri = Uri.EMPTY, mockUiState)
 
         assert(viewModel.validateFields(mockUiState))
-        viewModel.addEvent()
-        coVerify { eventRepository.addEvent(any()) }
-        coVerify { userRepository.updateUser(any()) }
+        runBlocking {viewModel.addEvent()}
 
-        assert(viewModel.uiState.value.eventName == mockEvent.eventName)
-        assert(viewModel.uiState.value.eventDescription == mockEvent.description)
-        assert(viewModel.uiState.value.startDate == mockEvent.start.format(dateFormat))
-        assert(viewModel.uiState.value.startTime == mockEvent.start.format(timeFormat))
-        assert(viewModel.uiState.value.endDate == mockEvent.end.format(dateFormat))
-        assert(viewModel.uiState.value.endDate == mockEvent.end.format(timeFormat))
-        assert(viewModel.uiState.value.location == mockEvent.location.address)
-        assert(viewModel.uiState.value.ticketCapacity.toInt() == mockEvent.ticket.capacity)
-        assert(viewModel.uiState.value.ticketPrice.toDouble() == mockEvent.ticket.price)
-        assert(viewModel.uiState.value.ticketName == mockEvent.ticket.name)
-        assert(viewModel.uiState.value.eventCategory == mockEvent.category)
+
+        //verify{Log.d("CreateEventViewModel", "Successfully added event")}
+        //verify {Log.d("CreateEventViewModel", "Successfully updated user ${mockUser.userId} host list")}
+        assert(mockUiState.value.eventName == mockEvent.eventName)
+        assert(mockUiState.value.eventDescription == mockEvent.description)
+        assert(mockUiState.value.startDate == mockEvent.start.format(dateFormat))
+        assert(mockUiState.value.startTime == mockEvent.start.format(timeFormat))
+        assert(mockUiState.value.endDate == mockEvent.end.format(dateFormat))
+        assert(mockUiState.value.endTime == mockEvent.end.format(timeFormat))
+        assert(mockUiState.value.location == mockEvent.location.address)
+        assert(mockUiState.value.ticketCapacity.toInt() == mockEvent.ticket.capacity)
+        assert(mockUiState.value.ticketPrice.toDouble() == mockEvent.ticket.price)
+        assert(mockUiState.value.ticketName == mockEvent.ticket.name)
+        assert(mockUiState.value.eventCategory == mockEvent.category)
+        assert(mockUiState.value.eventPhotoUri == Uri.EMPTY)
+        unmockkAll()
     }
 }

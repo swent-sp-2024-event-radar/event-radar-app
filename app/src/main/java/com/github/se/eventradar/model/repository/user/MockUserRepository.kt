@@ -80,13 +80,13 @@ class MockUserRepository : IUserRepository {
     imageId: String,
     folderName: String
   ): Resource<Unit> {
-    val userList = mockImagesDatabase.keys.filter { user -> user.userId == imageId }
-    return if (userList.isEmpty()) {
+    println("Uploading Image")
+    return if (currentUserId == null) {
       Resource.Failure(Exception("User with id $imageId not found"))
-    } else if (folderName != "QR_Codes" && folderName != "Profile_Pictures") {
+    } else if (folderName != "QR_Codes" && folderName != "Profile_Pictures" && folderName != "Event_Pictures") {
       Resource.Failure(Exception("Folder $folderName does not exist"))
     } else {
-      val user = userList[0]
+      val user = mockImagesDatabase.keys.filter { user -> user.userId == currentUserId }[0]
       mockImagesDatabase[user]?.replace(folderName, "http://example.com/$folderName/$imageId")
       Resource.Success(Unit)
     }
@@ -96,7 +96,7 @@ class MockUserRepository : IUserRepository {
     val userList = mockImagesDatabase.keys.filter { user -> user.userId == uid }
     return if (userList.isEmpty()) {
       Resource.Failure(Exception("User with id $uid not found"))
-    } else if (folderName != "QR_Codes" && folderName != "Profile_Pictures") {
+    } else if (folderName != "QR_Codes" && folderName != "Profile_Pictures" && folderName != "Event_Pictures") {
       Resource.Failure(Exception("Folder $folderName does not exist"))
     } else {
       val user = userList[0]

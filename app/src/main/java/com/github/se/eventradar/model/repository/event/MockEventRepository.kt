@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.map
 
 class MockEventRepository : IEventRepository {
 
-  private val mockEvents = mutableListOf<Event>()
+  val mockEvents = mutableListOf<Event>()
   private var ticker = 0
   val eventsFlow = MutableStateFlow<Resource<List<Event>>>(Resource.Success(mockEvents))
   override suspend fun getEvents(): Resource<List<Event>> {

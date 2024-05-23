@@ -50,9 +50,11 @@ constructor(
       userRepository.getCurrentUserId().let { userIdResource ->
         when (userIdResource) {
           is Resource.Success -> {
+              println("fetching newEventId")
               val newEventId =
                   when (val result = eventRepository.getUniqueEventId()){
                       is Resource.Success -> {
+                          println("fetched newEventId..")
                           result.data
                       }
                       is Resource.Failure -> {
@@ -62,9 +64,11 @@ constructor(
                   }
 
             val uid = userIdResource.data
+              println("fetching Location..")
             val fetchedLocation =
                 when (val result = locationRepository.fetchLocation(state.value.location)){
                     is Resource.Success -> {
+                        println("fetched Location..")
                         result.data
                     }
                     is Resource.Failure -> {
@@ -75,10 +79,14 @@ constructor(
               val eventPhotoUri =
                   state.value.eventPhotoUri
                       ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder")
-              userRepository.uploadImage(eventPhotoUri, newEventId, "Event_Pictures") //uid_event_name?
+              println("uploading image..")
+              println(eventPhotoUri)
+              userRepository.uploadImage(eventPhotoUri, newEventId, "Event_Pictures")
+              println("fetching eventPicture..")
               val eventPhotoUrl =
-                  when (val result = userRepository.getImage(newEventId, "Profile_Pictures")) {
+                  when (val result = userRepository.getImage(newEventId, "Event_Pictures")) {
                       is Resource.Success -> {
+                          println("fetched eventPicture..")
                           result.data
                       }
                       is Resource.Failure -> {
@@ -106,7 +114,8 @@ constructor(
                     "category" to state.value.eventCategory,
                 )
             val newEvent = Event(eventHashMap, newEventId)
-            addUserEvent(uid, newEvent)
+
+            addUserEvent(uid, newEvent, state)
           }
           is Resource.Failure -> {
             Log.d("CreateEventViewModel", "User not logged in or error fetching user ID")
@@ -123,15 +132,15 @@ constructor(
   private suspend fun addUserEvent(
       uid: String,
       newEvent: Event,
-      state: MutableStateFlow<CreateEventUiState> = _uiState
+      state: MutableStateFlow<CreateEventUiState>
   ) {
     //Adds the event
     viewModelScope.launch {
       when (eventRepository.addEvent(newEvent)) {
         is Resource.Success -> {
           // update user!
-          updateUserHostList(uid, newEvent.fireBaseID)
-          Log.d("CreateEventViewModel", "Successfully added event")
+            Log.d("CreateEventViewModel", "Successfully added event")
+          updateUserHostList(uid, newEvent.fireBaseID, state)
         }
         is Resource.Failure -> {
           Log.d("CreateEventViewModel", "Failed to add event")
@@ -143,7 +152,7 @@ constructor(
   private suspend fun updateUserHostList(
       uid: String,
       newEventId: String,
-      state: MutableStateFlow<CreateEventUiState> = _uiState
+      state: MutableStateFlow<CreateEventUiState>
   ) {
       //Updates the user list
     when (val userResource = userRepository.getUser(uid)) {
@@ -164,6 +173,7 @@ constructor(
                 "eventsHostList" to user.eventsHostList.add(newEventId))
         val newUser = User(userValues, uid)
         userRepository.updateUser(newUser)
+          Log.d("CreateEventViewModel", "Successfully updated user ${uid} host list")
       }
       is Resource.Failure -> {
         Log.d("CreateEventViewModel", "Failed to find user ${uid} in database")
@@ -198,7 +208,7 @@ constructor(
             locationIsError = state.value.location.isBlank(),
             ticketNameIsError = state.value.ticketName.isBlank(),
             ticketCapacityIsError = !isValidNumber(state.value.ticketCapacity),
-            ticketPriceIsError = !isValidNumber(state.value.ticketPrice))
+            ticketPriceIsError = !isValidDouble(state.value.ticketPrice))
 
 
     return !state.value.eventNameIsError &&
@@ -240,6 +250,10 @@ constructor(
     val parsedNumber: Int? = number.toIntOrNull()
     return (parsedNumber != null && parsedNumber > 0)
   }
+    private fun isValidDouble(double: String): Boolean {
+        val parsedNumber: Double? = double.toDoubleOrNull()
+        return (parsedNumber != null && parsedNumber >= 0.0)
+    }
 
   fun onEventNameChanged(eventName: String, state: MutableStateFlow<CreateEventUiState>) {
     state.value = state.value.copy(eventName = eventName)
