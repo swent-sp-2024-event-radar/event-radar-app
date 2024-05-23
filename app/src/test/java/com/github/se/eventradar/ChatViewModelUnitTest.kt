@@ -4,6 +4,7 @@ import android.util.Log
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.message.Message
+import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.model.repository.message.IMessageRepository
 import com.github.se.eventradar.model.repository.message.MockMessageRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
@@ -16,6 +17,7 @@ import io.mockk.verify
 import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -269,5 +271,61 @@ class ChatViewModelUnitTest {
 
     assert(uiState.messageBarInput == "")
     assert(uiState.messageHistory.messages.isEmpty())
+  }
+
+  @Test
+  fun `observeMessages Success`() = runTest {
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    userRepository.addUser(opponent)
+
+    val msg1 = mockMessage.copy(sender = "user1", id = "msg1")
+    val msg2 = mockMessage.copy(sender = "user2", id = "msg2")
+
+    val messageHistory = messageRepository.createNewMessageHistory("user1", "user2")
+
+    val editedMH = (messageHistory as Resource.Success).data
+
+    editedMH.messages.add(msg1)
+
+    // Init calls observeMessages()
+    viewModel = ChatViewModel(messageRepository, userRepository, opponentId)
+
+    messageRepository.addMessage(msg2, editedMH)
+
+    val expected = messageRepository.getMessages("user1", "user2")
+
+    (messageRepository as MockMessageRepository).messagesFlow.emit(expected)
+
+    assert(viewModel.uiState.value.messageHistory == (expected as Resource.Success).data)
+  }
+
+  @Test
+  fun `observeMessages Failure`() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    userRepository.addUser(opponent)
+
+    val exception = Exception("Error retrieving message histories")
+    (messageRepository as MockMessageRepository).messagesFlow.emit(Resource.Failure(exception))
+
+    viewModel = ChatViewModel(messageRepository, userRepository, opponentId)
+
+    delay(500)
+    val expectedLogMessage = "Failed to fetch messages: ${exception.message}"
+
+    val expectedMH =
+        MessageHistory(
+            user1 = "user1",
+            user2 = opponentId,
+            latestMessageId = "",
+            user1ReadMostRecentMessage = false,
+            user2ReadMostRecentMessage = false,
+            messages = mutableListOf())
+
+    verify { Log.d("ChatViewModel", expectedLogMessage) }
+    assert(viewModel.uiState.value.messageHistory == expectedMH)
+
+    unmockkAll()
   }
 }
