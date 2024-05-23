@@ -95,4 +95,14 @@ class NominatimLocationRepositoryUnitTest {
             .message!!
             .contains("Request to get location data failed due to IOException"))
   }
+
+  @Test
+  fun testLocationRepositoryFailure() = runTest {
+    val location = locationRepository.fetchLocation("")
+
+    assert(location is Resource.Failure)
+
+    assert(
+        (location as Resource.Failure).throwable.message.equals("Empty location name is invalid"))
+  }
 }
