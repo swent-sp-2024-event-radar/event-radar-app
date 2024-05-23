@@ -15,8 +15,9 @@ class NominatimLocationRepository(
     val requestBuilder: Request.Builder = Request.Builder(),
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ILocationRepository {
-  override suspend fun fetchLocation(locationName: String): Resource<Location> {
+  override suspend fun fetchLocation(locationName: String): Resource<List<Location>> {
     return try {
+      val locationList = mutableListOf<Location>()
       val url = "https://nominatim.openstreetmap.org/search?q=${locationName}&format=json"
       val request = requestBuilder.url(url).build()
       val response = withContext(ioDispatcher) { client.newCall(request).execute() }
@@ -25,13 +26,16 @@ class NominatimLocationRepository(
             IOException("Request to get location data failed due to IOException ${response}"))
       }
       val jsonArray = JSONArray(response.body!!.string())
-      val firstObject = jsonArray.getJSONObject(0)
-      val fetchedLocationName = firstObject.getString("name")
-      print(fetchedLocationName)
-      val latitude = firstObject.getDouble("lat")
-      val longitude = firstObject.getDouble("lon")
-
-      Resource.Success(Location(latitude, longitude, fetchedLocationName))
+      for (i in 0 until jsonArray.length()) {
+        val location = jsonArray.getJSONObject(i)
+        locationList.add(
+            Location(
+                location.getDouble("lat"),
+                location.getDouble("lon"),
+                location.getString("name"),
+            ))
+      }
+      Resource.Success(locationList)
     } catch (e: Exception) {
       Resource.Failure(e)
     }

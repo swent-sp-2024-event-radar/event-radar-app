@@ -23,8 +23,8 @@ class MockLocationRepositoryUnitTest {
 
     assert(location is Resource.Success)
 
-    assert((location as Resource.Success).data.address == mockLocation.address)
-    assert(location.data.latitude == mockLocation.latitude)
-    assert(location.data.longitude == mockLocation.longitude)
+    assert((location as Resource.Success).data[0].address == mockLocation.address)
+    assert(location.data[0].latitude == mockLocation.latitude)
+    assert(location.data[0].longitude == mockLocation.longitude)
   }
 }

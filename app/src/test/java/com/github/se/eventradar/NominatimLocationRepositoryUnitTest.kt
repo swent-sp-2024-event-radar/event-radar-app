@@ -72,12 +72,12 @@ class NominatimLocationRepositoryUnitTest {
     every { mockResponse.isSuccessful } returns true
     every { mockResponse.body } returns responseBody
 
-    val location = locationRepository.fetchLocation("EPFL")
+    val listOfLocations = locationRepository.fetchLocation("EPFL")
 
-    assert(location is Resource.Success)
-    assert((location as Resource.Success).data.address == expectedLocation.address)
-    assert(location.data.latitude == expectedLocation.latitude)
-    assert(location.data.longitude == expectedLocation.longitude)
+    assert(listOfLocations is Resource.Success)
+    assert((listOfLocations as Resource.Success).data[0].address == expectedLocation.address)
+    assert(listOfLocations.data[0].latitude == expectedLocation.latitude)
+    assert(listOfLocations.data[0].longitude == expectedLocation.longitude)
   }
 
   @Test
