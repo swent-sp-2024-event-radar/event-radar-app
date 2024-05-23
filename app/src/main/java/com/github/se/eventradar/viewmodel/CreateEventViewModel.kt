@@ -57,7 +57,7 @@ constructor(
             val fetchedLocation =
                 when (val result = locationRepository.fetchLocation(state.value.location)) {
                   is Resource.Success -> {
-                    result.data
+                    result.data[0]
                   }
                   is Resource.Failure -> {
                     Log.d("CreateEventViewModel", "Location Fetching Failed")
@@ -166,11 +166,11 @@ constructor(
   }
 
   // Upon clicking Search Icon, the location is updated in the CreateEvent Screen
-  fun updateLocationName(state: MutableStateFlow<CreateEventUiState> = _uiState) {
+  fun updateListOfLocations(state: MutableStateFlow<CreateEventUiState> = _uiState) {
     viewModelScope.launch {
       when (val result = locationRepository.fetchLocation(state.value.location)) {
         is Resource.Success -> {
-          state.value = state.value.copy(location = result.data.address)
+          state.value = state.value.copy(listOfLocations = result.data)
         }
         is Resource.Failure -> {
           state.value = state.value.copy(locationIsError = true)
@@ -344,5 +344,6 @@ data class CreateEventUiState(
     val locationIsError: Boolean = false,
     val ticketNameIsError: Boolean = false,
     val ticketCapacityIsError: Boolean = false,
-    val ticketPriceIsError: Boolean = false
+    val ticketPriceIsError: Boolean = false,
+    val listOfLocations: List<Location> = emptyList()
 )

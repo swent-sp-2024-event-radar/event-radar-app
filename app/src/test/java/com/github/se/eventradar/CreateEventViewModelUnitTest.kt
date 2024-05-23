@@ -262,4 +262,18 @@ class CreateEventViewModelUnitTest {
     assert(mockUiState.value.organiserList == emptyList<String>())
     unmockkAll()
   }
+
+  @Test
+  fun updateLocationListTestSuccess(){
+    viewModel.onLocationChanged("EPFL",mockUiState)
+    viewModel.updateListOfLocations(mockUiState)
+    assert(mockUiState.value.listOfLocations == listOf(Location(100.0,100.0,"EPFL")))
+  }
+
+  @Test
+  fun updateLocationListTestFailure(){
+    viewModel.onLocationChanged("",mockUiState)
+    viewModel.updateListOfLocations(mockUiState)
+    assert(mockUiState.value.listOfLocations == listOf(Location(100.0,100.0,"EPFL")))
+  }
 }
