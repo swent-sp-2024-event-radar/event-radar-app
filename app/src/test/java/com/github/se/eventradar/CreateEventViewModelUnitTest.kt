@@ -89,7 +89,7 @@ class CreateEventViewModelUnitTest {
                   0.0,
                   0.0,
                   "École Polytechnique Fédérale de Lausanne"), // note: only the address will be
-                                                               // used for now.
+          // used for now.
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1, 0),
           mainOrganiser = "1",
@@ -264,16 +264,17 @@ class CreateEventViewModelUnitTest {
   }
 
   @Test
-  fun updateLocationListTestSuccess(){
-    viewModel.onLocationChanged("EPFL",mockUiState)
+  fun updateLocationListTestSuccess() {
+    viewModel.onLocationChanged("EPFL", mockUiState)
     viewModel.updateListOfLocations(mockUiState)
-    assert(mockUiState.value.listOfLocations == listOf(Location(100.0,100.0,"EPFL")))
+    assert(mockUiState.value.listOfLocations == listOf(Location(100.0, 100.0, "EPFL")))
   }
 
   @Test
-  fun updateLocationListTestFailure(){
-    viewModel.onLocationChanged("",mockUiState)
+  fun updateLocationListTestFailure() {
+    viewModel.onLocationChanged("", mockUiState)
+    assert(mockUiState.value.locationIsError == false)
     viewModel.updateListOfLocations(mockUiState)
-    assert(mockUiState.value.listOfLocations == listOf(Location(100.0,100.0,"EPFL")))
+    assert(mockUiState.value.locationIsError == true)
   }
 }
