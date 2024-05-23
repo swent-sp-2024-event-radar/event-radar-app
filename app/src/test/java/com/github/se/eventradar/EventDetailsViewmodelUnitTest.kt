@@ -328,7 +328,7 @@ class EventDetailsViewmodelUnitTest {
     verify {
       Log.d(
           "EventDetailsViewModel",
-          "Error updating event: Event with id ${mockEvent.fireBaseID} not found")
+          "Error removing attendee in event: Event with id ${mockEvent.fireBaseID} not found")
     }
 
     unmockkAll()
@@ -360,7 +360,8 @@ class EventDetailsViewmodelUnitTest {
 
     verify {
       Log.d(
-          "EventDetailsViewModel", "Error getting user: User with id ${mockUser.userId} not found")
+          "EventDetailsViewModel",
+          "Error removing attendance in user: User with id ${mockUser.userId} not found")
     }
 
     unmockkAll()
@@ -390,7 +391,7 @@ class EventDetailsViewmodelUnitTest {
     assert(viewModel.registrationSuccessful.value)
 
     // must mock the method here to avoid mocking it during the call to `buyTicketForEvent()`
-    coEvery { userRepository.updateUser(any()) } returns
+    coEvery { userRepository.getUser(any()) } returns
         Resource.Failure(Exception("User with id ${mockUser.userId} not found"))
 
     viewModel.removeUserFromEvent()
@@ -399,7 +400,8 @@ class EventDetailsViewmodelUnitTest {
 
     verify {
       Log.d(
-          "EventDetailsViewModel", "Error updating user: User with id ${mockUser.userId} not found")
+          "EventDetailsViewModel",
+          "Error removing attendance in user: User with id ${mockUser.userId} not found")
     }
 
     unmockkAll()

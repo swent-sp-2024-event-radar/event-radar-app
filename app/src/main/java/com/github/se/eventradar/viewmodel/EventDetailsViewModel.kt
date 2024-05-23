@@ -99,6 +99,15 @@ constructor(
       }
 
       if (!_isUserAttending.value) {
+        if (registrationProcedure(eventId, currentUserId)) {
+          registrationSuccessful.value = true
+          _isUserAttending.update { true }
+        } else {
+          errorOccurred.value = true
+        }
+      }
+      /*
+      if (!_isUserAttending.value) {
         // TODO needs to be atomic to avoid concurrency issues
         registrationUpdateEvent()
         if (!errorOccurred.value) {
@@ -108,7 +117,7 @@ constructor(
       if (!errorOccurred.value) {
         registrationSuccessful.value = true
         _isUserAttending.update { true }
-      }
+      }*/
     }
   }
 
@@ -192,17 +201,27 @@ constructor(
   }
 
   fun removeUserFromEvent() {
+    viewModelScope.launch {
+      if (unregistrationProcedure(eventId, currentUserId)) {
+        _isUserAttending.update { false }
+        showCancelRegistrationDialog.value = false
+      } else {
+        errorOccurred.value = true
+      }
+    }
+    /*
     if (displayedEvent != null) {
       val event: Event = displayedEvent as Event
 
       // remove currentUserId from the event attendees list
       event.attendeeList.remove(currentUserId)
       event.ticket =
-          EventTicket(
-              event.ticket.name,
-              event.ticket.price,
-              event.ticket.capacity,
-              event.ticket.purchases - 1)
+        EventTicket(
+          event.ticket.name,
+          event.ticket.price,
+          event.ticket.capacity,
+          event.ticket.purchases - 1
+        )
 
       viewModelScope.launch {
         // update event data to the database
@@ -210,11 +229,13 @@ constructor(
           is Resource.Success -> {
             Log.i("EventDetailsViewModel", "Successfully updated event")
           }
+
           is Resource.Failure -> {
             errorOccurred.value = true
             Log.d(
-                "EventDetailsViewModel",
-                "Error updating event: ${updateResponse.throwable.message}")
+              "EventDetailsViewModel",
+              "Error updating event: ${updateResponse.throwable.message}"
+            )
           }
         }
         // update user data to the database
@@ -231,15 +252,18 @@ constructor(
                 is Resource.Success -> {
                   Log.i("EventDetailsViewModel", "Successfully updated user")
                 }
+
                 is Resource.Failure -> {
                   errorOccurred.value = true
                   Log.d(
-                      "EventDetailsViewModel",
-                      "Error updating user: ${updateResponse.throwable.message}")
+                    "EventDetailsViewModel",
+                    "Error updating user: ${updateResponse.throwable.message}"
+                  )
                 }
               }
             }
           }
+
           is Resource.Failure -> {
             errorOccurred.value = true
             Log.d("EventDetailsViewModel", "Error getting user: ${userResponse.throwable.message}")
@@ -251,7 +275,60 @@ constructor(
     } else {
       errorOccurred.value = true
       Log.d("EventDetailsViewModel", "Error getting event data: no event displayed")
+    }*/
+
+  }
+
+  private suspend fun unregistrationProcedure(eventId: String, userId: String): Boolean {
+    // is atomic but TODO no checks for consistency between these 3 values
+
+    val resEvent = eventRepository.removeAttendee(eventId, userId)
+    if (resEvent is Resource.Failure) {
+      Log.d(
+          "EventDetailsViewModel",
+          "Error removing attendee in event: ${resEvent.throwable.message}")
     }
+    val resPurchases = eventRepository.decrementPurchases(eventId)
+    if (resPurchases is Resource.Failure) {
+      Log.d(
+          "EventDetailsViewModel",
+          "Error decrementing purchases: ${resPurchases.throwable.message}")
+    }
+    val resUser = userRepository.removeAttendingEvent(userId, eventId)
+    if (resUser is Resource.Failure) {
+      Log.d(
+          "EventDetailsViewModel",
+          "Error removing attendance in user: ${resUser.throwable.message}")
+    }
+
+    return (resEvent is Resource.Success &&
+        resPurchases is Resource.Success &&
+        resUser is Resource.Success)
+  }
+
+  private suspend fun registrationProcedure(eventId: String, userId: String): Boolean {
+    // is atomic but TODO no checks for consistency between these 3 values
+
+    val resEvent = eventRepository.addAttendee(eventId, userId)
+    if (resEvent is Resource.Failure) {
+      Log.d(
+          "EventDetailsViewModel", "Error adding attendee in event: ${resEvent.throwable.message}")
+    }
+    val resPurchases = eventRepository.incrementPurchases(eventId)
+    if (resPurchases is Resource.Failure) {
+      Log.d(
+          "EventDetailsViewModel",
+          "Error incrementing purchases: ${resPurchases.throwable.message}")
+    }
+    val resUser = userRepository.addAttendingEvent(userId, eventId)
+    if (resUser is Resource.Failure) {
+      Log.d(
+          "EventDetailsViewModel", "Error adding attendance in user: ${resUser.throwable.message}")
+    }
+
+    return (resEvent is Resource.Success &&
+        resPurchases is Resource.Success &&
+        resUser is Resource.Success)
   }
 
   // Code for creating an instance of EventDetailsViewModel
