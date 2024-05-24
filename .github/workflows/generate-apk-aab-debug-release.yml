@@ -1,7 +1,10 @@
 name: Generated Signed APK Debug and Release
 
+env:
+  # The name of the main module repository
+  main_project_module: app
 on:
-  pull_request:
+  push:
     branches:
       - 'M[0-9]'
 
