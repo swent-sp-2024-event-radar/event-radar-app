@@ -13,6 +13,7 @@ import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.qrCode.QrCodeScreen
 import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
 import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
+import com.github.se.eventradar.viewmodel.qrCode.Tab
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -62,7 +63,7 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
     userRepository = MockUserRepository()
     (userRepository as MockUserRepository).updateCurrentUserId(myUID)
     qrCodeAnalyser = mockk<QrCodeAnalyser>(relaxed = true)
-    viewModel = ScanFriendQrViewModel(userRepository, qrCodeAnalyser, mockNavActions)
+    viewModel = ScanFriendQrViewModel(userRepository, qrCodeAnalyser)
     composeTestRule.setContent { QrCodeScreen(viewModel, mockNavActions) }
     mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
   }
@@ -94,7 +95,7 @@ class QrCodeScanFriendUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
   fun testTabInteraction() = run {
     onComposeScreen<QrCodeScanFriendUiScreen>(composeTestRule) {
       scanQrTab.performClick()
-      assertEquals(ScanFriendQrViewModel.Tab.ScanQR, viewModel.uiState.value.tabState)
+      assertEquals(Tab.ScanQR, viewModel.uiState.value.tabState)
     }
   }
 }

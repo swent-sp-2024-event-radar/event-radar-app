@@ -1,31 +1,18 @@
 package com.github.se.eventradar.viewmodel.qrCode
 
 import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.IUserRepository
-import com.github.se.eventradar.ui.navigation.NavigationActions
-import com.github.se.eventradar.ui.navigation.Route
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.async
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 // TODO ViewModel & UI can be improved on by having a state where the UI reflects a loading icon if
 // firebase operations take a long time
@@ -33,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ScanFriendQrViewModel
-@Inject constructor(
+@Inject
+constructor(
     private val userRepository: IUserRepository, // Dependency injection
     val qrCodeAnalyser: QrCodeAnalyser, // Dependency injection
 ) : ViewModel() {
@@ -42,20 +30,17 @@ class ScanFriendQrViewModel
 
   init {
     viewModelScope.launch {
-      _uiState.update {
-        val userId = userRepository.getCurrentUserId()
-        
-        if (userId is Resource.Success) {
-          it.copy(userId = userId.data)
-        } else {
-          Log.d(
+      val userId = userRepository.getCurrentUserId()
+      if (userId is Resource.Success) {
+        _uiState.update { it.copy(userId = userId.data) }
+      } else {
+        Log.d(
             "ChatViewModel",
             "Error getting user ID: ${(userId as Resource.Failure).throwable.message}")
-        }
       }
     }
   }
-  
+
   fun setDecodedResultCallback(callback: ((String?) -> Unit)? = null) {
     qrCodeAnalyser.onDecoded = callback
   }
@@ -68,13 +53,15 @@ class ScanFriendQrViewModel
 
     viewModelScope.launch {
       val friendUserDeferred = async { userRepository.getUser(friendID) }
-      val currentUserDeferred = async { userRepository.getUser(myUID) }
+      val currentUserDeferred = async { userRepository.getUser(_uiState.value.userId!!) }
 
       val friendUser = friendUserDeferred.await()
       val currentUser = currentUserDeferred.await()
 
       if (friendUser is Resource.Success && currentUser is Resource.Success) {
-        val friendUpdatesDeferred = async { retryUpdate(friendUser.data!!, myUID) }
+        val friendUpdatesDeferred = async {
+          retryUpdate(friendUser.data!!, _uiState.value.userId!!)
+        }
         val userUpdatesDeferred = async { retryUpdate(currentUser.data!!, friendID) }
 
         // Await both updates to complete successfully
@@ -88,15 +75,15 @@ class ScanFriendQrViewModel
           return@launch
         }
       } else {
-        val exception = (if (friendUser is Resource.Failure) friendUser.throwable else (currentUser as Resource.Failure).throwable)
-        Log.d(
-          "ScanFriendQrViewModel",
-          "Error fetching user details: ${exception.message}")
+        val exception =
+            (if (friendUser is Resource.Failure) friendUser.throwable
+            else (currentUser as Resource.Failure).throwable)
+        Log.d("ScanFriendQrViewModel", "Error fetching user details: ${exception.message}")
         successfulUpdate = false
         return@launch
       }
     }
-    
+
     return successfulUpdate
   }
 
@@ -118,7 +105,7 @@ class ScanFriendQrViewModel
 
     return updateResult is Resource.Success
   }
-  
+
   fun onDecodedResultChanged(decodedResult: String) {
     _uiState.value = _uiState.value.copy(decodedResult = decodedResult)
   }
@@ -162,10 +149,10 @@ enum class Tab {
 }
 
 data class QrCodeScanFriendState(
-  val userId: String? = null,
-  val decodedResult: String = "",
-  val tabState: Tab = Tab.MyQR,
-  val username: String = "",
-  val qrCodeLink: String = "",
-  val isLoading: Boolean = true, // Indicates loading state
+    val userId: String? = null,
+    val decodedResult: String = "",
+    val tabState: Tab = Tab.MyQR,
+    val username: String = "",
+    val qrCodeLink: String = "",
+    val isLoading: Boolean = true, // Indicates loading state
 )

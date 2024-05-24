@@ -21,7 +21,6 @@ import com.github.se.eventradar.util.toast
 import com.github.se.eventradar.viewmodel.ChatViewModel
 import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.viewmodel.ViewFriendsProfileViewModel
-import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
 
 @Composable
 fun NavGraph(
@@ -64,10 +63,7 @@ fun NavGraph(
         }
     // TODO replace the Toast message with the corresponding screen function of the route
     composable(Route.MESSAGE) { MessagesScreen(navigationActions = navActions) }
-    composable(Route.SCANNER) {
-      val viewModel = ScanFriendQrViewModel.create(navigationActions = navActions)
-      QrCodeScreen(viewModel = viewModel, navigationActions = navActions)
-    }
+    composable(Route.SCANNER) { QrCodeScreen(navigationActions = navActions) }
     composable(Route.PROFILE) {
       HomeScreen(navigationActions = navActions)
       context.toast("Profile screen needs to be implemented")

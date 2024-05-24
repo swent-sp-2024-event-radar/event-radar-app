@@ -5,18 +5,15 @@ import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
-import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
 import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
 import io.mockk.MockKAnnotations
-import io.mockk.Runs
 import io.mockk.every
-import io.mockk.impl.annotations.RelaxedMockK
-import io.mockk.just
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import io.mockk.verify
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestDispatcher
@@ -138,102 +135,20 @@ class ScanFriendQrViewModelTest {
     }
   }
 
-  @RelaxedMockK lateinit var mockNavActions: NavigationActions
-
   @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
   @Before
   fun setUp() {
     MockKAnnotations.init(this)
-    every { mockNavActions.navigateTo(any()) } just Runs
     userRepository = MockUserRepository()
     (userRepository as MockUserRepository).updateCurrentUserId(myUID)
     qrCodeAnalyser = QrCodeAnalyser()
-    viewModel = ScanFriendQrViewModel(userRepository, qrCodeAnalyser, mockNavActions)
-    //      waitForLoadingToComplete()
-  }
-
-  //    private fun waitForLoadingToComplete() {
-  //        while (viewModel.uiState.value.isLoading) {
-  //            // Small sleep to avoid busy waiting
-  //            Thread.sleep(50)
-  //        }
-  //    }
-
-  //    @Test
-  //    fun switchesScreenWhenNavigatedToNextScreen() = run {
-  //            viewModel.changeAction(ScanFriendQrViewModel.Action.NavigateToNextScreen)
-  //            verify { mockNavActions.navigateTo(any()) }
-  //        }
-
-  @Test
-  fun testDecodingSuccess() = runTest {
-    userRepository.addUser(mockUser1)
-    userRepository.addUser(mockUser2)
-    val testDecodedString = "user2"
-    qrCodeAnalyser.onDecoded?.invoke(testDecodedString)
-    assertEquals(testDecodedString, viewModel.uiState.value.decodedResult)
-  }
-
-  @Test
-  fun testDecodingFailure() = runTest {
-    userRepository.addUser(mockUser1)
-    userRepository.addUser(mockUser2)
-    qrCodeAnalyser.onDecoded?.invoke(null)
-    assertEquals("Failed to decode QR Code", viewModel.uiState.value.decodedResult)
-    assertEquals(ScanFriendQrViewModel.Action.AnalyserError, viewModel.uiState.value.action)
-  }
-  // todo should i be testing thta it is reset to none ? isnt this Ui logic?
-  @Test
-  fun testInvokedAndFriendListUpdated() = runTest {
-    userRepository.addUser(mockUser1)
-    userRepository.addUser(mockUser2)
-    qrCodeAnalyser.onDecoded?.invoke("user2")
-    when (val user1 = userRepository.getUser("user1")) {
-      is Resource.Success -> {
-        assertEquals(mutableListOf("user2"), user1.data!!.friendsList)
-      }
-      else -> {
-        assert(false)
-        println("User 1 not found or could not be fetched")
+    viewModel = ScanFriendQrViewModel(userRepository, qrCodeAnalyser)
+    viewModel.setDecodedResultCallback {
+      if (it != null) {
+        viewModel.onDecodedResultChanged(it)
       }
     }
-    when (val user2 = userRepository.getUser("user2")) {
-      is Resource.Success -> {
-        assertEquals(mutableListOf("user1"), user2.data!!.friendsList)
-      }
-      else -> {
-        assert(false)
-        println("User 2 not found or could not be fetched")
-      }
-    }
-    assertEquals(ScanFriendQrViewModel.Action.None, viewModel.uiState.value.action)
-  }
-
-  @Test
-  fun testInvokedWhenAlreadyFriends() = runTest {
-    userRepository.addUser(mockUser1AF)
-    userRepository.addUser(mockUser2AF)
-    qrCodeAnalyser.onDecoded?.invoke("user2")
-    when (val user1 = userRepository.getUser("user1")) {
-      is Resource.Success -> {
-        assertEquals(mutableListOf("user2"), user1.data!!.friendsList)
-      }
-      else -> {
-        assert(false)
-        println("User 1 not found or could not be fetched")
-      }
-    }
-    when (val user2 = userRepository.getUser("user2")) {
-      is Resource.Success -> {
-        assertEquals(mutableListOf("user1"), user2.data!!.friendsList)
-      }
-      else -> {
-        assert(false)
-        println("User 2 not found or could not be fetched")
-      }
-    }
-    assertEquals(ScanFriendQrViewModel.Action.None, viewModel.uiState.value.action)
   }
 
   // This is testing if the getUserDetails function (to display information in MyQRCode Tab) returns
@@ -329,6 +244,53 @@ class ScanFriendQrViewModelTest {
             "Image from folder $folderName not found for user $userId")
     // Get user does not automatically return this error, should i call getQrCode in getUser? I mean
     // in theory im just getting all the user fields, but it should double check!
+    unmockkAll()
+  }
+
+  @Test
+  fun testUpdateFriendsListSuccess() = runTest {
+    // Given
+    val userId = mockUser1.userId
+    val friendId = mockUser2.userId
+    // initialize user with no mock
+    userRepository.addUser(mockUser1)
+    userRepository.addUser(mockUser2)
+    (userRepository as MockUserRepository).updateCurrentUserId(userId)
+    // When
+    val result = viewModel.updateFriendList(friendId)
+    // Then
+    assertTrue(result)
+    val user1 = userRepository.getUser(userId)
+    val user2 = userRepository.getUser(friendId)
+    assertTrue(user1 is Resource.Success)
+    assertTrue(user2 is Resource.Success)
+    assert((user1 as Resource.Success).data!!.friendsList.contains(friendId))
+    assert((user2 as Resource.Success).data!!.friendsList.contains(userId))
+  }
+
+  @Test
+  fun testUpdateFriendsListFailsWhenUserNotInDatabase() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    // Given
+    val userId = mockUser1.userId
+    val friendId = mockUser2.userId
+    // initialize user with no mock
+    userRepository.addUser(mockUser2)
+    (userRepository as MockUserRepository).updateCurrentUserId(userId)
+    // When
+    val result = viewModel.updateFriendList(friendId)
+    // Then
+    assertTrue(!result)
+
+    verify {
+      Log.d("ScanFriendQrViewModel", "Error fetching user details: User with id $userId not found")
+    }
+
+    val user2 = userRepository.getUser(friendId)
+    assertTrue(user2 is Resource.Success)
+    assert(!(user2 as Resource.Success).data!!.friendsList.contains(userId))
     unmockkAll()
   }
 }
