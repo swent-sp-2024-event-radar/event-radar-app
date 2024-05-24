@@ -49,7 +49,7 @@ jobs:
           key_password: ${{ secrets.KEY_PASSWORD }}
           alias: ${{ secrets.ALIAS }}
         run: |
-          bash ./update_properties.sh "keystore/keystore.jks" $key_store_password $alias $key_password
+          bash update_properties.sh "keystore/keystore.jks" $key_store_password $alias $key_password
 
       # Create APK Debug
       - name: Build Debug apk
