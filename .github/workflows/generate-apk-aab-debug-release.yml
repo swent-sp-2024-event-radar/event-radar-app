@@ -1,4 +1,4 @@
-name: Generated Signed APK Debug and Release
+name: Generated Signed APK Debug
 
 env:
   # The name of the main module repository
