@@ -43,13 +43,13 @@ jobs:
           mkdir -p $temp_keystore_path
           echo $encoded_string | base64 -di > "${temp_keystore_path}"/keystore.jks
           
-      - name: Print Params Values
+      - name: Create keystore properties
         env:
           key_store_password: ${{ secrets.KEY_STORE_PASSWORD }}
           key_password: ${{ secrets.KEY_PASSWORD }}
           alias: ${{ secrets.ALIAS }}
         run: |
-          bash update_properties.sh "keystore/keystore.jks" $key_store_password $alias $key_password
+          bash ./update_properties.sh "keystore/keystore.jks" $key_store_password $alias $key_password
 
       # Create APK Debug
       - name: Build Debug apk
