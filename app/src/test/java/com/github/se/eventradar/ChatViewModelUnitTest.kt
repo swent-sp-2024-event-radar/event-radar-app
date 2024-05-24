@@ -167,14 +167,13 @@ class ChatViewModelUnitTest {
     val msg1 = mockMessage.copy(sender = "user1", id = "msg1")
     val msg2 = mockMessage.copy(sender = "user2", id = "msg2")
 
-    // TODO: clean up logic with add message
     val messageHistory = messageRepository.createNewMessageHistory("user1", "user2")
-
     val editedMH = (messageHistory as Resource.Success).data
 
-    editedMH.messages.add(msg1)
-
-    messageRepository.addMessage(msg2, editedMH)
+      messageRepository.addMessage(msg1, editedMH)
+      var uiState = viewModel.uiState.value
+      messageRepository.addMessage(msg2, uiState.messageHistory)
+      uiState = viewModel.uiState.value
 
     viewModel =
         ChatViewModel(messageRepository, userRepository, opponentId) // Initialize view model
@@ -182,7 +181,6 @@ class ChatViewModelUnitTest {
     runBlocking { viewModel.getMessages() }
 
     val expectedMessages = mutableListOf(msg1, msg2)
-    val uiState = viewModel.uiState.value
     assert(expectedMessages == uiState.messageHistory.messages)
   }
 
@@ -232,7 +230,7 @@ class ChatViewModelUnitTest {
 
     val editedMH = (messageHistory as Resource.Success).data
 
-    editedMH.messages.add(msg1)
+    messageRepository.addMessage(msg1, editedMH)
 
     viewModel =
         ChatViewModel(messageRepository, userRepository, opponentId) // Initialize view model
@@ -281,40 +279,21 @@ class ChatViewModelUnitTest {
     val msg1 = mockMessage.copy(sender = "user1", id = "msg1")
     val msg2 = mockMessage.copy(sender = "user2", id = "msg2")
 
-    val messageHistory = messageRepository.createNewMessageHistory("user1", "user2")
+    val resource = messageRepository.createNewMessageHistory("user1", "user2")
 
-    val editedMH = (messageHistory as Resource.Success).data
+    val messageHistory = (resource as Resource.Success).data
 
-    editedMH.messages.add(msg1)
-
-    // Init calls observeMessages()
-    viewModel = ChatViewModel(messageRepository, userRepository, opponentId)
-
-    messageRepository.addMessage(msg2, editedMH)
-
-    val expected = messageRepository.getMessages("user1", "user2")
-
-    (messageRepository as MockMessageRepository).messagesFlow.emit(expected)
-
-    assert(viewModel.uiState.value.messageHistory == (expected as Resource.Success).data)
-  }
-
-  @Test
-  fun `observeMessages Success No Existing Message History`() = runTest {
-    (userRepository as MockUserRepository).updateCurrentUserId("user1")
-    userRepository.addUser(opponent)
-
-    val messageHistory = messageRepository.createNewMessageHistory("user1", "user2")
-
-    val editedMH = (messageHistory as Resource.Success).data
+    messageRepository.addMessage(msg1, messageHistory)
 
     // Init calls observeMessages()
     viewModel = ChatViewModel(messageRepository, userRepository, opponentId)
 
+    messageRepository.addMessage(msg2, messageHistory)
+
     val expected = messageRepository.getMessages("user1", "user2")
 
     (messageRepository as MockMessageRepository).messagesFlow.emit(expected)
-
+x
     assert(viewModel.uiState.value.messageHistory == (expected as Resource.Success).data)
   }
 

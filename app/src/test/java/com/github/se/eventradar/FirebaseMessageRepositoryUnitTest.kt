@@ -334,10 +334,10 @@ class FirebaseMessageRepositoryUnitTest {
     // Execute the addMessage function
     val result = firebaseMessageRepository.addMessage(message, emptyMessageHistory)
 
-    // Assert successful addition and correct message history creation
+    // Assert successful addition
     assert(result is Resource.Success)
     assert(captureUpdate.captured == expectedUpdateValues)
-    assert(emptyMessageHistory.id == newMessageHistoryId) // Check if the ID was set correctly
+    assert(emptyMessageHistory.id == newMessageHistoryId)
   }
 
   @Test
