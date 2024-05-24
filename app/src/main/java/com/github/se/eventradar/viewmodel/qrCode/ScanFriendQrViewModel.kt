@@ -23,145 +23,47 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 // TODO ViewModel & UI can be improved on by having a state where the UI reflects a loading icon if
 // firebase operations take a long time
 // TODO ViewModel & UI can be improved to error message for each different type of Error ?
 
-@HiltViewModel(assistedFactory = ScanFriendQrViewModel.Factory::class)
+@HiltViewModel
 class ScanFriendQrViewModel
-@AssistedInject
-constructor(
+@Inject constructor(
     private val userRepository: IUserRepository, // Dependency injection
     val qrCodeAnalyser: QrCodeAnalyser, // Dependency injection
-    @Assisted private val navigationActions: NavigationActions
 ) : ViewModel() {
-
-  @AssistedFactory
-  interface Factory {
-    fun create(navigationActions: NavigationActions): ScanFriendQrViewModel
-  }
-
-  companion object {
-    @Composable
-    fun create(navigationActions: NavigationActions): ScanFriendQrViewModel {
-      return hiltViewModel<ScanFriendQrViewModel, Factory>(
-          creationCallback = { factory -> factory.create(navigationActions = navigationActions) })
-    }
-  }
-
-  enum class Action {
-    None,
-    NavigateToNextScreen,
-    FirebaseFetchError,
-    FirebaseUpdateError,
-    AnalyserError,
-    CantGetMyUID
-  }
-
-  enum class Tab {
-    MyQR,
-    ScanQR
-  }
-
-  data class QrCodeScanFriendState(
-      val decodedResult: String = "",
-      val action: Action = Action.None,
-      val tabState: Tab = Tab.MyQR,
-      val username: String = "",
-      val qrCodeLink: String = "",
-      val isLoading: Boolean = true, // Indicates loading state
-  )
-
-  private var myUID: String = ""
-
   private val _uiState = MutableStateFlow(QrCodeScanFriendState())
   val uiState: StateFlow<QrCodeScanFriendState> = _uiState
 
-  private val initialUiState: StateFlow<QrCodeScanFriendState> =
-      flow {
-            emit(QrCodeScanFriendState(isLoading = true))
-
-            when (val userIdResult = userRepository.getCurrentUserId()) {
-              is Resource.Success -> {
-                val getMyUID = userIdResult.data
-                //                emit(QrCodeScanFriendState(isLoading = true))
-                myUID = getMyUID
-              }
-              is Resource.Failure -> {
-                emit(QrCodeScanFriendState(isLoading = false, action = Action.CantGetMyUID))
-              }
-            }
-            val decodedResult =
-                callbackFlow {
-                      qrCodeAnalyser.onDecoded = { decodedString ->
-                        trySend(decodedString ?: "Failed to decode QR Code")
-                        close()
-                      }
-                      awaitClose { qrCodeAnalyser.onDecoded = null }
-                    }
-                    .first()
-
-            if (decodedResult == "Failed to decode QR Code") {
-              emit(
-                  QrCodeScanFriendState(
-                      isLoading = false,
-                      action = Action.AnalyserError,
-                      decodedResult = decodedResult))
-            } else {
-              emit(QrCodeScanFriendState(isLoading = false, decodedResult = decodedResult))
-              updateFriendList(decodedResult)
-            }
-          }
-          .stateIn(
-              viewModelScope,
-              SharingStarted.WhileSubscribed(5000),
-              QrCodeScanFriendState(isLoading = true))
-
   init {
-    viewModelScope.launch { initialUiState.collect { newState -> _uiState.value = newState } }
+    viewModelScope.launch {
+      _uiState.update {
+        val userId = userRepository.getCurrentUserId()
+        
+        if (userId is Resource.Success) {
+          it.copy(userId = userId.data)
+        } else {
+          Log.d(
+            "ChatViewModel",
+            "Error getting user ID: ${(userId as Resource.Failure).throwable.message}")
+        }
+      }
+    }
+  }
+  
+  fun setDecodedResultCallback(callback: ((String?) -> Unit)? = null) {
+    qrCodeAnalyser.onDecoded = callback
   }
 
-  //    qrCodeAnalyser.onDecoded = { decodedString ->
-  //      Log.d("QrCodeFriendViewModel", "Decoded QR Code: $decodedString")
-  //      if(decodedString != null) {
-  //        emit(QrCodeScanFriendState(isLoading = false))
-  //        updateFriendList(decodedString)
-  //      } else {
-  //        emit(QrCodeScanFriendState(isLoading = false, action = Action.AnalyserError))
-  //      }
-  //    }
-  //  }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000),
-  // QrCodeScanFriendState(isLoading = true))
-
-  //  init {
-  //    viewModelScope.launch {
-  //      when (userRepository.getCurrentUserId()) {
-  //        is Resource.Success -> {
-  //          myUID = (userRepository.getCurrentUserId() as Resource.Success<String>).data
-  //        }
-  //        is Resource.Failure -> {
-  //          changeAction(Action.CantGetMyUID)
-  //        }
-  //      }
-  //    }
-  //    qrCodeAnalyser.onDecoded = { decodedString ->
-  //      Log.d("QrCodeFriendViewModel", "Decoded QR Code: $decodedString")
-  //      val result = decodedString ?: "Failed to decode QR Code"
-  //      _uiState.value = _uiState.value.copy(decodedResult = result) // Update state flow
-  //      //      _decodedResult.value = result // Update state flow
-  //      if (result != "Failed to decode QR Code") {
-  //        updateFriendList(result) // Directly call updateFriendList
-  //      } else {
-  //        changeAction(Action.AnalyserError)
-  //      }
-  //    }
-  //  }
-
-  private fun updateFriendList(decodedString: String) { // private
+  fun updateFriendList(decodedString: String = _uiState.value.decodedResult): Boolean { // private
     val uiLength = 28
     val friendID = decodedString.take(uiLength)
+    var successfulUpdate = true
     Log.d("QrCodeFriendViewModel", "Friend ID: $friendID")
 
     viewModelScope.launch {
@@ -180,16 +82,22 @@ constructor(
         val userUpdateResult = userUpdatesDeferred.await()
 
         // After successful updates, navigate to the next screen
-        if (friendUpdateResult && userUpdateResult) {
-          changeAction(Action.NavigateToNextScreen)
-        } else {
-          changeAction(Action.FirebaseUpdateError)
+        if (!friendUpdateResult || !userUpdateResult) {
+          Log.d("ScanFriendQrViewModel", "Failed to update user details")
+          successfulUpdate = false
+          return@launch
         }
       } else {
-        changeAction(Action.FirebaseFetchError)
+        val exception = (if (friendUser is Resource.Failure) friendUser.throwable else (currentUser as Resource.Failure).throwable)
+        Log.d(
+          "ScanFriendQrViewModel",
+          "Error fetching user details: ${exception.message}")
+        successfulUpdate = false
         return@launch
       }
     }
+    
+    return successfulUpdate
   }
 
   private suspend fun retryUpdate(user: User, friendIDToAdd: String): Boolean {
@@ -210,15 +118,9 @@ constructor(
 
     return updateResult is Resource.Success
   }
-
-  private fun changeAction(action: Action) {
-    _uiState.value = uiState.value.copy(action = action)
-    if (action == Action.NavigateToNextScreen) {
-      navigationActions.navController.navigate(
-          "${Route.PRIVATE_CHAT}/${_uiState.value.decodedResult}") // TODO check correct
-      _uiState.value = _uiState.value.copy(action = Action.None)
-      changeTabState(Tab.MyQR) // TODO add test for this
-    }
+  
+  fun onDecodedResultChanged(decodedResult: String) {
+    _uiState.value = _uiState.value.copy(decodedResult = decodedResult)
   }
 
   fun changeTabState(tab: Tab) {
@@ -253,3 +155,17 @@ constructor(
     }
   }
 }
+
+enum class Tab {
+  MyQR,
+  ScanQR
+}
+
+data class QrCodeScanFriendState(
+  val userId: String? = null,
+  val decodedResult: String = "",
+  val tabState: Tab = Tab.MyQR,
+  val username: String = "",
+  val qrCodeLink: String = "",
+  val isLoading: Boolean = true, // Indicates loading state
+)

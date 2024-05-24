@@ -1,5 +1,7 @@
 package com.github.se.eventradar.ui.qrCode
 
+import android.service.credentials.Action
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,6 +15,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -30,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
 
@@ -43,21 +47,20 @@ fun QrCodeScreen(
 
   val qrScanUiState = viewModel.uiState.collectAsStateWithLifecycle()
 
-  //  // React to changes in navigation state
-  //  LaunchedEffect(qrScanUiState.value.action) {
-  //    when (qrScanUiState.value.action) {
-  //      ScanFriendQrViewModel.Action.NavigateToNextScreen -> {
-  //        navigationActions.navigateTo(
-  //            TOP_LEVEL_DESTINATIONS[
-  //                1]) // TODO change to private message screen with friend // Adjust according to
-  // your
-  //        viewModel.resetNavigationEvent() // Reset the navigation event in the ViewModel to
-  // prevent
-  //        viewModel.changeTabState(ScanFriendQrViewModel.Tab.MyQR) // TODO add test for this
-  //      }
-  //      else -> Unit // Do nothing if the state is None or any other non-navigational state
-  //    }
-  //  }
+  // React to changes in navigation state
+  LaunchedEffect(Unit) {
+    viewModel.setDecodedResultCallback { friendId ->
+      Log.d("QrCodeFriendViewModel", "Decoded QR Code: $friendId")
+      if (friendId != null) {
+        viewModel.onDecodedResultChanged(friendId)
+        if (viewModel.updateFriendList(friendId)) {
+          navigationActions.navController.navigate(Route.PRIVATE_CHAT + "/$friendId")
+        }
+      } else {
+        Log.d("QrCodeFriendViewModel", "Friend ID is null")
+      }
+    }
+  }
 
   ConstraintLayout(
       modifier = Modifier.fillMaxSize().testTag("qrCodeScannerScreen"),
