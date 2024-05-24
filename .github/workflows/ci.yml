@@ -72,6 +72,23 @@ jobs:
       - name: Grant execute permission for gradlew
         run: |
           chmod +x ./gradlew
+          
+      - name: Create the Keystore
+        env:
+          encoded_string: ${{ secrets.SIGNING_KEY }}
+          temp_keystore_path: "${RUNNER_TEMP}"/keystore
+        run: |
+          mkdir -p $temp_keystore_path
+          # import keystore from secrets
+          echo encoded_string | base64 -di > "${TMP_KEYSTORE_FILE_PATH}"/keystore.jks
+
+      - name: Print Params Values
+        env:
+          key_store_password: ${{ secrets.KEY_STORE_PASSWORD }}
+          key_password: ${{ secrets.KEY_PASSWORD }}
+          alias: ${{ secrets.ALIAS }}
+        run: |
+          bash update_properties.sh "keystore/keystore.jks" $key_store_password $alias $key_password
 
       # Check formatting
       - name: KTFmt Check
