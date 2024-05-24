@@ -65,8 +65,8 @@ jobs:
       - name: Create the Keystore
         env:
           encoded_string: ${{ secrets.SIGNING_KEY }}
-          temp_keystore_path: "${RUNNER_TEMP}"/keystore
         run: |
+          temp_keystore_path="${RUNNER_TEMP}"/keystore
           mkdir -p $temp_keystore_path
           echo $encoded_string | base64 -di > "${temp_keystore_path}"/keystore.jks
 
