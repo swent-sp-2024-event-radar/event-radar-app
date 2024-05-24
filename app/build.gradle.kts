@@ -74,7 +74,9 @@ android {
     packagingOptions { jniLibs { useLegacyPackaging = true } }
   }
 }
-
+val activityComposeVersion = "1.9.0"
+val androidXCameraVersion = "1.3.3"
+val androidXEmulatorVersion = "2.3.0-alpha04"
 dependencies {
   implementation("androidx.core:core-ktx:1.7.0")
   implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
@@ -118,7 +120,7 @@ dependencies {
   implementation("com.google.firebase:firebase-database-ktx")
 
   // Coil
-  implementation("io.coil-kt:coil-compose:1.4.0")
+  implementation("io.coil-kt:coil-compose:2.6.0")
 
   // Dagger Hilt
   implementation("com.google.dagger:hilt-android:${rootProject.extra.get("hiltVersion")}")
@@ -128,7 +130,7 @@ dependencies {
   testImplementation("com.google.dagger:hilt-android-testing:2.44")
   kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
   androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
-  implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+  implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
   // JUnit
   testImplementation("junit:junit:4.13.2")
   androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -136,16 +138,20 @@ dependencies {
   testImplementation("androidx.arch.core:core-testing:2.2.0")
 
   testImplementation("org.json:json:20220924")
-
-  // Mockk & Espresso
-  testImplementation("io.mockk:mockk:1.13.10")
-  androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-  androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
-  androidTestImplementation("com.kaspersky.android-components:kaspresso:1.4.3")
-  androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:1.4.1")
-  androidTestImplementation("io.mockk:mockk:1.13.10")
-  androidTestImplementation("io.mockk:mockk-android:1.13.10")
-  androidTestImplementation("io.mockk:mockk-agent:1.13.10")
+    
+    // Mockk & Espresso
+    testImplementation("io.mockk:mockk:1.13.10")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
+    androidTestImplementation("com.kaspersky.android-components:kaspresso:1.4.3")
+    androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:1.4.1")
+    androidTestImplementation("io.mockk:mockk:1.13.10")
+    androidTestImplementation("io.mockk:mockk-android:1.13.10")
+    androidTestImplementation("io.mockk:mockk-agent:1.13.10")
+    androidTestImplementation ("androidx.test:runner:1.5.2")
+    androidTestImplementation ("androidx.test:rules:1.5.0")
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation ("androidx.test.espresso:espresso-intents:3.5.1")
 
   // Robolectric
   testImplementation("org.robolectric:robolectric:4.11.1")
@@ -155,8 +161,17 @@ dependencies {
   implementation("com.squareup.okhttp3:okhttp")
   implementation("com.squareup.okhttp3:logging-interceptor")
 
-  // QR CODE
-  implementation("com.google.zxing:core:3.4.1")
+    //QR CODE (Zxing)
+    implementation ("com.google.zxing:core:3.4.1")
+
+    // CameraX
+    implementation ("androidx.camera:camera-camera2:$androidXCameraVersion")
+    implementation ("androidx.camera:camera-lifecycle:$androidXCameraVersion")
+    implementation ("androidx.camera:camera-view:$androidXCameraVersion")
+
+    // Android Test
+    androidTestImplementation ("androidx.test.uiautomator:uiautomator:$androidXEmulatorVersion")
+
 }
 
 secrets {

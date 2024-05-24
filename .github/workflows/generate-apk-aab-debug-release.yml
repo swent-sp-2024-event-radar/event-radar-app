@@ -1,8 +1,7 @@
 name: Generated Signed APK Debug and Release
 
 on:
-
-  push:
+  pull_request:
     branches:
       - 'M[0-9]'
 

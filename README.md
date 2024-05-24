@@ -50,6 +50,7 @@ Note:
 
 ### Events database
 The structure of the event database is as follows:
+
  ```json
 {
   "events": {
@@ -68,7 +69,8 @@ The structure of the event database is as follows:
       "ticket": {
         "ticket_name": "Standard",
         "ticket_price": 20.00,
-        "ticket_quantity": 450
+        "ticket_capacity": 450,
+        "ticket_purchases": 0
       },
       "main_organiser": "xu378csh",
       "organisers_list": [
@@ -84,6 +86,9 @@ The structure of the event database is as follows:
   }
 }
 ```
+Field Definitions:
+- Ticket capacity refers to the maximum number of tickets sold by the event host.
+- Ticket purchases refers to the number of ticket purchases made so far by event attendees.
 Note:
 - Co-Organiser list: List of references (in Firebase).  
        
@@ -95,14 +100,15 @@ The structure of the Messages database is as follows:
     "message_history_id": {
       "from_user": "xu378csh",
       "to_user": "qwglei7",
+      "from_user_read": true,
+      "to_user_read": false,
       "latest_message_id": "ortz34k39",
       "messages_list": [
         {
           "message_id": {
             "sender": "qwglei7",
             "content": "message here",
-            "date_time_sent": "31/12/2024 23:00:00",
-            "message_read": true
+            "date_time_sent": "31/12/2024 23:00:00"
           }
         }
       ]

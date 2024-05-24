@@ -1,57 +1,62 @@
 package com.github.se.eventradar.ui.event
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.github.se.eventradar.R
-import com.github.se.eventradar.model.event.EventDetailsViewModel
-import com.github.se.eventradar.ui.BottomNavigationMenu
+import com.github.se.eventradar.ui.component.AppScaffold
+import com.github.se.eventradar.ui.component.EventCategory
+import com.github.se.eventradar.ui.component.EventComponentsStyle
+import com.github.se.eventradar.ui.component.EventDate
+import com.github.se.eventradar.ui.component.EventDescription
+import com.github.se.eventradar.ui.component.EventDistance
+import com.github.se.eventradar.ui.component.EventTime
+import com.github.se.eventradar.ui.component.EventTitle
+import com.github.se.eventradar.ui.component.GenericDialogBox
+import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.navigation.NavigationActions
-import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.eventradar.ui.navigation.Route
+import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 
 // Temporary sizes. Needs to be responsive...
-private val widthPadding = 34.dp
 private val imageHeight = 191.dp
 
 @Composable
-fun EventDetails(
-    viewModel: EventDetailsViewModel = hiltViewModel(),
-    navigationActions: NavigationActions
-) {
+fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: NavigationActions) {
 
-  // TODO to be moved in viewModel init
-  LaunchedEffect(Unit) { // Using `Unit` as a key to run only once
-    viewModel.getEventData()
-  }
-
+  val isUserAttending = viewModel.isUserAttending.collectAsStateWithLifecycle().value
   val eventUiState = viewModel.uiState.collectAsStateWithLifecycle().value
+
+  LaunchedEffect(isUserAttending) { viewModel.refreshAttendance() }
 
   val componentStyle =
       EventComponentsStyle(
@@ -60,120 +65,96 @@ fun EventDetails(
           MaterialTheme.colorScheme.onSurface,
       )
 
-  Scaffold(
-      modifier = Modifier.testTag("EventDetailsScreen"),
-      topBar = {},
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelected = { tab -> navigationActions.navigateTo(tab) },
-            tabList = TOP_LEVEL_DESTINATIONS,
-            selectedItem = TOP_LEVEL_DESTINATIONS[2],
-            modifier = Modifier.testTag("bottomNavMenu"))
+  AppScaffold(
+      modifier = Modifier.testTag("eventDetailsScreen"),
+      topBar = {
+        GoBackButton(modifier = Modifier.wrapContentSize()) { navigationActions.goBack() }
       },
       floatingActionButton = {
-        // register button
+        // view ticket button
+        val icon = if (isUserAttending) R.drawable.cancel else R.drawable.ticket
         FloatingActionButton(
-            onClick = { /*TODO*/},
-            modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("ticketButton"),
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            onClick = {
+              if (isUserAttending) {
+                viewModel.showCancelRegistrationDialog.value = true
+              } else {
+                navigationActions.navController.navigate(
+                    "${Route.EVENT_DETAILS_TICKETS}/${viewModel.eventId}")
+              }
+            },
+            modifier = Modifier.testTag("registrationButton"),
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
         ) {
           Icon(
-              painter = painterResource(id = R.drawable.ticket),
-              contentDescription = "register to event button",
+              painter = painterResource(id = icon),
+              contentDescription = "Event details FAB",
               modifier = Modifier.size(32.dp),
-              tint = MaterialTheme.colorScheme.primary,
+              tint = MaterialTheme.colorScheme.onPrimaryContainer,
           )
         }
-      }) { innerPadding ->
-        ConstraintLayout(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-          val (image, backButton, title, description, distance, category, dateAndTime) =
-              createRefs()
-          val imagePainter: Painter = rememberImagePainter(eventUiState.eventPhoto)
-          Image(
-              painter = imagePainter,
-              contentDescription = "Event banner image",
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .height(imageHeight)
-                      .constrainAs(image) {
-                        top.linkTo(parent.top, margin = 0.dp)
-                        start.linkTo(parent.start, margin = 0.dp)
-                      }
-                      .testTag("eventImage"),
-              contentScale = ContentScale.FillWidth)
+      },
+      navigationActions = navigationActions) {
+        Column(
+            modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(it)) {
+              // TODO uncomment when image are implemented
+              // val imagePainter: Painter = rememberAsyncImagePainter(eventUiState.eventPhoto)
+              val imagePainter: Painter = rememberAsyncImagePainter(R.drawable.placeholderbig)
+              Image(
+                  painter = imagePainter,
+                  contentDescription = "Event banner image",
+                  modifier = Modifier.fillMaxWidth().height(imageHeight).testTag("eventImage"),
+                  contentScale = ContentScale.FillWidth)
 
-          // Go back button
-          Button(
-              onClick = { navigationActions.goBack() },
-              modifier =
-                  Modifier.wrapContentSize()
-                      .constrainAs(backButton) {
-                        top.linkTo(image.bottom, margin = 8.dp)
-                        start.linkTo(image.start, margin = 4.dp)
-                      }
-                      .testTag("goBackButton"),
-              colors =
-                  ButtonDefaults.buttonColors(
-                      contentColor = Color.Transparent,
-                      containerColor = Color.Transparent,
-                  ),
-          ) {
-            Icon(
-                painter = painterResource(id = R.drawable.back_arrow),
-                contentDescription = "Back navigation arrow",
-                tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.width(24.dp).height(24.dp).align(Alignment.CenterVertically))
-          }
+              EventTitle(
+                  modifier = Modifier.align(Alignment.CenterHorizontally),
+                  eventUiState = eventUiState,
+                  style = componentStyle)
 
-          Text(
-              text = eventUiState.eventName,
-              style = componentStyle.titleStyle,
-              modifier =
-                  Modifier.constrainAs(title) {
-                        top.linkTo(image.bottom, margin = 32.dp)
-                        start.linkTo(image.start)
-                        end.linkTo(image.end)
-                      }
-                      .testTag("eventTitle"),
-              color = MaterialTheme.colorScheme.onSurface)
+              Spacer(modifier = Modifier.height(8.dp))
 
-          EventDescription(
-              modifier =
-                  Modifier
-                      // .padding(start = widthPadding, end = widthPadding)
-                      .constrainAs(description) {
-                        top.linkTo(title.bottom, margin = 32.dp)
-                        start.linkTo(parent.start, margin = widthPadding)
-                      },
-              eventUiState,
-              componentStyle)
+              Column(
+                  modifier = Modifier.padding(horizontal = 16.dp),
+                  horizontalAlignment = Alignment.CenterHorizontally) {
+                    EventDescription(modifier = Modifier, eventUiState, componentStyle)
 
-          EventDistance(
-              modifier =
-                  Modifier.constrainAs(distance) {
-                    top.linkTo(description.bottom, margin = 32.dp)
-                    start.linkTo(parent.start, margin = widthPadding)
-                  },
-              eventUiState,
-              componentStyle)
+                    Spacer(modifier = Modifier.height(16.dp))
 
-          EventDateTime(
-              modifier =
-                  Modifier.constrainAs(dateAndTime) {
-                    top.linkTo(distance.bottom, margin = 32.dp)
-                    start.linkTo(parent.start, margin = widthPadding)
-                  },
-              eventUiState,
-              componentStyle)
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                      EventDistance(modifier = Modifier.weight(2f), eventUiState, componentStyle)
 
-          EventCategory(
-              modifier =
-                  Modifier.constrainAs(category) {
-                    top.linkTo(dateAndTime.bottom, margin = 32.dp)
-                    start.linkTo(parent.start, margin = widthPadding)
-                  },
-              eventUiState,
-              componentStyle)
-        }
+                      EventDate(modifier = Modifier.weight(1f), eventUiState, componentStyle)
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                      EventCategory(modifier = Modifier.weight(2f), eventUiState, componentStyle)
+
+                      EventTime(modifier = Modifier.weight(1f), eventUiState, componentStyle)
+                    }
+
+                    if (isUserAttending) {
+                      Spacer(modifier = Modifier.height(16.dp))
+                      Text(
+                          text = stringResource(id = R.string.event_attendance_message),
+                          modifier = Modifier.testTag("attendance"),
+                          style =
+                              TextStyle(
+                                  fontSize = 18.sp,
+                                  fontFamily = FontFamily(Font(R.font.roboto)),
+                                  fontWeight = FontWeight.Bold,
+                              ),
+                          color = MaterialTheme.colorScheme.primary)
+                    }
+                  }
+            }
       }
+
+  GenericDialogBox(
+      openDialog = viewModel.showCancelRegistrationDialog,
+      title = "Confirm cancellation",
+      modifier = Modifier.testTag("cancelRegistrationDialog"),
+      message = stringResource(id = R.string.cancel_registration_message),
+      onClickConfirmButton = { viewModel.removeUserFromEvent() },
+      boxIcon = null)
 }

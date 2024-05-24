@@ -6,10 +6,12 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-class FirebaseEventRepository : IEventRepository {
-  private val db: FirebaseFirestore = Firebase.firestore
+class FirebaseEventRepository(db: FirebaseFirestore = Firebase.firestore) : IEventRepository {
   private val eventRef: CollectionReference = db.collection("events")
 
   override suspend fun getEvents(): Resource<List<Event>> {
@@ -79,5 +81,41 @@ class FirebaseEventRepository : IEventRepository {
     } catch (e: Exception) {
       Resource.Failure(e)
     }
+  }
+
+  override fun observeAllEvents(): Flow<Resource<List<Event>>> = callbackFlow {
+    val listener =
+        eventRef.addSnapshotListener { snapshot, error ->
+          if (error != null) {
+            trySend(
+                Resource.Failure(Exception("Error listening to event updates: ${error.message}")))
+            return@addSnapshotListener
+          }
+          val events = snapshot?.documents?.mapNotNull { Event(it.data!!, it.id) }
+          trySend(Resource.Success(events ?: listOf()))
+        }
+    awaitClose { listener.remove() }
+  }
+
+  override fun observeUpcomingEvents(userId: String): Flow<Resource<List<Event>>> = callbackFlow {
+    val query = eventRef.whereArrayContains("attendees_list", userId)
+
+    val listener =
+        query.addSnapshotListener { snapshot, error ->
+          if (error != null) {
+            trySend(
+                Resource.Failure(
+                    Exception("Error listening to upcoming event updates: ${error.message}")))
+            return@addSnapshotListener
+          }
+
+          val upcomingEvents =
+              snapshot?.documents?.mapNotNull { it.data?.let { data -> Event(data, it.id) } }
+                  ?: listOf()
+
+          trySend(Resource.Success(upcomingEvents))
+        }
+
+    awaitClose { listener.remove() }
   }
 }

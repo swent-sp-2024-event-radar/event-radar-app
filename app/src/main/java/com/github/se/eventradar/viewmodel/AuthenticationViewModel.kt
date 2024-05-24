@@ -1,19 +1,23 @@
 package com.github.se.eventradar.viewmodel
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.repository.user.IUserRepository
-import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.auth
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.qrcode.QRCodeWriter
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 @HiltViewModel
@@ -22,59 +26,122 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
   private val _uiState = MutableStateFlow(LoginUiState())
   val uiState: StateFlow<LoginUiState> = _uiState
 
-  fun addUser(
-      state: MutableStateFlow<LoginUiState> = _uiState,
-      user: FirebaseUser? = Firebase.auth.currentUser
-  ): Boolean {
-    if (user == null) {
-      Log.d("LoginScreenViewModel", "User not logged in")
-      return false
+  fun addUser(state: MutableStateFlow<LoginUiState> = _uiState) {
+    viewModelScope.launch {
+      when (val userIdResource = userRepository.getCurrentUserId()) {
+        is Resource.Success -> {
+          val uid = userIdResource.data
+          // Upload Profile Pic Image to Firestore
+          val imageURI =
+              state.value.selectedImageUri
+                  ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder")
+          userRepository.uploadImage(imageURI, uid, "Profile_Pictures")
+          // Generate QR Code Image and Upload it to Firestore
+          val qrCodeUrl =
+              when (val qrCodeData = generateQRCodeData(uid)) {
+                null -> {
+                  Log.d(
+                      "Exception",
+                      "QR Code Generation failed, a null QR Code ByteArray is received")
+                  ""
+                }
+                else -> {
+                  userRepository.uploadQRCode(qrCodeData, uid)
+                  when (val result = userRepository.getImage(uid, "QR_Codes")) {
+                    is Resource.Success -> result.data
+                    is Resource.Failure -> {
+                      Log.d("LoginScreenViewModel", "Fetching QR Code Error")
+                      ""
+                    }
+                  }
+                }
+              }
+          val profilePicUrl =
+              when (val result = userRepository.getImage(uid, "Profile_Pictures")) {
+                is Resource.Success -> {
+                  result.data
+                }
+                is Resource.Failure -> {
+                  Log.d("LoginScreenViewModel", "Fetching Profile Picture Error")
+                  ""
+                }
+              }
+          val userEmail =
+              when (val result = userRepository.getUser(uid)) {
+                is Resource.Success -> {
+                  result.data!!.email
+                }
+                is Resource.Failure -> {
+                  Log.d("LoginScreenViewModel", "Fetching Profile Picture Error")
+                  ""
+                }
+              }
+          val userValues =
+              hashMapOf(
+                  "private/firstName" to state.value.firstName,
+                  "private/lastName" to state.value.lastName,
+                  "private/phoneNumber" to state.value.phoneNumber,
+                  "private/birthDate" to state.value.birthDate,
+                  "private/email" to userEmail,
+                  "profilePicUrl" to profilePicUrl,
+                  "qrCodeUrl" to qrCodeUrl,
+                  "bio" to "",
+                  "username" to state.value.username,
+                  "accountStatus" to "active",
+                  "eventsAttendeeList" to emptyList<String>(),
+                  "eventsHostList" to emptyList<String>())
+          addUserAsync(userValues, uid, state)
+        }
+        is Resource.Failure -> {
+          Log.d("LoginScreenViewModel", "User not logged in")
+        }
+      }
     }
-
-    // If no image is selected, use a placeholder image
-    val imageURI =
-        state.value.selectedImageUri
-            ?: Uri.parse("android.resource://com.github.se.eventradar/drawable/placeholder")
-
-    val userValues =
-        hashMapOf(
-            "private/firstName" to state.value.firstName,
-            "private/lastName" to state.value.lastName,
-            "private/phoneNumber" to state.value.phoneNumber,
-            "private/birthDate" to state.value.birthDate,
-            "private/email" to user.email,
-            "profilePicUrl" to imageURI.toString(),
-            "qrCodeUrl" to "", // TODO: generate QR code here
-            "username" to state.value.username,
-            "accountStatus" to "active",
-            "eventsAttendeeList" to emptyList<String>(),
-            "eventsHostList" to emptyList<String>(),
-        )
-
-    // Add a new document with a generated ID into collection "users"
-    val success: Boolean
-    runBlocking { success = addUserAsync(userValues, user.uid) }
-
-    return success
   }
 
-  private suspend fun addUserAsync(userValues: Map<String, Any?>, userId: String): Boolean {
-    return when (val result = userRepository.addUser(userValues, userId)) {
+  private fun generateQRCodeData(userId: String): ByteArray? {
+    return try {
+      val qrCodeWriter = QRCodeWriter()
+      val bitMatrix = qrCodeWriter.encode(userId, BarcodeFormat.QR_CODE, 200, 200)
+      val bitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.RGB_565)
+      for (x in 0 until 200) {
+        for (y in 0 until 200) {
+          bitmap.setPixel(
+              x,
+              y,
+              if (bitMatrix[x, y]) Color(0xFF000000).hashCode() else Color(0xFFFFFFFF).hashCode())
+        }
+      }
+      // Convert the bitmap to a byte array
+      val baos = ByteArrayOutputStream()
+      bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
+      val data = baos.toByteArray()
+      data
+    } catch (e: Exception) {
+      Log.d("Exception", "Error generating QR Code for User: ${e.message}")
+      null
+    }
+  }
+
+  private suspend fun addUserAsync(
+      userValues: Map<String, Any?>,
+      userId: String,
+      state: MutableStateFlow<LoginUiState>
+  ) {
+    when (val result = userRepository.addUser(userValues, userId)) {
       is Resource.Success -> {
-        true
+        state.value = state.value.copy(isSignUpCompleted = true, isSignUpSuccessful = true)
       }
       is Resource.Failure -> {
         Log.d("LoginScreenViewModel", "Error adding user: ${result.throwable.message}")
-        false
+        state.value = state.value.copy(isSignUpCompleted = true, isSignUpSuccessful = false)
       }
     }
   }
 
   fun doesUserExist(userId: String): Boolean {
     var userExists: Boolean
-
     runBlocking { userExists = doesUserExistAsync(userId) }
-
     return userExists
   }
 
@@ -88,6 +155,10 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
         false
       }
     }
+  }
+
+  fun onSignUpStarted(state: MutableStateFlow<LoginUiState> = _uiState) {
+    state.value = state.value.copy(isSignUpStarted = true)
   }
 
   fun onSelectedImageUriChanged(uri: Uri?, state: MutableStateFlow<LoginUiState> = _uiState) {
@@ -167,6 +238,9 @@ data class LoginUiState(
     val lastNameIsError: Boolean = false,
     val phoneNumberIsError: Boolean = false,
     val birthDateIsError: Boolean = false,
+    val isSignUpStarted: Boolean = false,
+    val isSignUpCompleted: Boolean = false,
+    val isSignUpSuccessful: Boolean = false,
 )
 
 enum class CountryCode(val ext: String, val country: String, val numberLength: Int) {

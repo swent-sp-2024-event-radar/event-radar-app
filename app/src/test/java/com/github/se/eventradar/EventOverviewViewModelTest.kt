@@ -2,6 +2,7 @@ package com.github.se.eventradar
 
 import android.util.Log
 import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
@@ -19,6 +20,7 @@ import io.mockk.verify
 import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -60,10 +62,10 @@ class EventsOverviewViewModelTest {
           end = LocalDateTime.now(),
           location = Location(0.0, 0.0, "Test Location"),
           description = "Test Description",
-          ticket = EventTicket("Test Ticket", 0.0, 1),
+          ticket = EventTicket("Test Ticket", 0.0, 1, 0),
           mainOrganiser = "1",
-          organiserSet = mutableSetOf("Test Organiser"),
-          attendeeSet = mutableSetOf("Test Attendee"),
+          organiserList = mutableListOf("Test Organiser"),
+          attendeeList = mutableListOf("Test Attendee"),
           category = EventCategory.COMMUNITY,
           fireBaseID = "1")
 
@@ -76,11 +78,12 @@ class EventsOverviewViewModelTest {
           lastName = "Doe",
           phoneNumber = "1234567890",
           accountStatus = "active",
-          eventsAttendeeSet = mutableSetOf("1", "2"),
-          eventsHostSet = mutableSetOf("3"),
-          friendsSet = mutableSetOf(),
+          eventsAttendeeList = mutableListOf("1", "2"),
+          eventsHostList = mutableListOf("3"),
+          friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/pic.jpg",
           qrCodeUrl = "http://example.com/qr.jpg",
+          bio = "",
           username = "john_doe")
 
   @Before
@@ -131,27 +134,63 @@ class EventsOverviewViewModelTest {
 
     userRepository.addUser(mockUser)
     // MockUser is on the attendeeList for events with id "1" and "2"
-    viewModel.getUpcomingEvents("user1")
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    viewModel.getUpcomingEvents()
 
-    assert(viewModel.uiState.value.eventList.allEvents.size == 2)
-    assert(viewModel.uiState.value.eventList.allEvents == listOf(event1, event2))
-    assert(viewModel.uiState.value.eventList.filteredEvents.size == 2)
-    assert(viewModel.uiState.value.eventList.filteredEvents == listOf(event1, event2))
-    assertNull(viewModel.uiState.value.eventList.selectedEvent)
+    assert(viewModel.uiState.value.upcomingEventList.allEvents.size == 2)
+    assert(viewModel.uiState.value.upcomingEventList.allEvents == listOf(event1, event2))
+    assert(viewModel.uiState.value.upcomingEventList.filteredEvents.size == 2)
+    assert(viewModel.uiState.value.upcomingEventList.filteredEvents == listOf(event1, event2))
+    assertNull(viewModel.uiState.value.upcomingEventList.selectedEvent)
+  }
+
+  @Test
+  fun testGetUpcomingEventsFilteredSuccess() = runTest {
+    viewModel.onTabChanged(Tab.UPCOMING)
+    val events =
+        listOf(
+            mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
+            mockEvent.copy(eventName = "Event 2", fireBaseID = "2"),
+            mockEvent.copy(eventName = "Event 3", fireBaseID = "3"))
+
+    events.forEach { event -> eventRepository.addEvent(event) }
+
+    userRepository.addUser(mockUser)
+    // MockUser is on the attendeeList for events with id "1" and "2"
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    viewModel.getUpcomingEvents()
+
+    val anotherQuery = "Event 1"
+    viewModel.onSearchQueryChanged(anotherQuery)
+    assert(anotherQuery == viewModel.uiState.value.searchQuery)
+
+    viewModel.filterEvents()
+    assert(viewModel.uiState.value.upcomingEventList.allEvents.size == 2)
+    assert(
+        viewModel.uiState.value.upcomingEventList.allEvents ==
+            listOf(
+                mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
+                mockEvent.copy(eventName = "Event 2", fireBaseID = "2")))
+    assert(viewModel.uiState.value.upcomingEventList.filteredEvents.size == 1)
+    assert(
+        viewModel.uiState.value.upcomingEventList.filteredEvents ==
+            listOf(mockEvent.copy(eventName = "Event 1", fireBaseID = "1")))
+    assertNull(viewModel.uiState.value.upcomingEventList.selectedEvent)
   }
 
   @Test
   fun testGetUpcomingEventsWithEventsNotInRepo() = runTest {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
-    (userRepository as MockUserRepository).addUser(mockUser.copy(userId = "user2"))
+    userRepository.addUser(mockUser.copy(userId = "user2"))
     // MockUser is on the attendeeList for events with id "1" and "2" but these are not in the
     // eventRepository
-    viewModel.getUpcomingEvents("user2")
+    (userRepository as MockUserRepository).updateCurrentUserId("user2")
+    viewModel.getUpcomingEvents()
 
-    assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
-    assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
-    assertNull(viewModel.uiState.value.eventList.selectedEvent)
+    assert(viewModel.uiState.value.upcomingEventList.allEvents.isEmpty())
+    assert(viewModel.uiState.value.upcomingEventList.filteredEvents.isEmpty())
+    assertNull(viewModel.uiState.value.upcomingEventList.selectedEvent)
 
     verify { Log.d("EventsOverviewViewModel", "Error getting events for user2") }
     unmockkAll()
@@ -162,12 +201,13 @@ class EventsOverviewViewModelTest {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
     val userId = "userNotFound"
+    (userRepository as MockUserRepository).updateCurrentUserId(userId)
+    viewModel.getUpcomingEvents()
 
-    viewModel.getUpcomingEvents(userId)
+    assert(viewModel.uiState.value.upcomingEventList.allEvents.isEmpty())
+    assert(viewModel.uiState.value.upcomingEventList.filteredEvents.isEmpty())
+    assertNull(viewModel.uiState.value.upcomingEventList.selectedEvent)
 
-    assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
-    assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
-    assertNull(viewModel.uiState.value.eventList.selectedEvent)
     verify { Log.d("EventsOverviewViewModel", "Error fetching user document") }
     unmockkAll()
   }
@@ -175,21 +215,39 @@ class EventsOverviewViewModelTest {
   @Test
   fun testGetUpcomingEventsEmptyAttendeeList() = runTest {
     val userWithEmptyList =
-        mockUser.copy(userId = "userWithEmptyList", eventsAttendeeSet = mutableSetOf())
+        mockUser.copy(userId = "userWithEmptyList", eventsAttendeeList = mutableListOf())
     userRepository.addUser(userWithEmptyList)
-    viewModel.getUpcomingEvents("userWithEmptyList")
+    (userRepository as MockUserRepository).updateCurrentUserId("userWithEmptyList")
+    viewModel.getUpcomingEvents()
 
-    assert(viewModel.uiState.value.eventList.allEvents.isEmpty())
-    assert(viewModel.uiState.value.eventList.filteredEvents.isEmpty())
-    assertNull(viewModel.uiState.value.eventList.selectedEvent)
+    assert(viewModel.uiState.value.upcomingEventList.allEvents.isEmpty())
+    assert(viewModel.uiState.value.upcomingEventList.filteredEvents.isEmpty())
+    assertNull(viewModel.uiState.value.upcomingEventList.selectedEvent)
+  }
+
+  @Test
+  fun testGetUpcomingEventsUserNotLoggedIn() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+    (userRepository as MockUserRepository).updateCurrentUserId(null) // no user logged in
+
+    viewModel.getUpcomingEvents()
+
+    assert(viewModel.uiState.value.upcomingEventList.allEvents.isEmpty())
+    assert(viewModel.uiState.value.upcomingEventList.filteredEvents.isEmpty())
+    assertNull(viewModel.uiState.value.upcomingEventList.selectedEvent)
+
+    verify {
+      Log.d("EventsOverviewViewModel", "Error fetching user ID: No user currently signed in")
+    }
   }
 
   @Test
   fun testViewListChange() = runTest {
     viewModel.onViewListStatusChanged()
-    assert(viewModel.uiState.value.viewList.equals(false))
+    assert(!viewModel.uiState.value.viewList)
     viewModel.onViewListStatusChanged()
-    assert(viewModel.uiState.value.viewList.equals(true))
+    assert(viewModel.uiState.value.viewList)
   }
 
   @Test
@@ -198,5 +256,291 @@ class EventsOverviewViewModelTest {
     assert(viewModel.uiState.value.tab == Tab.UPCOMING)
     viewModel.onTabChanged(tab = Tab.BROWSE)
     assert(viewModel.uiState.value.tab == Tab.BROWSE)
+  }
+
+  @Test
+  fun testSetFilterDialogOpen() = runTest {
+    // init value is false
+    viewModel.onFilterDialogOpen()
+    assert(viewModel.uiState.value.isFilterDialogOpen)
+
+    viewModel.onFilterDialogOpen()
+    assert(!viewModel.uiState.value.isFilterDialogOpen)
+  }
+
+  @Test
+  fun testOnSearchQueryChange() = runTest {
+    val newQuery = "sample search"
+    viewModel.onSearchQueryChanged(newQuery)
+    assert(newQuery == viewModel.uiState.value.searchQuery)
+
+    val anotherQuery = "another search"
+    viewModel.onSearchQueryChanged(anotherQuery)
+    assert(anotherQuery == viewModel.uiState.value.searchQuery)
+  }
+
+  @Test
+  fun testOnSearchActiveChange() = runTest {
+    viewModel.onSearchActiveChanged(true)
+    assert(viewModel.uiState.value.isSearchActive)
+
+    viewModel.onSearchActiveChanged(false)
+    assert(!viewModel.uiState.value.isSearchActive)
+  }
+
+  @Test
+  fun testOnRadiusQueryChange() = runTest {
+    val newQuery = "10"
+    viewModel.onRadiusQueryChanged(newQuery)
+    assert(newQuery == viewModel.uiState.value.radiusQuery)
+
+    val anotherQuery = "5"
+    viewModel.onRadiusQueryChanged(anotherQuery)
+    assert(anotherQuery == viewModel.uiState.value.radiusQuery)
+  }
+
+  @Test
+  fun testOnFreeSwitchChange() = runTest {
+    // init value is false
+    viewModel.onFreeSwitchChanged()
+    assert(viewModel.uiState.value.isFreeSwitchOn)
+
+    viewModel.onFreeSwitchChanged()
+    assert(!viewModel.uiState.value.isFreeSwitchOn)
+  }
+
+  @Test
+  fun testOnFilterApply() = runTest {
+    // init value is false
+    viewModel.onFilterApply()
+    assert(viewModel.uiState.value.isFilterActive)
+
+    viewModel.onFilterApply()
+    assert(viewModel.uiState.value.isFilterActive)
+  }
+
+  @Test
+  fun testFilterEventsSearchSuccess() = runTest {
+    val events =
+        listOf(
+            mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
+            mockEvent.copy(eventName = "Event 2", fireBaseID = "2"),
+            mockEvent.copy(eventName = "Event 3", fireBaseID = "3"))
+
+    events.forEach { event -> eventRepository.addEvent(event) }
+
+    viewModel.getEvents()
+
+    val newQuery = "Event"
+    viewModel.onSearchQueryChanged(newQuery)
+    assert(newQuery == viewModel.uiState.value.searchQuery)
+
+    viewModel.filterEvents()
+    assert(viewModel.uiState.value.eventList.filteredEvents.isNotEmpty())
+    assert(viewModel.uiState.value.eventList.filteredEvents.size == 3)
+    assert(viewModel.uiState.value.eventList.filteredEvents == events)
+
+    val anotherQuery = "Event 1"
+    viewModel.onSearchQueryChanged(anotherQuery)
+    assert(anotherQuery == viewModel.uiState.value.searchQuery)
+
+    viewModel.filterEvents()
+    assert(viewModel.uiState.value.eventList.filteredEvents.isNotEmpty())
+    assert(viewModel.uiState.value.eventList.filteredEvents.size == 1)
+    assert(
+        viewModel.uiState.value.eventList.filteredEvents ==
+            listOf(mockEvent.copy(fireBaseID = "1")))
+  }
+
+  @Test
+  fun testFilterEventsRadiusSuccess() = runTest {
+    val events =
+        listOf(
+            mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
+            mockEvent.copy(
+                eventName = "Event 2",
+                location = Location(38.92, 78.78, "Test Location near user"),
+                fireBaseID = "2"),
+            mockEvent.copy(
+                eventName = "Event 3",
+                location = Location(38.8, 78.7, "Test Location near user 2"),
+                fireBaseID = "3"))
+
+    events.forEach { event -> eventRepository.addEvent(event) }
+
+    viewModel.getEvents()
+
+    val newQuery = "20"
+    viewModel.onRadiusQueryChanged(newQuery)
+    assert(newQuery == viewModel.uiState.value.radiusQuery)
+
+    val correctFilterEvents =
+        listOf(
+            mockEvent.copy(
+                eventName = "Event 2",
+                location = Location(38.92, 78.78, "Test Location near user"),
+                fireBaseID = "2"),
+            mockEvent.copy(
+                eventName = "Event 3",
+                location = Location(38.8, 78.7, "Test Location near user 2"),
+                fireBaseID = "3"))
+
+    viewModel.filterEvents()
+    assert(viewModel.uiState.value.eventList.filteredEvents.isNotEmpty())
+    assert(viewModel.uiState.value.eventList.filteredEvents.size == 2)
+    assert(viewModel.uiState.value.eventList.filteredEvents == correctFilterEvents)
+  }
+
+  @Test
+  fun testFilterEventsFreeSuccess() = runTest {
+    val events =
+        listOf(
+            mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
+            mockEvent.copy(
+                eventName = "Event 2",
+                ticket = EventTicket("Test Ticket", 5.0, 1, 0),
+                fireBaseID = "2"),
+            mockEvent.copy(eventName = "Event 3", fireBaseID = "3"))
+
+    events.forEach { event -> eventRepository.addEvent(event) }
+
+    viewModel.getEvents()
+
+    viewModel.onFreeSwitchChanged()
+    assert(viewModel.uiState.value.isFreeSwitchOn)
+
+    val correctFilterEvents =
+        listOf(
+            mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
+            mockEvent.copy(eventName = "Event 3", fireBaseID = "3"))
+
+    viewModel.filterEvents()
+    assert(viewModel.uiState.value.eventList.filteredEvents.isNotEmpty())
+    assert(viewModel.uiState.value.eventList.filteredEvents.size == 2)
+    assert(viewModel.uiState.value.eventList.filteredEvents == correctFilterEvents)
+  }
+
+  @Test
+  fun testUserLoggedIn() = runTest {
+    userRepository.addUser(mockUser)
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    viewModel.checkUserLoginStatus()
+    assert(viewModel.uiState.value.userLoggedIn)
+  }
+
+  @Test
+  fun testUserDefaultNotLoggedIn() = runTest {
+    viewModel.checkUserLoginStatus()
+    assert(!viewModel.uiState.value.userLoggedIn)
+  }
+
+  @Test
+  fun testUserLoggedOut() = runTest {
+    userRepository.addUser(mockUser)
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    viewModel.checkUserLoginStatus()
+    (userRepository as MockUserRepository).updateCurrentUserId(null)
+    viewModel.checkUserLoginStatus()
+    assert(!viewModel.uiState.value.userLoggedIn)
+  }
+
+  @Test
+  fun testObserveAllEvents() = runTest {
+    val testEvent1 = mockEvent.copy(fireBaseID = "1", eventName = "Test Event 1")
+    val testEvent2 = mockEvent.copy(fireBaseID = "2", eventName = "Test Event 2")
+
+    eventRepository.addEvent(testEvent1)
+
+    // Setup your ViewModel with mocked dependencies
+    // automatically triggers the 'init' block, which calls 'observeAllEvents()'
+
+    val viewModel = EventsOverviewViewModel(eventRepository, userRepository)
+
+    delay(100)
+    eventRepository.addEvent(testEvent2)
+
+    (eventRepository as MockEventRepository)
+        .eventsFlow
+        .emit(Resource.Success(listOf(testEvent1, testEvent2)))
+
+    assert(viewModel.uiState.value.eventList.allEvents.containsAll(listOf(testEvent1, testEvent2)))
+  }
+
+  @Test
+  fun testObserveAllEventsFailure() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    val exception = Exception("Network error")
+
+    (eventRepository as MockEventRepository).eventsFlow.emit(Resource.Failure(exception))
+
+    EventsOverviewViewModel(eventRepository, userRepository)
+
+    delay(500)
+
+    val expectedLogMessage = "Failed to fetch events: $exception"
+
+    verify { Log.d("EventsOverviewViewModel", expectedLogMessage) }
+
+    unmockkAll()
+  }
+
+  @Test
+  fun testObserveUpcomingEventsSuccess() = runTest {
+    val testEvent1 = mockEvent.copy(fireBaseID = "1", attendeeList = mutableListOf("user1"))
+    val testEvent2 = mockEvent.copy(fireBaseID = "2", attendeeList = mutableListOf("user1"))
+    val testEvent3 = mockEvent.copy(fireBaseID = "3", attendeeList = mutableListOf("user2"))
+    eventRepository.addEvent(testEvent1)
+    eventRepository.addEvent(testEvent2)
+    eventRepository.addEvent(testEvent3)
+
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+
+    val viewModel = EventsOverviewViewModel(eventRepository, userRepository)
+
+    (eventRepository as MockEventRepository)
+        .eventsFlow
+        .emit(Resource.Success(listOf(testEvent1, testEvent2, testEvent3)))
+
+    assert(viewModel.uiState.value.upcomingEventList.allEvents.size == 2)
+    assert(
+        viewModel.uiState.value.upcomingEventList.allEvents.containsAll(
+            listOf(testEvent1, testEvent2)))
+  }
+
+  @Test
+  fun testObserveUpcomingEventsUserIdFetchFailure() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    val exception = Exception("No user currently signed in")
+    (userRepository as MockUserRepository).updateCurrentUserId(null)
+
+    EventsOverviewViewModel(eventRepository, userRepository)
+
+    delay(500)
+
+    verify { Log.d("EventsOverviewViewModel", "Error fetching user ID: ${exception.message}") }
+    unmockkAll()
+  }
+
+  @Test
+  fun testObserveUpcomingEventsFetchFailure() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    val exception = Exception("Network error")
+    (eventRepository as MockEventRepository).eventsFlow.emit(Resource.Failure(exception))
+
+    EventsOverviewViewModel(eventRepository, userRepository)
+
+    delay(500)
+
+    verify {
+      Log.d("EventsOverviewViewModel", "Failed to fetch upcoming events: ${exception.message}")
+    }
+    unmockkAll()
   }
 }

@@ -1,18 +1,32 @@
 package com.github.se.eventradar
 
+import android.content.Context
+import android.net.Uri
+import androidx.test.core.app.ApplicationProvider
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.FirebaseUserRepository
 import com.google.android.gms.tasks.Task
+import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
+import com.google.firebase.storage.storage
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.unmockkAll
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -38,11 +52,12 @@ class FirebaseUserRepositoryUnitTest {
           lastName = "",
           phoneNumber = "",
           accountStatus = "active",
-          eventsAttendeeSet = mutableSetOf(),
-          eventsHostSet = mutableSetOf(),
-          friendsSet = mutableSetOf(),
+          eventsAttendeeList = mutableListOf(),
+          eventsHostList = mutableListOf(),
+          friendsList = mutableListOf(),
           profilePicUrl = "",
           qrCodeUrl = "",
+          bio = "",
           username = "",
       )
 
@@ -58,6 +73,29 @@ class FirebaseUserRepositoryUnitTest {
     every { mockDb.collection("users") } returns userRef
 
     firebaseUserRepository = FirebaseUserRepository(db = mockDb)
+
+    val mockFirebaseApp = mockk<FirebaseApp>()
+    val mockFirebaseAuth = mockk<FirebaseAuth>()
+    val mockFirebaseStorage = mockk<FirebaseStorage>()
+
+    mockkStatic(FirebaseApp::class)
+    mockkStatic(FirebaseAuth::class)
+    mockkStatic(FirebaseStorage::class)
+
+    every { FirebaseApp.getInstance() } returns mockFirebaseApp
+    every { FirebaseAuth.getInstance() } returns mockFirebaseAuth
+    every { FirebaseStorage.getInstance() } returns mockFirebaseStorage
+
+    // Mock Context
+    val mockContext = mockk<Context>()
+
+    // Mock static methods
+    mockkStatic(FirebaseApp::class)
+    mockkStatic(ApplicationProvider::class)
+
+    // Define behavior
+    every { FirebaseApp.initializeApp(any()) } returns mockFirebaseApp
+    every { ApplicationProvider.getApplicationContext<Context>() } returns mockContext
   }
 
   @After
@@ -77,6 +115,7 @@ class FirebaseUserRepositoryUnitTest {
             "eventsHostList" to emptyList<String>(),
             "profilePicUrl" to "",
             "qrCodeUrl" to "",
+            "bio" to "",
             "username" to "",
         )
     every { userRef.document(any()).collection("private").document("private").get() } returns
@@ -126,11 +165,12 @@ class FirebaseUserRepositoryUnitTest {
     every { mockDocumentSnapshot.data } returns
         mapOf(
             "accountStatus" to "active",
-            "eventsAttendeeList" to mutableSetOf<String>(),
-            "eventsHostList" to mutableSetOf<String>(),
-            "friendsList" to mutableSetOf<String>(),
+            "eventsAttendeeList" to mutableListOf<String>(),
+            "eventsHostList" to mutableListOf<String>(),
+            "friendsList" to mutableListOf<String>(),
             "profilePicUrl" to "",
             "qrCodeUrl" to "",
+            "bio" to "",
             "username" to "",
         )
     every { mockDocumentSnapshot.id } returns uid
@@ -182,11 +222,12 @@ class FirebaseUserRepositoryUnitTest {
         capturePublic.captured ==
             mapOf(
                 "accountStatus" to "active",
-                "eventsAttendeeList" to mutableSetOf<String>(),
-                "eventsHostList" to mutableSetOf<String>(),
-                "friendsList" to mutableSetOf<String>(),
+                "eventsAttendeeList" to mutableListOf<String>(),
+                "eventsHostList" to mutableListOf<String>(),
+                "friendsList" to mutableListOf<String>(),
                 "profilePicUrl" to "",
                 "qrCodeUrl" to "",
+                "bio" to "",
                 "username" to "",
             ))
     assert(
@@ -220,11 +261,12 @@ class FirebaseUserRepositoryUnitTest {
     val map =
         mapOf(
             "accountStatus" to "active",
-            "eventsAttendeeList" to mutableSetOf<String>(),
-            "eventsHostList" to mutableSetOf<String>(),
-            "friendsList" to mutableSetOf<String>(),
+            "eventsAttendeeList" to mutableListOf<String>(),
+            "eventsHostList" to mutableListOf<String>(),
+            "friendsList" to mutableListOf<String>(),
             "profilePicUrl" to "",
             "qrCodeUrl" to "",
+            "bio" to "",
             "username" to "",
             "private/birthDate" to "",
             "private/email" to "",
@@ -248,11 +290,12 @@ class FirebaseUserRepositoryUnitTest {
         capturePublic.captured ==
             mapOf(
                 "accountStatus" to "active",
-                "eventsAttendeeList" to mutableSetOf<String>(),
-                "eventsHostList" to mutableSetOf<String>(),
-                "friendsList" to mutableSetOf<String>(),
+                "eventsAttendeeList" to mutableListOf<String>(),
+                "eventsHostList" to mutableListOf<String>(),
+                "friendsList" to mutableListOf<String>(),
                 "profilePicUrl" to "",
                 "qrCodeUrl" to "",
+                "bio" to "",
                 "username" to "",
             ))
     assert(
@@ -271,11 +314,12 @@ class FirebaseUserRepositoryUnitTest {
     val map =
         mapOf(
             "accountStatus" to "active",
-            "eventsAttendeeList" to mutableSetOf<String>(),
-            "eventsHostList" to mutableSetOf<String>(),
-            "friendsList" to mutableSetOf<String>(),
+            "eventsAttendeeList" to mutableListOf<String>(),
+            "eventsHostList" to mutableListOf<String>(),
+            "friendsList" to mutableListOf<String>(),
             "profilePicUrl" to "",
             "qrCodeUrl" to "",
+            "bio" to "",
             "username" to "",
             "private/birthDate" to "",
             "private/email" to "",
@@ -316,11 +360,12 @@ class FirebaseUserRepositoryUnitTest {
         capturePublic.captured ==
             mapOf(
                 "accountStatus" to "active",
-                "eventsAttendeeList" to mutableSetOf<String>(),
-                "eventsHostList" to mutableSetOf<String>(),
-                "friendsList" to mutableSetOf<String>(),
+                "eventsAttendeeList" to mutableListOf<String>(),
+                "eventsHostList" to mutableListOf<String>(),
+                "friendsList" to mutableListOf<String>(),
                 "profilePicUrl" to "",
                 "qrCodeUrl" to "",
+                "bio" to "",
                 "username" to "",
             ))
     assert(
@@ -402,6 +447,181 @@ class FirebaseUserRepositoryUnitTest {
     assert(result is Resource.Failure)
     assert((result as Resource.Failure).throwable.message == message)
   }
+
+  @Test
+  fun `test GetCurrentUserId Success`() = runTest {
+    mockkStatic("com.google.firebase.Firebase")
+    mockkStatic("com.google.firebase.auth.FirebaseAuth")
+
+    val mockFirebaseAuth = mockk<FirebaseAuth>()
+    val mockFirebaseUser = mockk<FirebaseUser>()
+
+    every { Firebase.auth } returns mockFirebaseAuth
+    every { mockFirebaseAuth.currentUser } returns mockFirebaseUser
+    every { mockFirebaseUser.uid } returns "1"
+
+    val result = firebaseUserRepository.getCurrentUserId()
+    assert(result is Resource.Success)
+    assert((result as Resource.Success).data == "1")
+
+    unmockkStatic("com.google.firebase.Firebase")
+    unmockkStatic("com.google.firebase.auth.FirebaseAuth")
+  }
+
+  @Test
+  fun `test GetCurrentUserId Failure`() = runTest {
+    mockkStatic("com.google.firebase.Firebase")
+    mockkStatic("com.google.firebase.auth.FirebaseAuth")
+
+    val mockFirebaseAuth = mockk<FirebaseAuth>()
+
+    every { Firebase.auth } returns mockFirebaseAuth
+    every { mockFirebaseAuth.currentUser } returns null
+
+    val result = firebaseUserRepository.getCurrentUserId()
+    assert(result is Resource.Failure)
+    val failureResult = result as Resource.Failure
+    assert(failureResult.throwable is Exception)
+    assert(failureResult.throwable.message == "No user currently signed in")
+
+    unmockkStatic("com.google.firebase.Firebase")
+    unmockkStatic("com.google.firebase.auth.FirebaseAuth")
+  }
+
+  @Test
+  fun `test uploadImage Success`() = runTest {
+    val selectedImageUri = mockk<Uri>()
+    every { selectedImageUri.path } returns "/path/to/image"
+    val uid = "1"
+    val folderName = "folderName"
+    val storageRef = mockk<StorageReference>()
+    every { Firebase.storage.reference } returns storageRef
+    every { storageRef.child("$folderName/$uid") } returns storageRef
+    every { storageRef.putFile(selectedImageUri) } returns
+        mockUploadTask(selectedImageUri, null, isSuccessful = true)
+    val result = firebaseUserRepository.uploadImage(selectedImageUri, uid, folderName)
+    assert(result is Resource.Success)
+  }
+
+  @Test
+  fun `test uploadImage Generic Error Failure`() = runTest {
+    val selectedImageUri = mockk<Uri>()
+    every { selectedImageUri.path } returns "/path/to/image"
+    val uid = "1"
+    val folderName = "folderName"
+    val storageRef = mockk<StorageReference>()
+    val genericException = Exception("Generic Error") // get coverage?
+    every { Firebase.storage.reference } returns storageRef
+    every { storageRef.child("$folderName/$uid") } returns storageRef
+    every { storageRef.putFile(selectedImageUri) } returns
+        mockUploadTask(null, genericException, isSuccessful = false)
+    val result = firebaseUserRepository.uploadImage(selectedImageUri, uid, folderName)
+    assert(result is Resource.Failure)
+    assert(
+        (result as Resource.Failure).throwable.message ==
+            "Error during upload image: ${genericException.message}")
+  }
+
+  @Test
+  fun `test uploadImage Failure From Task`() = runTest {
+    val selectedImageUri = mockk<Uri>()
+    every { selectedImageUri.path } returns "/path/to/image"
+    val uid = "1"
+    val folderName = "folderName"
+    val storageRef = mockk<StorageReference>()
+    val exception = Exception("Upload failed without a specific error")
+    every { Firebase.storage.reference } returns storageRef
+    every { storageRef.child("$folderName/$uid") } returns storageRef
+    every { storageRef.putFile(selectedImageUri) } returns
+        mockUploadTask(selectedImageUri, null, isSuccessful = false)
+    val result = firebaseUserRepository.uploadImage(selectedImageUri, uid, folderName)
+    assert(result is Resource.Failure)
+    assert((result as Resource.Failure).throwable.message == exception.message)
+  }
+
+  @Test
+  fun `test getImage Success`() = runTest {
+    val uid = "1"
+    val folderName = "folderName"
+    val selectedImageUri = mockk<Uri>()
+    val expectedUrl = "http://example.com/image.png"
+    every { selectedImageUri.toString() } returns expectedUrl
+    val storageRef = mockk<StorageReference>()
+    every { Firebase.storage.reference.child("$folderName/$uid") } returns storageRef
+    every { storageRef.downloadUrl } returns mockDownloadUrlTask(selectedImageUri)
+
+    val result = firebaseUserRepository.getImage(uid, folderName)
+
+    assert(result is Resource.Success)
+    assert((result as Resource.Success).data == expectedUrl)
+  }
+
+  @Test
+  fun `test getImage Generic Failure`() = runTest {
+    val uid = "1"
+    val folderName = "folderName"
+    val genericException = Exception("Generic Error")
+    val storageRef = mockk<StorageReference>()
+
+    every { Firebase.storage.reference.child("$folderName/$uid") } returns storageRef
+    every { storageRef.downloadUrl } throws genericException
+
+    val result = firebaseUserRepository.getImage(uid, folderName)
+
+    assert(result is Resource.Failure)
+    assert(
+        (result as Resource.Failure).throwable.message ==
+            "Error while getting image: ${genericException.message}")
+  }
+
+  @Test
+  fun `test uploadQRCode Success`() = runTest {
+    val uid = "1"
+    val folderName = "QR_Codes"
+    val storageRef = mockk<StorageReference>()
+    val mockData = ByteArray(1)
+    every { FirebaseStorage.getInstance().reference } returns storageRef
+    every { storageRef.child("$folderName/$uid") } returns storageRef
+    every { storageRef.putBytes(any()) } returns mockUploadTaskQrCode(isSuccessful = true)
+
+    val result = firebaseUserRepository.uploadQRCode(mockData, uid)
+    assert(result is Resource.Success)
+  }
+
+  @Test
+  fun `test uploadQRCode Failure From Task`() = runTest {
+    val uid = "1"
+    val folderName = "QR_Codes"
+    val storageRef = mockk<StorageReference>()
+    val mockData = ByteArray(1)
+    val exception = Exception("Upload QR Code failed without a specific error")
+    every { FirebaseStorage.getInstance().reference } returns storageRef
+    every { storageRef.child("$folderName/$uid") } returns storageRef
+    every { storageRef.putBytes(any()) } returns mockUploadTaskQrCode(null, isSuccessful = false)
+
+    val result = firebaseUserRepository.uploadQRCode(mockData, uid)
+    assert(result is Resource.Failure)
+    assert((result as Resource.Failure).throwable.message == exception.message)
+  }
+
+  @Test
+  fun `test uploadQRCode Generic Error Failure`() = runTest {
+    val uid = "1"
+    val folderName = "QR_Codes"
+    val genericException = Exception("Generic Error")
+    val storageRef = mockk<StorageReference>()
+    val mockData = ByteArray(1)
+    every { FirebaseStorage.getInstance().reference } returns storageRef
+    every { storageRef.child("$folderName/$uid") } returns storageRef
+    every { storageRef.putBytes(any()) } returns
+        mockUploadTaskQrCode(exception = genericException, isSuccessful = true)
+
+    val result = firebaseUserRepository.uploadQRCode(mockData, uid)
+    assert(result is Resource.Failure)
+    assert(
+        (result as Resource.Failure).throwable.message ==
+            "Error during QR code upload: ${genericException.message}")
+  }
 }
 
 /**
@@ -414,6 +634,43 @@ inline fun <reified T> mockTask(result: T?, exception: Exception? = null): Task<
   every { task.exception } returns exception
   every { task.isCanceled } returns false
   val relaxedT: T = mockk(relaxed = true)
+  every { task.result } returns result
+  return task
+}
+
+fun mockUploadTask(result: Uri?, exception: Exception? = null, isSuccessful: Boolean): UploadTask {
+  val task: UploadTask = mockk(relaxed = true)
+  val snapshot: UploadTask.TaskSnapshot = mockk(relaxed = true)
+  every { snapshot.task } returns task
+  every { snapshot.metadata } returns mockk { every { path } returns result?.path.toString() }
+  every { task.isComplete } returns true
+  every { task.exception } returns exception
+  every { task.isCanceled } returns false
+  every { task.isSuccessful } returns isSuccessful
+  every { task.result } returns snapshot
+  return task
+}
+
+fun mockUploadTaskQrCode(exception: Exception? = null, isSuccessful: Boolean): UploadTask {
+  val task: UploadTask = mockk(relaxed = true)
+  val snapshot: UploadTask.TaskSnapshot = mockk(relaxed = true)
+  every { snapshot.task } returns task
+  // every { snapshot.metadata } returns mockk { every { path } returns result?.path.toString() }
+  every { task.isComplete } returns true
+  every { task.exception } returns exception
+  every { task.isCanceled } returns false
+  every { task.isSuccessful } returns isSuccessful
+  every { task.result } returns snapshot
+  return task
+}
+
+fun mockDownloadUrlTask(result: Uri?, exception: Exception? = null): Task<Uri> {
+
+  val task: Task<Uri> = mockk(relaxed = true)
+  every { task.isComplete } returns true
+  every { task.isCanceled } returns false
+  every { task.isSuccessful } returns (exception == null)
+  every { task.exception } returns exception
   every { task.result } returns result
   return task
 }

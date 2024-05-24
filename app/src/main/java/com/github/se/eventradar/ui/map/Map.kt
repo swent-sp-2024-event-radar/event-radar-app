@@ -8,7 +8,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.github.se.eventradar.model.event.Event
-import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
@@ -22,8 +21,8 @@ import com.google.maps.android.compose.rememberMarkerState
 @Composable
 fun EventMap(
     events: List<Event>,
-    navigationActions: NavigationActions,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onCardClick: (String) -> Unit,
 ) {
   val mapProperties by remember {
     mutableStateOf(MapProperties(maxZoomPreference = 50f, minZoomPreference = 0f))
@@ -49,11 +48,7 @@ fun EventMap(
                       position = LatLng(event.location.latitude, event.location.longitude)),
               title = event.eventName,
               snippet = event.description,
-              onClick = {
-                // TODO: Navigate to event details
-                //          navigationActions.navController.navigate(Route.EVENT_DETAILS)
-                true
-              })
+              onInfoWindowClick = { onCardClick(event.fireBaseID) })
         }
       }
 }

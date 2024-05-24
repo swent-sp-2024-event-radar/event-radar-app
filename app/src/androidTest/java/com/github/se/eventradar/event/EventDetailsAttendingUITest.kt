@@ -1,15 +1,16 @@
 package com.github.se.eventradar.event
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.EventCategory
-import com.github.se.eventradar.model.event.EventDetailsViewModel
 import com.github.se.eventradar.model.event.EventTicket
-import com.github.se.eventradar.model.event.EventUiState
 import com.github.se.eventradar.screens.EventDetailsScreen
 import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.viewmodel.EventDetailsViewModel
+import com.github.se.eventradar.viewmodel.EventUiState
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -27,7 +28,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
+class EventDetailsAttendingUITest :
+    TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -47,17 +49,23 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
               end = LocalDateTime.MAX,
               location = Location(0.0, 0.0, "base address"),
               description = "Let's debug some code together because we all enjoy kotlin !",
-              ticket = EventTicket("Luck", 0.0, 7),
+              ticket = EventTicket("Luck", 0.0, 7, 0),
               mainOrganiser = "some.name@host.com",
               category = EventCategory.COMMUNITY,
           ))
 
   private val eventId = "tdjWMT9Eon2ROTVakQb"
 
+  private var isTicketFree = true
+  private var isUserAttending = true
+
   @Before
   fun testSetup() {
-
+    every { mockViewModel.isUserAttending } returns MutableStateFlow(isUserAttending)
+    every { mockViewModel.isTicketFree() } returns isTicketFree
     every { mockViewModel.uiState } returns sampleEventDetailsUiState
+    every { mockViewModel.eventId } returns eventId
+    every { mockViewModel.showCancelRegistrationDialog } returns mutableStateOf(false)
 
     composeTestRule.setContent { EventDetails(mockViewModel, navigationActions = mockNavActions) }
   }
@@ -65,15 +73,18 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
   @Test
   fun screenDisplaysNavigationElementsCorrectly() = run {
     ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
-      ticketButton { assertIsDisplayed() }
-      goBackButton { assertIsDisplayed() }
-      bottomNav { assertIsDisplayed() }
+      step("Check if navigation elements are displayed correctly") {
+        registrationButton { assertIsDisplayed() }
+        goBackButton { assertIsDisplayed() }
+        bottomNav { assertIsDisplayed() }
+      }
     }
   }
 
   @Test
   fun screenDisplaysContentElementsCorrectly() = run {
     ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
+      eventTitle { assertIsDisplayed() }
       eventImage { assertIsDisplayed() }
       descriptionTitle { assertIsDisplayed() }
       descriptionContent {
@@ -87,9 +98,12 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
         assertIsDisplayed()
         assertTextContains("Community")
       }
-      dateTimeTitle { assertIsDisplayed() }
-      dateTimeStartContent { assertIsDisplayed() }
-      dateTimeEndContent { assertIsDisplayed() }
+      dateTitle { assertIsDisplayed() }
+      dateContent { assertIsDisplayed() }
+      timeTitle { assertIsDisplayed() }
+      timeContent { assertIsDisplayed() }
+
+      attendance { assertIsDisplayed() }
     }
   }
 
@@ -108,5 +122,19 @@ class EventDetailsTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
     // assert: the nav action has been called
     verify { mockNavActions.goBack() }
     confirmVerified(mockNavActions)
+  }
+
+  @Test
+  fun cancelRegistrationShowsConfirmationDialog() = run {
+    ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
+      step("Click on the cancel registration button") {
+        registrationButton {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+
+      step("Check if the dialog is displayed") { cancelRegistrationDialog { assertIsDisplayed() } }
+    }
   }
 }
