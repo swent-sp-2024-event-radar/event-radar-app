@@ -49,7 +49,7 @@ constructor(
                   }
                   is Resource.Failure -> {
                     Log.d("CreateEventViewModel", "Error Generating Event Id")
-                    ""
+                    return@launch
                   }
                 }
 
@@ -104,7 +104,9 @@ constructor(
           is Resource.Failure -> {
             Log.d("CreateEventViewModel", "User not logged in or error fetching user ID")
             state.value =
-                CreateEventUiState() // reset the state to ensure it doesn't preserve prev state
+                CreateEventUiState(
+                    eventUploadError =
+                        true) // reset the state to ensure it doesn't preserve prev state
           }
         }
       }
@@ -345,5 +347,6 @@ data class CreateEventUiState(
     val ticketNameIsError: Boolean = false,
     val ticketCapacityIsError: Boolean = false,
     val ticketPriceIsError: Boolean = false,
+    val eventUploadError: Boolean = false,
     val listOfLocations: List<Location> = emptyList()
 )

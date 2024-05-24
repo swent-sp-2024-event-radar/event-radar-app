@@ -109,8 +109,10 @@ class CreateEventViewModelUnitTest {
           every { path } returns
               "content://media/picker/0/com.android.providers.media.photopicker/media/1000009885"
         }
-    runBlocking { userRepository.addUser(mockUser) }
-    runBlocking { (userRepository as MockUserRepository).updateCurrentUserId(mockUser.userId) }
+    runBlocking {
+      userRepository.addUser(mockUser)
+      (userRepository as MockUserRepository).updateCurrentUserId(mockUser.userId)
+    }
     viewModel = CreateEventViewModel(locationRepository, eventRepository, userRepository)
   }
 
