@@ -1,5 +1,10 @@
 package com.github.se.eventradar.ui.home
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
+import android.os.Looper
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,6 +14,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,10 +30,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
+import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
@@ -40,10 +48,15 @@ import com.github.se.eventradar.ui.component.getIconFromViewListBool
 import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
-import com.github.se.eventradar.util.toast
 import com.github.se.eventradar.viewmodel.EventsOverviewUiState
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.github.se.eventradar.viewmodel.Tab
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 
 @Composable
 fun HomeScreen(
@@ -52,6 +65,7 @@ fun HomeScreen(
 ) {
   // Ui States handled by viewModel
   val uiState by viewModel.uiState.collectAsState()
+  val context = LocalContext.current
 
   LaunchedEffect(key1 = uiState.isSearchActive, key2 = uiState.isFilterActive) {
     if (uiState.isSearchActive || uiState.isFilterActive) {
@@ -66,6 +80,39 @@ fun HomeScreen(
     }
   }
 
+  val locationProvider = LocationServices.getFusedLocationProviderClient(context)
+
+  val locationCallback =
+      object : LocationCallback() {
+        // 1
+        override fun onLocationResult(result: LocationResult) {
+          if (ActivityCompat.checkSelfPermission(
+              context, Manifest.permission.ACCESS_FINE_LOCATION) !=
+              PackageManager.PERMISSION_GRANTED &&
+              ActivityCompat.checkSelfPermission(
+                  context, Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                  PackageManager.PERMISSION_GRANTED) {
+            // set default location
+            val epflLocation = Location(46.519962, 6.56637, "EPFL")
+            viewModel.onUserLocationChanged(epflLocation)
+            return
+          }
+
+          locationProvider.lastLocation
+              .addOnSuccessListener { location ->
+                location?.let {
+                  val lat = location.latitude
+                  val long = location.longitude
+                  // Update data class with location data
+                  viewModel.onUserLocationChanged(Location(lat, long, "User"))
+                }
+              }
+              .addOnFailureListener { Log.e("Location_error", "${it.message}") }
+        }
+      }
+
+  GetUserLocation(locationProvider, locationCallback)
+
   AppScaffold(
       modifier = Modifier.testTag("homeScreen"),
       floatingActionButton = {
@@ -76,8 +123,6 @@ fun HomeScreen(
       },
       navigationActions = navigationActions,
   ) {
-    val context = LocalContext.current
-
     Column(
         modifier = Modifier.fillMaxSize().padding(it).padding(top = 16.dp).testTag("homeScreen"),
         horizontalAlignment = Alignment.CenterHorizontally) {
@@ -145,10 +190,12 @@ fun HomeScreen(
                 onFreeSwitchChanged = { viewModel.onFreeSwitchChanged() },
                 onFilterApply = {
                   if (uiState.radiusQuery != "") {
-                    viewModel.onRadiusQueryChanged("")
-                    context.toast("Radius filtering not yet implemented")
+                    viewModel.onRadiusQueryChanged(uiState.radiusQuery)
                   }
                   viewModel.onFilterApply()
+
+                  // automatically close dialog
+                  viewModel.onFilterDialogOpen()
                 },
                 uiState = uiState,
                 onRadiusQueryChanged = { viewModel.onRadiusQueryChanged(it) },
@@ -178,7 +225,8 @@ fun EventsOverview(
             navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
           }
       false ->
-          EventMap(events, modifier.testTag("eventMap").fillMaxWidth()) { eventId ->
+          EventMap(events, modifier.testTag("eventMap").fillMaxWidth(), uiState.userLocation!!) {
+              eventId ->
             navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
           }
     }
@@ -199,10 +247,59 @@ fun EventsOverview(
                 navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
               }
       else ->
-          EventMap(events, modifier.testTag("eventMapUpcoming").fillMaxWidth()) { eventId ->
-            navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-          }
+          EventMap(
+              events,
+              modifier.testTag("eventMapUpcoming").fillMaxWidth(),
+              uiState.userLocation!!) { eventId ->
+                navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+              }
     }
+  }
+}
+
+@Composable
+fun GetUserLocation(
+    locationProvider: FusedLocationProviderClient,
+    locationCallback: LocationCallback
+) {
+  DisposableEffect(key1 = locationProvider) {
+    locationUpdate(locationProvider, locationCallback)
+    // 3
+    onDispose { stopLocationUpdate(locationProvider, locationCallback) }
+  }
+}
+
+@SuppressLint("MissingPermission")
+private fun locationUpdate(
+    locationProvider: FusedLocationProviderClient,
+    locationCallback: LocationCallback
+) {
+  locationCallback.let {
+    // An encapsulation of various parameters for requesting
+    // location through FusedLocationProviderClient.
+    val locationRequest: LocationRequest =
+        LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).build()
+    // use FusedLocationProviderClient to request location update
+    locationProvider.requestLocationUpdates(locationRequest, it, Looper.getMainLooper())
+  }
+}
+
+fun stopLocationUpdate(
+    locationProvider: FusedLocationProviderClient,
+    locationCallback: LocationCallback
+) {
+  try {
+    // Removes all location updates for the given callback.
+    val removeTask = locationProvider.removeLocationUpdates(locationCallback)
+    removeTask.addOnCompleteListener { task ->
+      if (task.isSuccessful) {
+        Log.d("LocationProvider", "Location Callback removed.")
+      } else {
+        Log.d("LocationProvider", "Failed to remove Location Callback.")
+      }
+    }
+  } catch (se: SecurityException) {
+    Log.e("LocationProvider", "Failed to remove Location Callback.. $se")
   }
 }
 

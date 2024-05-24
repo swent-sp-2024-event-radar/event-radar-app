@@ -88,6 +88,7 @@ dependencies {
   implementation(platform("androidx.compose:compose-bom:2024.02.02"))
   implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
   implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+  implementation("com.google.android.gms:play-services-location:21.2.0")
   androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.02"))
   implementation("androidx.compose.ui:ui")
   implementation("androidx.compose.ui:ui-tooling-preview")

@@ -11,17 +11,17 @@ import com.github.se.eventradar.model.event.EventList
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @HiltViewModel
 class EventsOverviewViewModel
@@ -85,16 +85,13 @@ constructor(
             }
             .allEvents
 
-    // User location should ideally be dynamic but is fixed for the purpose of this example
-    val userLocation = Location(latitude = 38.92, longitude = 78.78, address = "Ecublens")
-
     val filteredEvents =
         eventList.filter { event ->
           // Search filter
           event.eventName.contains(_uiState.value.searchQuery, ignoreCase = true) &&
               // Radius filter
               (_uiState.value.radiusQuery.isEmpty() ||
-                  calculateDistance(userLocation, event.location) <=
+                  calculateDistance(_uiState.value.userLocation, event.location) <=
                       _uiState.value.radiusQuery.toDouble()) &&
               // Free event filter
               (!_uiState.value.isFreeSwitchOn || event.ticket.price == 0.0) &&
@@ -300,6 +297,10 @@ constructor(
     state.value = state.value.copy(isFilterDialogOpen = false)
     state.value = state.value.copy(viewList = !state.value.viewList)
   }
+
+  fun onUserLocationChanged(location: Location) {
+    _uiState.update { currentState -> currentState.copy(userLocation = location) }
+  }
 }
 
 data class EventsOverviewUiState(
@@ -315,6 +316,7 @@ data class EventsOverviewUiState(
     val viewList: Boolean = true,
     val tab: Tab = Tab.BROWSE,
     val userLoggedIn: Boolean = false,
+    val userLocation: Location = Location(46.519962, 6.56637, "EPFL"),
 )
 
 enum class Tab {
