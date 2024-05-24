@@ -207,7 +207,7 @@ fun SearchBarField(
               unfocusedIndicatorColor = Color.Transparent,
               disabledIndicatorColor = Color.Transparent),
       placeholder = { Text(stringResource(id = placeholderStringResource)) },
-      trailingIcon = { Icon(Icons.Default.Search, contentDescription = null) })
+      leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) })
 }
 
 @Composable
