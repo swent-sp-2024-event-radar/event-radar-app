@@ -81,7 +81,7 @@ class MockUserRepository : IUserRepository {
         folderName != "Event_Pictures") {
       Resource.Failure(Exception("Folder $folderName does not exist"))
     } else {
-      mockImagesDatabase[folderName]!!.add(imageId)
+      mockImagesDatabase.getValue(folderName).add(imageId)
       Resource.Success(Unit)
     }
   }
@@ -95,13 +95,14 @@ class MockUserRepository : IUserRepository {
         folderName != "Event_Pictures") {
       Resource.Failure(Exception("Folder $folderName does not exist"))
     } else {
-      val databaseFolderList = mockImagesDatabase[folderName]!!.filter { id -> id == imageId }
+      val databaseFolderList =
+          mockImagesDatabase.getValue(folderName).filter { id -> id == imageId }
       if (databaseFolderList.isEmpty() || databaseFolderList[0] != imageId) {
         Resource.Failure(
             Exception("Image from folder $folderName not found for user $currentUserId"))
       } else {
         val databaseImageId = databaseFolderList[0]
-        val imageUrl = "http://example.com/$folderName/$imageId"
+        val imageUrl = "http://example.com/$folderName/$databaseImageId"
         Resource.Success(imageUrl)
       }
     }
@@ -110,7 +111,7 @@ class MockUserRepository : IUserRepository {
   override suspend fun uploadQRCode(data: ByteArray, userId: String): Resource<Unit> {
     val index = mockUsers.indexOfFirst { it.userId == userId }
     return if (index != -1) {
-      mockImagesDatabase["QR_Codes"]!!.add(userId)
+      mockImagesDatabase.getValue("QR_Codes").add(userId)
       Resource.Success(Unit)
     } else {
       Resource.Failure(Exception("User with id $userId not found"))
