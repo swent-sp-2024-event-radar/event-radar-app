@@ -167,13 +167,11 @@ class ChatViewModelUnitTest {
     val msg1 = mockMessage.copy(sender = "user1", id = "msg1")
     val msg2 = mockMessage.copy(sender = "user2", id = "msg2")
 
-    val messageHistory = messageRepository.createNewMessageHistory("user1", "user2")
-    val editedMH = (messageHistory as Resource.Success).data
+    val resource = messageRepository.createNewMessageHistory("user1", "user2")
+    val messageHistory = (resource as Resource.Success).data
 
-      messageRepository.addMessage(msg1, editedMH)
-      var uiState = viewModel.uiState.value
-      messageRepository.addMessage(msg2, uiState.messageHistory)
-      uiState = viewModel.uiState.value
+    messageRepository.addMessage(msg1, messageHistory)
+    messageRepository.addMessage(msg2, messageHistory)
 
     viewModel =
         ChatViewModel(messageRepository, userRepository, opponentId) // Initialize view model
@@ -181,6 +179,7 @@ class ChatViewModelUnitTest {
     runBlocking { viewModel.getMessages() }
 
     val expectedMessages = mutableListOf(msg1, msg2)
+    val uiState = viewModel.uiState.value
     assert(expectedMessages == uiState.messageHistory.messages)
   }
 
@@ -196,7 +195,8 @@ class ChatViewModelUnitTest {
     viewModel.getMessages()
 
     verify {
-      Log.d("ChatViewModel", "Error fetching messages: No message history found between users")
+      Log.d(
+          "ChatViewModel", "Failed to fetch messages: No message history found for specified users")
     }
     unmockkAll()
   }
@@ -226,11 +226,10 @@ class ChatViewModelUnitTest {
 
     val msg1 = mockMessage.copy(sender = "user1", id = "msg1")
 
-    val messageHistory = messageRepository.createNewMessageHistory("user1", "user2")
+    val resource = messageRepository.createNewMessageHistory("user1", "user2")
+    val messageHistory = (resource as Resource.Success).data
 
-    val editedMH = (messageHistory as Resource.Success).data
-
-    messageRepository.addMessage(msg1, editedMH)
+    messageRepository.addMessage(msg1, messageHistory)
 
     viewModel =
         ChatViewModel(messageRepository, userRepository, opponentId) // Initialize view model
@@ -293,7 +292,7 @@ class ChatViewModelUnitTest {
     val expected = messageRepository.getMessages("user1", "user2")
 
     (messageRepository as MockMessageRepository).messagesFlow.emit(expected)
-x
+
     assert(viewModel.uiState.value.messageHistory == (expected as Resource.Success).data)
   }
 

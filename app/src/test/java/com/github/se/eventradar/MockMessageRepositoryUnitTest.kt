@@ -36,65 +36,63 @@ class MockMessageRepositoryUnitTest {
     assert(messageHistory is Resource.Success)
 
     messageHistory = messageHistory as Resource.Success
-      assert(messageHistory.data.user1 == "1")
-      assert(messageHistory.data.user2 == "2")
+    assert(messageHistory.data.user1 == "1")
+    assert(messageHistory.data.user2 == "2")
   }
 
   @Test
   fun testGetMessagesReturnsAlreadyCreatedMessageHistory() = runTest {
     // Test getMessages() method
-      var messageHistory = messageRepository.getMessages("1", "2")
-      assert(messageHistory is Resource.Success)
+    var messageHistory = messageRepository.getMessages("1", "2")
+    assert(messageHistory is Resource.Success)
 
-      messageHistory = messageHistory as Resource.Success
+    messageHistory = messageHistory as Resource.Success
 
-      val messageHistoryId = messageHistory.data.id
+    val messageHistoryId = messageHistory.data.id
 
-      messageHistory = messageRepository.getMessages("1", "2")
+    messageHistory = messageRepository.getMessages("1", "2")
 
     assert(messageHistory is Resource.Success)
 
-      assert((messageHistory as Resource.Success).data.id == messageHistoryId)
+    assert((messageHistory as Resource.Success).data.id == messageHistoryId)
   }
 
   @Test
   fun testAddMessage() = runTest {
-      // Test addMessage() method
-      var messageHistory = messageRepository.getMessages("1", "2")
+    // Test addMessage() method
+    var messageHistory = messageRepository.getMessages("1", "2")
 
-      assert(messageHistory is Resource.Success)
+    assert(messageHistory is Resource.Success)
 
-      messageHistory = messageHistory as Resource.Success
+    messageHistory = messageHistory as Resource.Success
 
-      val addMessage = messageRepository.addMessage(mockMessage, messageHistory.data)
+    val addMessage = messageRepository.addMessage(mockMessage, messageHistory.data)
 
     assert(addMessage is Resource.Success)
 
-      assert(messageHistory.data.messages[0] == mockMessage)
-      assert(messageHistory.data.latestMessageId == "1")
+    assert(messageHistory.data.messages[0] == mockMessage)
+    assert(messageHistory.data.latestMessageId == "1")
   }
 
   @Test
   fun testUpdateMessage() = runTest {
-      // Test updateMessage() method
-      var messageHistory = messageRepository.getMessages("1", "2")
+    // Test updateMessage() method
+    var messageHistory = messageRepository.getMessages("1", "2")
 
-      assert(messageHistory is Resource.Success)
+    assert(messageHistory is Resource.Success)
 
-      messageHistory = messageHistory as Resource.Success
+    messageHistory = messageHistory as Resource.Success
 
-
-      val addMessage = messageRepository.addMessage(mockMessage, messageHistory.data)
-
+    val addMessage = messageRepository.addMessage(mockMessage, messageHistory.data)
 
     assert(addMessage is Resource.Success)
 
-      val updateMessage = messageRepository.updateReadStateForUser("1", messageHistory.data)
+    val updateMessage = messageRepository.updateReadStateForUser("1", messageHistory.data)
 
     assert(updateMessage is Resource.Success)
 
-      assert(messageHistory.data.user1ReadMostRecentMessage)
-      assert(!messageHistory.data.user2ReadMostRecentMessage)
+    assert(messageHistory.data.user1ReadMostRecentMessage)
+    assert(!messageHistory.data.user2ReadMostRecentMessage)
   }
 
   @Test
@@ -156,13 +154,13 @@ class MockMessageRepositoryUnitTest {
 
   @Test
   fun addMessageUpdatesMessageHistoryWhenNewMessageIsReceived() = runTest {
-      var messageHistory = messageRepository.getMessages("1", "2")
+    var messageHistory = messageRepository.getMessages("1", "2")
 
-      assert(messageHistory is Resource.Success)
+    assert(messageHistory is Resource.Success)
 
-      messageHistory = messageHistory as Resource.Success
+    messageHistory = messageHistory as Resource.Success
 
-      val addMessage = messageRepository.addMessage(mockMessage, messageHistory.data)
+    val addMessage = messageRepository.addMessage(mockMessage, messageHistory.data)
 
     assert(addMessage is Resource.Success)
 
@@ -171,7 +169,7 @@ class MockMessageRepositoryUnitTest {
 
     assert(addSecondMessage is Resource.Success)
 
-      messageHistory = messageRepository.getMessages("1", "2")
+    messageHistory = messageRepository.getMessages("1", "2")
 
     assert(messageHistory is Resource.Success)
 
@@ -220,11 +218,11 @@ class MockMessageRepositoryUnitTest {
     val user1 = "1"
     val user2 = "2"
 
-      var messageHistory = messageRepository.getMessages("1", "2")
+    var messageHistory = messageRepository.getMessages("1", "2")
 
-      assert(messageHistory is Resource.Success)
+    assert(messageHistory is Resource.Success)
 
-      messageHistory = messageHistory as Resource.Success
+    messageHistory = messageHistory as Resource.Success
 
     var addMessage = messageRepository.addMessage(mockMessage, messageHistory.data)
 
