@@ -41,6 +41,7 @@ constructor(
 
   val errorOccurred = mutableStateOf(false)
   val registrationSuccessful = mutableStateOf(false)
+  val showCancelRegistrationDialog = mutableStateOf(false)
 
   private lateinit var currentUserId: String
   private var displayedEvent: Event? = null
@@ -187,6 +188,69 @@ constructor(
               "EventDetailsViewModel", "Error getting user data: ${userResponse.throwable.message}")
         }
       }
+    }
+  }
+
+  fun removeUserFromEvent() {
+    if (displayedEvent != null) {
+      val event: Event = displayedEvent as Event
+
+      // remove currentUserId from the event attendees list
+      event.attendeeList.remove(currentUserId)
+      event.ticket =
+          EventTicket(
+              event.ticket.name,
+              event.ticket.price,
+              event.ticket.capacity,
+              event.ticket.purchases - 1)
+
+      viewModelScope.launch {
+        // update event data to the database
+        when (val updateResponse = eventRepository.updateEvent(event)) {
+          is Resource.Success -> {
+            Log.i("EventDetailsViewModel", "Successfully updated event")
+          }
+          is Resource.Failure -> {
+            errorOccurred.value = true
+            Log.d(
+                "EventDetailsViewModel",
+                "Error updating event: ${updateResponse.throwable.message}")
+          }
+        }
+        // update user data to the database
+        when (val userResponse = userRepository.getUser(currentUserId)) {
+          is Resource.Success -> {
+            val currentUser = userResponse.data
+            if (currentUser == null) {
+              Log.d("EventDetailsViewModel", "No existing users")
+            } else {
+              // remove eventId from current user attended event list
+              currentUser.eventsAttendeeList.remove(eventId)
+
+              when (val updateResponse = userRepository.updateUser(currentUser)) {
+                is Resource.Success -> {
+                  Log.i("EventDetailsViewModel", "Successfully updated user")
+                }
+                is Resource.Failure -> {
+                  errorOccurred.value = true
+                  Log.d(
+                      "EventDetailsViewModel",
+                      "Error updating user: ${updateResponse.throwable.message}")
+                }
+              }
+            }
+          }
+          is Resource.Failure -> {
+            errorOccurred.value = true
+            Log.d("EventDetailsViewModel", "Error getting user: ${userResponse.throwable.message}")
+          }
+        }
+
+        getEventData()
+      }
+    } else {
+      errorOccurred.value = true
+      Log.d("EventDetailsViewModel", "Error getting event data: no event displayed")
     }
   }
 

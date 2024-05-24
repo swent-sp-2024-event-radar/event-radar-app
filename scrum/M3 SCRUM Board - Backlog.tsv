@@ -1,0 +1,100 @@
+Title	URL	Assignees	Status	Sprint	Task Type	Nature	Epic	Time Estimation	Actual Time
+Wireframes + Mockups for Cancel Registration	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/287	jgeaso1266	Sprint Backlog	Sprint 9	Figma	Sprint Task	UX/UI	30min	
+Cancel Registration UI	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/288	jgeaso1266	Sprint Backlog	Sprint 9	Frontend	Sprint Task	Technical Requirements	2h	
+Cancel Registration VM	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/289	jgeaso1266	Sprint Backlog	Sprint 9	ViewModel	Sprint Task	Technical Requirements	3h	
+Connect QR Scanner to Private Chat Screen	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/278	wisdomseeker2001	Sprint Backlog	Sprint 9	Frontend	Sprint Task	Networking	30 mins	
+Create the viewModel for EventDetails Host perspective	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/146	wisdomseeker2001	Sprint Backlog	Sprint 9	ViewModel	Sprint Task	Event Organization	4h	
+Create UI for Event Details (Host Perspective) + Test	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/168	wisdomseeker2001	Sprint Backlog	Sprint 9	Frontend	Sprint Task	Event Organization		
+Scanning QrCode as Ticket VM	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/231	wisdomseeker2001	Sprint Backlog	Sprint 9	Backend	Sprint Task	Event Organization	2h	
+Scanning QrCode as Ticket UI	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/78	wisdomseeker2001	Done in Sprint 8	Sprint 9	Backend	Sprint Task	Event Organization	2h	
+Edit profile - UI	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/174	achillet3	Sprint Backlog	Sprint 9	Frontend	Sprint Task	Networking	1.5h	
+Create "Profile" page - UI	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/145	achillet3	Sprint Backlog	Sprint 9	Frontend	Sprint Task	Networking	2h	
+Create Event : UI	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/81	nikhen-s	Sprint Backlog	Sprint 9	Frontend	Sprint Task	Event Organization	5h	
+Create Event: ViewModel + Test 	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/70	nikhen-s	Sprint Backlog	Sprint 9	ViewModel	Sprint Task	Event Organization	5h	
+Reuse search bar and filter button in "My hosting"	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/234	christinehahaa	Sprint Backlog	Sprint 9	Backend	Sprint Task	Event Organization	5h	
+Private Chat - Receiving messages + real time updates	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/281	christinehahaa	Sprint Backlog	Sprint 9	ViewModel	Sprint Task	Networking	4h	
+Bug Fix: Navigation bar label text overflows on small screens	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/261	Nath-Assa	Sprint Backlog	Sprint 9	Frontend	Sprint Task	Technical Requirements	1h	
+Bug Fix: Event Radar Logo not adapting to Dark Mode	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/128	Nath-Assa	Sprint Backlog	Sprint 9	Frontend	Sprint Task	Technical Requirements	1.5h	
+Implement atomic transaction in database for buying tickets	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/224	Viccha18	Sprint Backlog	Sprint 9	Backend	Sprint Task	Networking	6h	
+Implement Real-time Updates in Home.kt part2/2	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/252	Nath-Assa	Done in Sprint 8	Sprint 8	Backend	Sprint Task		4h	6h
+Private chat ViewModel	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/241	Nath-Assa	Done in Sprint 8	Sprint 8	ViewModel	Sprint Task	Networking	4h	6h30
+Add Ticket_Purchases as a field to firebase	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/271	nikhen-s	Done in Sprint 8	Sprint 8	Backend	Sprint Task		1h	1.5h
+Create reusable Search&Filter VM and UI components	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/245	jgeaso1266	Done in Sprint 8						
+Connect View Profile Screen to Private Chat Screen	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/279	nikhen-s	Done in Sprint 8	Sprint 8	Frontend	Sprint Task	Networking	30 mins	
+View Friend Profile ViewModel	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/246	nikhen-s	Done in Sprint 8	Sprint 8	ViewModel	Sprint Task	Networking	2h	3h
+Create UI for View Friend Profile	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/247	nikhen-s	Done in Sprint 8	Sprint 8	Frontend	Sprint Task	Networking	2h	4h
+Use Scaffold instead of Constraint Layout	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/264	jgeaso1266	Done in Sprint 8	Sprint 8	Frontend	Sprint Task	Technical Requirements	1h	
+Create a Factory for EventDetailsViewModel	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/219	Viccha18	Done in Sprint 8	Sprint 7	ViewModel	Sprint Task	Event Organization	5h	6h
+View Friends list VM	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/200	jgeaso1266	Done in Sprint 7	Sprint 7	ViewModel	Sprint Task	Event Organization	6h	1h
+Sign Up: Link to Firebase	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/87	achillet3, nikhen-s	Done in Sprint 8	Sprint 8	Backend	Sprint Task	Technical Requirements	6h	8h
+Add test for login end-to-end user flow	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/56	achillet3	Done in Sprint 8	Sprint 8	Backend	Sprint Task	Technical Requirements	2h	
+Improve sign up process with better field helpers	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/199	achillet3	Done in Sprint 7	Sprint 7	Backend	Sprint Task		4h	4
+Profile VM	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/198	achillet3	Done in Sprint 7	Sprint 7	ViewModel	Sprint Task		4h	4
+View QR Code: Integrate with sign up	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/113	achillet3, nikhen-s, wisdomseeker2001	Done in Sprint 7	Sprint 7	Backend	Sprint Task	Technical Requirements	4h	8h
+SCAN QR ANALYSER + TEST on Phone	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/218	wisdomseeker2001	Done in Sprint 7	Sprint 7	Backend	Sprint Task	Networking	8h	11h
+FRIEND SCAN UI + TESTs	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/216	wisdomseeker2001	Done in Sprint 7	Sprint 7	Frontend	Sprint Task	Networking	2h	3h
+FRIEND QR SCAN VM + TESTs	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/217	wisdomseeker2001	Done in Sprint 7	Sprint 7	ViewModel	Sprint Task	Networking	8h	12h
+Implement Real-time Updates in Home.kt part1/2	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/249	Nath-Assa	Done in Sprint 7	Sprint 7	Backend	Sprint Task		2h	3h30
+Refine Event Handling on Home Screen	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/220	Nath-Assa	Done in Sprint 7	Sprint 7	Backend	Sprint Task	Event Organization	2h	3h
+Update HostedEventsViewModel to utilize new getCurrentId() function	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/192	Nath-Assa	Done in Sprint 7	Sprint 7	ViewModel	Sprint Task	Technical Requirements	1h30	1h30
+Wireframes + Mockups for 21. Edit Event	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/104	christinehahaa	Done in Sprint 7	Sprint 7	Figma	Sprint Task	UX/UI	30mins	45mins
+Wireframes + Mockups for 22. Scan A QR Code (as host)	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/49	christinehahaa	Done in Sprint 7	Sprint 7	Figma	Sprint Task	UX/UI	20mins	30mins
+Wireframes + Mockups for 20. View Dashboard for Specific Event	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/50	christinehahaa	Done in Sprint 7	Sprint 7	Figma	Sprint Task	UX/UI	30mins	45mins
+Map of nearby events	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/16	jgeaso1266	Done in Sprint 7	Sprint 7		User Story	Networking		
+Buy Ticket / Join Part 1 (event logic & tests)	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/256	Viccha18	Done in Sprint 7	Sprint 7	Backend	Sprint Task	Networking	5h	5h
+Small fixes (APK YAML, app name. google-services.json)	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/257	jgeaso1266	Done in Sprint 7	Sprint 7		Sprint Task	Technical Requirements		
+Create search bar and filter button: ViewModel + Query the database interface + test	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/117	christinehahaa	Done in Sprint 8	Sprint 8		Sprint Task	Event Organization	4h	11h
+Create "Private Chat" - UI	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/158	christinehahaa	Done in Sprint 8	Sprint 8	Frontend	Sprint Task	Networking	6h	8h
+Buy Ticket / Join Part 2 (debug firebase interaction & add visual response for user)	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/164	Viccha18	Done in Sprint 8	Sprint 8	ViewModel	Sprint Task	Networking	5h	5h
+Friend List (Event interaction) UI 	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/201	jgeaso1266	Done in Sprint 8	Sprint 8	Frontend	Sprint Task	Networking	4h	
+Landing page for messages list	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/91	jgeaso1266	Done in Sprint 7	Sprint 7	Frontend	Sprint Task	Networking	3h	4h
+Display my Qr Code View Model	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/176	nikhen-s	Done in Sprint 7	Sprint 7	ViewModel	Sprint Task	Networking	1.5h	3.5h
+Display QR Code on MY QR Code Screen	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/175	nikhen-s	Done in Sprint 7	Sprint 7	Frontend	Sprint Task	Networking	30mins	2h
+Bug fix: Remove past events from browse and upcoming events	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/296		Product Backlog		Backend	Sprint Task	Technical Requirements		
+Adapt certain features to work with offline mode	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/297		Product Backlog		Backend	Sprint Task	Technical Requirements		
+User location VM	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/205		Product Backlog		ViewModel	Sprint Task	Networking		
+User location UI	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/206		Product Backlog		Frontend	Sprint Task	UX/UI		
+Get user current location	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/204		Product Backlog		Backend	Sprint Task	Technical Requirements		
+Send Notifications to Event Attendees - UI	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/284		Product Backlog		Frontend	Sprint Task	Event Organization		
+Send Notifications to Event Attendees - VM	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/285		Product Backlog		ViewModel	Sprint Task	Event Organization		
+Send Notifications to Event Attendees - Database	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/286		Product Backlog		Backend	Sprint Task	Event Organization		
+Wireframes + Mockups for 24. View Past Events Hosted	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/52		Product Backlog		Figma	Sprint Task	UX/UI		
+Wireframes + Mockups for 14. View Participants List in Group Chat	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/101		Product Backlog		Figma	Sprint Task	UX/UI		
+Wireframes + Mockups for 13. Send Message in Group Chat	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/40		Product Backlog		Figma	Sprint Task	UX/UI		
+Group Chat UI	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/209		Product Backlog		Frontend	Sprint Task	UX/UI		
+Group Chat VM	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/208		Product Backlog		ViewModel	Sprint Task	Networking		
+Group chat Overview UI	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/212		Product Backlog		Frontend	Sprint Task	Networking		
+Group chat Overview VM	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/211		Product Backlog		ViewModel	Sprint Task	Networking		
+Group chat Overview Filter Frontend	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/215		Product Backlog		Frontend	Sprint Task			
+Group chat Overview Filter Backend	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/214		Product Backlog		Backend	Sprint Task			
+Link Private Chat UI and VM	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/280	christinehahaa	Done in Sprint 8	Sprint 8	Frontend	Sprint Task	Networking	3hrs	5hrs
+Browse Events List	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/15	christinehahaa, Nath-Assa, wisdomseeker2001	Done in Sprint 8	Sprint 8		User Story	Technical Requirements		
+Change DOB input to use "." instead of "/"	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/191	Viccha18	Sprint Backlog	Sprint 9		Sprint Task	Technical Requirements	3h	
+Edit Event UI	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/254	wisdomseeker2001	Sprint Backlog	Sprint 9	Frontend	Sprint Task		3h	
+Edit Event VM	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/253	wisdomseeker2001	Sprint Backlog	Sprint 9	Backend	Sprint Task		3h	
+Manage event	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/106	nikhen-s, Viccha18, wisdomseeker2001	Sprint Backlog	Sprint 9		User Story	Event Organization		
+Create new event	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/41	nikhen-s, Viccha18	Sprint Backlog	Sprint 9		User Story	Event Organization		
+Individual profile	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/22	achillet3, christinehahaa	Sprint Backlog	Sprint 9		User Story	Networking		
+Individual Chats	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/20	christinehahaa, jgeaso1266	Sprint Backlog	Sprint 8		User Story	Networking		
+Ticket Verification via QR Code	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/30	wisdomseeker2001	Sprint Backlog	Sprint 8		User Story	Event Organization		
+Adding Friend with QR Code	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/17	achillet3, christinehahaa, wisdomseeker2001	Done in Sprint 8	Sprint 8		User Story	Networking		
+Connection Graph UI	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/203		Product Backlog			Sprint Task			
+Connection Graph VM	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/202		Product Backlog			Sprint Task			
+Live location integration with Map view of Events	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/207		Product Backlog			User Story			
+Photo Sharing	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/28		Product Backlog			User Story			
+Share live location	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/27		Product Backlog			User Story			
+Shared Photo for friend connection	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/26		Product Backlog			User Story			
+Connection Graph	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/21		Product Backlog			User Story			
+Group Chat	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/18		Product Backlog			User Story			
+Personal ticket to any event	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/25	achillet3, christinehahaa	Done in Sprint 8	Sprint 8		User Story	Event Organization		
+Sign-up	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/12	achillet3, nikhen-s	Done in Sprint 8	Sprint 8		User Story	Technical Requirements		
+Group Chat Overview	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/210		Product Backlog			User Story			
+Group chat overview Filter	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/213		Product Backlog			User Story			
+Develop features for people that host events to easily create and manage them. By making it easy to create and check tickets via QR code.	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/11		Product Backlog				Event Organization		
+Add features to make networking and interaction among event participants easier	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/10		Product Backlog				Networking		
+Add profile picture to Messages Overview Screen	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/255	jgeaso1266	Done in Sprint 8	Sprint 8	ViewModel	Sprint Task	UX/UI	2h	2h
+Add navigation from map view to the event details page	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/262	jgeaso1266	Done in Sprint 8	Sprint 8	ViewModel	Sprint Task	UX/UI	1.5h	1h
+Event interaction summary	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/23	jgeaso1266	Done in Sprint 8	Sprint 8		User Story	Networking		
+Add search bar to messages	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/263		Done in Sprint 8		ViewModel	Sprint Task	UX/UI		
+Test EventDetailsViewModel Instantiation with hilt injection in tests files	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/295	Viccha18	Done in Sprint 8	Sprint 8	Backend	Sprint Task	Networking	3h	3h
+Join Event	https://github.com/swent-sp-2024-event-radar/event-radar-app/issues/99	Viccha18	Done in Sprint 8	Sprint 8		User Story	Networking		

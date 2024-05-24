@@ -83,7 +83,7 @@ class FirebaseEventRepository(db: FirebaseFirestore = Firebase.firestore) : IEve
     }
   }
 
-  override fun observeAllEvents(): Flow<Resource<List<Event>>> = callbackFlow { // to be tested
+  override fun observeAllEvents(): Flow<Resource<List<Event>>> = callbackFlow {
     val listener =
         eventRef.addSnapshotListener { snapshot, error ->
           if (error != null) {
