@@ -77,7 +77,6 @@ jobs:
           alias: ${{ secrets.ALIAS }}
         run: |
           bash update_properties.sh "${RUNNER_TEMP}/keystore/keystore.jks" $key_store_password $alias $key_password
-          cat keystore.properties
 
       - name: KTFmt Check
         run: ./gradlew ktfmtCheck
