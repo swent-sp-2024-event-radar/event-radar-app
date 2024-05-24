@@ -1,14 +1,10 @@
-name: Generated APK AAB (Upload - Create Artifact To Github Action)
-
-env:
-  # The name of the main module repository
-  main_project_module: app
+name: Generated Signed APK Debug and Release
 
 on:
 
   push:
     branches:
-      - 'release/**'
+      - 'M[0-9]'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -39,23 +35,29 @@ jobs:
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
-      # Create APK Debug
-      - name: Build Debug apk
-        run: ./gradlew assembleDebug
-
       # Create APK Release
       - name: Create the Keystore
         env:
-          ENCODED_STRING: ${{ secrets.SIGNING_KEY }}
+          encoded_string: ${{ secrets.SIGNING_KEY }}
+          temp_keystore_path: "${RUNNER_TEMP}"/keystore
         run: |
+          mkdir -p $temp_keystore_path
           # import keystore from secrets
-          echo $ENCODED_STRING | base64 -di > $keystore.jks
-
-      - name: Build Release apk
+          echo encoded_string | base64 -di > "${TMP_KEYSTORE_FILE_PATH}"/keystore.jks
+          
+      - name: Print Params Values
         env:
           key_store_password: ${{ secrets.KEY_STORE_PASSWORD }}
           key_password: ${{ secrets.KEY_PASSWORD }}
           alias: ${{ secrets.ALIAS }}
+        run: |
+          bash update_properties.sh "keystore/keystore.jks" $key_store_password $alias $key_password
+
+      # Create APK Debug
+      - name: Build Debug apk
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Build Release apk
         run: ./gradlew assembleRelease
 
       # Upload Artifact Build
