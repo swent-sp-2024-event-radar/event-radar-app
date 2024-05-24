@@ -1,6 +1,5 @@
 name: CI - Test Runner
 
-# Run the workflow when commits are pushed on main or when a PR is modified
 on:
   push:
     branches:
@@ -15,19 +14,15 @@ on:
 jobs:
   ci:
     name: CI
-    # Execute the CI on the course's runners
     runs-on: ubuntu-latest
 
     steps:
-      # First step : Checkout the repository on the runner
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of Sonar analysis (if we use Sonar Later)
+          fetch-depth: 0
 
-
-      # Kernel-based Virtual Machine (KVM) is an open source virtualization technology built into Linux. Enabling it allows the Android emulator to run faster.
       - name: Enable KVM group perms
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -40,14 +35,9 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
-      # Caching is a very useful part of a CI, as a workflow is executed in a clean environment every time,
-      # this means that one would need to re-download and re-process gradle files for every run. Which is very time consuming.
-      #
-      # To avoid that, we cache the the gradle folder to reuse it later.
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
 
-      # Cache the Emulator, if the cache does not hit, create the emulator
       - name: AVD cache
         uses: actions/cache@v4
         id: avd-cache
@@ -70,44 +60,32 @@ jobs:
           script: echo "Generated AVD snapshot for caching."
 
       - name: Grant execute permission for gradlew
-        run: |
-          chmod +x ./gradlew
-          
+        run: chmod +x ./gradlew
+
       - name: Create the Keystore
         env:
           encoded_string: ${{ secrets.SIGNING_KEY }}
           temp_keystore_path: "${RUNNER_TEMP}"/keystore
         run: |
           mkdir -p $temp_keystore_path
-          # import keystore from secrets
-          echo encoded_string | base64 -di > "${TMP_KEYSTORE_FILE_PATH}"/keystore.jks
+          echo $encoded_string | base64 -di > "${temp_keystore_path}"/keystore.jks
 
       - name: Print Params Values
         env:
           key_store_password: ${{ secrets.KEY_STORE_PASSWORD }}
           key_password: ${{ secrets.KEY_PASSWORD }}
           alias: ${{ secrets.ALIAS }}
-        run: |
-          bash update_properties.sh "keystore/keystore.jks" $key_store_password $alias $key_password
+        run: bash update_properties.sh "keystore/keystore.jks" $key_store_password $alias $key_password
 
-      # Check formatting
       - name: KTFmt Check
-        run: |
-          ./gradlew ktfmtCheck
+        run: ./gradlew ktfmtCheck
 
-      # This step runs gradle commands to build the application
       - name: Assemble
-        run: |
-          # To run the CI with debug information, add --info
-          ./gradlew assemble lint --parallel --build-cache
+        run: ./gradlew assemble lint --parallel --build-cache
 
-      # Run Unit tests
       - name: Run unit tests
-        run: |
-          # To run the CI with debug information, add --info
-          ./gradlew check --parallel --build-cache
+        run: ./gradlew check --parallel --build-cache
 
-      # Run connected tests on the emulator
       - name: Run connected tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -119,12 +97,9 @@ jobs:
           disable-animations: true
           script: ./gradlew connectedCheck --parallel --build-cache
 
-      # This step generates the coverage report which will be uploaded to sonar
       - name: Generate Coverage Report
-        run: |
-          ./gradlew jacocoTestReport
+        run: ./gradlew jacocoTestReport
 
-      # Upload the various reports to sonar
       - name: Upload report to SonarCloud
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

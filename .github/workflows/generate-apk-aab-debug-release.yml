@@ -41,8 +41,7 @@ jobs:
           temp_keystore_path: "${RUNNER_TEMP}"/keystore
         run: |
           mkdir -p $temp_keystore_path
-          # import keystore from secrets
-          echo encoded_string | base64 -di > "${TMP_KEYSTORE_FILE_PATH}"/keystore.jks
+          echo $encoded_string | base64 -di > "${temp_keystore_path}"/keystore.jks
           
       - name: Print Params Values
         env:
