@@ -313,12 +313,13 @@ class ChatViewModelUnitTest {
 
     val expectedMH =
         MessageHistory(
-            user1 = "Default sender",
-            user2 = "Default recipient",
-            latestMessageId = "DefaultId",
+            user1 = "user1",
+            user2 = "user2",
+            latestMessageId = "",
             user1ReadMostRecentMessage = false,
             user2ReadMostRecentMessage = false,
-            messages = mutableListOf())
+            messages = mutableListOf(),
+            id = "0")
 
     verify { Log.d("ChatViewModel", expectedLogMessage) }
     assert(viewModel.uiState.value.messageHistory == expectedMH)
