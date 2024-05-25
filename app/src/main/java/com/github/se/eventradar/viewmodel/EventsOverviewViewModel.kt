@@ -305,17 +305,17 @@ constructor(
 data class EventsOverviewUiState(
     val eventList: EventList = EventList(emptyList(), emptyList(), null),
     val upcomingEventList: EventList = EventList(emptyList(), emptyList(), null),
-    val searchQuery: String = "",
-    val isSearchActive: Boolean = false,
-    val isFilterDialogOpen: Boolean = false,
-    val isFilterActive: Boolean = false,
-    val radiusQuery: String = "",
-    val isFreeSwitchOn: Boolean = false,
-    val categoriesCheckedList: MutableSet<EventCategory> = mutableSetOf(),
+    override val searchQuery: String = "",
+    override val isSearchActive: Boolean = false,
+    override val isFilterDialogOpen: Boolean = false,
+    override val isFilterActive: Boolean = false,
+    override val radiusQuery: String = "",
+    override val isFreeSwitchOn: Boolean = false,
+    override val categoriesCheckedList: MutableSet<EventCategory> = mutableSetOf(),
     val viewList: Boolean = true,
     val tab: Tab = Tab.BROWSE,
     val userLoggedIn: Boolean = false,
-)
+) : SearchFilterUiState()
 
 enum class Tab {
   BROWSE,
