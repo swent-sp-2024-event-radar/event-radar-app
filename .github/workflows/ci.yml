@@ -76,19 +76,22 @@ jobs:
       # Check formatting
       - name: KTFmt Check
         run: |
-          ./gradlew ktfmtCheck
+          ./gradlew ktfmtCheck --stacktrace
+  
 
       # This step runs gradle commands to build the application
       - name: Assemble
         run: |
           # To run the CI with debug information, add --info
-          ./gradlew assemble lint --parallel --build-cache
+          ./gradlew assemble lint --parallel --build-cache --stacktrace
+    
+     
 
       # Run Unit tests
       - name: Run unit tests
         run: |
           # To run the CI with debug information, add --info
-          ./gradlew check --parallel --build-cache
+          ./gradlew check --parallel --build-cache --stacktrace
 
       # Run connected tests on the emulator
       - name: Run connected tests
@@ -100,7 +103,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew connectedCheck --parallel --build-cache
+          script: ./gradlew connectedCheck --parallel --build-cache --stacktrace
 
       # This step generates the coverage report which will be uploaded to sonar
       - name: Generate Coverage Report
@@ -112,4 +115,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew sonar --parallel --build-cache
+        run: ./gradlew sonar --parallel --build-cache --stacktrace
