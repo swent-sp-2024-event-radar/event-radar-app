@@ -50,7 +50,7 @@ constructor(
                   }
                   is Resource.Failure -> {
                     Log.d("CreateEventViewModel", "Error Generating Event Id")
-                      resetStateAndSetEventUploadError(true, state)
+                    resetStateAndSetEventUploadError(true, state)
                     return@launch
                   }
                 }
@@ -63,8 +63,8 @@ constructor(
                   }
                   is Resource.Failure -> {
                     Log.d("CreateEventViewModel", "Location Fetching Failed")
-                      resetStateAndSetEventUploadError(true, state)
-                      return@launch
+                    resetStateAndSetEventUploadError(true, state)
+                    return@launch
                   }
                 }
             val eventPhotoUri =
@@ -78,8 +78,8 @@ constructor(
                   }
                   is Resource.Failure -> {
                     Log.d("CreateEventViewModel", "Fetching Profile Picture Error")
-                      resetStateAndSetEventUploadError(true, state)
-                      return@launch
+                    resetStateAndSetEventUploadError(true, state)
+                    return@launch
                   }
                 }
             val eventHashMap =
@@ -107,7 +107,7 @@ constructor(
           }
           is Resource.Failure -> {
             Log.d("CreateEventViewModel", "User not logged in or error fetching user ID")
-              resetStateAndSetEventUploadError(true, state)
+            resetStateAndSetEventUploadError(true, state)
           }
         }
       }
@@ -182,11 +182,12 @@ constructor(
     }
   }
 
-    fun resetStateAndSetEventUploadError(newErrorState: Boolean, state: MutableStateFlow<CreateEventUiState> = _uiState){
-        state.value = CreateEventUiState(
-            eventUploadError =
-            newErrorState)
-    }
+  fun resetStateAndSetEventUploadError(
+      newErrorState: Boolean,
+      state: MutableStateFlow<CreateEventUiState> = _uiState
+  ) {
+    state.value = CreateEventUiState(eventUploadError = newErrorState)
+  }
 
   fun validateFields(state: MutableStateFlow<CreateEventUiState>): Boolean {
     state.value =

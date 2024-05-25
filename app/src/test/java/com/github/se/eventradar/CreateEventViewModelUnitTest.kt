@@ -248,7 +248,8 @@ class CreateEventViewModelUnitTest {
 
     assert(viewModel.validateFields(mockUiState))
     runBlocking { viewModel.addEvent(mockUiState) }
-    //Since Fetching Profile Picture Requires a User to be logged in, there will be an error message
+    // Since Fetching Profile Picture Requires a User to be logged in, there will be an error
+    // message
     verify { Log.d("CreateEventViewModel", "Fetching Profile Picture Error") }
     assert(mockUiState.value.eventName == "")
     assert(mockUiState.value.eventDescription == "")
@@ -370,5 +371,4 @@ class CreateEventViewModelUnitTest {
     viewModel.onTicketPriceChanged(newTicketPrice, mockUiState)
     assertEquals(newTicketPrice, mockUiState.value.ticketPrice)
   }
-
 }

@@ -3,7 +3,6 @@ package com.github.se.eventradar.model.event
 import com.github.se.eventradar.model.ConversionUtils.convertToMutableListOfStrings
 import com.github.se.eventradar.model.Location
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 data class Event(
     var eventName: String,
