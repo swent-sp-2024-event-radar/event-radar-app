@@ -58,9 +58,10 @@ class FirebaseEventRepository(db: FirebaseFirestore = Firebase.firestore) : IEve
   }
 
   override suspend fun addEvent(event: Event): Resource<Unit> {
-
+    val eventMap = event.toMap()
+    val eventId = event.fireBaseID
     return try {
-      eventRef.add(event).await()
+      eventRef.document(eventId).set(eventMap).await()
       Resource.Success(Unit)
     } catch (e: Exception) {
       Resource.Failure(e)

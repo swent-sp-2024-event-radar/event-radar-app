@@ -31,6 +31,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -136,7 +137,7 @@ class CreateEventViewModelUnitTest {
     viewModel.onStartTimeChanged(mockEvent.start.format(timeFormat), mockUiState)
     viewModel.onEndDateChanged(mockEvent.end.format(dateFormat), mockUiState)
     viewModel.onEndTimeChanged(mockEvent.end.format(timeFormat), mockUiState)
-    viewModel.onEventCategoryChanged(mockEvent.category.displayName, mockUiState)
+    viewModel.onEventCategoryChanged(mockEvent.category.toString(), mockUiState)
     viewModel.onOrganiserListChanged(mockEvent.organiserList, mockUiState)
 
     viewModel.onLocationChanged(mockEvent.location.address, mockUiState)
@@ -160,7 +161,7 @@ class CreateEventViewModelUnitTest {
     assert(mockUiState.value.endDate == mockEvent.end.format(dateFormat))
     assert(mockUiState.value.endTime == mockEvent.end.format(timeFormat))
     assert(mockUiState.value.location == mockEvent.location.address)
-    assert(mockUiState.value.eventCategory == mockEvent.category.displayName)
+    assert(mockUiState.value.eventCategory == mockEvent.category.toString())
     assert(mockUiState.value.ticketCapacity.toInt() == mockEvent.ticket.capacity)
     assert(mockUiState.value.ticketPrice.toDouble() == mockEvent.ticket.price)
     assert(mockUiState.value.ticketName == mockEvent.ticket.name)
@@ -189,7 +190,7 @@ class CreateEventViewModelUnitTest {
     viewModel.onStartTimeChanged(mockEvent.start.format(timeFormat), mockUiState)
     viewModel.onEndDateChanged(mockEvent.end.format(dateFormat), mockUiState)
     viewModel.onEndTimeChanged(mockEvent.end.format(timeFormat), mockUiState)
-    viewModel.onEventCategoryChanged(mockEvent.category.displayName, mockUiState)
+    viewModel.onEventCategoryChanged(mockEvent.category.toString(), mockUiState)
     viewModel.onOrganiserListChanged(mockEvent.organiserList, mockUiState)
 
     viewModel.onLocationChanged(mockEvent.location.address, mockUiState)
@@ -235,7 +236,7 @@ class CreateEventViewModelUnitTest {
     viewModel.onStartTimeChanged(mockEvent.start.format(timeFormat), mockUiState)
     viewModel.onEndDateChanged(mockEvent.end.format(dateFormat), mockUiState)
     viewModel.onEndTimeChanged(mockEvent.end.format(timeFormat), mockUiState)
-    viewModel.onEventCategoryChanged(mockEvent.category.displayName, mockUiState)
+    viewModel.onEventCategoryChanged(mockEvent.category.toString(), mockUiState)
     viewModel.onOrganiserListChanged(mockEvent.organiserList, mockUiState)
 
     viewModel.onLocationChanged(mockEvent.location.address, mockUiState)
@@ -247,8 +248,8 @@ class CreateEventViewModelUnitTest {
 
     assert(viewModel.validateFields(mockUiState))
     runBlocking { viewModel.addEvent(mockUiState) }
-
-    verify { Log.d("CreateEventViewModel", "Failed to find user non-existent-user in database") }
+    //Since Fetching Profile Picture Requires a User to be logged in, there will be an error message
+    verify { Log.d("CreateEventViewModel", "Fetching Profile Picture Error") }
     assert(mockUiState.value.eventName == "")
     assert(mockUiState.value.eventDescription == "")
     assert(mockUiState.value.startDate == "")
@@ -279,4 +280,95 @@ class CreateEventViewModelUnitTest {
     viewModel.updateListOfLocations(mockUiState)
     assert(mockUiState.value.locationIsError == true)
   }
+
+  @Test
+  fun testResetStateAndSetEventUploadError() = runTest {
+    viewModel.resetStateAndSetEventUploadError(true, mockUiState)
+    assert(mockUiState.value.eventUploadError == true)
+  }
+
+  @Test
+  fun testOnEventNameChanged() = runTest {
+    val newName = "New Event Name"
+    viewModel.onEventNameChanged(newName, mockUiState)
+    assertEquals(newName, mockUiState.value.eventName)
+  }
+
+  @Test
+  fun testOnEventCategoryChanged() = runTest {
+    val newCategory = "New Event Category"
+    viewModel.onEventCategoryChanged(newCategory, mockUiState)
+    assertEquals(newCategory, mockUiState.value.eventCategory)
+  }
+
+  @Test
+  fun testOnOrganiserListChanged() = runTest {
+    val newOrganiserList = mutableListOf("Organiser1", "Organiser2")
+    viewModel.onOrganiserListChanged(newOrganiserList, mockUiState)
+    assertEquals(newOrganiserList, mockUiState.value.organiserList)
+  }
+
+  @Test
+  fun testOnEventDescriptionChanged() = runTest {
+    val newDescription = "New Event Description"
+    viewModel.onEventDescriptionChanged(newDescription, mockUiState)
+    assertEquals(newDescription, mockUiState.value.eventDescription)
+  }
+
+  @Test
+  fun testOnStartDateChanged() = runTest {
+    val newStartDate = "2024-05-25"
+    viewModel.onStartDateChanged(newStartDate, mockUiState)
+    assertEquals(newStartDate, mockUiState.value.startDate)
+  }
+
+  @Test
+  fun testOnEndDateChanged() = runTest {
+    val newEndDate = "2024-05-26"
+    viewModel.onEndDateChanged(newEndDate, mockUiState)
+    assertEquals(newEndDate, mockUiState.value.endDate)
+  }
+
+  @Test
+  fun testOnStartTimeChanged() = runTest {
+    val newStartTime = "10:00"
+    viewModel.onStartTimeChanged(newStartTime, mockUiState)
+    assertEquals(newStartTime, mockUiState.value.startTime)
+  }
+
+  @Test
+  fun testOnEndTimeChanged() = runTest {
+    val newEndTime = "18:00"
+    viewModel.onEndTimeChanged(newEndTime, mockUiState)
+    assertEquals(newEndTime, mockUiState.value.endTime)
+  }
+
+  @Test
+  fun testOnLocationChanged() = runTest {
+    val newLocation = "New Location"
+    viewModel.onLocationChanged(newLocation, mockUiState)
+    assertEquals(newLocation, mockUiState.value.location)
+  }
+
+  @Test
+  fun testOnTicketNameChanged() = runTest {
+    val newTicketName = "VIP Ticket"
+    viewModel.onTicketNameChanged(newTicketName, mockUiState)
+    assertEquals(newTicketName, mockUiState.value.ticketName)
+  }
+
+  @Test
+  fun testOnTicketCapacityChanged() = runTest {
+    val newTicketCapacity = "500"
+    viewModel.onTicketCapacityChanged(newTicketCapacity, mockUiState)
+    assertEquals(newTicketCapacity, mockUiState.value.ticketCapacity)
+  }
+
+  @Test
+  fun testOnTicketPriceChanged() = runTest {
+    val newTicketPrice = "50"
+    viewModel.onTicketPriceChanged(newTicketPrice, mockUiState)
+    assertEquals(newTicketPrice, mockUiState.value.ticketPrice)
+  }
+
 }

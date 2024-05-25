@@ -37,6 +37,7 @@ constructor(
   Afterward, a hashmap is generated based on the user information.
   Finally, the event firestore database is updated with the new event, and the user's event_hosting list is updated.
    */
+
   fun addEvent(state: MutableStateFlow<CreateEventUiState> = _uiState) {
     viewModelScope.launch {
       userRepository.getCurrentUserId().let { userIdResource ->
@@ -49,6 +50,7 @@ constructor(
                   }
                   is Resource.Failure -> {
                     Log.d("CreateEventViewModel", "Error Generating Event Id")
+                      resetStateAndSetEventUploadError(true, state)
                     return@launch
                   }
                 }
@@ -61,7 +63,8 @@ constructor(
                   }
                   is Resource.Failure -> {
                     Log.d("CreateEventViewModel", "Location Fetching Failed")
-                    Location(0.0, 0.0, "")
+                      resetStateAndSetEventUploadError(true, state)
+                      return@launch
                   }
                 }
             val eventPhotoUri =
@@ -75,7 +78,8 @@ constructor(
                   }
                   is Resource.Failure -> {
                     Log.d("CreateEventViewModel", "Fetching Profile Picture Error")
-                    ""
+                      resetStateAndSetEventUploadError(true, state)
+                      return@launch
                   }
                 }
             val eventHashMap =
@@ -103,10 +107,7 @@ constructor(
           }
           is Resource.Failure -> {
             Log.d("CreateEventViewModel", "User not logged in or error fetching user ID")
-            state.value =
-                CreateEventUiState(
-                    eventUploadError =
-                        true) // reset the state to ensure it doesn't preserve prev state
+              resetStateAndSetEventUploadError(true, state)
           }
         }
       }
@@ -180,6 +181,12 @@ constructor(
       }
     }
   }
+
+    fun resetStateAndSetEventUploadError(newErrorState: Boolean, state: MutableStateFlow<CreateEventUiState> = _uiState){
+        state.value = CreateEventUiState(
+            eventUploadError =
+            newErrorState)
+    }
 
   fun validateFields(state: MutableStateFlow<CreateEventUiState>): Boolean {
     state.value =

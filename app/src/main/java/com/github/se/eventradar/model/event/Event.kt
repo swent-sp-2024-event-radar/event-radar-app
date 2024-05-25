@@ -25,14 +25,8 @@ data class Event(
   ) : this(
       eventName = map["name"] as String,
       eventPhoto = map["photo_url"] as String,
-      start =
-          LocalDateTime.parse(
-              map["start"] as String, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"))
-              as LocalDateTime,
-      end =
-          LocalDateTime.parse(
-              map["end"] as String, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"))
-              as LocalDateTime,
+      start = LocalDateTime.parse(map["start"] as String),
+      end = LocalDateTime.parse(map["end"] as String),
       location =
           Location(
               latitude = map["location_lat"] as Double,
@@ -48,7 +42,7 @@ data class Event(
       mainOrganiser = map["main_organiser"] as String,
       organiserList = convertToMutableListOfStrings(map["organisers_list"]),
       attendeeList = convertToMutableListOfStrings(map["attendees_list"]),
-      category = EventCategory.fromDisplayName(map["category"] as String) as EventCategory,
+      category = EventCategory.valueOf(map["category"] as String),
       fireBaseID = id)
 
   fun toMap(): HashMap<String, Any> {
