@@ -32,14 +32,12 @@ constructor(
     viewModelScope.launch { setEnvironment() }
   }
 
-   suspend fun setEnvironment() {
+  suspend fun setEnvironment() {
     val userId = userRepository.getCurrentUserId()
     if (userId is Resource.Success) {
       _uiState.update { it.copy(userId = userId.data) }
     } else {
-      Log.d(
-          "currentIdNull",
-          "Error getting user ID: Failure, is Null")
+      Log.d("currentIdNull", "Error getting user ID: Failure, is Null")
     }
   }
 
@@ -61,7 +59,8 @@ constructor(
       val currentUser = currentUserDeferred.await()
 
       if (friendUser is Resource.Success && currentUser is Resource.Success) {
-        val friendUpdatesDeferred = async { retryUpdate(friendUser.data!!, _uiState.value.userId!!)
+        val friendUpdatesDeferred = async {
+          retryUpdate(friendUser.data!!, _uiState.value.userId!!)
         }
         val userUpdatesDeferred = async { retryUpdate(currentUser.data!!, friendID) }
 
@@ -71,7 +70,7 @@ constructor(
 
         // After successful updates, navigate to the next screen
         if (!friendUpdateResult || !userUpdateResult) {
-//          Log.d("ScanFriendQrViewModel", "Failed to update user details")
+          //          Log.d("ScanFriendQrViewModel", "Failed to update user details")
           successfulUpdate = false
           return@launch
         }

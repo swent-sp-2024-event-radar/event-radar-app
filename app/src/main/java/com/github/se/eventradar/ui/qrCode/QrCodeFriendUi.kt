@@ -37,8 +37,6 @@ import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
 import com.github.se.eventradar.viewmodel.qrCode.Tab
 
-
-
 @Composable
 fun QrCodeScreen(
     viewModel: ScanFriendQrViewModel = hiltViewModel(),
@@ -50,7 +48,7 @@ fun QrCodeScreen(
   // React to changes in navigation state
   LaunchedEffect(Unit) {
     viewModel.setDecodedResultCallback { friendId ->
-//      Log.d("QrCodeFriendViewModel", "Decoded QR Code: $friendId")
+      //      Log.d("QrCodeFriendViewModel", "Decoded QR Code: $friendId")
       if (friendId != null) {
         viewModel.onDecodedResultChanged(friendId)
 
@@ -63,7 +61,6 @@ fun QrCodeScreen(
       }
     }
   }
-
 
   ConstraintLayout(
       modifier = Modifier.fillMaxSize().testTag("qrCodeScannerScreen"),
