@@ -8,11 +8,13 @@ import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
 import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
 import io.mockk.MockKAnnotations
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import io.mockk.verify
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -150,7 +152,6 @@ class ScanFriendQrViewModelTest {
       }
     }
   }
-
   // This is testing if the getUserDetails function (to display information in MyQRCode Tab) returns
   // an error when we are trying to get a username when no user is logged in (no userid)
   @Test
@@ -165,6 +166,17 @@ class ScanFriendQrViewModelTest {
     unmockkAll()
   }
 
+      @Test
+      fun testGetNullUserID() = runTest {
+          mockkStatic(Log::class)
+          every { Log.d(any(), any()) } returns 0
+          // initialize user with no mock
+          (userRepository as MockUserRepository).updateCurrentUserId(null)
+          viewModel.setEnvironment()
+          verify {  Log.d("currentIdNull", "Error getting user ID: Failure, is Null")}
+          unmockkAll()
+      }
+
   @Test
   fun testGetUserNameNoUserFail() = runTest {
     mockkStatic(Log::class)
@@ -178,9 +190,36 @@ class ScanFriendQrViewModelTest {
       Log.d(
           "ScanFriendQrViewModel", "Error fetching user details: User with id ${userId} not found")
     }
-
     unmockkAll()
   }
+
+    @Test
+    fun testSetCallBack() = runTest {
+        viewModel.setDecodedResultCallback(null)
+        assertEquals(null, qrCodeAnalyser.onDecoded)
+    }
+
+//    @Test
+//    fun testUpdateFriendsFailed() = runTest {
+//        val userId = mockUser1.userId
+//        val friendId = mockUser2.userId
+//        // initialize user with no mock
+//        userRepository.addUser(mockUser1)
+//        userRepository.addUser(mockUser2)
+//        (userRepository as MockUserRepository).updateCurrentUserId(userId)
+//        coEvery { viewModel.retryUpdate(any(), any()) } returns false
+////        val result =
+//            viewModel.updateFriendList(friendId)
+//        verify { Log.d("ScanFriendQrViewModel", "Failed to update user details") }
+////        assertFalse(result)
+//    }
+
+
+ @Test
+ fun onDecodedResultChanged() = runTest {
+     viewModel.onDecodedResultChanged(mockUser.userId)
+     assertEquals(mockUser.userId, viewModel.uiState.value.decodedResult)
+ }
 
   @Test
   fun testGetUserNameSuccess() = runTest {

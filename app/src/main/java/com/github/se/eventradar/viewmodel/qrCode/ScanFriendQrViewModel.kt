@@ -29,15 +29,17 @@ constructor(
   val uiState: StateFlow<QrCodeScanFriendState> = _uiState
 
   init {
-    viewModelScope.launch {
-      val userId = userRepository.getCurrentUserId()
-      if (userId is Resource.Success) {
-        _uiState.update { it.copy(userId = userId.data) }
-      } else {
-        Log.d(
-            "ChatViewModel",
-            "Error getting user ID: ${(userId as Resource.Failure).throwable.message}")
-      }
+    viewModelScope.launch { setEnvironment() }
+  }
+
+   suspend fun setEnvironment() {
+    val userId = userRepository.getCurrentUserId()
+    if (userId is Resource.Success) {
+      _uiState.update { it.copy(userId = userId.data) }
+    } else {
+      Log.d(
+          "currentIdNull",
+          "Error getting user ID: Failure, is Null")
     }
   }
 
@@ -45,7 +47,7 @@ constructor(
     qrCodeAnalyser.onDecoded = callback
   }
 
-  fun updateFriendList(decodedString: String = _uiState.value.decodedResult): Boolean { // private
+  fun updateFriendList(decodedString: String = _uiState.value.decodedResult): Boolean {
     val uiLength = 28
     val friendID = decodedString.take(uiLength)
     var successfulUpdate = true
@@ -59,8 +61,7 @@ constructor(
       val currentUser = currentUserDeferred.await()
 
       if (friendUser is Resource.Success && currentUser is Resource.Success) {
-        val friendUpdatesDeferred = async {
-          retryUpdate(friendUser.data!!, _uiState.value.userId!!)
+        val friendUpdatesDeferred = async { retryUpdate(friendUser.data!!, _uiState.value.userId!!)
         }
         val userUpdatesDeferred = async { retryUpdate(currentUser.data!!, friendID) }
 
@@ -70,7 +71,7 @@ constructor(
 
         // After successful updates, navigate to the next screen
         if (!friendUpdateResult || !userUpdateResult) {
-          Log.d("ScanFriendQrViewModel", "Failed to update user details")
+//          Log.d("ScanFriendQrViewModel", "Failed to update user details")
           successfulUpdate = false
           return@launch
         }
@@ -87,7 +88,7 @@ constructor(
     return successfulUpdate
   }
 
-  private suspend fun retryUpdate(user: User, friendIDToAdd: String): Boolean {
+  suspend fun retryUpdate(user: User, friendIDToAdd: String): Boolean {
     var maxNumberOfRetries = 3
     var updateResult: Resource<Any>?
     do {
