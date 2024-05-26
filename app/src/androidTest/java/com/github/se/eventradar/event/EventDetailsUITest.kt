@@ -1,5 +1,6 @@
 package com.github.se.eventradar.event
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.model.Location
@@ -61,6 +62,7 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
     every { mockViewModel.isUserAttending } returns MutableStateFlow(false)
     every { mockViewModel.uiState } returns sampleEventDetailsUiState
     every { mockViewModel.eventId } returns eventId
+    every { mockViewModel.showCancelRegistrationDialog } returns mutableStateOf(false)
 
     composeTestRule.setContent { EventDetails(mockViewModel, navigationActions = mockNavActions) }
   }
@@ -68,7 +70,7 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   @Test
   fun screenDisplaysNavigationElementsCorrectly() = run {
     ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
-      ticketButton { assertIsDisplayed() }
+      registrationButton { assertIsDisplayed() }
       goBackButton { assertIsDisplayed() }
       bottomNav { assertIsDisplayed() }
     }
@@ -118,7 +120,7 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   @Test
   fun ticketButtonTriggersNavigation() = run {
     ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
-      ticketButton {
+      registrationButton {
         // arrange: verify the pre-conditions
         assertIsDisplayed()
         assertIsEnabled()
