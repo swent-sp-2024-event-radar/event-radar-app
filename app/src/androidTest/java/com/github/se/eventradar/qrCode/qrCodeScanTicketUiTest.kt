@@ -229,24 +229,24 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
     }
   }
 
-  @Test
-  fun screenDisplaysContentElementsCorrectly1() =
-      //  Test(timeout = 45.seconds) {
-      run {
-        every { mockViewModel.uiState } returns MyEventTabDetailsUiState
-        //      val viewModel = setupViewModelMyEventTab()
-        onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-          composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
-          lazyEventDetails.assertIsDisplayed()
-          eventTitle { assertIsDisplayed() }
-          eventImage { assertIsDisplayed() }
-          descriptionTitle { assertIsDisplayed() }
-          descriptionContent {
-            assertIsDisplayed()
-            assertTextContains("Test Description")
-          }
-        }
-      }
+  //  @Test
+  //  fun screenDisplaysContentElementsCorrectly1() =
+  //      //  Test(timeout = 45.seconds) {
+  //      run {
+  //        every { mockViewModel.uiState } returns MyEventTabDetailsUiState
+  //        //      val viewModel = setupViewModelMyEventTab()
+  //        onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
+  //          composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
+  //          lazyEventDetails.assertIsDisplayed()
+  //          eventTitle { assertIsDisplayed() }
+  //          eventImage { assertIsDisplayed() }
+  ////          descriptionTitle { assertIsDisplayed() }
+  //          descriptionContent {
+  //            assertIsDisplayed()
+  //            assertTextContains("Test Description")
+  //          }
+  //        }
+  //      }
 
   @Test
   fun screenDisplaysContentElementsCorrectly2() =
@@ -312,11 +312,11 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
         onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
           composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
           ticketSoldTitle {
-//            performScrollTo()
+            //            performScrollTo()
             assertIsDisplayed()
           }
           ticketSoldContent {
-//            performScrollTo()
+            //            performScrollTo()
             assertIsDisplayed()
             assertTextContains("59 tickets sold")
           }

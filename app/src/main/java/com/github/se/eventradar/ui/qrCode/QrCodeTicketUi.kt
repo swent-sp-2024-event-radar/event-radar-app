@@ -57,7 +57,6 @@ import com.github.se.eventradar.ui.component.EventDate
 import com.github.se.eventradar.ui.component.EventDescription
 import com.github.se.eventradar.ui.component.EventDistance
 import com.github.se.eventradar.ui.component.EventTime
-import com.github.se.eventradar.ui.component.EventTitle
 import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.component.Logo
 import com.github.se.eventradar.ui.navigation.NavigationActions
@@ -76,34 +75,30 @@ fun QrCodeTicketUi(
   val context = LocalContext.current
 
   ConstraintLayout(
-      modifier = Modifier
-          .fillMaxSize()
-          .testTag("qrCodeScannerScreen"),
+      modifier = Modifier.fillMaxSize().testTag("qrCodeScannerScreen"),
   ) {
     val (logo, tabs, eventDetails, bottomNav) = createRefs()
     Logo(
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .fillMaxWidth()
-            .constrainAs(logo) {
-                top.linkTo(parent.top, margin = 32.dp)
-                start.linkTo(parent.start, margin = 16.dp)
-            }
-            .testTag("logo"),
+            Modifier.fillMaxWidth()
+                .fillMaxWidth()
+                .constrainAs(logo) {
+                  top.linkTo(parent.top, margin = 32.dp)
+                  start.linkTo(parent.start, margin = 16.dp)
+                }
+                .testTag("logo"),
     )
     TabRow(
         selectedTabIndex = qrScanUiState.value.tabState.ordinal,
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp)
-            .constrainAs(tabs) {
-                top.linkTo(logo.bottom, margin = 16.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }
-            .testTag("tabs"),
+            Modifier.fillMaxWidth()
+                .padding(top = 8.dp)
+                .constrainAs(tabs) {
+                  top.linkTo(logo.bottom, margin = 16.dp)
+                  start.linkTo(parent.start)
+                  end.linkTo(parent.end)
+                }
+                .testTag("tabs"),
         contentColor = MaterialTheme.colorScheme.primary) {
           Tab(
               selected = qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent,
@@ -178,171 +173,170 @@ fun QrCodeTicketUi(
 
       LazyColumn(
           modifier =
-          Modifier
-              .fillMaxSize()
-              .padding(horizontal = 16.dp)
-              .constrainAs(lazyEventDetails) {
-                  top.linkTo(tabs.bottom, margin = 0.dp)
-                  start.linkTo(parent.start, margin = 0.dp)
-                  end.linkTo(parent.end, margin = 0.dp)
-              }
-              .testTag("lazyEventDetails")) {
+              Modifier.fillMaxSize()
+                  .padding(horizontal = 16.dp)
+                  .constrainAs(lazyEventDetails) {
+                    top.linkTo(tabs.bottom, margin = 0.dp)
+                    start.linkTo(parent.start, margin = 0.dp)
+                    end.linkTo(parent.end, margin = 0.dp)
+                  }
+                  .testTag("lazyEventDetails")) {
             item {
               Image(
                   painter = imagePainter,
                   contentDescription = "Event banner image",
                   modifier =
-                  Modifier
-                      .fillMaxWidth()
-                      .height(imageHeight)
-                      .constrainAs(image) {
-                          top.linkTo(tabs.bottom, margin = 0.dp)
-                          start.linkTo(parent.start, margin = 0.dp)
-                      }
-                      .testTag("eventImage"),
+                      Modifier.fillMaxWidth()
+                          .height(imageHeight)
+                          .constrainAs(image) {
+                            top.linkTo(tabs.bottom, margin = 0.dp)
+                            start.linkTo(parent.start, margin = 0.dp)
+                          }
+                          .testTag("eventImage"),
                   contentScale = ContentScale.FillWidth)
             }
             item {
               GoBackButton(
                   modifier =
-                  Modifier
-                      .wrapContentSize()
-                      .constrainAs(backButton) {
-                          top.linkTo(image.bottom, margin = 8.dp)
-                          start.linkTo(image.start, margin = 4.dp)
+                      Modifier.wrapContentSize().constrainAs(backButton) {
+                        top.linkTo(image.bottom, margin = 8.dp)
+                        start.linkTo(image.start, margin = 4.dp)
                       }) {
                     navigationActions.goBack()
                   }
             }
-            item {
-              EventTitle(
-                  modifier =
-                      Modifier.constrainAs(title) {
-                        top.linkTo(image.bottom, margin = 32.dp)
-                        start.linkTo(image.start)
-                        end.linkTo(image.end)
-                      },
-                  eventUiState = uiState.eventUiState,
-                  style = componentStyle)
-            }
+            //            item {
+            //              EventTitle(
+            //                  modifier =
+            //                      Modifier.constrainAs(title) {
+            //                        top.linkTo(image.bottom, margin = 32.dp)
+            //                        start.linkTo(image.start)
+            //                        end.linkTo(image.end)
+            //                      },
+            //                  eventUiState = uiState.eventUiState,
+            //                  style = componentStyle)
+            //            }
+            //          Column(
+            //              modifier = Modifier.padding(horizontal = 16.dp),
+            //              horizontalAlignment = Alignment.CenterHorizontally) {
+            //              EventDescription(
+            //                  modifier = Modifier, qrScanUiState.value.eventUiState,
+            // componentStyle)
+
             item { Spacer(modifier = Modifier.height(32.dp)) }
             item {
               EventDescription(
-                  modifier =
-                      Modifier
-                          // .padding(start = widthPadding, end = widthPadding)
-                          .constrainAs(description) {
-                            top.linkTo(title.bottom, margin = 32.dp)
-                            start.linkTo(parent.start, margin = widthPadding)
-                          },
-                  eventUiState = uiState.eventUiState,
-                  componentStyle)
+                  modifier = Modifier, qrScanUiState.value.eventUiState, componentStyle)
             }
+
+            //              EventDescription(
+            //                  modifier =
+            //                      Modifier
+            //                          // .padding(start = widthPadding, end = widthPadding)
+            //                          .constrainAs(description) {
+            //                            top.linkTo(title.bottom, margin = 32.dp)
+            //                            start.linkTo(parent.start, margin = widthPadding)
+            //                          },
+            //                  eventUiState = uiState.eventUiState,
+            //                  componentStyle)
+
             item { Spacer(modifier = Modifier.height(32.dp)) }
             item {
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    EventDistance(
-                        modifier = Modifier.weight(2f),
-                        uiState.eventUiState,
-                        componentStyle
-                    )
-                    EventDate(modifier = Modifier.weight(1f), uiState.eventUiState, componentStyle)
-                }
+              Row(modifier = Modifier.fillMaxWidth()) {
+                EventDistance(modifier = Modifier.weight(2f), uiState.eventUiState, componentStyle)
+                EventDate(modifier = Modifier.weight(1f), uiState.eventUiState, componentStyle)
+              }
             }
-//              EventDistance(
-//                  modifier =
-//                      Modifier.constrainAs(distance) {
-//                        top.linkTo(description.bottom, margin = 32.dp)
-//                        start.linkTo(parent.start, margin = widthPadding)
-//                      },
-//                  eventUiState = uiState.eventUiState,
-//                  componentStyle)
-//            }
+            //              EventDistance(
+            //                  modifier =
+            //                      Modifier.constrainAs(distance) {
+            //                        top.linkTo(description.bottom, margin = 32.dp)
+            //                        start.linkTo(parent.start, margin = widthPadding)
+            //                      },
+            //                  eventUiState = uiState.eventUiState,
+            //                  componentStyle)
+            //            }
             item { Spacer(modifier = Modifier.height(32.dp)) }
-//            item {
-//              EventDate(
-//                  modifier =
-//                      Modifier.constrainAs(date) {
-//                        top.linkTo(distance.bottom, margin = 32.dp)
-//                        start.linkTo(parent.start, margin = widthPadding)
-//                      },
-//                  eventUiState = uiState.eventUiState,
-//                  componentStyle)
-//            }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
-
-            item {
-
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    EventCategory(
-                        modifier = Modifier.weight(2f),
-                        uiState.eventUiState,
-                        componentStyle
-                    )
-
-                    EventTime(modifier = Modifier.weight(1f), uiState.eventUiState, componentStyle)
-                }
-            }
-//              EventTime(
-//                  modifier =
-//                      Modifier.constrainAs(time) {
-//                        top.linkTo(date.bottom, margin = 32.dp)
-//                        start.linkTo(parent.start, margin = widthPadding)
-//                      },
-//                  eventUiState = uiState.eventUiState,
-//                  componentStyle)
-//            }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
-//            item {
-//              EventCategory(
-//                  modifier =
-//                      Modifier.constrainAs(category) {
-//                        top.linkTo(time.bottom, margin = 32.dp)
-//                        start.linkTo(parent.start, margin = widthPadding)
-//                      },
-//                  eventUiState = uiState.eventUiState,
-//                  componentStyle)
-//            }
+            //            item {
+            //              EventDate(
+            //                  modifier =
+            //                      Modifier.constrainAs(date) {
+            //                        top.linkTo(distance.bottom, margin = 32.dp)
+            //                        start.linkTo(parent.start, margin = widthPadding)
+            //                      },
+            //                  eventUiState = uiState.eventUiState,
+            //                  componentStyle)
+            //            }
             item { Spacer(modifier = Modifier.height(32.dp)) }
 
             item {
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Column(
-                        modifier = Modifier.weight(2f),
-                        verticalArrangement = Arrangement.SpaceBetween) {
-                        Text(
-                            text = "Tickets Sold",
-                            style = componentStyle.fieldTitleStyle,
-                            color = componentStyle.fieldTitleColor,
-                            modifier = Modifier.testTag("ticketSoldTitle"))
-                        Text(
-                            text =
-                            "${qrScanUiState.value.eventUiState.ticket.purchases} tickets sold",
-                            style = componentStyle.contentStyle,
-                            color = componentStyle.contentColor,
-                            modifier = Modifier.testTag("ticketSoldContent"))
+              Row(modifier = Modifier.fillMaxWidth()) {
+                EventCategory(modifier = Modifier.weight(2f), uiState.eventUiState, componentStyle)
+
+                EventTime(modifier = Modifier.weight(1f), uiState.eventUiState, componentStyle)
+              }
+            }
+            //              EventTime(
+            //                  modifier =
+            //                      Modifier.constrainAs(time) {
+            //                        top.linkTo(date.bottom, margin = 32.dp)
+            //                        start.linkTo(parent.start, margin = widthPadding)
+            //                      },
+            //                  eventUiState = uiState.eventUiState,
+            //                  componentStyle)
+            //            }
+            item { Spacer(modifier = Modifier.height(32.dp)) }
+            //            item {
+            //              EventCategory(
+            //                  modifier =
+            //                      Modifier.constrainAs(category) {
+            //                        top.linkTo(time.bottom, margin = 32.dp)
+            //                        start.linkTo(parent.start, margin = widthPadding)
+            //                      },
+            //                  eventUiState = uiState.eventUiState,
+            //                  componentStyle)
+            //            }
+            item { Spacer(modifier = Modifier.height(32.dp)) }
+
+            item {
+              Row(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier.weight(2f),
+                    verticalArrangement = Arrangement.SpaceBetween) {
+                      Text(
+                          text = "Tickets Sold",
+                          style = componentStyle.fieldTitleStyle,
+                          color = componentStyle.fieldTitleColor,
+                          modifier = Modifier.testTag("ticketSoldTitle"))
+                      Text(
+                          text =
+                              "${qrScanUiState.value.eventUiState.ticket.purchases} tickets sold",
+                          style = componentStyle.contentStyle,
+                          color = componentStyle.contentColor,
+                          modifier = Modifier.testTag("ticketSoldContent"))
                     }
-                }
-                
-//              Column(
-//                  modifier =
-//                      Modifier.constrainAs(ticketSold) {
-//                        top.linkTo(category.bottom, margin = 32.dp)
-//                        start.linkTo(parent.start, margin = widthPadding)
-//                      }) {
-//                    Text(
-//                        text = "Tickets Sold",
-//                        style = componentStyle.fieldTitleStyle,
-//                        color = componentStyle.fieldTitleColor,
-//                        modifier = Modifier.testTag("ticketSoldTitle"))
-//                    Text(
-//                        text =
-//                            "${uiState.eventUiState.ticket.purchases} tickets sold", // TODO CHNAGE
-//                        // TO SOLD
-//                        style = componentStyle.contentStyle,
-//                        color = componentStyle.contentColor,
-//                        modifier = Modifier.testTag("ticketSoldContent"))
-//                  }
+              }
+
+              //              Column(
+              //                  modifier =
+              //                      Modifier.constrainAs(ticketSold) {
+              //                        top.linkTo(category.bottom, margin = 32.dp)
+              //                        start.linkTo(parent.start, margin = widthPadding)
+              //                      }) {
+              //                    Text(
+              //                        text = "Tickets Sold",
+              //                        style = componentStyle.fieldTitleStyle,
+              //                        color = componentStyle.fieldTitleColor,
+              //                        modifier = Modifier.testTag("ticketSoldTitle"))
+              //                    Text(
+              //                        text =
+              //                            "${uiState.eventUiState.ticket.purchases} tickets sold",
+              // // TODO CHNAGE
+              //                        // TO SOLD
+              //                        style = componentStyle.contentStyle,
+              //                        color = componentStyle.contentColor,
+              //                        modifier = Modifier.testTag("ticketSoldContent"))
+              //                  }
             }
           }
     } else {
@@ -374,12 +368,10 @@ fun QrCodeTicketUi(
         tabList = TOP_LEVEL_DESTINATIONS,
         selectedItem = TOP_LEVEL_DESTINATIONS[3],
         modifier =
-        Modifier
-            .testTag("bottomNavMenu")
-            .constrainAs(bottomNav) {
-                bottom.linkTo(parent.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
+            Modifier.testTag("bottomNavMenu").constrainAs(bottomNav) {
+              bottom.linkTo(parent.bottom)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
             })
   }
 }
@@ -396,24 +388,21 @@ fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
 
     Box(
         modifier =
-        Modifier
-            .size(400.dp) // Adjust the size here to make it larger
-            .background(boxColor, RoundedCornerShape(8.dp))
-            .padding(20.dp)
-            .semantics {
-                testTag =
-                    when (boxColor) {
+            Modifier.size(400.dp) // Adjust the size here to make it larger
+                .background(boxColor, RoundedCornerShape(8.dp))
+                .padding(20.dp)
+                .semantics {
+                  testTag =
+                      when (boxColor) {
                         Color.Green -> "ApprovedBox"
                         Color.Red -> "DeniedBox"
                         else -> "ErrorBox"
-                    }
-            },
+                      }
+                },
         // Aligning content to the top right corner
     ) {
       Column(
-          modifier = Modifier
-              .fillMaxSize()
-              .padding(vertical = 16.dp),
+          modifier = Modifier.fillMaxSize().padding(vertical = 16.dp),
           verticalArrangement = Arrangement.Center,
           horizontalAlignment = Alignment.CenterHorizontally) {
             val textToShow =
@@ -435,9 +424,7 @@ fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
                           }
                     })
           }
-      Box(modifier = Modifier
-          .align(Alignment.TopEnd)
-          .padding(8.dp)) {
+      Box(modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)) {
         IconButton(
             onClick = { viewModel.changeAction(ScanTicketQrViewModel.Action.ScanTicket) },
             modifier =
@@ -462,9 +449,9 @@ fun PreviewQrCodeTicketUi() {
   QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewQrCodeTicketGranted() {
+// @Preview(showBackground = true)
+// @Composable
+// fun PreviewQrCodeTicketGranted() {
 //  // Create a mock NavigationActions to pass into the function
 //  val userRepository = MockUserRepository()
 //  (userRepository as MockUserRepository).updateCurrentUserId("user1")
@@ -474,7 +461,7 @@ fun PreviewQrCodeTicketUi() {
 //  viewModel.changeTabState(ScanTicketQrViewModel.Tab.ScanQr)
 //  viewModel.changeAction(ScanTicketQrViewModel.Action.ApproveEntry)
 //  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
-//}
+// }
 //// s
 // @Preview(showBackground = true)
 // @Composable
