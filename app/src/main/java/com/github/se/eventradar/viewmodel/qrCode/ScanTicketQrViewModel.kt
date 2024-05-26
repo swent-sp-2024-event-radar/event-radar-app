@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = ScanTicketQrViewModel.Factory::class)
 class ScanTicketQrViewModel
-@AssistedInject // Dependency injection
+@AssistedInject
 constructor(
     private val userRepository: IUserRepository,
     private val eventRepository: IEventRepository,
@@ -74,13 +74,8 @@ constructor(
     getEventData()
   }
 
-  private fun updatePermissions(decodedString: String) {
-
-    println("entered updatePermissions")
-    val uiLength = 28
-    val attendeeID = decodedString.take(uiLength)
+  private fun updatePermissions(attendeeID: String) {
     Log.d("QrCodeTicketViewModel", "Ticket User ID: $attendeeID")
-
     viewModelScope.launch {
       val attendeeUserDeferred = async { userRepository.getUser(attendeeID) }
       val currentEventDeferred = async { eventRepository.getEvent(myEventID) }
