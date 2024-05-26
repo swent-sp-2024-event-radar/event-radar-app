@@ -14,6 +14,7 @@ class QrCodeScanTicketUiScreen(semanticsProvider: SemanticsNodeInteractionsProvi
   val tabs: KNode = child { hasTestTag("tabs") }
   val myQrTab: KNode = tabs.child { hasTestTag("My Event") }
   val scanQrTab: KNode = tabs.child { hasTestTag("Scan QR Code") }
+
   val bottomNavMenu: KNode = child { hasTestTag("bottomNavMenu") }
 
   // QR SCANNING TAB
@@ -26,21 +27,20 @@ class QrCodeScanTicketUiScreen(semanticsProvider: SemanticsNodeInteractionsProvi
   val deniedText: KNode = onNode { hasTestTag("EntryDeniedText") }
   val errorText: KNode = onNode { hasTestTag("ErrorText") }
 
-  // MY EvENt TAB
-  val lazyEventDetails: KNode = child { hasTestTag("lazyEventDetails") }
-  val goBackButton: KNode = lazyEventDetails.child { hasTestTag("goBackButton") }
-  val eventImage: KNode = lazyEventDetails.child { hasTestTag("eventImage") }
-  val eventTitle: KNode = lazyEventDetails.child { hasTestTag("eventTitle") }
-  val descriptionTitle: KNode = lazyEventDetails.child { hasTestTag("descriptionTitle") }
-  val descriptionContent: KNode = lazyEventDetails.child { hasTestTag("descriptionContent") }
-  val distanceTitle: KNode = lazyEventDetails.child { hasTestTag("distanceTitle") }
-  val distanceContent: KNode = lazyEventDetails.child { hasTestTag("distanceContent") }
-  val dateTitle: KNode = lazyEventDetails.child { hasTestTag("dateTitle") }
-  val dateContent: KNode = lazyEventDetails.child { hasTestTag("dateContent") }
-  val timeTitle: KNode = lazyEventDetails.child { hasTestTag("timeTitle") }
-  val timeContent: KNode = lazyEventDetails.child { hasTestTag("timeContent") }
-  val categoryTitle: KNode = lazyEventDetails.child { hasTestTag("categoryTitle") }
-  val categoryContent: KNode = lazyEventDetails.child { hasTestTag("categoryContent") }
-  val ticketSoldTitle: KNode = lazyEventDetails.child { hasTestTag("ticketSoldTitle") }
-  val ticketSoldContent: KNode = lazyEventDetails.child { hasTestTag("ticketSoldContent") }
+  // MY EvENt TAB - ALL GOOD
+  val eventTitle: KNode = onNode { hasTestTag("eventTitle") }
+  val descriptionTitle: KNode = onNode { hasTestTag("descriptionTitle") }
+  val descriptionContent: KNode = onNode { hasTestTag("descriptionContent") }
+  val distanceTitle: KNode = onNode { hasTestTag("distanceTitle") }
+  val distanceContent: KNode = onNode { hasTestTag("distanceContent") }
+  val dateTitle: KNode = onNode { hasTestTag("dateTitle") }
+  val dateContent: KNode = onNode { hasTestTag("dateContent") }
+  val timeTitle: KNode = onNode { hasTestTag("timeTitle") }
+  val timeContent: KNode = onNode { hasTestTag("timeContent") }
+  val categoryTitle: KNode = onNode { hasTestTag("categoryTitle") }
+  val categoryContent: KNode = onNode { hasTestTag("categoryContent") }
+  val goBackButton: KNode = onNode { hasTestTag("goBackButton") }
+  val eventImage: KNode = onNode { hasTestTag("eventImage") }
+  val ticketSoldTitle: KNode = onNode { hasTestTag("ticketSoldTitle") }
+  val ticketSoldContent: KNode = onNode { hasTestTag("ticketSoldContent") }
 }

@@ -12,8 +12,10 @@ class HomeScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   val tabs: KNode = child { hasTestTag("tabs") }
   val upcomingTab: KNode = tabs.child { hasTestTag("upcomingTab") }
   val browseTab: KNode = tabs.child { hasTestTag("browseTab") }
-  val eventCard: KNode = onNode { hasTestTag("eventCard") }
+
   val bottomNav: KNode = child { hasTestTag("bottomNavMenu") }
+
+  val eventCard: KNode = onNode { hasTestTag("eventCard") }
   val viewToggleFab: KNode = child { hasTestTag("viewToggleFab") }
   val map: KNode = child { hasTestTag("eventMap") }
   val eventList: KNode = child { hasTestTag("eventList") }
