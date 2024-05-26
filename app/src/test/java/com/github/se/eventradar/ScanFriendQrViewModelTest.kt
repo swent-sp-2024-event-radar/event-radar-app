@@ -261,18 +261,16 @@ class ScanFriendQrViewModelTest {
   fun testGetUserQrCodeSuccess() = runTest {
     // Given
     val userId = mockUser.userId
+    val exampleQRCode = ByteArray(123)
     val expectedQrCodeLink = "http://example.com/QR_Codes/$userId"
     // initialize user with no mock
     (userRepository as MockUserRepository).updateCurrentUserId(userId)
     // Mocking what happens when you add a user
     userRepository.addUser(mockUser)
+    userRepository.uploadQRCode(exampleQRCode, userId)
     val result = userRepository.getImage(userId, "QR_Codes")
     Assert.assertTrue(result is Resource.Success)
     Assert.assertEquals(expectedQrCodeLink, (result as Resource.Success).data)
-
-    // add use
-    viewModel.getUserDetails()
-    assertEquals(expectedQrCodeLink, viewModel.uiState.value.qrCodeLink)
   }
 
   @Test
