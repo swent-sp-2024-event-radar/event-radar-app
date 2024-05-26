@@ -38,6 +38,9 @@ class MockMessageRepositoryUnitTest {
     messageHistory = messageHistory as Resource.Success
     assert(messageHistory.data.user1 == "1")
     assert(messageHistory.data.user2 == "2")
+    assert(!messageHistory.data.user1ReadMostRecentMessage)
+    assert(!messageHistory.data.user2ReadMostRecentMessage)
+    assert(messageHistory.data.messages.isEmpty())
   }
 
   @Test

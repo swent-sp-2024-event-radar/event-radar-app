@@ -18,7 +18,6 @@ import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -175,8 +174,6 @@ class ChatViewModelUnitTest {
 
     viewModel =
         ChatViewModel(messageRepository, userRepository, opponentId) // Initialize view model
-
-    runBlocking { viewModel.getMessages() }
 
     val expectedMessages = mutableListOf(msg1, msg2)
     val uiState = viewModel.uiState.value
