@@ -306,26 +306,43 @@ fun QrCodeTicketUi(
             item { Spacer(modifier = Modifier.height(32.dp)) }
 
             item {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Column(
+                        modifier = Modifier.weight(2f),
+                        verticalArrangement = Arrangement.SpaceBetween) {
+                        Text(
+                            text = "Tickets Sold",
+                            style = componentStyle.fieldTitleStyle,
+                            color = componentStyle.fieldTitleColor,
+                            modifier = Modifier.testTag("ticketSoldTitle"))
+                        Text(
+                            text =
+                            "${qrScanUiState.value.eventUiState.ticket.purchases} tickets sold",
+                            style = componentStyle.contentStyle,
+                            color = componentStyle.contentColor,
+                            modifier = Modifier.testTag("ticketSoldContent"))
+                    }
+                }
                 
-              Column(
-                  modifier =
-                      Modifier.constrainAs(ticketSold) {
-                        top.linkTo(category.bottom, margin = 32.dp)
-                        start.linkTo(parent.start, margin = widthPadding)
-                      }) {
-                    Text(
-                        text = "Tickets Sold",
-                        style = componentStyle.fieldTitleStyle,
-                        color = componentStyle.fieldTitleColor,
-                        modifier = Modifier.testTag("ticketSoldTitle"))
-                    Text(
-                        text =
-                            "${uiState.eventUiState.ticket.purchases} tickets sold", // TODO CHNAGE
-                        // TO SOLD
-                        style = componentStyle.contentStyle,
-                        color = componentStyle.contentColor,
-                        modifier = Modifier.testTag("ticketSoldContent"))
-                  }
+//              Column(
+//                  modifier =
+//                      Modifier.constrainAs(ticketSold) {
+//                        top.linkTo(category.bottom, margin = 32.dp)
+//                        start.linkTo(parent.start, margin = widthPadding)
+//                      }) {
+//                    Text(
+//                        text = "Tickets Sold",
+//                        style = componentStyle.fieldTitleStyle,
+//                        color = componentStyle.fieldTitleColor,
+//                        modifier = Modifier.testTag("ticketSoldTitle"))
+//                    Text(
+//                        text =
+//                            "${uiState.eventUiState.ticket.purchases} tickets sold", // TODO CHNAGE
+//                        // TO SOLD
+//                        style = componentStyle.contentStyle,
+//                        color = componentStyle.contentColor,
+//                        modifier = Modifier.testTag("ticketSoldContent"))
+//                  }
             }
           }
     } else {
@@ -433,18 +450,18 @@ fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
   }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewQrCodeTicketUi() {
-//  // Create a mock NavigationActions to pass into the function
-//  val userRepository = MockUserRepository()
-//  (userRepository as MockUserRepository).updateCurrentUserId("user1")
-//  val eventRepository = MockEventRepository()
-//  val qrCodeAnalyser = QrCodeAnalyser()
-//  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser, "1")
-//  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
-//}
-//
+@Preview(showBackground = true)
+@Composable
+fun PreviewQrCodeTicketUi() {
+  // Create a mock NavigationActions to pass into the function
+  val userRepository = MockUserRepository()
+  (userRepository as MockUserRepository).updateCurrentUserId("user1")
+  val eventRepository = MockEventRepository()
+  val qrCodeAnalyser = QrCodeAnalyser()
+  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser, "1")
+  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
+}
+
 //@Preview(showBackground = true)
 //@Composable
 //fun PreviewQrCodeTicketGranted() {
