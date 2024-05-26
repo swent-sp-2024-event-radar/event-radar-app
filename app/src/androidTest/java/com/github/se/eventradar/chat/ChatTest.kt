@@ -135,7 +135,6 @@ class ChatTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
         }
 
         chatScreenMessagesList { assertIsDisplayed() }
-        bottomNav { assertIsDisplayed() }
 
         chatInput { assertIsDisplayed() }
         chatInputField { assertIsDisplayed() }

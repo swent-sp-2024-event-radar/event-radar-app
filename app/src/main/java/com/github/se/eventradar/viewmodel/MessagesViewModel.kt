@@ -47,11 +47,17 @@ constructor(
     viewModelScope.launch {
       when (val response = messagesRepository.getMessages(_uiState.value.userId!!)) {
         is Resource.Success -> {
-          // sort message list by timestamp of latest message for each message history
+          // Filter the message histories to include only those with non-empty messages
+          val filteredMessageList = response.data.filter { it.messages.isNotEmpty() }
+
+          // Sort the filtered message list by timestamp of the latest message for each message
+          // history
           val sortedMessageList =
-              response.data.sortedByDescending {
+              filteredMessageList.sortedByDescending {
                 it.messages.find { message -> message.id == it.latestMessageId }?.dateTimeSent
               }
+
+          // Update the UI state with the sorted and filtered message list
           _uiState.value = _uiState.value.copy(messageList = sortedMessageList)
         }
         is Resource.Failure -> {
