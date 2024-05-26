@@ -16,8 +16,14 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -61,17 +67,32 @@ constructor(
     ScanQr
   }
 
+  private val initialUiState: StateFlow<ScanTicketQrViewModel.QrCodeScanTicketState> =
+      flow {
+            val decodedResult =
+                callbackFlow {
+                      qrCodeAnalyser.onDecoded = { decodedString ->
+                        trySend(decodedString)
+                        close()
+                      }
+                      awaitClose { qrCodeAnalyser.onDecoded = null }
+                    }
+                    .first()
+            if (decodedResult != null) {
+              updatePermissions(decodedResult)
+              emit(QrCodeScanTicketState(isLoading = false, decodedResult = decodedResult))
+            } else {
+              emit(QrCodeScanTicketState(isLoading = false, action = Action.AnalyserError))
+            }
+            getEventData()
+          }
+          .stateIn(
+              viewModelScope,
+              SharingStarted.WhileSubscribed(5000),
+              QrCodeScanTicketState(isLoading = true))
+
   init {
-    qrCodeAnalyser.onDecoded = { decodedString ->
-      val result = decodedString ?: "Failed to decode QR Code"
-      updateDecodedString(result) // Update state flow
-      if (result != "Failed to decode QR Code") {
-        updatePermissions(result) // Directly call updateFriendList
-      } else {
-        changeAction(Action.AnalyserError)
-      }
-    }
-    getEventData()
+    viewModelScope.launch { initialUiState.collect { newState -> _uiState.value = newState } }
   }
 
   private fun updatePermissions(decodedString: String) {
@@ -170,6 +191,7 @@ constructor(
   }
 
   data class QrCodeScanTicketState(
+      val isLoading: Boolean = false,
       val decodedResult: String = "",
       val action: Action = Action.ScanTicket,
       val tabState: Tab = Tab.MyEvent,
