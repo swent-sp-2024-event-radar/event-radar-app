@@ -3,8 +3,11 @@ package com.github.se.eventradar
 import com.github.se.eventradar.model.di.FirebaseEventDatabaseModule
 import com.github.se.eventradar.model.di.FirebaseMessageDatabaseModule
 import com.github.se.eventradar.model.di.FirebaseUserDatabaseModule
+import com.github.se.eventradar.model.di.LocationModule
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.event.MockEventRepository
+import com.github.se.eventradar.model.repository.location.ILocationRepository
+import com.github.se.eventradar.model.repository.location.MockLocationRepository
 import com.github.se.eventradar.model.repository.message.IMessageRepository
 import com.github.se.eventradar.model.repository.message.MockMessageRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
@@ -45,5 +48,15 @@ class MockMessageDatabaseModule {
   @Singleton
   fun provideMockMessageRepository(): IMessageRepository {
     return MockMessageRepository()
+  }
+}
+
+@Module
+@TestInstallIn(components = [SingletonComponent::class], replaces = [LocationModule::class])
+class MockLocationModule {
+  @Provides
+  @Singleton
+  fun provideMockLocationRepository(): ILocationRepository {
+    return MockLocationRepository()
   }
 }

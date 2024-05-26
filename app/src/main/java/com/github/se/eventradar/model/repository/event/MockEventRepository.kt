@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 
 class MockEventRepository : IEventRepository {
+
   val mockEvents = mutableListOf<Event>()
+  private var ticker = 0
   val eventsFlow = MutableStateFlow<Resource<List<Event>>>(Resource.Success(mockEvents))
 
   override suspend fun getEvents(): Resource<List<Event>> {
@@ -23,6 +25,10 @@ class MockEventRepository : IEventRepository {
     } else {
       Resource.Failure(Exception("Event with id $id not found"))
     }
+  }
+
+  override suspend fun getUniqueEventId(): Resource<String> {
+    return Resource.Success(ticker++.toString())
   }
 
   override suspend fun addEvent(event: Event): Resource<Unit> {

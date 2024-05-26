@@ -107,18 +107,7 @@ constructor(
           }
           is Resource.Failure -> {
             Log.d("ChatViewModel", "Failed to fetch messages: ${resource.throwable.message}")
-            _uiState.update { currentState
-              -> // Following the current logic in getMessages, may be updated
-              currentState.copy(
-                  messageHistory =
-                      MessageHistory(
-                          user1 = userId,
-                          user2 = opponentId,
-                          latestMessageId = "",
-                          user1ReadMostRecentMessage = false,
-                          user2ReadMostRecentMessage = false,
-                          messages = mutableListOf()))
-            }
+            _uiState.update { currentState -> currentState }
           }
         }
       }
@@ -140,19 +129,7 @@ constructor(
           }
           is Resource.Failure -> {
             Log.d("ChatViewModel", "Error fetching messages: ${messagesResource.throwable.message}")
-
-            // Message history doesn't exist between two users.
-            // Record an empty message history with the two user id's,
-            // so that a new message history can be created for them when addMessage is called
-            currentState.copy(
-                messageHistory =
-                    MessageHistory(
-                        user1 = userId,
-                        user2 = opponentId,
-                        latestMessageId = "",
-                        user1ReadMostRecentMessage = false,
-                        user2ReadMostRecentMessage = false,
-                        messages = mutableListOf()))
+            currentState
           }
         }
       }

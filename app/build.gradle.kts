@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
   id("com.android.application")
@@ -11,6 +13,9 @@ plugins {
   id("kotlin-kapt")
   id("dagger.hilt.android.plugin")
 }
+
+val keystoreProperties = Properties()
+keystoreProperties.load(FileInputStream(rootProject.file("keystore.properties")))
 
 android {
   namespace = "com.github.se.eventradar"
@@ -26,6 +31,15 @@ android {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables { useSupportLibrary = true }
   }
+  
+  signingConfigs {
+    create("debug_with_signing") {
+      storeFile = file(keystoreProperties["key_store_file"] as String)
+      storePassword = keystoreProperties["key_store_password"] as String
+      keyAlias = keystoreProperties["alias"] as String
+      keyPassword = keystoreProperties["key_password"] as String
+    }
+  }
 
   buildTypes {
     release {
@@ -35,6 +49,7 @@ android {
     debug {
       enableUnitTestCoverage = true
       enableAndroidTestCoverage = true
+      signingConfig = signingConfigs.getByName("debug_with_signing")
     }
   }
   compileOptions {
