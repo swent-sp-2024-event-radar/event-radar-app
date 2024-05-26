@@ -180,7 +180,7 @@ class ScanFriendQrViewModelTest {
     userRepository.addUser(mockUser1)
     userRepository.addUser(mockUser2)
     qrCodeAnalyser.onDecoded?.invoke(null)
-    assertEquals("Failed to decode QR Code", viewModel.uiState.value.decodedResult)
+    assertEquals(null, viewModel.uiState.value.decodedResult)
     assertEquals(ScanFriendQrViewModel.Action.AnalyserError, viewModel.uiState.value.action)
   }
   // todo should i be testing thta it is reset to none ? isnt this Ui logic?

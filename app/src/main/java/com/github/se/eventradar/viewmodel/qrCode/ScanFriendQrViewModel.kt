@@ -66,7 +66,7 @@ constructor(
   }
 
   data class QrCodeScanFriendState(
-      val decodedResult: String = "",
+      val decodedResult: String? = null,
       val action: Action = Action.None,
       val tabState: Tab = Tab.MyQR,
       val username: String = "",
@@ -86,7 +86,6 @@ constructor(
             when (val userIdResult = userRepository.getCurrentUserId()) {
               is Resource.Success -> {
                 val getMyUID = userIdResult.data
-                //                emit(QrCodeScanFriendState(isLoading = true))
                 myUID = getMyUID
               }
               is Resource.Failure -> {
@@ -96,19 +95,15 @@ constructor(
             val decodedResult =
                 callbackFlow {
                       qrCodeAnalyser.onDecoded = { decodedString ->
-                        trySend(decodedString ?: "Failed to decode QR Code")
+                        trySend(decodedString)
                         close()
                       }
                       awaitClose { qrCodeAnalyser.onDecoded = null }
                     }
                     .first()
 
-            if (decodedResult == "Failed to decode QR Code") {
-              emit(
-                  QrCodeScanFriendState(
-                      isLoading = false,
-                      action = Action.AnalyserError,
-                      decodedResult = decodedResult))
+            if (decodedResult == null) {
+              emit(QrCodeScanFriendState(isLoading = false, action = Action.AnalyserError))
             } else {
               emit(QrCodeScanFriendState(isLoading = false, decodedResult = decodedResult))
               updateFriendList(decodedResult)
@@ -123,45 +118,7 @@ constructor(
     viewModelScope.launch { initialUiState.collect { newState -> _uiState.value = newState } }
   }
 
-  //    qrCodeAnalyser.onDecoded = { decodedString ->
-  //      Log.d("QrCodeFriendViewModel", "Decoded QR Code: $decodedString")
-  //      if(decodedString != null) {
-  //        emit(QrCodeScanFriendState(isLoading = false))
-  //        updateFriendList(decodedString)
-  //      } else {
-  //        emit(QrCodeScanFriendState(isLoading = false, action = Action.AnalyserError))
-  //      }
-  //    }
-  //  }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000),
-  // QrCodeScanFriendState(isLoading = true))
-
-  //  init {
-  //    viewModelScope.launch {
-  //      when (userRepository.getCurrentUserId()) {
-  //        is Resource.Success -> {
-  //          myUID = (userRepository.getCurrentUserId() as Resource.Success<String>).data
-  //        }
-  //        is Resource.Failure -> {
-  //          changeAction(Action.CantGetMyUID)
-  //        }
-  //      }
-  //    }
-  //    qrCodeAnalyser.onDecoded = { decodedString ->
-  //      Log.d("QrCodeFriendViewModel", "Decoded QR Code: $decodedString")
-  //      val result = decodedString ?: "Failed to decode QR Code"
-  //      _uiState.value = _uiState.value.copy(decodedResult = result) // Update state flow
-  //      //      _decodedResult.value = result // Update state flow
-  //      if (result != "Failed to decode QR Code") {
-  //        updateFriendList(result) // Directly call updateFriendList
-  //      } else {
-  //        changeAction(Action.AnalyserError)
-  //      }
-  //    }
-  //  }
-
-  private fun updateFriendList(decodedString: String) { // private
-    val uiLength = 28
-    val friendID = decodedString.take(uiLength)
+  private fun updateFriendList(friendID: String) { // private
     Log.d("QrCodeFriendViewModel", "Friend ID: $friendID")
 
     viewModelScope.launch {
@@ -215,9 +172,9 @@ constructor(
     _uiState.value = uiState.value.copy(action = action)
     if (action == Action.NavigateToNextScreen) {
       navigationActions.navController.navigate(
-          "${Route.PRIVATE_CHAT}/${_uiState.value.decodedResult}") // TODO check correct
+          Route.PRIVATE_CHAT + "/${uiState.value.decodedResult}")
       _uiState.value = _uiState.value.copy(action = Action.None)
-      changeTabState(Tab.MyQR) // TODO add test for this
+      changeTabState(Tab.MyQR)
     }
   }
 
