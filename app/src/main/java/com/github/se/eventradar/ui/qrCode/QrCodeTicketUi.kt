@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -75,30 +76,34 @@ fun QrCodeTicketUi(
   val context = LocalContext.current
 
   ConstraintLayout(
-      modifier = Modifier.fillMaxSize().testTag("qrCodeScannerScreen"),
+      modifier = Modifier
+          .fillMaxSize()
+          .testTag("qrCodeScannerScreen"),
   ) {
     val (logo, tabs, eventDetails, bottomNav) = createRefs()
     Logo(
         modifier =
-            Modifier.fillMaxWidth()
-                .fillMaxWidth()
-                .constrainAs(logo) {
-                  top.linkTo(parent.top, margin = 32.dp)
-                  start.linkTo(parent.start, margin = 16.dp)
-                }
-                .testTag("logo"),
+        Modifier
+            .fillMaxWidth()
+            .fillMaxWidth()
+            .constrainAs(logo) {
+                top.linkTo(parent.top, margin = 32.dp)
+                start.linkTo(parent.start, margin = 16.dp)
+            }
+            .testTag("logo"),
     )
     TabRow(
         selectedTabIndex = qrScanUiState.value.tabState.ordinal,
         modifier =
-            Modifier.fillMaxWidth()
-                .padding(top = 8.dp)
-                .constrainAs(tabs) {
-                  top.linkTo(logo.bottom, margin = 16.dp)
-                  start.linkTo(parent.start)
-                  end.linkTo(parent.end)
-                }
-                .testTag("tabs"),
+        Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+            .constrainAs(tabs) {
+                top.linkTo(logo.bottom, margin = 16.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
+            .testTag("tabs"),
         contentColor = MaterialTheme.colorScheme.primary) {
           Tab(
               selected = qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent,
@@ -173,34 +178,38 @@ fun QrCodeTicketUi(
 
       LazyColumn(
           modifier =
-              Modifier.fillMaxSize()
-                  .padding(horizontal = 16.dp)
-                  .constrainAs(lazyEventDetails) {
-                    top.linkTo(tabs.bottom, margin = 0.dp)
-                    start.linkTo(parent.start, margin = 0.dp)
-                    end.linkTo(parent.end, margin = 0.dp)
-                  }
-                  .testTag("lazyEventDetails")) {
+          Modifier
+              .fillMaxSize()
+              .padding(horizontal = 16.dp)
+              .constrainAs(lazyEventDetails) {
+                  top.linkTo(tabs.bottom, margin = 0.dp)
+                  start.linkTo(parent.start, margin = 0.dp)
+                  end.linkTo(parent.end, margin = 0.dp)
+              }
+              .testTag("lazyEventDetails")) {
             item {
               Image(
                   painter = imagePainter,
                   contentDescription = "Event banner image",
                   modifier =
-                      Modifier.fillMaxWidth()
-                          .height(imageHeight)
-                          .constrainAs(image) {
-                            top.linkTo(tabs.bottom, margin = 0.dp)
-                            start.linkTo(parent.start, margin = 0.dp)
-                          }
-                          .testTag("eventImage"),
+                  Modifier
+                      .fillMaxWidth()
+                      .height(imageHeight)
+                      .constrainAs(image) {
+                          top.linkTo(tabs.bottom, margin = 0.dp)
+                          start.linkTo(parent.start, margin = 0.dp)
+                      }
+                      .testTag("eventImage"),
                   contentScale = ContentScale.FillWidth)
             }
             item {
               GoBackButton(
                   modifier =
-                      Modifier.wrapContentSize().constrainAs(backButton) {
-                        top.linkTo(image.bottom, margin = 8.dp)
-                        start.linkTo(image.start, margin = 4.dp)
+                  Modifier
+                      .wrapContentSize()
+                      .constrainAs(backButton) {
+                          top.linkTo(image.bottom, margin = 8.dp)
+                          start.linkTo(image.start, margin = 4.dp)
                       }) {
                     navigationActions.goBack()
                   }
@@ -231,52 +240,73 @@ fun QrCodeTicketUi(
             }
             item { Spacer(modifier = Modifier.height(32.dp)) }
             item {
-              EventDistance(
-                  modifier =
-                      Modifier.constrainAs(distance) {
-                        top.linkTo(description.bottom, margin = 32.dp)
-                        start.linkTo(parent.start, margin = widthPadding)
-                      },
-                  eventUiState = uiState.eventUiState,
-                  componentStyle)
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    EventDistance(
+                        modifier = Modifier.weight(2f),
+                        uiState.eventUiState,
+                        componentStyle
+                    )
+                    EventDate(modifier = Modifier.weight(1f), uiState.eventUiState, componentStyle)
+                }
             }
+//              EventDistance(
+//                  modifier =
+//                      Modifier.constrainAs(distance) {
+//                        top.linkTo(description.bottom, margin = 32.dp)
+//                        start.linkTo(parent.start, margin = widthPadding)
+//                      },
+//                  eventUiState = uiState.eventUiState,
+//                  componentStyle)
+//            }
             item { Spacer(modifier = Modifier.height(32.dp)) }
-            item {
-              EventDate(
-                  modifier =
-                      Modifier.constrainAs(date) {
-                        top.linkTo(distance.bottom, margin = 32.dp)
-                        start.linkTo(parent.start, margin = widthPadding)
-                      },
-                  eventUiState = uiState.eventUiState,
-                  componentStyle)
-            }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
-
-            item {
-              EventTime(
-                  modifier =
-                      Modifier.constrainAs(time) {
-                        top.linkTo(date.bottom, margin = 32.dp)
-                        start.linkTo(parent.start, margin = widthPadding)
-                      },
-                  eventUiState = uiState.eventUiState,
-                  componentStyle)
-            }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
-            item {
-              EventCategory(
-                  modifier =
-                      Modifier.constrainAs(category) {
-                        top.linkTo(time.bottom, margin = 32.dp)
-                        start.linkTo(parent.start, margin = widthPadding)
-                      },
-                  eventUiState = uiState.eventUiState,
-                  componentStyle)
-            }
+//            item {
+//              EventDate(
+//                  modifier =
+//                      Modifier.constrainAs(date) {
+//                        top.linkTo(distance.bottom, margin = 32.dp)
+//                        start.linkTo(parent.start, margin = widthPadding)
+//                      },
+//                  eventUiState = uiState.eventUiState,
+//                  componentStyle)
+//            }
             item { Spacer(modifier = Modifier.height(32.dp)) }
 
             item {
+
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    EventCategory(
+                        modifier = Modifier.weight(2f),
+                        uiState.eventUiState,
+                        componentStyle
+                    )
+
+                    EventTime(modifier = Modifier.weight(1f), uiState.eventUiState, componentStyle)
+                }
+            }
+//              EventTime(
+//                  modifier =
+//                      Modifier.constrainAs(time) {
+//                        top.linkTo(date.bottom, margin = 32.dp)
+//                        start.linkTo(parent.start, margin = widthPadding)
+//                      },
+//                  eventUiState = uiState.eventUiState,
+//                  componentStyle)
+//            }
+            item { Spacer(modifier = Modifier.height(32.dp)) }
+//            item {
+//              EventCategory(
+//                  modifier =
+//                      Modifier.constrainAs(category) {
+//                        top.linkTo(time.bottom, margin = 32.dp)
+//                        start.linkTo(parent.start, margin = widthPadding)
+//                      },
+//                  eventUiState = uiState.eventUiState,
+//                  componentStyle)
+//            }
+            item { Spacer(modifier = Modifier.height(32.dp)) }
+
+            item {
+                
               Column(
                   modifier =
                       Modifier.constrainAs(ticketSold) {
@@ -327,10 +357,12 @@ fun QrCodeTicketUi(
         tabList = TOP_LEVEL_DESTINATIONS,
         selectedItem = TOP_LEVEL_DESTINATIONS[3],
         modifier =
-            Modifier.testTag("bottomNavMenu").constrainAs(bottomNav) {
-              bottom.linkTo(parent.bottom)
-              start.linkTo(parent.start)
-              end.linkTo(parent.end)
+        Modifier
+            .testTag("bottomNavMenu")
+            .constrainAs(bottomNav) {
+                bottom.linkTo(parent.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
             })
   }
 }
@@ -347,21 +379,24 @@ fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
 
     Box(
         modifier =
-            Modifier.size(400.dp) // Adjust the size here to make it larger
-                .background(boxColor, RoundedCornerShape(8.dp))
-                .padding(20.dp)
-                .semantics {
-                  testTag =
-                      when (boxColor) {
+        Modifier
+            .size(400.dp) // Adjust the size here to make it larger
+            .background(boxColor, RoundedCornerShape(8.dp))
+            .padding(20.dp)
+            .semantics {
+                testTag =
+                    when (boxColor) {
                         Color.Green -> "ApprovedBox"
                         Color.Red -> "DeniedBox"
                         else -> "ErrorBox"
-                      }
-                },
+                    }
+            },
         // Aligning content to the top right corner
     ) {
       Column(
-          modifier = Modifier.fillMaxSize().padding(vertical = 16.dp),
+          modifier = Modifier
+              .fillMaxSize()
+              .padding(vertical = 16.dp),
           verticalArrangement = Arrangement.Center,
           horizontalAlignment = Alignment.CenterHorizontally) {
             val textToShow =
@@ -383,7 +418,9 @@ fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
                           }
                     })
           }
-      Box(modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)) {
+      Box(modifier = Modifier
+          .align(Alignment.TopEnd)
+          .padding(8.dp)) {
         IconButton(
             onClick = { viewModel.changeAction(ScanTicketQrViewModel.Action.ScanTicket) },
             modifier =
