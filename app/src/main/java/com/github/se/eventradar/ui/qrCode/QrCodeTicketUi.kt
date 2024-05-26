@@ -396,31 +396,31 @@ fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
   }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewQrCodeTicketUi() {
-  // Create a mock NavigationActions to pass into the function
-  val userRepository = MockUserRepository()
-  (userRepository as MockUserRepository).updateCurrentUserId("user1")
-  val eventRepository = MockEventRepository()
-  val qrCodeAnalyser = QrCodeAnalyser()
-  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser, "1")
-  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewQrCodeTicketGranted() {
-  // Create a mock NavigationActions to pass into the function
-  val userRepository = MockUserRepository()
-  (userRepository as MockUserRepository).updateCurrentUserId("user1")
-  val eventRepository = MockEventRepository()
-  val qrCodeAnalyser = QrCodeAnalyser()
-  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser, "1")
-  viewModel.changeTabState(ScanTicketQrViewModel.Tab.ScanQr)
-  viewModel.changeAction(ScanTicketQrViewModel.Action.ApproveEntry)
-  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewQrCodeTicketUi() {
+//  // Create a mock NavigationActions to pass into the function
+//  val userRepository = MockUserRepository()
+//  (userRepository as MockUserRepository).updateCurrentUserId("user1")
+//  val eventRepository = MockEventRepository()
+//  val qrCodeAnalyser = QrCodeAnalyser()
+//  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser, "1")
+//  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewQrCodeTicketGranted() {
+//  // Create a mock NavigationActions to pass into the function
+//  val userRepository = MockUserRepository()
+//  (userRepository as MockUserRepository).updateCurrentUserId("user1")
+//  val eventRepository = MockEventRepository()
+//  val qrCodeAnalyser = QrCodeAnalyser()
+//  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser, "1")
+//  viewModel.changeTabState(ScanTicketQrViewModel.Tab.ScanQr)
+//  viewModel.changeAction(ScanTicketQrViewModel.Action.ApproveEntry)
+//  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
+//}
 //// s
 // @Preview(showBackground = true)
 // @Composable
