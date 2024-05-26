@@ -423,6 +423,31 @@ fun AppScaffold(
 }
 
 @Composable
+fun AppScaffold2(
+    modifier: Modifier = Modifier,
+    topBar: @Composable () -> Unit = {
+        Logo(modifier = Modifier.fillMaxWidth().padding(top = 32.dp, start = 16.dp).testTag("logo"))
+    },
+    navigationActions: NavigationActions,
+    selectedItem: String = Route.HOME,
+    content: @Composable (PaddingValues) -> Unit,
+) {
+    Scaffold(
+        modifier = modifier,
+        topBar = topBar,
+        bottomBar = {
+            BottomNavigationMenu(
+                onTabSelected = navigationActions::navigateTo,
+                tabList = TOP_LEVEL_DESTINATIONS,
+                selectedItem = getTopLevelDestination(selectedItem),
+                modifier = Modifier.testTag("bottomNavMenu"))
+        }
+    ) {
+        content(it)
+    }
+}
+
+@Composable
 fun GenericDialogBox(
     openDialog: MutableState<Boolean>,
     modifier: Modifier = Modifier,
