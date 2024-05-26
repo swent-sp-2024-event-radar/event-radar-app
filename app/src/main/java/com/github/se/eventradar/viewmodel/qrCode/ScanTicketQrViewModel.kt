@@ -16,14 +16,20 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = ScanTicketQrViewModel.Factory::class)
 class ScanTicketQrViewModel
-@AssistedInject // Dependency injection
+@AssistedInject
 constructor(
     private val userRepository: IUserRepository,
     private val eventRepository: IEventRepository,
@@ -44,9 +50,6 @@ constructor(
     }
   }
 
-  private val _uiState = MutableStateFlow(QrCodeScanTicketState())
-  val uiState: StateFlow<QrCodeScanTicketState> = _uiState
-
   enum class Action {
     ScanTicket,
     ApproveEntry,
@@ -61,26 +64,39 @@ constructor(
     ScanQr
   }
 
+  private val _uiState = MutableStateFlow(QrCodeScanTicketState())
+  val uiState: StateFlow<QrCodeScanTicketState> = _uiState
+
+  private val initialUiState: StateFlow<ScanTicketQrViewModel.QrCodeScanTicketState> =
+      flow {
+            val decodedResult =
+                callbackFlow {
+                      qrCodeAnalyser.onDecoded = { decodedString ->
+                        trySend(decodedString)
+                        close()
+                      }
+                      awaitClose { qrCodeAnalyser.onDecoded = null }
+                    }
+                    .first()
+            if (decodedResult != null) {
+              updatePermissions(decodedResult)
+              emit(QrCodeScanTicketState(isLoading = false, decodedResult = decodedResult))
+            } else {
+              emit(QrCodeScanTicketState(isLoading = false, action = Action.AnalyserError))
+            }
+            getEventData()
+          }
+          .stateIn(
+              viewModelScope,
+              SharingStarted.WhileSubscribed(5000),
+              QrCodeScanTicketState(isLoading = true))
+
   init {
-    qrCodeAnalyser.onDecoded = { decodedString ->
-      val result = decodedString ?: "Failed to decode QR Code"
-      updateDecodedString(result) // Update state flow
-      if (result != "Failed to decode QR Code") {
-        updatePermissions(result) // Directly call updateFriendList
-      } else {
-        changeAction(Action.AnalyserError)
-      }
-    }
-    getEventData()
+    viewModelScope.launch { initialUiState.collect { newState -> _uiState.value = newState } }
   }
 
-  private fun updatePermissions(decodedString: String) {
-
-    println("entered updatePermissions")
-    val uiLength = 28
-    val attendeeID = decodedString.take(uiLength)
+  private fun updatePermissions(attendeeID: String) {
     Log.d("QrCodeTicketViewModel", "Ticket User ID: $attendeeID")
-
     viewModelScope.launch {
       val attendeeUserDeferred = async { userRepository.getUser(attendeeID) }
       val currentEventDeferred = async { eventRepository.getEvent(myEventID) }
@@ -170,6 +186,7 @@ constructor(
   }
 
   data class QrCodeScanTicketState(
+      val isLoading: Boolean = true,
       val decodedResult: String = "",
       val action: Action = Action.ScanTicket,
       val tabState: Tab = Tab.MyEvent,
