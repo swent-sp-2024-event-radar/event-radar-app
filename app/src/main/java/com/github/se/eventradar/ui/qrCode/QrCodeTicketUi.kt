@@ -1,19 +1,14 @@
 package com.github.se.eventradar.ui.qrCode
 
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -27,8 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
@@ -38,31 +31,17 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.rememberNavController
-import coil.compose.rememberImagePainter
 import com.github.se.eventradar.R
-import com.github.se.eventradar.model.repository.event.MockEventRepository
-import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu
-import com.github.se.eventradar.ui.component.EventCategory
-import com.github.se.eventradar.ui.component.EventComponentsStyle
-import com.github.se.eventradar.ui.component.EventDate
-import com.github.se.eventradar.ui.component.EventDescription
-import com.github.se.eventradar.ui.component.EventDistance
-import com.github.se.eventradar.ui.component.EventTime
-import com.github.se.eventradar.ui.component.EventTitle
-import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.component.Logo
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
 import com.github.se.eventradar.viewmodel.qrCode.ScanTicketQrViewModel
 
 @Composable
@@ -143,7 +122,7 @@ fun QrCodeTicketUi(
         }
 
     if (qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent) {
-        Toast.makeText(context, "Not implemented yet ", Toast.LENGTH_SHORT).show()
+      Toast.makeText(context, "Not implemented yet ", Toast.LENGTH_SHORT).show()
     } else {
       when (qrScanUiState.value.action) {
         ScanTicketQrViewModel.Action.ScanTicket -> {
@@ -242,9 +221,9 @@ fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
   }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewQrCodeTicketUi() {
+// @Preview(showBackground = true)
+// @Composable
+// fun PreviewQrCodeTicketUi() {
 //  // Create a mock NavigationActions to pass into the function
 //  val userRepository = MockUserRepository()
 //  (userRepository as MockUserRepository).updateCurrentUserId("user1")
@@ -252,11 +231,11 @@ fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
 //  val qrCodeAnalyser = QrCodeAnalyser()
 //  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser, "1")
 //  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
-//}
+// }
 //
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewQrCodeTicketGranted() {
+// @Preview(showBackground = true)
+// @Composable
+// fun PreviewQrCodeTicketGranted() {
 //  // Create a mock NavigationActions to pass into the function
 //  val userRepository = MockUserRepository()
 //  (userRepository as MockUserRepository).updateCurrentUserId("user1")
@@ -266,7 +245,7 @@ fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
 //  viewModel.changeTabState(ScanTicketQrViewModel.Tab.ScanQr)
 //  viewModel.changeAction(ScanTicketQrViewModel.Action.ApproveEntry)
 //  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
-//}
+// }
 //// s
 // @Preview(showBackground = true)
 // @Composable
