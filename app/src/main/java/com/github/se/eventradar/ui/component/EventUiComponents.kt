@@ -160,14 +160,9 @@ fun EventTime(modifier: Modifier, eventUiState: EventUiState, style: EventCompon
 fun TicketsSold(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
   Column(modifier = modifier) {
     Text(
-        text = stringResource(id = R.string.tickets_sold),
-        style = style.fieldTitleStyle,
-        color = style.fieldTitleColor,
-        modifier = Modifier.testTag("ticketSoldTitle"))
-    Text(
         text = "${eventUiState.ticket.purchases} tickets sold",
-        style = style.contentStyle,
-        color = style.contentColor,
+        style = style.subTitleStyle,
+        color = style.fieldTitleColor,
         modifier = Modifier.testTag("ticketSoldContent"))
   }
 }

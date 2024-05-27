@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -29,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
@@ -74,12 +74,10 @@ fun QrCodeTicketUi(
 
   val qrScanUiState = viewModel.uiState.collectAsStateWithLifecycle()
 
-  val context = LocalContext.current
-
   ConstraintLayout(
       modifier = Modifier.fillMaxSize().testTag("qrCodeScannerScreen"),
   ) {
-    val (logo, tabs, eventDetails, bottomNav) = createRefs()
+    val (logo, tabs, bottomNav) = createRefs()
     Logo(
         modifier =
             Modifier.fillMaxWidth()
@@ -144,7 +142,6 @@ fun QrCodeTicketUi(
         }
 
     if (qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent) {
-      val widthPadding = 34.dp
       val imageHeight = 191.dp
 
       val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -185,9 +182,22 @@ fun QrCodeTicketUi(
             item { Spacer(modifier = Modifier.height(8.dp)) }
             item {
               EventTitle(
-                  modifier = Modifier, // .(Alignment.CenterHorizontally),
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .wrapContentWidth(
+                              Alignment.CenterHorizontally), // .(Alignment.CenterHorizontally),
                   eventUiState = qrScanUiState.value.eventUiState,
                   style = componentStyle)
+            }
+
+            item {
+              //              Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement =
+              // Arrangement.Center) {
+              TicketsSold(
+                  modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally),
+                  eventUiState = uiState.eventUiState,
+                  style = componentStyle)
+              //              }
             }
 
             item { Spacer(modifier = Modifier.height(8.dp)) }
@@ -208,23 +218,11 @@ fun QrCodeTicketUi(
 
             item {
               Row(modifier = Modifier.fillMaxWidth()) {
-                TicketsSold(
-                    modifier = Modifier.weight(2f),
-                    eventUiState = uiState.eventUiState,
-                    style = componentStyle)
-
+                EventCategory(modifier = Modifier.weight(2f), uiState.eventUiState, componentStyle)
                 EventTime(modifier = Modifier.weight(1f), uiState.eventUiState, componentStyle)
               }
             }
             item { Spacer(modifier = Modifier.height(8.dp)) }
-
-            item {
-              Row(modifier = Modifier.fillMaxWidth()) {
-                EventCategory(modifier = Modifier.weight(2f), uiState.eventUiState, componentStyle)
-                //                TicketsSold(modifier = Modifier.weight(2f), eventUiState =
-                // uiState.eventUiState, style = componentStyle)
-              }
-            }
           }
     } else {
       when (qrScanUiState.value.action) {
@@ -329,7 +327,7 @@ fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
 fun PreviewQrCodeTicketUi() {
   // Create a mock NavigationActions to pass into the function
   val userRepository = MockUserRepository()
-  (userRepository as MockUserRepository).updateCurrentUserId("user1")
+  (userRepository).updateCurrentUserId("user1")
   val eventRepository = MockEventRepository()
   val qrCodeAnalyser = QrCodeAnalyser()
   val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser, "1")
