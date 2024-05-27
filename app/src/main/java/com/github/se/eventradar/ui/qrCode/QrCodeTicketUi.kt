@@ -57,6 +57,7 @@ import com.github.se.eventradar.ui.component.EventDate
 import com.github.se.eventradar.ui.component.EventDescription
 import com.github.se.eventradar.ui.component.EventDistance
 import com.github.se.eventradar.ui.component.EventTime
+import com.github.se.eventradar.ui.component.EventTitle
 import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.component.Logo
 import com.github.se.eventradar.ui.navigation.NavigationActions
@@ -154,18 +155,7 @@ fun QrCodeTicketUi(
               MaterialTheme.colorScheme.onSurface,
           )
 
-      val (
-          image,
-          backButton,
-          title,
-          description,
-          distance,
-          category,
-          date,
-          time,
-          ticketSold,
-          lazyEventDetails) =
-          createRefs()
+      val (image, backButton, lazyEventDetails) = createRefs()
 
       // TODO uncomment when image are implemented
       // val imagePainter: Painter = rememberImagePainter(eventUiState.eventPhoto)
@@ -185,14 +175,7 @@ fun QrCodeTicketUi(
               Image(
                   painter = imagePainter,
                   contentDescription = "Event banner image",
-                  modifier =
-                      Modifier.fillMaxWidth()
-                          .height(imageHeight)
-                          .constrainAs(image) {
-                            top.linkTo(tabs.bottom, margin = 0.dp)
-                            start.linkTo(parent.start, margin = 0.dp)
-                          }
-                          .testTag("eventImage"),
+                  modifier = Modifier.fillMaxWidth().height(imageHeight).testTag("eventImage"),
                   contentScale = ContentScale.FillWidth)
             }
             item {
@@ -205,69 +188,29 @@ fun QrCodeTicketUi(
                     navigationActions.goBack()
                   }
             }
-            //            item {
-            //              EventTitle(
-            //                  modifier =
-            //                      Modifier.constrainAs(title) {
-            //                        top.linkTo(image.bottom, margin = 32.dp)
-            //                        start.linkTo(image.start)
-            //                        end.linkTo(image.end)
-            //                      },
-            //                  eventUiState = uiState.eventUiState,
-            //                  style = componentStyle)
-            //            }
-            //          Column(
-            //              modifier = Modifier.padding(horizontal = 16.dp),
-            //              horizontalAlignment = Alignment.CenterHorizontally) {
-            //              EventDescription(
-            //                  modifier = Modifier, qrScanUiState.value.eventUiState,
-            // componentStyle)
+            item { Spacer(modifier = Modifier.height(8.dp)) }
+            item {
+              EventTitle(
+                  modifier = Modifier, // .(Alignment.CenterHorizontally),
+                  eventUiState = qrScanUiState.value.eventUiState,
+                  style = componentStyle)
+            }
 
-            item { Spacer(modifier = Modifier.height(32.dp)) }
+            item { Spacer(modifier = Modifier.height(8.dp)) }
+
             item {
               EventDescription(
                   modifier = Modifier, qrScanUiState.value.eventUiState, componentStyle)
             }
 
-            //              EventDescription(
-            //                  modifier =
-            //                      Modifier
-            //                          // .padding(start = widthPadding, end = widthPadding)
-            //                          .constrainAs(description) {
-            //                            top.linkTo(title.bottom, margin = 32.dp)
-            //                            start.linkTo(parent.start, margin = widthPadding)
-            //                          },
-            //                  eventUiState = uiState.eventUiState,
-            //                  componentStyle)
-
-            item { Spacer(modifier = Modifier.height(32.dp)) }
+            item { Spacer(modifier = Modifier.height(16.dp)) }
             item {
               Row(modifier = Modifier.fillMaxWidth()) {
                 EventDistance(modifier = Modifier.weight(2f), uiState.eventUiState, componentStyle)
                 EventDate(modifier = Modifier.weight(1f), uiState.eventUiState, componentStyle)
               }
             }
-            //              EventDistance(
-            //                  modifier =
-            //                      Modifier.constrainAs(distance) {
-            //                        top.linkTo(description.bottom, margin = 32.dp)
-            //                        start.linkTo(parent.start, margin = widthPadding)
-            //                      },
-            //                  eventUiState = uiState.eventUiState,
-            //                  componentStyle)
-            //            }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
-            //            item {
-            //              EventDate(
-            //                  modifier =
-            //                      Modifier.constrainAs(date) {
-            //                        top.linkTo(distance.bottom, margin = 32.dp)
-            //                        start.linkTo(parent.start, margin = widthPadding)
-            //                      },
-            //                  eventUiState = uiState.eventUiState,
-            //                  componentStyle)
-            //            }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
+            item { Spacer(modifier = Modifier.height(8.dp)) }
 
             item {
               Row(modifier = Modifier.fillMaxWidth()) {
@@ -276,67 +219,23 @@ fun QrCodeTicketUi(
                 EventTime(modifier = Modifier.weight(1f), uiState.eventUiState, componentStyle)
               }
             }
-            //              EventTime(
-            //                  modifier =
-            //                      Modifier.constrainAs(time) {
-            //                        top.linkTo(date.bottom, margin = 32.dp)
-            //                        start.linkTo(parent.start, margin = widthPadding)
-            //                      },
-            //                  eventUiState = uiState.eventUiState,
-            //                  componentStyle)
-            //            }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
-            //            item {
-            //              EventCategory(
-            //                  modifier =
-            //                      Modifier.constrainAs(category) {
-            //                        top.linkTo(time.bottom, margin = 32.dp)
-            //                        start.linkTo(parent.start, margin = widthPadding)
-            //                      },
-            //                  eventUiState = uiState.eventUiState,
-            //                  componentStyle)
-            //            }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
+            item { Spacer(modifier = Modifier.height(8.dp)) }
 
             item {
               Row(modifier = Modifier.fillMaxWidth()) {
-                Column(
-                    modifier = Modifier.weight(2f),
-                    verticalArrangement = Arrangement.SpaceBetween) {
-                      Text(
-                          text = "Tickets Sold",
-                          style = componentStyle.fieldTitleStyle,
-                          color = componentStyle.fieldTitleColor,
-                          modifier = Modifier.testTag("ticketSoldTitle"))
-                      Text(
-                          text =
-                              "${qrScanUiState.value.eventUiState.ticket.purchases} tickets sold",
-                          style = componentStyle.contentStyle,
-                          color = componentStyle.contentColor,
-                          modifier = Modifier.testTag("ticketSoldContent"))
-                    }
+                Column(modifier = Modifier.weight(2f)) {
+                  Text(
+                      text = "Tickets Sold",
+                      style = componentStyle.fieldTitleStyle,
+                      color = componentStyle.fieldTitleColor,
+                      modifier = Modifier.testTag("ticketSoldTitle"))
+                  Text(
+                      text = "${qrScanUiState.value.eventUiState.ticket.purchases} tickets sold",
+                      style = componentStyle.contentStyle,
+                      color = componentStyle.contentColor,
+                      modifier = Modifier.testTag("ticketSoldContent"))
+                }
               }
-
-              //              Column(
-              //                  modifier =
-              //                      Modifier.constrainAs(ticketSold) {
-              //                        top.linkTo(category.bottom, margin = 32.dp)
-              //                        start.linkTo(parent.start, margin = widthPadding)
-              //                      }) {
-              //                    Text(
-              //                        text = "Tickets Sold",
-              //                        style = componentStyle.fieldTitleStyle,
-              //                        color = componentStyle.fieldTitleColor,
-              //                        modifier = Modifier.testTag("ticketSoldTitle"))
-              //                    Text(
-              //                        text =
-              //                            "${uiState.eventUiState.ticket.purchases} tickets sold",
-              // // TODO CHNAGE
-              //                        // TO SOLD
-              //                        style = componentStyle.contentStyle,
-              //                        color = componentStyle.contentColor,
-              //                        modifier = Modifier.testTag("ticketSoldContent"))
-              //                  }
             }
           }
     } else {
