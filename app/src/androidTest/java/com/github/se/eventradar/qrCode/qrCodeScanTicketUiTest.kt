@@ -297,20 +297,38 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
         }
       }
 
-  //  @Test
-  //  fun screenDisplaysContentElementsCorrectly6() =
-  //      //  Test(timeout = 45.seconds) {
-  //      run {
-  //        every { mockViewModel.uiState } returns MyEventTabDetailsUiState
-  //        onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-  //          composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
-  //          ticketSoldTitle { assertIsDisplayed() }
-  //          ticketSoldContent {
-  //            assertIsDisplayed()
-  //            assertTextContains("59 tickets sold")
-  //          }
-  //        }
-  //      }
+  @Test
+  fun screenDisplaysContentElementsCorrectly6() =
+      //  Test(timeout = 45.seconds) {
+      run {
+        every { mockViewModel.uiState } returns MyEventTabDetailsUiState
+        onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
+          composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
+          ticketSoldTitle { assertIsDisplayed() }
+        }
+      }
+
+  @Test
+  fun screenDisplaysContentElementsCorrectly7() =
+      //  Test(timeout = 45.seconds) {
+      run {
+        every { mockViewModel.uiState } returns MyEventTabDetailsUiState
+        onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
+          composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
+          ticketSoldContent { assertIsDisplayed() }
+        }
+      }
+
+  @Test
+  fun screenDisplaysContentElementsCorrectly8() =
+      //  Test(timeout = 45.seconds) {
+      run {
+        every { mockViewModel.uiState } returns MyEventTabDetailsUiState
+        onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
+          composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
+          ticketSoldContent { assertTextContains("59 tickets sold") }
+        }
+      }
 
   @Test
   fun goBackButtonTriggersBackNavigation() = run {

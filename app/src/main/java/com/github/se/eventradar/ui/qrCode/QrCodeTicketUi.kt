@@ -38,14 +38,18 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.github.se.eventradar.R
+import com.github.se.eventradar.model.repository.event.MockEventRepository
+import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.EventCategory
 import com.github.se.eventradar.ui.component.EventComponentsStyle
@@ -56,8 +60,10 @@ import com.github.se.eventradar.ui.component.EventTime
 import com.github.se.eventradar.ui.component.EventTitle
 import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.component.Logo
+import com.github.se.eventradar.ui.component.TicketsSold
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
 import com.github.se.eventradar.viewmodel.qrCode.ScanTicketQrViewModel
 
 @Composable
@@ -150,7 +156,7 @@ fun QrCodeTicketUi(
               MaterialTheme.colorScheme.onSurface,
           )
 
-      val (image, backButton, lazyEventDetails) = createRefs()
+      val (lazyEventDetails) = createRefs()
 
       // TODO uncomment when image are implemented
       // val imagePainter: Painter = rememberImagePainter(eventUiState.eventPhoto)
@@ -174,14 +180,7 @@ fun QrCodeTicketUi(
                   contentScale = ContentScale.FillWidth)
             }
             item {
-              GoBackButton(
-                  modifier =
-                      Modifier.wrapContentSize().constrainAs(backButton) {
-                        top.linkTo(image.bottom, margin = 8.dp)
-                        start.linkTo(image.start, margin = 4.dp)
-                      }) {
-                    navigationActions.goBack()
-                  }
+              GoBackButton(modifier = Modifier.wrapContentSize()) { navigationActions.goBack() }
             }
             item { Spacer(modifier = Modifier.height(8.dp)) }
             item {
@@ -218,18 +217,10 @@ fun QrCodeTicketUi(
 
             item {
               Row(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.weight(2f)) {
-                  Text(
-                      text = "Tickets Sold",
-                      style = componentStyle.fieldTitleStyle,
-                      color = componentStyle.fieldTitleColor,
-                      modifier = Modifier.testTag("ticketSoldTitle"))
-                  Text(
-                      text = "${qrScanUiState.value.eventUiState.ticket.purchases} tickets sold",
-                      style = componentStyle.contentStyle,
-                      color = componentStyle.contentColor,
-                      modifier = Modifier.testTag("ticketSoldContent"))
-                }
+                TicketsSold(
+                    modifier = Modifier.weight(2f),
+                    eventUiState = uiState.eventUiState,
+                    style = componentStyle)
               }
             }
           }
@@ -331,17 +322,17 @@ fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
   }
 }
 
-// @Preview(showBackground = true)
-// @Composable
-// fun PreviewQrCodeTicketUi() {
-//  // Create a mock NavigationActions to pass into the function
-//  val userRepository = MockUserRepository()
-//  (userRepository as MockUserRepository).updateCurrentUserId("user1")
-//  val eventRepository = MockEventRepository()
-//  val qrCodeAnalyser = QrCodeAnalyser()
-//  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser, "1")
-//  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
-// }
+@Preview(showBackground = true)
+@Composable
+fun PreviewQrCodeTicketUi() {
+  // Create a mock NavigationActions to pass into the function
+  val userRepository = MockUserRepository()
+  (userRepository as MockUserRepository).updateCurrentUserId("user1")
+  val eventRepository = MockEventRepository()
+  val qrCodeAnalyser = QrCodeAnalyser()
+  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser, "1")
+  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
+}
 
 // @Preview(showBackground = true)
 // @Composable
