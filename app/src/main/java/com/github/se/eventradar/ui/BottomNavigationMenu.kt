@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.eventradar.R
@@ -55,7 +56,9 @@ fun BottomNavigationMenu(
             Text(
                 text = labelText,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 11.sp)
+                fontSize = 11.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis)
           },
           selected = selectedItem == tab,
           onClick = { onTabSelected(tab) },
