@@ -208,7 +208,10 @@ fun QrCodeTicketUi(
 
             item {
               Row(modifier = Modifier.fillMaxWidth()) {
-                EventCategory(modifier = Modifier.weight(2f), uiState.eventUiState, componentStyle)
+                TicketsSold(
+                    modifier = Modifier.weight(2f),
+                    eventUiState = uiState.eventUiState,
+                    style = componentStyle)
 
                 EventTime(modifier = Modifier.weight(1f), uiState.eventUiState, componentStyle)
               }
@@ -217,10 +220,9 @@ fun QrCodeTicketUi(
 
             item {
               Row(modifier = Modifier.fillMaxWidth()) {
-                TicketsSold(
-                    modifier = Modifier.weight(2f),
-                    eventUiState = uiState.eventUiState,
-                    style = componentStyle)
+                EventCategory(modifier = Modifier.weight(2f), uiState.eventUiState, componentStyle)
+                //                TicketsSold(modifier = Modifier.weight(2f), eventUiState =
+                // uiState.eventUiState, style = componentStyle)
               }
             }
           }
