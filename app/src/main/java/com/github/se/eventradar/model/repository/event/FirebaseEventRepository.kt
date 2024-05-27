@@ -7,46 +7,44 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 class FirebaseEventRepository(db: FirebaseFirestore = Firebase.firestore) : IEventRepository {
   private val eventRef: CollectionReference = db.collection("events")
   private val expiredEventRef: CollectionReference = db.collection("expired_events")
   private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
 
-
   override suspend fun getEvents(): Resource<List<Event>> {
     cleanExpiredEvents()
     val resultDocument = eventRef.get().await()
 
     return try {
-      val events = resultDocument.documents
-        .map { document -> Event(document.data!!, document.id) }
+      val events = resultDocument.documents.map { document -> Event(document.data!!, document.id) }
       Resource.Success(events)
     } catch (e: Exception) {
       Resource.Failure(e)
     }
   }
 
-//called to ensure expired events are moved to collection expired_events
-  override suspend fun cleanExpiredEvents(): Resource<Unit>  {
-  val currentDateTimeString = LocalDateTime.now().format(formatter)
-  val expiredResult = eventRef.whereLessThan("end", currentDateTimeString).get().await()
+  // called to ensure expired events are moved to collection expired_events
+  override suspend fun cleanExpiredEvents(): Resource<Unit> {
+    val currentDateTimeString = LocalDateTime.now().format(formatter)
+    val expiredResult = eventRef.whereLessThan("end", currentDateTimeString).get().await()
     return try {
       // For Each Document in querySnapshot:
       for (document in expiredResult.documents) {
-        //Call addEventExpired directly with the document as argument
+        // Call addEventExpired directly with the document as argument
         try {
           addEventExpired(document)
         } catch (e: Exception) {
           return Resource.Failure(e)
         }
-        //Call deleteEventByID with the document ID as argument
+        // Call deleteEventByID with the document ID as argument
         try {
           deleteEventByID(document.id)
         } catch (e: Exception) {
@@ -67,7 +65,6 @@ class FirebaseEventRepository(db: FirebaseFirestore = Firebase.firestore) : IEve
       Resource.Failure(e)
     }
   }
-
 
   override suspend fun addEventExpired(document: DocumentSnapshot): Resource<Unit> {
     val eventId = document.id

@@ -3,7 +3,6 @@ package com.github.se.eventradar.model.repository.event
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.event.Event
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.flow.Flow
 
 interface IEventRepository {
@@ -26,8 +25,6 @@ interface IEventRepository {
   suspend fun deleteEventByID(fireBaseID: String): Resource<Unit>
 
   suspend fun getEventsByIds(ids: List<String>): Resource<List<Event>>
-
-
 
   fun observeAllEvents(): Flow<Resource<List<Event>>>
 
