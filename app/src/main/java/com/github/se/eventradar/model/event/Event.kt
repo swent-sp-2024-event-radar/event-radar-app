@@ -20,7 +20,7 @@ data class Event(
 ) {
   constructor(
       map: Map<String, Any>,
-      id: String
+      id: String,
   ) : this(
       eventName = map["name"] as String,
       eventPhoto = map["photo_url"] as String,

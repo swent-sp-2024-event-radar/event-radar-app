@@ -168,10 +168,24 @@ class FirebaseMessageRepositoryUnitTest {
     every { messagesRef.where(any()).limit(1).get() } returns mockTask(mockQuerySnapshot)
     every { mockQuerySnapshot.isEmpty } returns true
 
+    every { messagesRef.add(any()) } returns mockTask(mockDocumentReference)
+    every { mockDocumentReference.id } returns "1"
+
     val result = firebaseMessageRepository.getMessages(uid, "2")
-    val exceptionMessage = ("No message history found between users")
-    assert(result is Resource.Failure)
-    assert((result as Resource.Failure).throwable.message == exceptionMessage)
+
+    val expectedMH =
+        MessageHistory(
+            user1 = uid,
+            user2 = "2",
+            latestMessageId = "",
+            user1ReadMostRecentMessage = false,
+            user2ReadMostRecentMessage = false,
+            messages = mutableListOf(),
+            id = "1")
+
+    assert(result is Resource.Success)
+    val returnedMessageHistory = (result as Resource.Success).data
+    assert(returnedMessageHistory == expectedMH)
   }
 
   @Test
@@ -320,10 +334,10 @@ class FirebaseMessageRepositoryUnitTest {
     // Execute the addMessage function
     val result = firebaseMessageRepository.addMessage(message, emptyMessageHistory)
 
-    // Assert successful addition and correct message history creation
+    // Assert successful addition
     assert(result is Resource.Success)
     assert(captureUpdate.captured == expectedUpdateValues)
-    assert(emptyMessageHistory.id == newMessageHistoryId) // Check if the ID was set correctly
+    assert(emptyMessageHistory.id == newMessageHistoryId)
   }
 
   @Test

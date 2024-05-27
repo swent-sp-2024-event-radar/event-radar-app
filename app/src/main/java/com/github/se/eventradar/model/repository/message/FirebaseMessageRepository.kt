@@ -70,7 +70,7 @@ class FirebaseMessageRepository(db: FirebaseFirestore = Firebase.firestore) : IM
               .await()
 
       if (resultDocument == null || resultDocument.isEmpty) {
-        return Resource.Failure(Exception("No message history found between users"))
+        return createNewMessageHistory(user1, user2)
       }
 
       val result = resultDocument.documents[0]
@@ -100,26 +100,9 @@ class FirebaseMessageRepository(db: FirebaseFirestore = Firebase.firestore) : IM
       messageHistory: MessageHistory
   ): Resource<Unit> {
     return try {
-      // Check if the message history exists based on the `messages` field
-      // If messages field is empty, then message history doesn't exist in Firestore
-      val messageHistoryId =
-          if (messageHistory.messages.isEmpty()) {
-            val newHistoryResource =
-                createNewMessageHistory(messageHistory.user1, messageHistory.user2)
-            if (newHistoryResource is Resource.Failure) {
-              return Resource.Failure(newHistoryResource.throwable)
-            }
-
-            val newHistory = (newHistoryResource as Resource.Success).data
-            newHistory.id
-          } else {
-            // Use the existing message history ID
-            messageHistory.id
-          }
-
       val newMessage =
           messageRef
-              .document(messageHistoryId)
+              .document(messageHistory.id)
               .collection("messages_list")
               .add(message.toMap())
               .await()
@@ -131,7 +114,7 @@ class FirebaseMessageRepository(db: FirebaseFirestore = Firebase.firestore) : IM
               "to_user_read" to (message.sender == messageHistory.user2),
           )
 
-      messageRef.document(messageHistoryId).update(updatedValues).await()
+      messageRef.document(messageHistory.id).update(updatedValues).await()
       Resource.Success(Unit)
     } catch (e: Exception) {
       Resource.Failure(e)
