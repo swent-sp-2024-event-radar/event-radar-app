@@ -146,7 +146,7 @@ fun QrCodeScreen(
           }
     } else {
       Column(modifier = Modifier.testTag("QrScanner")) {
-        QrCodeScanner(analyser = viewModel.qrCodeAnalyser)
+        QrCodeScannerFriend(analyser = viewModel.qrCodeAnalyser)
       }
     }
     BottomNavigationMenu(

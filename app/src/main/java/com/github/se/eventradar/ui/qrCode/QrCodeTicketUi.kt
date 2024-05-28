@@ -50,44 +50,44 @@ fun QrCodeTicketUi(
     navigationActions: NavigationActions
 ) {
 
-  val qrScanUiState = viewModel.uiState.collectAsStateWithLifecycle()
+    val qrScanUiState = viewModel.uiState.collectAsStateWithLifecycle()
 
-  val context = LocalContext.current
+    val context = LocalContext.current
 
-  ConstraintLayout(
-      modifier = Modifier.fillMaxSize().testTag("qrCodeScannerScreen"),
-  ) {
-    val (logo, tabs, eventDetails, bottomNav) = createRefs()
-    Logo(
-        modifier =
+    ConstraintLayout(
+        modifier = Modifier.fillMaxSize().testTag("qrCodeScannerScreen"),
+    ) {
+        val (logo, tabs, eventDetails, bottomNav) = createRefs()
+        Logo(
+            modifier =
             Modifier.fillMaxWidth()
                 .fillMaxWidth()
                 .constrainAs(logo) {
-                  top.linkTo(parent.top, margin = 32.dp)
-                  start.linkTo(parent.start, margin = 16.dp)
+                    top.linkTo(parent.top, margin = 32.dp)
+                    start.linkTo(parent.start, margin = 16.dp)
                 }
                 .testTag("logo"),
-    )
-    TabRow(
-        selectedTabIndex = qrScanUiState.value.tabState.ordinal,
-        modifier =
+        )
+        TabRow(
+            selectedTabIndex = qrScanUiState.value.tabState.ordinal,
+            modifier =
             Modifier.fillMaxWidth()
                 .padding(top = 8.dp)
                 .constrainAs(tabs) {
-                  top.linkTo(logo.bottom, margin = 16.dp)
-                  start.linkTo(parent.start)
-                  end.linkTo(parent.end)
+                    top.linkTo(logo.bottom, margin = 16.dp)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
                 }
                 .testTag("tabs"),
-        contentColor = MaterialTheme.colorScheme.primary) {
-          Tab(
-              selected = qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent,
-              onClick = { viewModel.changeTabState(ScanTicketQrViewModel.Tab.MyEvent) },
-              modifier = Modifier.testTag("My Event"),
-          ) {
-            Text(
-                text = "My Event",
-                style =
+            contentColor = MaterialTheme.colorScheme.primary) {
+            Tab(
+                selected = qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent,
+                onClick = { viewModel.changeTabState(ScanTicketQrViewModel.Tab.MyEvent) },
+                modifier = Modifier.testTag("My Event"),
+            ) {
+                Text(
+                    text = "My Event",
+                    style =
                     TextStyle(
                         fontSize = 19.sp,
                         lineHeight = 17.sp,
@@ -97,128 +97,129 @@ fun QrCodeTicketUi(
                         textAlign = TextAlign.Center,
                         letterSpacing = 0.25.sp,
                     ),
-                modifier = Modifier.padding(bottom = 8.dp))
-          }
-          Tab(
-              selected = qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.ScanQr,
-              onClick = {
-                viewModel.changeTabState(ScanTicketQrViewModel.Tab.ScanQr)
-              }, // selectedTabIndex = 1
-              modifier = Modifier.testTag("Scan QR Code")) {
+                    modifier = Modifier.padding(bottom = 8.dp))
+            }
+            Tab(
+                selected = qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.ScanQr,
+                onClick = {
+                    viewModel.changeTabState(ScanTicketQrViewModel.Tab.ScanQr)
+                }, // selectedTabIndex = 1
+                modifier = Modifier.testTag("Scan QR Code")) {
                 Text(
                     text = "Scan Ticket",
                     style =
-                        TextStyle(
-                            fontSize = 19.sp,
-                            lineHeight = 17.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto)),
-                            fontWeight = FontWeight(500),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            textAlign = TextAlign.Center,
-                            letterSpacing = 0.25.sp,
-                        ),
+                    TextStyle(
+                        fontSize = 19.sp,
+                        lineHeight = 17.sp,
+                        fontFamily = FontFamily(Font(R.font.roboto)),
+                        fontWeight = FontWeight(500),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        textAlign = TextAlign.Center,
+                        letterSpacing = 0.25.sp,
+                    ),
                     modifier = Modifier.padding(bottom = 8.dp))
-              }
+            }
         }
 
-    if (qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent) {
-      Toast.makeText(context, "Not implemented yet ", Toast.LENGTH_SHORT).show()
-    } else {
-      when (qrScanUiState.value.action) {
-        ScanTicketQrViewModel.Action.ScanTicket -> {
-          Column(modifier = Modifier.testTag("QrScanner")) {
-            QrCodeScanner(analyser = viewModel.qrCodeAnalyser)
-          }
+        if (qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent) {
+            Toast.makeText(context, "Not implemented yet ", Toast.LENGTH_SHORT).show()
+        } else {
+            when (qrScanUiState.value.action) {
+                ScanTicketQrViewModel.Action.ScanTicket -> {
+                    Column(modifier = Modifier.testTag("QrScanner")) {
+                        QrCodeScannerFriend(analyser = viewModel.qrCodeAnalyser)
+                    }
+                }
+                ScanTicketQrViewModel.Action.ApproveEntry -> {
+                    println("ApprovedBox should now be displayed")
+                    EntryDialog(0, viewModel)
+                }
+                ScanTicketQrViewModel.Action.DenyEntry -> {
+                    EntryDialog(1, viewModel)
+                }
+                ScanTicketQrViewModel.Action.FirebaseUpdateError,
+                ScanTicketQrViewModel.Action.FirebaseFetchError,
+                ScanTicketQrViewModel.Action.AnalyserError -> {
+                    EntryDialog(2, viewModel)
+                }
+            }
         }
-        ScanTicketQrViewModel.Action.ApproveEntry -> {
-          println("ApprovedBox should now be displayed")
-          EntryDialog(0, viewModel)
-        }
-        ScanTicketQrViewModel.Action.DenyEntry -> {
-          EntryDialog(1, viewModel)
-        }
-        ScanTicketQrViewModel.Action.FirebaseUpdateError,
-        ScanTicketQrViewModel.Action.FirebaseFetchError,
-        ScanTicketQrViewModel.Action.AnalyserError -> {
-          EntryDialog(2, viewModel)
-        }
-      }
-    }
-    BottomNavigationMenu(
-        onTabSelected = { tab ->
-          navigationActions.navigateTo(tab)
-          viewModel.resetConditions()
-        },
-        tabList = TOP_LEVEL_DESTINATIONS,
-        selectedItem = TOP_LEVEL_DESTINATIONS[3],
-        modifier =
+        BottomNavigationMenu(
+            onTabSelected = { tab ->
+                navigationActions.navigateTo(tab)
+                viewModel.resetConditions()
+            },
+            tabList = TOP_LEVEL_DESTINATIONS,
+            selectedItem = TOP_LEVEL_DESTINATIONS[3],
+            modifier =
             Modifier.testTag("bottomNavMenu").constrainAs(bottomNav) {
-              bottom.linkTo(parent.bottom)
-              start.linkTo(parent.start)
-              end.linkTo(parent.end)
+                bottom.linkTo(parent.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
             })
-  }
+    }
 }
 
 @Composable
 fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
-  Dialog(onDismissRequest = { viewModel.changeAction(ScanTicketQrViewModel.Action.ScanTicket) }) {
-    val boxColor =
-        when (edr) {
-          0 -> Color.Green
-          1 -> Color.Red
-          else -> Color.Yellow
-        }
+    Dialog(onDismissRequest = { viewModel.changeAction(ScanTicketQrViewModel.Action.ScanTicket) }) {
+        val boxColor =
+            when (edr) {
+                0 -> Color.Green
+                1 -> Color.Red
+                else -> Color.Yellow
+            }
 
-    Box(
-        modifier =
+        Box(
+            modifier =
             Modifier.size(400.dp) // Adjust the size here to make it larger
                 .background(boxColor, RoundedCornerShape(8.dp))
                 .padding(20.dp)
                 .semantics {
-                  testTag =
-                      when (boxColor) {
-                        Color.Green -> "ApprovedBox"
-                        Color.Red -> "DeniedBox"
-                        else -> "ErrorBox"
-                      }
+                    testTag =
+                        when (boxColor) {
+                            Color.Green -> "ApprovedBox"
+                            Color.Red -> "DeniedBox"
+                            else -> "ErrorBox"
+                        }
                 },
-        // Aligning content to the top right corner
-    ) {
-      Column(
-          modifier = Modifier.fillMaxSize().padding(vertical = 16.dp),
-          verticalArrangement = Arrangement.Center,
-          horizontalAlignment = Alignment.CenterHorizontally) {
-            val textToShow =
-                when (edr) {
-                  0 -> "Entry Approved"
-                  1 -> "Entry Denied"
-                  else -> "Error, Please Retry"
-                }
-            Text(
-                text = textToShow,
-                style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp),
-                modifier =
+            // Aligning content to the top right corner
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(vertical = 16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                val textToShow =
+                    when (edr) {
+                        0 -> "Entry Approved"
+                        1 -> "Entry Denied"
+                        else -> "Error, Please Retry"
+                    }
+                Text(
+                    text = textToShow,
+                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp),
+                    modifier =
                     Modifier.semantics {
-                      testTag =
-                          when (edr) {
-                            0 -> "EntryApprovedText"
-                            1 -> "EntryDeniedText"
-                            else -> "ErrorText"
-                          }
+                        testTag =
+                            when (edr) {
+                                0 -> "EntryApprovedText"
+                                1 -> "EntryDeniedText"
+                                else -> "ErrorText"
+                            }
                     })
-          }
-      Box(modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)) {
-        IconButton(
-            onClick = { viewModel.changeAction(ScanTicketQrViewModel.Action.ScanTicket) },
-            modifier =
-                Modifier.semantics { testTag = "closeButton" } // Adding testTag to the IconButton
-            ) {
-              Icon(Icons.Default.Close, contentDescription = "Close")
             }
-      }
+            Box(modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)) {
+                IconButton(
+                    onClick = {
+                        viewModel.changeAction(ScanTicketQrViewModel.Action.ScanTicket) },
+                    modifier =
+                    Modifier.semantics { testTag = "closeButton" } // Adding testTag to the IconButton
+                ) {
+                    Icon(Icons.Default.Close, contentDescription = "Close")
+                }
+            }
+        }
     }
-  }
 }
 
 // @Preview(showBackground = true)

@@ -30,7 +30,7 @@ import androidx.core.content.ContextCompat
 import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
 
 @Composable
-fun QrCodeScanner(analyser: QrCodeAnalyser) {
+fun QrCodeScannerFriend(analyser: QrCodeAnalyser) {
 
   val context = LocalContext.current
   val lifeCycleOwner = LocalLifecycleOwner.current
