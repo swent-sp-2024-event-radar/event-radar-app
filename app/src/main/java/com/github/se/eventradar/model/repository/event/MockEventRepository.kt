@@ -2,6 +2,7 @@ package com.github.se.eventradar.model.repository.event
 
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.event.Event
+import java.time.LocalDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +20,9 @@ class MockEventRepository : IEventRepository {
   }
 
   override suspend fun getEvent(id: String): Resource<Event?> {
-    val event = mockEvents.find { it.fireBaseID == id }
+
+    val validEvents = mockEvents.filter { it.end.isAfter(LocalDateTime.now()) }
+    val event = validEvents.find { it.fireBaseID == id }
 
     return if (event != null) {
       Resource.Success(event)
@@ -102,13 +105,28 @@ class MockEventRepository : IEventRepository {
     return Resource.Success(events)
   }
 
-  override fun observeAllEvents(): Flow<Resource<List<Event>>> = eventsFlow.asStateFlow()
+  override fun observeAllEvents(): Flow<Resource<List<Event>>> {
+    return eventsFlow.asStateFlow().map { resource ->
+      when (resource) {
+        is Resource.Success -> {
+          val upcomingEvents = resource.data.filter { it.end.isAfter(LocalDateTime.now()) }
+          Resource.Success(upcomingEvents)
+        }
+        is Resource.Failure -> resource
+      }
+    }
+  }
+  //  override fun observeAllEvents(): Flow<Resource<List<Event>>> =
+  //    eventsFlow.asStateFlow()
 
   override fun observeUpcomingEvents(userId: String): Flow<Resource<List<Event>>> {
     return eventsFlow.asStateFlow().map { resource ->
       when (resource) {
         is Resource.Success -> {
-          val upcomingEvents = resource.data.filter { it.attendeeList.contains(userId) }
+          val upcomingEvents =
+              resource.data
+                  .filter { it.attendeeList.contains(userId) }
+                  .filter { it.end.isAfter(LocalDateTime.now()) }
           Resource.Success(upcomingEvents)
         }
         is Resource.Failure -> resource

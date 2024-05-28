@@ -29,51 +29,6 @@ class FirebaseEventRepository(db: FirebaseFirestore = Firebase.firestore) : IEve
     }
   }
 
-  // called to ensure expired events are moved to collection expired_events
-  //  override suspend fun cleanExpiredEvents(): Resource<Unit> {
-  //    val currentDateTimeString = LocalDateTime.now().format(formatter)
-  //    val validResults = eventRef.whereGreaterThan("end", currentDateTimeString).get().await()
-  //    return try {
-  //      // For Each Document in querySnapshot:
-  //      for (document in expiredResult.documents) {
-  //        // Call addEventExpired directly with the document as argument
-  //        try {
-  //          addEventExpired(document)
-  //        } catch (e: Exception) {
-  //          return Resource.Failure(e)
-  //        }
-  //        // Call deleteEventByID with the document ID as argument
-  //        try {
-  //          deleteEventByID(document.id)
-  //        } catch (e: Exception) {
-  //          return Resource.Failure(e)
-  //        }
-  //      }
-  //      Resource.Success(Unit)
-  //    } catch (e: Exception) {
-  //      Resource.Failure(e)
-  //    }
-  //  }
-  //  override suspend fun deleteEventByID(fireBaseID: String): Resource<Unit> {
-  //    return try {
-  //      eventRef.document(fireBaseID).delete().await()
-  //      Resource.Success(Unit)
-  //    } catch (e: Exception) {
-  //      Resource.Failure(e)
-  //    }
-  //  }
-  //
-  //  override suspend fun addEventExpired(document: DocumentSnapshot): Resource<Unit> {
-  //    val eventId = document.id
-  //    val eventMap = document.data ?: return Resource.Failure(Exception("Document data is null"))
-  //    return try {
-  //      expiredEventRef.document(eventId).set(eventMap).await()
-  //      Resource.Success(Unit)
-  //    } catch (e: Exception) {
-  //      Resource.Failure(e)
-  //    }
-  //  }
-
   override suspend fun addEvent(event: Event): Resource<Unit> {
     val eventMap = event.toMap()
     val eventId = event.fireBaseID
@@ -155,10 +110,10 @@ class FirebaseEventRepository(db: FirebaseFirestore = Firebase.firestore) : IEve
   }
 
   override fun observeAllEvents(): Flow<Resource<List<Event>>> = callbackFlow {
-        val currentDateTimeString = LocalDateTime.now().format(formatter)
+    val currentDateTimeString = LocalDateTime.now().format(formatter)
     val query = eventRef.whereGreaterThan("end", currentDateTimeString)
     val listener =
-      query.addSnapshotListener { snapshot, error ->
+        query.addSnapshotListener { snapshot, error ->
           if (error != null) {
             trySend(
                 Resource.Failure(Exception("Error listening to event updates: ${error.message}")))

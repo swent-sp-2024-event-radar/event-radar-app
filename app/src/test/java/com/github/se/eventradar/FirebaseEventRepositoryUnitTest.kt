@@ -19,13 +19,13 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.unmockkAll
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import java.time.format.DateTimeFormatter
 
 class FirebaseEventRepositoryUnitTest {
   @RelaxedMockK lateinit var eventRef: CollectionReference
@@ -135,8 +135,8 @@ class FirebaseEventRepositoryUnitTest {
 
   @Test
   fun `observeUpcomingEvents emits Resource_Success with relevant events`() = runTest {
-      val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
-      val currentDateTimeString = LocalDateTime.now().format(formatter)
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
+    val currentDateTimeString = LocalDateTime.now().format(formatter)
     val userId = "user1"
     val mockEventMap =
         mapOf(
@@ -162,9 +162,11 @@ class FirebaseEventRepositoryUnitTest {
     every { mockQuerySnapshot.documents } returns listOf(mockDocumentSnapshot)
 
     val queryMock = mockk<Query>()
-    every { eventRef
-        .whereGreaterThan("end", currentDateTimeString)
-        .whereArrayContains("attendees_list", userId) } returns queryMock
+    every {
+      eventRef
+          .whereGreaterThan("end", currentDateTimeString)
+          .whereArrayContains("attendees_list", userId)
+    } returns queryMock
 
     val slot = slot<EventListener<QuerySnapshot>>()
     val mockListenerRegistration = mockk<ListenerRegistration>()
@@ -191,17 +193,19 @@ class FirebaseEventRepositoryUnitTest {
 
   @Test
   fun `observeUpcomingEvents emits Resource_Failure on query error`() = runTest {
-     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
-      val currentDateTimeString = LocalDateTime.now().format(formatter)
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
+    val currentDateTimeString = LocalDateTime.now().format(formatter)
     val userId = "user1"
     val errorMessage = "Query error"
     val mockFirestoreException = mockk<FirebaseFirestoreException>()
     every { mockFirestoreException.message } returns errorMessage
 
     val queryMock = mockk<Query>()
-    every { eventRef
-        .whereGreaterThan("end", currentDateTimeString)
-        .whereArrayContains("attendees_list", userId) } returns queryMock
+    every {
+      eventRef
+          .whereGreaterThan("end", currentDateTimeString)
+          .whereArrayContains("attendees_list", userId)
+    } returns queryMock
 
     val slot = slot<EventListener<QuerySnapshot>>()
     val mockListenerRegistration = mockk<ListenerRegistration>()

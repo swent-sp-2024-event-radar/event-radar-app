@@ -32,6 +32,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
+import java.time.temporal.ChronoUnit
 
 @ExperimentalCoroutinesApi
 class EventsOverviewViewModelTest {
@@ -58,8 +59,8 @@ class EventsOverviewViewModelTest {
       Event(
           eventName = "Event 1",
           eventPhoto = "",
-          start = LocalDateTime.now(),
-          end = LocalDateTime.now(),
+          start = LocalDateTime.now().plus(1, ChronoUnit.DAYS),
+          end = LocalDateTime.now().plus(2, ChronoUnit.DAYS),
           location = Location(0.0, 0.0, "Test Location"),
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1, 0),
@@ -68,6 +69,21 @@ class EventsOverviewViewModelTest {
           attendeeList = mutableListOf("Test Attendee"),
           category = EventCategory.COMMUNITY,
           fireBaseID = "1")
+
+    private val expiredEvent =
+        Event(
+            eventName = "Event 1",
+            eventPhoto = "",
+            start = LocalDateTime.now().minus(2, ChronoUnit.DAYS),
+            end = LocalDateTime.now().minus(1, ChronoUnit.DAYS),
+            location = Location(0.0, 0.0, "Test Location"),
+            description = "Test Description",
+            ticket = EventTicket("Test Ticket", 0.0, 1, 0),
+            mainOrganiser = "1",
+            organiserList = mutableListOf("Test Organiser"),
+            attendeeList = mutableListOf("Test Attendee"),
+            category = EventCategory.COMMUNITY,
+            fireBaseID = "1")
 
   private val mockUser =
       User(
@@ -121,6 +137,28 @@ class EventsOverviewViewModelTest {
     assert(viewModel.uiState.value.eventList.filteredEvents == events)
     assertNull(viewModel.uiState.value.eventList.selectedEvent)
   }
+
+    @Test
+    fun testFilterExpired() = runTest {
+        val events =
+            listOf(
+                mockEvent.copy(fireBaseID = "1"),
+                expiredEvent.copy(fireBaseID = "2"),
+                mockEvent.copy(fireBaseID = "3"))
+
+        events.forEach { event -> eventRepository.addEvent(event) }
+
+        viewModel.getEvents()
+
+        assert(viewModel.uiState.value.eventList.allEvents.isNotEmpty())
+        assert(viewModel.uiState.value.eventList.allEvents.size == 2)
+        assert(viewModel.uiState.value.eventList.allEvents != events)
+//        assert(viewModel.uiState.value.eventList.filteredEvents.size == 3)
+//        assert(viewModel.uiState.value.eventList.filteredEvents == events)
+//        assertNull(viewModel.uiState.value.eventList.selectedEvent)
+    }
+
+
 
   @Test
   fun testGetUpcomingEventsSuccess() = runTest {
