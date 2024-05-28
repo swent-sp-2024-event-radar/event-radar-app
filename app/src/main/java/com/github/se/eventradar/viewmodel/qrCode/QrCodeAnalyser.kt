@@ -20,17 +20,17 @@ class QrCodeAnalyser @Inject constructor() : ImageAnalysis.Analyzer {
       listOf(ImageFormat.YUV_420_888, ImageFormat.YUV_422_888, ImageFormat.YUV_444_888)
 
   var onDecoded: ((String?) -> Unit)? = null
-    private var activeAnalysis = true
+  private var activeAnalysis = true
 
-    fun changeAnalysisState(boolean: Boolean) {
-        activeAnalysis = boolean
-    }
+  fun changeAnalysisState(boolean: Boolean) {
+    activeAnalysis = boolean
+  }
 
   override fun analyze(image: ImageProxy) {
-//      if (!activeAnalysis) {
-//          image.close()
-//          return
-//      }
+    //      if (!activeAnalysis) {
+    //          image.close()
+    //          return
+    //      }
 
     // only want to scan if it is a QR Code
     if (image.format in supportedImageFormats) {

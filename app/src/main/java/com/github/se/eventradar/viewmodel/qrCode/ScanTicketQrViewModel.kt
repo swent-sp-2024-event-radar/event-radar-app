@@ -66,8 +66,8 @@ constructor(
     getEventData()
   }
 
-  private fun resetAnalyser()  {
-//    qrCodeAnalyser.changeAnalysisState(true)
+  private fun resetAnalyser() {
+    //    qrCodeAnalyser.changeAnalysisState(true)
     qrCodeAnalyser.onDecoded = { decodedString ->
       val result = decodedString ?: "Failed to decode QR Code"
       updateDecodedString(result) // Update state flow
