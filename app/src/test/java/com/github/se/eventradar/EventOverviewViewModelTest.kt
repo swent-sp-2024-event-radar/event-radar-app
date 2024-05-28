@@ -72,7 +72,7 @@ class EventsOverviewViewModelTest {
   private val mockUser =
       User(
           userId = "user1",
-          birthDate = "01/01/2000",
+          birthDate = "01.01.2000",
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",
