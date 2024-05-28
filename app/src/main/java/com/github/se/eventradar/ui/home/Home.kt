@@ -1,9 +1,7 @@
 package com.github.se.eventradar.ui.home
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.os.Looper
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,7 +12,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -42,6 +39,7 @@ import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.component.AppScaffold
 import com.github.se.eventradar.ui.component.EventList
 import com.github.se.eventradar.ui.component.FilterPopUp
+import com.github.se.eventradar.ui.component.GetUserLocation
 import com.github.se.eventradar.ui.component.SearchBarAndFilter
 import com.github.se.eventradar.ui.component.ViewToggleFab
 import com.github.se.eventradar.ui.component.getIconFromViewListBool
@@ -51,12 +49,9 @@ import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.viewmodel.EventsOverviewUiState
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.github.se.eventradar.viewmodel.Tab
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 
 @Composable
 fun HomeScreen(
@@ -179,7 +174,7 @@ fun HomeScreen(
               onSearchQueryChanged = { viewModel.onSearchQueryChanged(it) },
               searchQuery = uiState.searchQuery,
               onSearchActiveChanged = { viewModel.onSearchActiveChanged(it) },
-              onFilterDialogOpen = { viewModel.onFilterDialogOpen() },
+              onFilterDialogOpen = { viewModel.onFilterDialogOpenChanged() },
               modifier =
                   Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
                       .testTag("searchBarAndFilter"),
@@ -195,7 +190,7 @@ fun HomeScreen(
                   viewModel.onFilterApply()
 
                   // automatically close dialog
-                  viewModel.onFilterDialogOpen()
+                  viewModel.onFilterDialogOpenChanged()
                 },
                 uiState = uiState,
                 onRadiusQueryChanged = { viewModel.onRadiusQueryChanged(it) },
@@ -254,52 +249,6 @@ fun EventsOverview(
                 navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
               }
     }
-  }
-}
-
-@Composable
-fun GetUserLocation(
-    locationProvider: FusedLocationProviderClient,
-    locationCallback: LocationCallback
-) {
-  DisposableEffect(key1 = locationProvider) {
-    locationUpdate(locationProvider, locationCallback)
-    // 3
-    onDispose { stopLocationUpdate(locationProvider, locationCallback) }
-  }
-}
-
-@SuppressLint("MissingPermission")
-private fun locationUpdate(
-    locationProvider: FusedLocationProviderClient,
-    locationCallback: LocationCallback
-) {
-  locationCallback.let {
-    // An encapsulation of various parameters for requesting
-    // location through FusedLocationProviderClient.
-    val locationRequest: LocationRequest =
-        LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).build()
-    // use FusedLocationProviderClient to request location update
-    locationProvider.requestLocationUpdates(locationRequest, it, Looper.getMainLooper())
-  }
-}
-
-fun stopLocationUpdate(
-    locationProvider: FusedLocationProviderClient,
-    locationCallback: LocationCallback
-) {
-  try {
-    // Removes all location updates for the given callback.
-    val removeTask = locationProvider.removeLocationUpdates(locationCallback)
-    removeTask.addOnCompleteListener { task ->
-      if (task.isSuccessful) {
-        Log.d("LocationProvider", "Location Callback removed.")
-      } else {
-        Log.d("LocationProvider", "Failed to remove Location Callback.")
-      }
-    }
-  } catch (se: SecurityException) {
-    Log.e("LocationProvider", "Failed to remove Location Callback.. $se")
   }
 }
 

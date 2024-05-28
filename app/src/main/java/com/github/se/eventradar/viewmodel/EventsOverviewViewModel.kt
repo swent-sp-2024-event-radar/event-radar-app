@@ -55,7 +55,7 @@ constructor(
     state.value = state.value.copy(isSearchActive = isSearchActive)
   }
 
-  fun onFilterDialogOpen(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
+  fun onFilterDialogOpenChanged(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
     state.value = state.value.copy(isFilterDialogOpen = !state.value.isFilterDialogOpen)
   }
 
@@ -318,10 +318,10 @@ data class EventsOverviewUiState(
     override val radiusQuery: String = "",
     override val isFreeSwitchOn: Boolean = false,
     override val categoriesCheckedList: MutableSet<EventCategory> = mutableSetOf(),
+    override val userLocation: Location = Location(46.519962, 6.56637, "EPFL"),
     val viewList: Boolean = true,
     val tab: Tab = Tab.BROWSE,
     val userLoggedIn: Boolean = false,
-    val userLocation: Location = Location(46.519962, 6.56637, "EPFL"),
 ) : SearchFilterUiState()
 
 enum class Tab {

@@ -1,8 +1,8 @@
-package com.github.se.eventradar.home
+package com.github.se.eventradar.component
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.eventradar.ui.home.GetUserLocation
+import com.github.se.eventradar.ui.component.GetUserLocation
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.kaspersky.components.composesupport.config.withComposeSupport

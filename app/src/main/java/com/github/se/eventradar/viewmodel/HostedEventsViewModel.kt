@@ -18,6 +18,7 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -99,7 +100,7 @@ constructor(
     state.value = state.value.copy(isSearchActive = isSearchActive)
   }
 
-  fun onFilterDialogOpen(state: MutableStateFlow<HostedEventsUiState> = _uiState) {
+  fun onFilterDialogOpenChanged(state: MutableStateFlow<HostedEventsUiState> = _uiState) {
     state.value = state.value.copy(isFilterDialogOpen = !state.value.isFilterDialogOpen)
   }
 
@@ -117,6 +118,10 @@ constructor(
   fun onFilterApply(state: MutableStateFlow<HostedEventsUiState> = _uiState) {
     state.value = state.value.copy(isFilterActive = true)
     filterHostedEvents()
+  }
+
+  fun onUserLocationChanged(location: Location) {
+    _uiState.update { currentState -> currentState.copy(userLocation = location) }
   }
 
   fun filterHostedEvents() {
@@ -177,4 +182,5 @@ data class HostedEventsUiState(
     override val radiusQuery: String = "",
     override val isFreeSwitchOn: Boolean = false,
     override val categoriesCheckedList: MutableSet<EventCategory> = mutableSetOf(),
+    override val userLocation: Location = Location(46.519962, 6.56637, "EPFL"),
 ) : SearchFilterUiState()

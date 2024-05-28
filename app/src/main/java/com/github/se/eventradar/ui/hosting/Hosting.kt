@@ -1,5 +1,8 @@
 package com.github.se.eventradar.ui.hosting
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,12 +34,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.se.eventradar.R
+import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.EventList
 import com.github.se.eventradar.ui.component.FilterPopUp
+import com.github.se.eventradar.ui.component.GetUserLocation
 import com.github.se.eventradar.ui.component.Logo
 import com.github.se.eventradar.ui.component.SearchBarAndFilter
 import com.github.se.eventradar.ui.component.ViewToggleFab
@@ -49,6 +55,9 @@ import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 import com.github.se.eventradar.util.toast
 import com.github.se.eventradar.viewmodel.HostedEventsUiState
 import com.github.se.eventradar.viewmodel.HostedEventsViewModel
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 
 @Composable
 fun HostingScreen(
@@ -57,12 +66,47 @@ fun HostingScreen(
 ) {
   // Ui States handled by viewModel
   val uiState by viewModel.uiState.collectAsState()
+  val context = LocalContext.current
+
   LaunchedEffect(key1 = uiState.isSearchActive, key2 = uiState.isFilterActive) {
     if (uiState.isSearchActive || uiState.isFilterActive) {
       viewModel.filterHostedEvents()
     }
   }
   LaunchedEffect(Unit) { viewModel.getHostedEvents() }
+
+  val locationProvider = LocationServices.getFusedLocationProviderClient(context)
+
+  val locationCallback =
+      object : LocationCallback() {
+        // 1
+        override fun onLocationResult(result: LocationResult) {
+          if (ActivityCompat.checkSelfPermission(
+              context, Manifest.permission.ACCESS_FINE_LOCATION) !=
+              PackageManager.PERMISSION_GRANTED &&
+              ActivityCompat.checkSelfPermission(
+                  context, Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                  PackageManager.PERMISSION_GRANTED) {
+            // set default location
+            val epflLocation = Location(46.519962, 6.56637, "EPFL")
+            viewModel.onUserLocationChanged(epflLocation)
+            return
+          }
+
+          locationProvider.lastLocation
+              .addOnSuccessListener { location ->
+                location?.let {
+                  val lat = location.latitude
+                  val long = location.longitude
+                  // Update data class with location data
+                  viewModel.onUserLocationChanged(Location(lat, long, "User"))
+                }
+              }
+              .addOnFailureListener { Log.e("Location_error", "${it.message}") }
+        }
+      }
+
+  GetUserLocation(locationProvider, locationCallback)
 
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("hostingScreen")) {
     val (logo, title, divider, searchfilter, filter, eventList, eventMap, bottomNav, buttons) =
@@ -89,7 +133,7 @@ fun HostingScreen(
         onSearchQueryChanged = { viewModel.onSearchQueryChanged(it) },
         searchQuery = uiState.searchQuery,
         onSearchActiveChanged = { viewModel.onSearchActiveChanged(it) },
-        onFilterDialogOpen = { viewModel.onFilterDialogOpen() },
+        onFilterDialogOpen = { viewModel.onFilterDialogOpenChanged() },
         modifier =
             Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
                 .testTag("searchBarAndFilter")
@@ -145,10 +189,12 @@ fun HostingScreen(
           onFreeSwitchChanged = { viewModel.onFreeSwitchChanged() },
           onFilterApply = {
             if (uiState.radiusQuery != "") {
-              viewModel.onRadiusQueryChanged("")
-              context.toast("Radius filtering not yet implemented")
+              viewModel.onRadiusQueryChanged(uiState.radiusQuery)
             }
             viewModel.onFilterApply()
+
+            // automatically close dialog
+            viewModel.onFilterDialogOpenChanged()
           },
           uiState = uiState,
           onRadiusQueryChanged = { viewModel.onRadiusQueryChanged(it) },

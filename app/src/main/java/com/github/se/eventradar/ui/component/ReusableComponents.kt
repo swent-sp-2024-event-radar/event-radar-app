@@ -1,5 +1,8 @@
 package com.github.se.eventradar.ui.component
 
+import android.annotation.SuppressLint
+import android.os.Looper
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -44,6 +47,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -80,6 +84,10 @@ import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 import com.github.se.eventradar.viewmodel.SearchFilterUiState
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.Priority
 
 fun getIconFromViewListBool(viewList: Boolean): ImageVector {
   return if (viewList) {
@@ -459,5 +467,51 @@ fun GenericDialogBox(
               }
         },
         modifier = modifier)
+  }
+}
+
+@Composable
+fun GetUserLocation(
+    locationProvider: FusedLocationProviderClient,
+    locationCallback: LocationCallback
+) {
+  DisposableEffect(key1 = locationProvider) {
+    locationUpdate(locationProvider, locationCallback)
+    // 3
+    onDispose { stopLocationUpdate(locationProvider, locationCallback) }
+  }
+}
+
+@SuppressLint("MissingPermission")
+private fun locationUpdate(
+    locationProvider: FusedLocationProviderClient,
+    locationCallback: LocationCallback
+) {
+  locationCallback.let {
+    // An encapsulation of various parameters for requesting
+    // location through FusedLocationProviderClient.
+    val locationRequest: LocationRequest =
+        LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).build()
+    // use FusedLocationProviderClient to request location update
+    locationProvider.requestLocationUpdates(locationRequest, it, Looper.getMainLooper())
+  }
+}
+
+fun stopLocationUpdate(
+    locationProvider: FusedLocationProviderClient,
+    locationCallback: LocationCallback
+) {
+  try {
+    // Removes all location updates for the given callback.
+    val removeTask = locationProvider.removeLocationUpdates(locationCallback)
+    removeTask.addOnCompleteListener { task ->
+      if (task.isSuccessful) {
+        Log.d("LocationProvider", "Location Callback removed.")
+      } else {
+        Log.d("LocationProvider", "Failed to remove Location Callback.")
+      }
+    }
+  } catch (se: SecurityException) {
+    Log.e("LocationProvider", "Failed to remove Location Callback.. $se")
   }
 }
