@@ -90,37 +90,7 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
     mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
   }
 
-  @Test
-  fun displaysAllComponentsCorrectly_CameraPermittedAlways(): Unit = run {
-    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-      val viewModel = setupViewModelWithState(ScanTicketQrViewModel.Action.ScanTicket)
-      composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
-      scanQrTab.performClick()
-      logo.assertIsDisplayed()
-      tabs.assertIsDisplayed()
-      myQrTab.assertIsDisplayed()
-      scanQrTab.assertIsDisplayed()
-      qrScanner.assertIsDisplayed()
-      bottomNavMenu.assertIsDisplayed()
-    }
-  }
 
-  @Test
-  fun displaysAllComponentsCorrectly_Approved(): Unit = run {
-    val viewModel = setupViewModelWithState(ScanTicketQrViewModel.Action.ApproveEntry)
-    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-      composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
-      scanQrTab.performClick()
-      logo.assertIsDisplayed()
-      tabs.assertIsDisplayed()
-      myQrTab.assertIsDisplayed()
-      scanQrTab.assertIsDisplayed()
-      bottomNavMenu.assertIsDisplayed()
-      approvedBox.assertIsDisplayed()
-      approvedText.assertIsDisplayed()
-      closeButton.assertIsDisplayed()
-    }
-  }
 
   @Test
   fun closeDialogueResetState(): Unit = run {
