@@ -171,7 +171,7 @@ constructor(
       }
     }
   }
-    //mas,mns
+  // mas,mns
 
   private suspend fun getUserUpcomingEvents(uid: String) {
     when (val userResponse = userRepository.getUser(uid)) {
