@@ -1,14 +1,12 @@
 package com.github.se.eventradar.qrCode
 
 import android.Manifest
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.github.se.eventradar.model.Location
-import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.repository.event.IEventRepository
@@ -27,11 +25,13 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen.Companion.onComposeScreen
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
+import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.verify
 import java.time.LocalDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
@@ -55,14 +55,12 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
   @RelaxedMockK lateinit var mockViewModel: ScanTicketQrViewModel
 
   private lateinit var mDevice: UiDevice
-
-  private lateinit var viewModel: ScanTicketQrViewModel
   private lateinit var userRepository: IUserRepository
   private lateinit var eventRepository: IEventRepository
   private lateinit var qrCodeAnalyser: QrCodeAnalyser
   private val myUID = "user1"
 
-  private val MyEventTabDetailsUiState =
+  private val myEventTabDetailsUiState =
       MutableStateFlow(
           ScanTicketQrViewModel.QrCodeScanTicketState(
               decodedResult = "",
@@ -80,21 +78,6 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
                       mainOrganiser = "1",
                       category = EventCategory.COMMUNITY)))
 
-  private val mockEvent =
-      Event(
-          eventName = "Event 1",
-          eventPhoto = "",
-          start = LocalDateTime.now(),
-          end = LocalDateTime.now(),
-          location = Location(0.0, 0.0, "Test Location"),
-          description = "Test Description",
-          ticket = EventTicket("Test Ticket", 0.0, 100, 59),
-          mainOrganiser = "1",
-          organiserList = mutableListOf("Test Organiser"),
-          attendeeList = mutableListOf("user1", "user2", "user3"),
-          category = EventCategory.COMMUNITY,
-          fireBaseID = "1")
-
   @Before
   fun testSetup() {
     MockKAnnotations.init(this)
@@ -105,132 +88,22 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
     qrCodeAnalyser = mockk<QrCodeAnalyser>(relaxed = true)
     mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
   }
-  //
-  //  @Test
-  //  fun displaysAllComponentsCorrectly_CameraPermittedAlways(): Unit = run {
-  //    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-  //      val viewModel = setupViewModelWithState(ScanTicketQrViewModel.Action.ScanTicket)
-  //      composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
-  //      scanQrTab.performClick()
-  //      logo.assertIsDisplayed()
-  //      tabs.assertIsDisplayed()
-  //      myQrTab.assertIsDisplayed()
-  //      scanQrTab.assertIsDisplayed()
-  //      qrScanner.assertIsDisplayed()
-  //      bottomNavMenu.assertIsDisplayed()
-  //    }
-  //  }
-  //
-  //  @Test
-  //  fun displaysAllComponentsCorrectly_Approved(): Unit = run {
-  //    val viewModel = setupViewModelWithState(ScanTicketQrViewModel.Action.ApproveEntry)
-  //    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-  //      composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
-  //      scanQrTab.performClick()
-  //      logo.assertIsDisplayed()
-  //      tabs.assertIsDisplayed()
-  //      myQrTab.assertIsDisplayed()
-  //      scanQrTab.assertIsDisplayed()
-  //      bottomNavMenu.assertIsDisplayed()
-  //      approvedBox.assertIsDisplayed()
-  //      approvedText.assertIsDisplayed()
-  //      closeButton.assertIsDisplayed()
-  //    }
-  //  }
-  //
-  //  @Test
-  //  fun displaysAllComponentsCorrectly_Denied(): Unit = run {
-  //    val viewModel = setupViewModelWithState(ScanTicketQrViewModel.Action.DenyEntry)
-  //    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-  //      composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
-  //      scanQrTab.performClick()
-  //      logo.assertIsDisplayed()
-  //      tabs.assertIsDisplayed()
-  //      myQrTab.assertIsDisplayed()
-  //      bottomNavMenu.assertIsDisplayed()
-  //      deniedBox.assertIsDisplayed()
-  //      deniedText.assertIsDisplayed()
-  //      closeButton.assertIsDisplayed()
-  //    }
-  //  }
-  //
-  //  @Test
-  //  fun displaysAllComponentsCorrectly_Error1(): Unit = run {
-  //    val viewModel = setupViewModelWithState(ScanTicketQrViewModel.Action.FirebaseFetchError)
-  //    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-  //      composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
-  //      scanQrTab.performClick()
-  //      logo.assertIsDisplayed()
-  //      tabs.assertIsDisplayed()
-  //      myQrTab.assertIsDisplayed()
-  //      scanQrTab.assertIsDisplayed()
-  //      bottomNavMenu.assertIsDisplayed()
-  //      errorBox.assertIsDisplayed()
-  //      errorText.assertIsDisplayed()
-  //      closeButton.assertIsDisplayed()
-  //    }
-  //  }
-  //
-  //  @Test
-  //  fun displaysAllComponentsCorrectly_Error2(): Unit = run {
-  //    val viewModel = setupViewModelWithState(ScanTicketQrViewModel.Action.FirebaseUpdateError)
-  //    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-  //      composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
-  //      scanQrTab.performClick()
-  //      logo.assertIsDisplayed()
-  //      tabs.assertIsDisplayed()
-  //      myQrTab.assertIsDisplayed()
-  //      scanQrTab.assertIsDisplayed()
-  //      bottomNavMenu.assertIsDisplayed()
-  //      errorBox.assertIsDisplayed()
-  //      errorText.assertIsDisplayed()
-  //      closeButton.assertIsDisplayed()
-  //    }
-  //  }
-  //
-  //  @Test
-  //  fun displaysAllComponentsCorrectly_Error3(): Unit = run {
-  //    val viewModel = setupViewModelWithState(ScanTicketQrViewModel.Action.AnalyserError)
-  //    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-  //      composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
-  //      scanQrTab.performClick()
-  //      logo.assertIsDisplayed()
-  //      tabs.assertIsDisplayed()
-  //      myQrTab.assertIsDisplayed()
-  //      scanQrTab.assertIsDisplayed()
-  //      bottomNavMenu.assertIsDisplayed()
-  //      errorBox.assertIsDisplayed()
-  //      errorText.assertIsDisplayed()
-  //      closeButton.assertIsDisplayed()
-  //    }
-  //  }
-  //
-  //  @Test
-  //  fun resetsTabState(): Unit = run {
-  //    val viewModel = setupViewModelWithState(ScanTicketQrViewModel.Action.ScanTicket)
-  //    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-  //      composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
-  //      scanQrTab.performClick()
-  //      myQrTab.performClick()
-  //      assertEquals(ScanTicketQrViewModel.Tab.MyEvent, viewModel.uiState.value.tabState)
-  //    }
-  //  }
-  //
-  //  @Test
-  //  fun screenDisplaysNavigationElementsCorrectly() = run {
-  //    every { mockViewModel.uiState } returns MyEventTabDetailsUiState
-  //    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-  //      composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
-  //      bottomNavMenu.assertIsDisplayed()
-  //      goBackButton.assertIsDisplayed()
-  //    }
-  //  }
+
+  @Test
+  fun screenDisplaysNavigationElementsCorrectly() = run {
+    every { mockViewModel.uiState } returns myEventTabDetailsUiState
+    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
+      composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
+      bottomNavMenu.assertIsDisplayed()
+      goBackButton.assertIsDisplayed()
+    }
+  }
 
   @Test
   fun screenDisplaysContentElementsCorrectly1() =
       //  Test(timeout = 45.seconds) {
       run {
-        every { mockViewModel.uiState } returns MyEventTabDetailsUiState
+        every { mockViewModel.uiState } returns myEventTabDetailsUiState
         //      val viewModel = setupViewModelMyEventTab()
         onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
           composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
@@ -250,7 +123,7 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       //  Test(timeout = 45.seconds) {
       run {
         //      val viewModel = setupViewModelMyEventTab()
-        every { mockViewModel.uiState } returns MyEventTabDetailsUiState
+        every { mockViewModel.uiState } returns myEventTabDetailsUiState
         onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
           composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
           distanceTitle { assertIsDisplayed() }
@@ -263,7 +136,7 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       //  Test(timeout = 45.seconds) {
       run {
         //      val viewModel = setupViewModelMyEventTab()
-        every { mockViewModel.uiState } returns MyEventTabDetailsUiState
+        every { mockViewModel.uiState } returns myEventTabDetailsUiState
         onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
           composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
           categoryTitle { assertIsDisplayed() }
@@ -279,7 +152,7 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       //  Test(timeout = 45.seconds) {
       run {
         //      val viewModel = setupViewModelMyEventTab()
-        every { mockViewModel.uiState } returns MyEventTabDetailsUiState
+        every { mockViewModel.uiState } returns myEventTabDetailsUiState
         onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
           composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
           dateTitle { assertIsDisplayed() }
@@ -292,7 +165,7 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       //  Test(timeout = 45.seconds) {
       run {
         //      val viewModel = setupViewModelMyEventTab()
-        every { mockViewModel.uiState } returns MyEventTabDetailsUiState
+        every { mockViewModel.uiState } returns myEventTabDetailsUiState
         onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
           composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
           timeTitle { assertIsDisplayed() }
@@ -305,7 +178,7 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       //  Test(timeout = 45.seconds) {
       run {
         //      val viewModel = setupViewModelMyEventTab()
-        every { mockViewModel.uiState } returns MyEventTabDetailsUiState
+        every { mockViewModel.uiState } returns myEventTabDetailsUiState
         onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
           composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
           ticketSoldTitle {
@@ -320,40 +193,22 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
         }
       }
 
-  //  @Test
-  //  fun goBackButtonTriggersBackNavigation() = run {
-  //    //    val viewModel = setupViewModelMyEventTab()
-  //    every { mockViewModel.uiState } returns MyEventTabDetailsUiState
-  //    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-  //      composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
-  //      goBackButton {
-  //        // arrange: verify the pre-conditions
-  //        assertIsDisplayed()
-  //        assertIsEnabled()
-  //        // act: go back !
-  //        performClick()
-  //      }
-  //    }
-  //    // assert: the nav action has been called
-  //    verify { mockNavActions.goBack() }
-  //    confirmVerified(mockNavActions)
-  //  }
-
-  private fun setupViewModelWithState(action: ScanTicketQrViewModel.Action): ScanTicketQrViewModel {
-    // Create the ViewModel with a specific state for testing
-    return ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser, "1").apply {
-      changeAction(action) // Assuming there is a method to change actions
+  @Test
+  fun goBackButtonTriggersBackNavigation() = run {
+    //    val viewModel = setupViewModelMyEventTab()
+    every { mockViewModel.uiState } returns myEventTabDetailsUiState
+    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
+      composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
+      goBackButton {
+        // arrange: verify the pre-conditions
+        assertIsDisplayed()
+        assertIsEnabled()
+        // act: go back !
+        performClick()
+      }
     }
+    // assert: the nav action has been called
+    verify { mockNavActions.goBack() }
+    confirmVerified(mockNavActions)
   }
 }
-
-//  private fun setupViewModelMyEventTab(): ScanTicketQrViewModel = runTest {
-//    eventRepository.addEvent(mockEvent)
-//    // Create the ViewModel with a specific state for testing
-//    ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser, "1")
-//      .apply {
-//        changeTabState(
-//          ScanTicketQrViewModel.Tab.MyEvent) // Assuming there is a method to change actions
-//      }
-//  }
-// }
