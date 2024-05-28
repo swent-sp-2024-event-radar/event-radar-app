@@ -3,18 +3,21 @@ package com.github.se.eventradar.ui.qrCode
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -124,161 +127,88 @@ fun QrCodeTicketUi(
         }
 
     if (qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent) {
-      val widthPadding = 34.dp
-      val imageHeight = 191.dp
+        val imageHeight = 191.dp
 
-      val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+        val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
-      val componentStyle =
-          EventComponentsStyle(
-              MaterialTheme.colorScheme.onSurface,
-              MaterialTheme.colorScheme.onSurfaceVariant,
-              MaterialTheme.colorScheme.onSurface,
-          )
+        val componentStyle =
+            EventComponentsStyle(
+                MaterialTheme.colorScheme.onSurface,
+                MaterialTheme.colorScheme.onSurfaceVariant,
+                MaterialTheme.colorScheme.onSurface,
+            )
 
-      val (
-          image,
-          backButton,
-          title,
-          description,
-          distance,
-          category,
-          date,
-          time,
-          ticketSold,
-          lazyEventDetails) =
-          createRefs()
+        val (lazyEventDetails) = createRefs()
 
-      // TODO uncomment when image are implemented
-      // val imagePainter: Painter = rememberImagePainter(eventUiState.eventPhoto)
-      val imagePainter: Painter = rememberImagePainter(R.drawable.placeholderbig)
+        // TODO uncomment when image are implemented
+        // val imagePainter: Painter = rememberImagePainter(eventUiState.eventPhoto)
+        val imagePainter: Painter = rememberImagePainter(R.drawable.placeholderbig)
 
-      LazyColumn(
-          modifier =
-              Modifier.fillMaxSize()
-                  .padding(horizontal = 16.dp)
-                  .constrainAs(lazyEventDetails) {
+        LazyColumn(
+            modifier =
+            Modifier.fillMaxSize()
+                .padding(horizontal = 16.dp)
+                .constrainAs(lazyEventDetails) {
                     top.linkTo(tabs.bottom, margin = 0.dp)
                     start.linkTo(parent.start, margin = 0.dp)
                     end.linkTo(parent.end, margin = 0.dp)
-                  }
-                  .testTag("lazyEventDetails")) {
+                }
+                .testTag("lazyEventDetails")) {
             item {
-              Image(
-                  painter = imagePainter,
-                  contentDescription = "Event banner image",
-                  modifier =
-                      Modifier.fillMaxWidth()
-                          .height(imageHeight)
-                          .constrainAs(image) {
-                            top.linkTo(tabs.bottom, margin = 0.dp)
-                            start.linkTo(parent.start, margin = 0.dp)
-                          }
-                          .testTag("eventImage"),
-                  contentScale = ContentScale.FillWidth)
+                Image(
+                    painter = imagePainter,
+                    contentDescription = "Event banner image",
+                    modifier = Modifier.fillMaxWidth().height(imageHeight).testTag("eventImage"),
+                    contentScale = ContentScale.FillWidth)
             }
             item {
-              GoBackButton(
-                  modifier =
-                      Modifier.wrapContentSize().constrainAs(backButton) {
-                        top.linkTo(image.bottom, margin = 8.dp)
-                        start.linkTo(image.start, margin = 4.dp)
-                      }) {
-                    navigationActions.goBack()
-                  }
+                GoBackButton(modifier = Modifier.wrapContentSize()) { navigationActions.goBack() }
             }
+            item { Spacer(modifier = Modifier.height(8.dp)) }
             item {
-              EventTitle(
-                  modifier =
-                      Modifier.constrainAs(title) {
-                        top.linkTo(image.bottom, margin = 32.dp)
-                        start.linkTo(image.start)
-                        end.linkTo(image.end)
-                      },
-                  eventUiState = uiState.eventUiState,
-                  style = componentStyle)
+                EventTitle(
+                    modifier =
+                    Modifier.fillMaxWidth()
+                        .wrapContentWidth(
+                            Alignment.CenterHorizontally), // .(Alignment.CenterHorizontally),
+                    eventUiState = qrScanUiState.value.eventUiState,
+                    style = componentStyle)
             }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
-            item {
-              EventDescription(
-                  modifier =
-                      Modifier
-                          // .padding(start = widthPadding, end = widthPadding)
-                          .constrainAs(description) {
-                            top.linkTo(title.bottom, margin = 32.dp)
-                            start.linkTo(parent.start, margin = widthPadding)
-                          },
-                  eventUiState = uiState.eventUiState,
-                  componentStyle)
-            }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
-            item {
-              EventDistance(
-                  modifier =
-                      Modifier.constrainAs(distance) {
-                        top.linkTo(description.bottom, margin = 32.dp)
-                        start.linkTo(parent.start, margin = widthPadding)
-                      },
-                  eventUiState = uiState.eventUiState,
-                  componentStyle)
-            }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
-            item {
-              EventDate(
-                  modifier =
-                      Modifier.constrainAs(date) {
-                        top.linkTo(distance.bottom, margin = 32.dp)
-                        start.linkTo(parent.start, margin = widthPadding)
-                      },
-                  eventUiState = uiState.eventUiState,
-                  componentStyle)
-            }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
 
             item {
-              EventTime(
-                  modifier =
-                      Modifier.constrainAs(time) {
-                        top.linkTo(date.bottom, margin = 32.dp)
-                        start.linkTo(parent.start, margin = widthPadding)
-                      },
-                  eventUiState = uiState.eventUiState,
-                  componentStyle)
+                //              Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement =
+                // Arrangement.Center) {
+                TicketsSold(
+                    modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally),
+                    eventUiState = uiState.eventUiState,
+                    style = componentStyle)
+                //              }
             }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
-            item {
-              EventCategory(
-                  modifier =
-                      Modifier.constrainAs(category) {
-                        top.linkTo(time.bottom, margin = 32.dp)
-                        start.linkTo(parent.start, margin = widthPadding)
-                      },
-                  eventUiState = uiState.eventUiState,
-                  componentStyle)
-            }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
+
+            item { Spacer(modifier = Modifier.height(8.dp)) }
 
             item {
-              Column(
-                  modifier =
-                      Modifier.constrainAs(ticketSold) {
-                        top.linkTo(category.bottom, margin = 32.dp)
-                        start.linkTo(parent.start, margin = widthPadding)
-                      }) {
-                    Text(
-                        text = "Tickets Sold",
-                        style = componentStyle.fieldTitleStyle,
-                        color = componentStyle.fieldTitleColor,
-                        modifier = Modifier.testTag("ticketSoldTitle"))
-                    Text(
-                        text = "${uiState.eventUiState.ticket.purchases} tickets sold",
-                        // TO SOLD
-                        style = componentStyle.contentStyle,
-                        color = componentStyle.contentColor,
-                        modifier = Modifier.testTag("ticketSoldContent"))
-                  }
+                EventDescription(
+                    modifier = Modifier, qrScanUiState.value.eventUiState, componentStyle)
             }
-          }
+
+            item { Spacer(modifier = Modifier.height(16.dp)) }
+            item {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    EventDistance(modifier = Modifier.weight(2f), uiState.eventUiState, componentStyle)
+                    EventDate(modifier = Modifier.weight(1f), uiState.eventUiState, componentStyle)
+                }
+            }
+            item { Spacer(modifier = Modifier.height(8.dp)) }
+
+            item {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    EventCategory(modifier = Modifier.weight(2f), uiState.eventUiState, componentStyle)
+                    EventTime(modifier = Modifier.weight(1f), uiState.eventUiState, componentStyle)
+                }
+            }
+            item { Spacer(modifier = Modifier.height(8.dp)) }
+        }
     } else {
       Toast.makeText(context, "Scan Ticket Not implemented yet", Toast.LENGTH_SHORT).show()
     }
