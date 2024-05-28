@@ -139,8 +139,8 @@ class FirebaseEventRepositoryUnitTest {
         mapOf(
             "name" to "User Specific Event",
             "photo_url" to "http://example.com/photo.jpg",
-            "start" to "2021-01-01T00:00",
-            "end" to "2021-01-02T00:00",
+            "start" to "2025-01-01T00:00",
+            "end" to "2025-01-02T00:00",
             "location_lat" to 10.0,
             "location_lng" to 20.0,
             "location_name" to "Event Venue",
