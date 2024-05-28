@@ -20,8 +20,20 @@ class QrCodeAnalyser @Inject constructor() : ImageAnalysis.Analyzer {
       listOf(ImageFormat.YUV_420_888, ImageFormat.YUV_422_888, ImageFormat.YUV_444_888)
 
   var onDecoded: ((String?) -> Unit)? = null
+  private var isPaused = false
 
-  override fun analyze(image: ImageProxy) {
+    fun pause() {
+        isPaused = true
+    }
+    fun resume() {
+        isPaused = false
+    }
+
+  override fun analyze(image: ImageProxy) { //TODO i want to reopen image
+      if (isPaused) {
+          image.close()
+          return
+      }
 
     // only want to scan if it is a QR Code
     if (image.format in supportedImageFormats) {

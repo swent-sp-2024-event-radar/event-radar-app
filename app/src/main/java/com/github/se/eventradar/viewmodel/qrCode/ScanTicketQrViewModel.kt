@@ -62,15 +62,7 @@ constructor(
   }
 
   init {
-    qrCodeAnalyser.onDecoded = { decodedString ->
-      val result = decodedString ?: "Failed to decode QR Code"
-      updateDecodedString(result) // Update state flow
-      if (result != "Failed to decode QR Code") {
-        updatePermissions(result) // Directly call updateFriendList
-      } else {
-        changeAction(Action.AnalyserError)
-      }
-    }
+    resetAnalyser()
     getEventData()
   }
 
@@ -140,8 +132,26 @@ constructor(
     _uiState.update { it.copy(tabState = tab) }
   }
 
-  fun changeAction(action: Action) {
+  private fun resetAnalyser()  {
+    qrCodeAnalyser.resume()
+    qrCodeAnalyser.onDecoded = { decodedString ->
+      val result = decodedString ?: "Failed to decode QR Code"
+      updateDecodedString(result) // Update state flow
+      if (result != "Failed to decode QR Code") {
+        updatePermissions(result) // Directly call updateFriendList
+      } else {
+        changeAction(Action.AnalyserError)
+      }
+    }
+  }
+
+  fun changeAction(action: Action) { //THINK OF ATOMICITY
     _uiState.update { it.copy(action = action) }
+    if (action == Action.ScanTicket) {
+      resetAnalyser()
+    } else {
+    qrCodeAnalyser.pause()
+  }
   }
 
   fun getEventData() {

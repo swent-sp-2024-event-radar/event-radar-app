@@ -127,7 +127,7 @@ fun QrCodeTicketUi(
       when (qrScanUiState.value.action) {
         ScanTicketQrViewModel.Action.ScanTicket -> {
           Column(modifier = Modifier.testTag("QrScanner")) {
-            QrCodeScanner(analyser = viewModel.qrCodeAnalyser)
+            QrCodeScannerFriend(analyser = viewModel.qrCodeAnalyser)
           }
         }
         ScanTicketQrViewModel.Action.ApproveEntry -> {
@@ -210,7 +210,8 @@ fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
           }
       Box(modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)) {
         IconButton(
-            onClick = { viewModel.changeAction(ScanTicketQrViewModel.Action.ScanTicket) },
+            onClick = {
+                viewModel.changeAction(ScanTicketQrViewModel.Action.ScanTicket) },
             modifier =
                 Modifier.semantics { testTag = "closeButton" } // Adding testTag to the IconButton
             ) {
