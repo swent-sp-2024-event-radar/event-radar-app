@@ -5,9 +5,9 @@ import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.github.kakaocup.compose.node.element.KNode
 
 class QrCodeScanTicketUiScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
-  ComposeScreen<QrCodeScanTicketUiScreen>(
-    semanticsProvider = semanticsProvider,
-    viewBuilderAction = { hasTestTag("qrCodeScannerScreen") }) {
+    ComposeScreen<QrCodeScanTicketUiScreen>(
+        semanticsProvider = semanticsProvider,
+        viewBuilderAction = { hasTestTag("qrCodeScannerScreen") }) {
 
   // BOTH TABS
   val logo: KNode = child { hasTestTag("logo") }

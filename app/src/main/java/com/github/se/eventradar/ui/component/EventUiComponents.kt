@@ -52,117 +52,117 @@ data class EventComponentsStyle(
 )
 
 fun formatDateTime(dateTime: LocalDateTime): String {
-    val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-    return dateTime.format(formatter)
+  val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+  return dateTime.format(formatter)
 }
 
 @Composable
 fun EventTitle(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
-    Text(
-        text = eventUiState.eventName,
-        style = style.titleStyle,
-        modifier = modifier.testTag("eventTitle"),
-        color = style.titleColor)
+  Text(
+      text = eventUiState.eventName,
+      style = style.titleStyle,
+      modifier = modifier.testTag("eventTitle"),
+      color = style.titleColor)
 }
 
 @Composable
 fun EventDescription(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
-    Column(modifier = modifier) {
-        Text(
-            text = stringResource(id = R.string.event_description),
-            style = style.fieldTitleStyle,
-            color = style.fieldTitleColor,
-            modifier = Modifier.testTag("descriptionTitle"))
-        Text(
-            text = eventUiState.description,
-            style = style.contentStyle,
-            color = style.contentColor,
-            modifier = Modifier.testTag("descriptionContent"))
-    }
+  Column(modifier = modifier) {
+    Text(
+        text = stringResource(id = R.string.event_description),
+        style = style.fieldTitleStyle,
+        color = style.fieldTitleColor,
+        modifier = Modifier.testTag("descriptionTitle"))
+    Text(
+        text = eventUiState.description,
+        style = style.contentStyle,
+        color = style.contentColor,
+        modifier = Modifier.testTag("descriptionContent"))
+  }
 }
 
 @Composable
 fun EventDistance(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
-    Column(modifier = modifier) {
-        Text(
-            text = stringResource(id = R.string.event_distance),
-            style = style.fieldTitleStyle,
-            color = style.fieldTitleColor,
-            modifier = Modifier.testTag("distanceTitle"))
-        Text(
-            // TODO the distance between the user and the event should be display instead
-            text = eventUiState.location.address,
-            style = style.contentStyle,
-            color = style.contentColor,
-            modifier = Modifier.testTag("distanceContent"))
-    }
+  Column(modifier = modifier) {
+    Text(
+        text = stringResource(id = R.string.event_distance),
+        style = style.fieldTitleStyle,
+        color = style.fieldTitleColor,
+        modifier = Modifier.testTag("distanceTitle"))
+    Text(
+        // TODO the distance between the user and the event should be display instead
+        text = eventUiState.location.address,
+        style = style.contentStyle,
+        color = style.contentColor,
+        modifier = Modifier.testTag("distanceContent"))
+  }
 }
 
 @Composable
 fun EventCategory(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.SpaceBetween) {
-        Text(
-            text = stringResource(id = R.string.event_categories),
-            style = style.fieldTitleStyle,
-            color = style.fieldTitleColor,
-            modifier = Modifier.testTag("categoryTitle"))
-        Text(
-            text = eventUiState.category.convertToResString(LocalContext.current),
-            style = style.contentStyle,
-            color = style.contentColor,
-            modifier = Modifier.testTag("categoryContent"))
-    }
+  Column(modifier = modifier, verticalArrangement = Arrangement.SpaceBetween) {
+    Text(
+        text = stringResource(id = R.string.event_categories),
+        style = style.fieldTitleStyle,
+        color = style.fieldTitleColor,
+        modifier = Modifier.testTag("categoryTitle"))
+    Text(
+        text = eventUiState.category.convertToResString(LocalContext.current),
+        style = style.contentStyle,
+        color = style.contentColor,
+        modifier = Modifier.testTag("categoryContent"))
+  }
 }
 
 @Composable
 fun EventDate(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
-    Column(modifier = modifier) {
-        Text(
-            text = stringResource(id = R.string.event_date),
-            style = style.fieldTitleStyle,
-            color = style.fieldTitleColor,
-            modifier = Modifier.testTag("dateTitle"))
+  Column(modifier = modifier) {
+    Text(
+        text = stringResource(id = R.string.event_date),
+        style = style.fieldTitleStyle,
+        color = style.fieldTitleColor,
+        modifier = Modifier.testTag("dateTitle"))
 
-        if (eventUiState.start.dayOfYear == eventUiState.end.dayOfYear) {
-            Text(
-                text = formatDateTime(eventUiState.start),
-                style = style.contentStyle,
-                color = style.contentColor,
-                modifier = Modifier.testTag("dateContent"))
-            return
-        } else {
-            Text(
-                text = "${formatDateTime(eventUiState.start)} - ${formatDateTime(eventUiState.end)}",
-                style = style.contentStyle,
-                color = style.contentColor,
-                modifier = Modifier.testTag("dateContent"))
-        }
+    if (eventUiState.start.dayOfYear == eventUiState.end.dayOfYear) {
+      Text(
+          text = formatDateTime(eventUiState.start),
+          style = style.contentStyle,
+          color = style.contentColor,
+          modifier = Modifier.testTag("dateContent"))
+      return
+    } else {
+      Text(
+          text = "${formatDateTime(eventUiState.start)} - ${formatDateTime(eventUiState.end)}",
+          style = style.contentStyle,
+          color = style.contentColor,
+          modifier = Modifier.testTag("dateContent"))
     }
+  }
 }
 
 @Composable
 fun EventTime(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
-    Column(modifier = modifier) {
-        Text(
-            text = stringResource(id = R.string.event_time),
-            style = style.fieldTitleStyle,
-            color = style.fieldTitleColor,
-            modifier = Modifier.testTag("timeTitle"))
-        Text(
-            text = "${eventUiState.start.toLocalTime()} - ${eventUiState.end.toLocalTime()}",
-            style = style.contentStyle,
-            color = style.contentColor,
-            modifier = Modifier.testTag("timeContent"))
-    }
+  Column(modifier = modifier) {
+    Text(
+        text = stringResource(id = R.string.event_time),
+        style = style.fieldTitleStyle,
+        color = style.fieldTitleColor,
+        modifier = Modifier.testTag("timeTitle"))
+    Text(
+        text = "${eventUiState.start.toLocalTime()} - ${eventUiState.end.toLocalTime()}",
+        style = style.contentStyle,
+        color = style.contentColor,
+        modifier = Modifier.testTag("timeContent"))
+  }
 }
 
 @Composable
 fun TicketsSold(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
-    Column(modifier = modifier) {
-        Text(
-            text = "${eventUiState.ticket.purchases} tickets sold",
-            style = style.subTitleStyle,
-            color = style.fieldTitleColor,
-            modifier = Modifier.testTag("ticketSoldContent"))
-    }
+  Column(modifier = modifier) {
+    Text(
+        text = "${eventUiState.ticket.purchases} tickets sold",
+        style = style.subTitleStyle,
+        color = style.fieldTitleColor,
+        modifier = Modifier.testTag("ticketSoldContent"))
+  }
 }

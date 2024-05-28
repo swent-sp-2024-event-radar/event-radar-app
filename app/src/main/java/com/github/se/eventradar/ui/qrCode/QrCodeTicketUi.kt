@@ -2,7 +2,6 @@ package com.github.se.eventradar.ui.qrCode
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,6 +44,7 @@ import com.github.se.eventradar.ui.component.EventTime
 import com.github.se.eventradar.ui.component.EventTitle
 import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.component.Logo
+import com.github.se.eventradar.ui.component.TicketsSold
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.viewmodel.qrCode.ScanTicketQrViewModel
@@ -127,88 +127,88 @@ fun QrCodeTicketUi(
         }
 
     if (qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent) {
-        val imageHeight = 191.dp
+      val imageHeight = 191.dp
 
-        val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+      val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
-        val componentStyle =
-            EventComponentsStyle(
-                MaterialTheme.colorScheme.onSurface,
-                MaterialTheme.colorScheme.onSurfaceVariant,
-                MaterialTheme.colorScheme.onSurface,
-            )
+      val componentStyle =
+          EventComponentsStyle(
+              MaterialTheme.colorScheme.onSurface,
+              MaterialTheme.colorScheme.onSurfaceVariant,
+              MaterialTheme.colorScheme.onSurface,
+          )
 
-        val (lazyEventDetails) = createRefs()
+      val (lazyEventDetails) = createRefs()
 
-        // TODO uncomment when image are implemented
-        // val imagePainter: Painter = rememberImagePainter(eventUiState.eventPhoto)
-        val imagePainter: Painter = rememberImagePainter(R.drawable.placeholderbig)
+      // TODO uncomment when image are implemented
+      // val imagePainter: Painter = rememberImagePainter(eventUiState.eventPhoto)
+      val imagePainter: Painter = rememberImagePainter(R.drawable.placeholderbig)
 
-        LazyColumn(
-            modifier =
-            Modifier.fillMaxSize()
-                .padding(horizontal = 16.dp)
-                .constrainAs(lazyEventDetails) {
+      LazyColumn(
+          modifier =
+              Modifier.fillMaxSize()
+                  .padding(horizontal = 16.dp)
+                  .constrainAs(lazyEventDetails) {
                     top.linkTo(tabs.bottom, margin = 0.dp)
                     start.linkTo(parent.start, margin = 0.dp)
                     end.linkTo(parent.end, margin = 0.dp)
-                }
-                .testTag("lazyEventDetails")) {
+                  }
+                  .testTag("lazyEventDetails")) {
             item {
-                Image(
-                    painter = imagePainter,
-                    contentDescription = "Event banner image",
-                    modifier = Modifier.fillMaxWidth().height(imageHeight).testTag("eventImage"),
-                    contentScale = ContentScale.FillWidth)
+              Image(
+                  painter = imagePainter,
+                  contentDescription = "Event banner image",
+                  modifier = Modifier.fillMaxWidth().height(imageHeight).testTag("eventImage"),
+                  contentScale = ContentScale.FillWidth)
             }
             item {
-                GoBackButton(modifier = Modifier.wrapContentSize()) { navigationActions.goBack() }
+              GoBackButton(modifier = Modifier.wrapContentSize()) { navigationActions.goBack() }
             }
             item { Spacer(modifier = Modifier.height(8.dp)) }
             item {
-                EventTitle(
-                    modifier =
-                    Modifier.fillMaxWidth()
-                        .wrapContentWidth(
-                            Alignment.CenterHorizontally), // .(Alignment.CenterHorizontally),
-                    eventUiState = qrScanUiState.value.eventUiState,
-                    style = componentStyle)
+              EventTitle(
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .wrapContentWidth(
+                              Alignment.CenterHorizontally), // .(Alignment.CenterHorizontally),
+                  eventUiState = qrScanUiState.value.eventUiState,
+                  style = componentStyle)
             }
 
             item {
-                //              Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement =
-                // Arrangement.Center) {
-                TicketsSold(
-                    modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally),
-                    eventUiState = uiState.eventUiState,
-                    style = componentStyle)
-                //              }
+              //              Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement =
+              // Arrangement.Center) {
+              TicketsSold(
+                  modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally),
+                  eventUiState = uiState.eventUiState,
+                  style = componentStyle)
+              //              }
             }
 
             item { Spacer(modifier = Modifier.height(8.dp)) }
 
             item {
-                EventDescription(
-                    modifier = Modifier, qrScanUiState.value.eventUiState, componentStyle)
+              EventDescription(
+                  modifier = Modifier, qrScanUiState.value.eventUiState, componentStyle)
             }
 
             item { Spacer(modifier = Modifier.height(16.dp)) }
             item {
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    EventDistance(modifier = Modifier.weight(2f), uiState.eventUiState, componentStyle)
-                    EventDate(modifier = Modifier.weight(1f), uiState.eventUiState, componentStyle)
-                }
+              Row(modifier = Modifier.fillMaxWidth()) {
+                EventDistance(modifier = Modifier.weight(2f), uiState.eventUiState, componentStyle)
+                EventDate(modifier = Modifier.weight(1f), uiState.eventUiState, componentStyle)
+              }
             }
             item { Spacer(modifier = Modifier.height(8.dp)) }
 
             item {
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    EventCategory(modifier = Modifier.weight(2f), uiState.eventUiState, componentStyle)
-                    EventTime(modifier = Modifier.weight(1f), uiState.eventUiState, componentStyle)
-                }
+              Row(modifier = Modifier.fillMaxWidth()) {
+                EventCategory(modifier = Modifier.weight(2f), uiState.eventUiState, componentStyle)
+                EventTime(modifier = Modifier.weight(1f), uiState.eventUiState, componentStyle)
+              }
             }
             item { Spacer(modifier = Modifier.height(8.dp)) }
-        }
+          }
     } else {
       Toast.makeText(context, "Scan Ticket Not implemented yet", Toast.LENGTH_SHORT).show()
     }
