@@ -8,7 +8,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.github.se.eventradar.model.Location
-import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.repository.event.IEventRepository
@@ -81,21 +80,6 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
                       mainOrganiser = "1",
                       category = EventCategory.COMMUNITY)))
 
-  private val mockEvent =
-      Event(
-          eventName = "Event 1",
-          eventPhoto = "",
-          start = LocalDateTime.now(),
-          end = LocalDateTime.now(),
-          location = Location(0.0, 0.0, "Test Location"),
-          description = "Test Description",
-          ticket = EventTicket("Test Ticket", 0.0, 100, 59),
-          mainOrganiser = "1",
-          organiserList = mutableListOf("Test Organiser"),
-          attendeeList = mutableListOf("user1", "user2", "user3"),
-          category = EventCategory.COMMUNITY,
-          fireBaseID = "1")
-
   @Before
   fun testSetup() {
     MockKAnnotations.init(this)
@@ -130,7 +114,6 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       scanQrTab.performClick()
       closeButton.performClick()
       assertEquals(ScanTicketQrViewModel.Action.ScanTicket, viewModel.uiState.value.action)
-
     }
   }
 
