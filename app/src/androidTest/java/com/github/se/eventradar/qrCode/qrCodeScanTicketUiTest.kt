@@ -123,6 +123,18 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
   }
 
   @Test
+  fun closeDialogueResetState(): Unit = run {
+    val viewModel = setupViewModelWithState(ScanTicketQrViewModel.Action.ApproveEntry)
+    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
+      composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
+      scanQrTab.performClick()
+      closeButton.performClick()
+      assertEquals(ScanTicketQrViewModel.Action.ScanTicket, viewModel.uiState.value.action)
+
+    }
+  }
+
+  @Test
   fun displaysAllComponentsCorrectly_Approved(): Unit = run {
     val viewModel = setupViewModelWithState(ScanTicketQrViewModel.Action.ApproveEntry)
     onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
