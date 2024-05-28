@@ -2,18 +2,14 @@ package com.github.se.eventradar.model.repository.event
 
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.event.Event
-import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 class MockEventRepository : IEventRepository {
 
   val mockEvents = mutableListOf<Event>()
-  val mockEventsExpired = mutableListOf<Event>()
 
   private var ticker = 0
   val eventsFlow = MutableStateFlow<Resource<List<Event>>>(Resource.Success(mockEvents))
@@ -32,38 +28,38 @@ class MockEventRepository : IEventRepository {
     }
   }
 
-  override suspend fun cleanExpiredEvents(): Resource<Unit> {
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-    val currentDateTimeString = LocalDateTime.now().format(formatter)
-    val newExpired = mockEvents.filter { it.end.format(formatter) < currentDateTimeString }
-    for (passedEvent in newExpired) {
-      // Call addEventExpired directly with the document as argument
-      try {
-        addEventExpired(document)
-      } catch (e: Exception) {
-        return Resource.Failure(e)
-      }
-      // Call deleteEventByID with the document ID as argument
-      try {
-        deleteEventByID(document.id)
-      } catch (e: Exception) {
-        return Resource.Failure(e)
-      }
-    }
-    Resource.Success(Unit)
-  } catch (e: Exception) {
-    Resource.Failure(e)
-  }
-}
-  }
+  //  override suspend fun cleanExpiredEvents(): Resource<Unit> {
+  //    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+  //    val currentDateTimeString = LocalDateTime.now().format(formatter)
+  //    val newExpired = mockEvents.filter { it.end.format(formatter) < currentDateTimeString }
+  //    for (passedEvent in newExpired) {
+  //      // Call addEventExpired directly with the document as argument
+  //      try {
+  //        addEventExpired(document)
+  //      } catch (e: Exception) {
+  //        return Resource.Failure(e)
+  //      }
+  //      // Call deleteEventByID with the document ID as argument
+  //      try {
+  //        deleteEventByID(document.id)
+  //      } catch (e: Exception) {
+  //        return Resource.Failure(e)
+  //      }
+  //    }
+  //    Resource.Success(Unit)
+  //  } catch (e: Exception) {
+  //    Resource.Failure(e)
+  //  }
+  // }
+  //  }
 
-  override suspend fun addEventExpired(document: DocumentSnapshot): Resource<Unit> {
-    TODO("Not yet implemented")
-  }
-
-  override suspend fun deleteEventByID(fireBaseID: String): Resource<Unit> {
-    TODO("Not yet implemented")
-  }
+  //  override suspend fun addEventExpired(document: DocumentSnapshot): Resource<Unit> {
+  //    TODO("Not yet implemented")
+  //  }
+  //
+  //  override suspend fun deleteEventByID(fireBaseID: String): Resource<Unit> {
+  //    TODO("Not yet implemented")
+  //  }
 
   override suspend fun getUniqueEventId(): Resource<String> {
     return Resource.Success(ticker++.toString())
