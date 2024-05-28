@@ -31,17 +31,22 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.R
+import com.github.se.eventradar.model.repository.event.MockEventRepository
+import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.Logo
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
 import com.github.se.eventradar.viewmodel.qrCode.ScanTicketQrViewModel
 
 @Composable
@@ -127,7 +132,7 @@ fun QrCodeTicketUi(
             when (qrScanUiState.value.action) {
                 ScanTicketQrViewModel.Action.ScanTicket -> {
                     Column(modifier = Modifier.testTag("QrScanner")) {
-                        QrCodeScannerFriend(analyser = viewModel.qrCodeAnalyser)
+                        QrCodeScannerTicket(viewModel = viewModel)
                     }
                 }
                 ScanTicketQrViewModel.Action.ApproveEntry -> {
@@ -222,17 +227,17 @@ fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
     }
 }
 
-// @Preview(showBackground = true)
-// @Composable
-// fun PreviewQrCodeTicketUi() {
-//  // Create a mock NavigationActions to pass into the function
-//  val userRepository = MockUserRepository()
-//  (userRepository as MockUserRepository).updateCurrentUserId("user1")
-//  val eventRepository = MockEventRepository()
-//  val qrCodeAnalyser = QrCodeAnalyser()
-//  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser, "1")
-//  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
-// }
+ @Preview(showBackground = true)
+ @Composable
+ fun PreviewQrCodeTicketUi() {
+  // Create a mock NavigationActions to pass into the function
+  val userRepository = MockUserRepository()
+  (userRepository as MockUserRepository).updateCurrentUserId("user1")
+  val eventRepository = MockEventRepository()
+  val qrCodeAnalyser = QrCodeAnalyser()
+  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser, "1")
+  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
+ }
 //
 // @Preview(showBackground = true)
 // @Composable

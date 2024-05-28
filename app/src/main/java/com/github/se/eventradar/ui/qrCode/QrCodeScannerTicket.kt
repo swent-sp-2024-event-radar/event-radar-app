@@ -34,7 +34,8 @@ import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
 import com.github.se.eventradar.viewmodel.qrCode.ScanTicketQrViewModel
 
 @Composable
-fun QrCodeScannerTicket(analyser: QrCodeAnalyser, viewModel: ScanTicketQrViewModel = hiltViewModel()) {
+fun QrCodeScannerTicket(viewModel: ScanTicketQrViewModel = hiltViewModel()) {
+    val analyser = viewModel.qrCodeAnalyser
 
     val context = LocalContext.current
     val lifeCycleOwner = LocalLifecycleOwner.current
@@ -53,7 +54,11 @@ fun QrCodeScannerTicket(analyser: QrCodeAnalyser, viewModel: ScanTicketQrViewMod
             onResult = { granted -> hasCameraPermission = granted })
 
     // only ask permission once
-    LaunchedEffect(key1 = true) { launcher.launch(Manifest.permission.CAMERA) }
+    LaunchedEffect(key1 = true) {
+        if (!hasCameraPermission) {
+            launcher.launch(Manifest.permission.CAMERA)
+        }
+    }
 
 // Shared variables for camera configuration
     val preview = remember { Preview.Builder().build() }
@@ -67,6 +72,31 @@ fun QrCodeScannerTicket(analyser: QrCodeAnalyser, viewModel: ScanTicketQrViewMod
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+//    fun reinitializeCamera(previewView: PreviewView) {
+//        val cameraProvider = cameraFutureProvider.get()
+//        cameraProvider.unbindAll()  // Unbind all use cases first
+//
+//        // Clear the previous surface provider
+//        preview.setSurfaceProvider(null)
+//
+//        // Rebind the use cases
+//        preview.setSurfaceProvider(previewView.surfaceProvider)
+//        imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(context), analyser)
+//
+//        try {
+//            cameraProvider.bindToLifecycle(
+//                lifeCycleOwner,
+//                selector,
+//                preview,
+//                imageAnalysis
+//            )
+//            Log.d("QrCodeScanner", "Camera use cases bound to lifecycle")
+//        } catch (e: Exception) {
+//            Log.e("QrCodeScanner", "Use case binding failed", e)
+//        }
+//    }
+
 
 
     //actual camera view
@@ -94,28 +124,36 @@ fun QrCodeScannerTicket(analyser: QrCodeAnalyser, viewModel: ScanTicketQrViewMod
                 },
                 modifier = Modifier.weight(1.5f).aspectRatio(1f).padding(horizontal = 32.dp)
             )
-            LaunchedEffect(key1 = uiState.action) {
-                if (uiState.action == ScanTicketQrViewModel.Action.ScanTicket) {
-                    val cameraProvider = cameraFutureProvider.get()
-                    cameraProvider.unbindAll()  // Unbind all use cases first
-
-                    // Rebind the use cases
-                    val previewView = PreviewView(context)
-                    preview.setSurfaceProvider(previewView.surfaceProvider)
-                    imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(context), analyser)
-
-                    try {
-                        cameraProvider.bindToLifecycle(
-                            lifeCycleOwner,
-                            selector,
-                            preview,
-                            imageAnalysis
-                        )
-                    } catch (e: Exception) {
-                        Log.e("QrCodeCameraFail", "Use case binding failed", e)
-                    }
-                }
-            }
+//            LaunchedEffect(key1 = uiState.action) {
+//                if (uiState.action == ScanTicketQrViewModel.Action.ScanTicket) {
+//                    // Reinitialize the camera using the same PreviewView instance
+//                    val previewView = PreviewView(context)
+//                    reinitializeCamera(previewView)
+//                    Log.d("QrCodeScanner", "Reinitializing camera on state change to ScanTicket")
+//                }
+//            }
+//            LaunchedEffect(key1 = uiState.action) {
+//                if (uiState.action == ScanTicketQrViewModel.Action.ScanTicket) {
+//                    val cameraProvider = cameraFutureProvider.get()
+//                    cameraProvider.unbindAll()  // Unbind all use cases first
+//
+//                    // Rebind the use cases
+//                    val previewView = PreviewView(context)
+//                    preview.setSurfaceProvider(previewView.surfaceProvider)
+//                    imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(context), analyser)
+//
+//                    try {
+//                        cameraProvider.bindToLifecycle(
+//                            lifeCycleOwner,
+//                            selector,
+//                            preview,
+//                            imageAnalysis
+//                        )
+//                    } catch (e: Exception) {
+//                        Log.e("QrCodeCameraFail", "Use case binding failed", e)
+//                    }
+//                }
+//            }
         }
     }
 }
