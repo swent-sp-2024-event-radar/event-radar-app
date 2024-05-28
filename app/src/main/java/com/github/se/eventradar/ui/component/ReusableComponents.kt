@@ -1,6 +1,9 @@
 package com.github.se.eventradar.ui.component
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Looper
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -73,9 +76,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.github.se.eventradar.R
+import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.ui.BottomNavigationMenu
@@ -87,6 +92,8 @@ import com.github.se.eventradar.viewmodel.SearchFilterUiState
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 
 fun getIconFromViewListBool(viewList: Boolean): ImageVector {
@@ -472,12 +479,43 @@ fun GenericDialogBox(
 
 @Composable
 fun GetUserLocation(
-    locationProvider: FusedLocationProviderClient,
-    locationCallback: LocationCallback
+    context: Context,
+    onUserLocationChanged: (Location) -> Unit,
+    locationProvider: FusedLocationProviderClient =
+        LocationServices.getFusedLocationProviderClient(context),
 ) {
+  val locationCallback =
+      object : LocationCallback() {
+        // 1
+        override fun onLocationResult(result: LocationResult) {
+          if (ActivityCompat.checkSelfPermission(
+              context, Manifest.permission.ACCESS_FINE_LOCATION) !=
+              PackageManager.PERMISSION_GRANTED &&
+              ActivityCompat.checkSelfPermission(
+                  context, Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                  PackageManager.PERMISSION_GRANTED) {
+            // set default location
+            val epflLocation = Location(46.519962, 6.56637, "EPFL")
+            onUserLocationChanged(epflLocation)
+            return
+          }
+
+          locationProvider.lastLocation
+              .addOnSuccessListener { location ->
+                location?.let {
+                  val lat = location.latitude
+                  val long = location.longitude
+                  // Update data class with location data
+                  onUserLocationChanged(Location(lat, long, "User"))
+                }
+              }
+              .addOnFailureListener { Log.e("Location_error", "${it.message}") }
+        }
+      }
+
   DisposableEffect(key1 = locationProvider) {
     locationUpdate(locationProvider, locationCallback)
-    // 3
+
     onDispose { stopLocationUpdate(locationProvider, locationCallback) }
   }
 }

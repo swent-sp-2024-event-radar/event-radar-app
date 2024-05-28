@@ -1,8 +1,5 @@
 package com.github.se.eventradar.ui.home
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,12 +24,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
-import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
@@ -49,9 +44,6 @@ import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.viewmodel.EventsOverviewUiState
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.github.se.eventradar.viewmodel.Tab
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
 
 @Composable
 fun HomeScreen(
@@ -75,38 +67,7 @@ fun HomeScreen(
     }
   }
 
-  val locationProvider = LocationServices.getFusedLocationProviderClient(context)
-
-  val locationCallback =
-      object : LocationCallback() {
-        // 1
-        override fun onLocationResult(result: LocationResult) {
-          if (ActivityCompat.checkSelfPermission(
-              context, Manifest.permission.ACCESS_FINE_LOCATION) !=
-              PackageManager.PERMISSION_GRANTED &&
-              ActivityCompat.checkSelfPermission(
-                  context, Manifest.permission.ACCESS_COARSE_LOCATION) !=
-                  PackageManager.PERMISSION_GRANTED) {
-            // set default location
-            val epflLocation = Location(46.519962, 6.56637, "EPFL")
-            viewModel.onUserLocationChanged(epflLocation)
-            return
-          }
-
-          locationProvider.lastLocation
-              .addOnSuccessListener { location ->
-                location?.let {
-                  val lat = location.latitude
-                  val long = location.longitude
-                  // Update data class with location data
-                  viewModel.onUserLocationChanged(Location(lat, long, "User"))
-                }
-              }
-              .addOnFailureListener { Log.e("Location_error", "${it.message}") }
-        }
-      }
-
-  GetUserLocation(locationProvider, locationCallback)
+  GetUserLocation(context, viewModel::onUserLocationChanged)
 
   AppScaffold(
       modifier = Modifier.testTag("homeScreen"),

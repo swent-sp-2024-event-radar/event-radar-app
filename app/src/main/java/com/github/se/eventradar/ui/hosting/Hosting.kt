@@ -1,8 +1,5 @@
 package com.github.se.eventradar.ui.hosting
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,10 +31,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.se.eventradar.R
-import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.EventList
@@ -55,9 +50,6 @@ import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 import com.github.se.eventradar.util.toast
 import com.github.se.eventradar.viewmodel.HostedEventsUiState
 import com.github.se.eventradar.viewmodel.HostedEventsViewModel
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
 
 @Composable
 fun HostingScreen(
@@ -75,38 +67,7 @@ fun HostingScreen(
   }
   LaunchedEffect(Unit) { viewModel.getHostedEvents() }
 
-  val locationProvider = LocationServices.getFusedLocationProviderClient(context)
-
-  val locationCallback =
-      object : LocationCallback() {
-        // 1
-        override fun onLocationResult(result: LocationResult) {
-          if (ActivityCompat.checkSelfPermission(
-              context, Manifest.permission.ACCESS_FINE_LOCATION) !=
-              PackageManager.PERMISSION_GRANTED &&
-              ActivityCompat.checkSelfPermission(
-                  context, Manifest.permission.ACCESS_COARSE_LOCATION) !=
-                  PackageManager.PERMISSION_GRANTED) {
-            // set default location
-            val epflLocation = Location(46.519962, 6.56637, "EPFL")
-            viewModel.onUserLocationChanged(epflLocation)
-            return
-          }
-
-          locationProvider.lastLocation
-              .addOnSuccessListener { location ->
-                location?.let {
-                  val lat = location.latitude
-                  val long = location.longitude
-                  // Update data class with location data
-                  viewModel.onUserLocationChanged(Location(lat, long, "User"))
-                }
-              }
-              .addOnFailureListener { Log.e("Location_error", "${it.message}") }
-        }
-      }
-
-  GetUserLocation(locationProvider, locationCallback)
+  GetUserLocation(context, viewModel::onUserLocationChanged)
 
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("hostingScreen")) {
     val (logo, title, divider, searchfilter, filter, eventList, eventMap, bottomNav, buttons) =
