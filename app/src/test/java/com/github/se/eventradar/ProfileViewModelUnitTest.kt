@@ -8,6 +8,7 @@ import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.viewmodel.ProfileUiState
 import com.github.se.eventradar.viewmodel.ProfileViewModel
 import com.google.firebase.auth.FirebaseUser
+import io.mockk.core.ValueClassSupport.boxedValue
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
@@ -15,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -85,23 +87,22 @@ class ProfileViewModelTest {
 
     every { user.uid } returns "1"
     every { user.email } returns "test@test.com"
+
+      runBlocking { userRepository.addUser(mockUser) }
   }
 
   @Test
   fun `updateField updates ProfileUiState correctly`() = runTest {
-    userRepository.addUser(mockUser)
 
-    // Arrange
-    val field = "username"
-    val newValue = "newUsername"
-    Mockito.`when`(userRepository.updateUserField("1", field, newValue))
-        .thenReturn(Resource.Success(Unit))
+      // Arrange
+      val field = "username"
+      val newValue = "newUsername"
 
-    // Act
-    viewModel.updateUserData(field, newValue)
+      // Act
+      viewModel.updateUserData(field, newValue)
 
-    // Assert
-    val uiState = viewModel.uiState.first()
-    assertEquals(newValue, uiState.username)
+      // Assert
+      val updatedUiState = viewModel.uiState.value
+      assertEquals(newValue, updatedUiState.username)
   }
 }

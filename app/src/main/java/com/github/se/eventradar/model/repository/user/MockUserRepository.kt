@@ -159,6 +159,35 @@ class MockUserRepository : IUserRepository {
     }
   }
 
+    override suspend fun getUserField(userId: String, field: String): Resource<Any> {
+        val index = mockUsers.indexOfFirst { it.userId == userId }
+        return if (index != -1) {
+        val user = mockUsers[index]
+        val value =
+            when (field) {
+                "username" -> user.username
+                "firstName" -> user.firstName
+                "lastName" -> user.lastName
+                "phoneNumber" -> user.phoneNumber
+                "birthDate" -> user.birthDate
+                "accountStatus" -> user.accountStatus
+                "eventsAttendeeList" -> user.eventsAttendeeList
+                "eventsHostList" -> user.eventsHostList
+                "friendsList" -> user.friendsList
+                "profilePicUrl" -> user.profilePicUrl
+                "qrCodeUrl" -> user.qrCodeUrl
+                else -> null
+            }
+        if (value != null) {
+            Resource.Success(value)
+        } else {
+            Resource.Failure(Exception("Field $field not found for user $userId"))
+        }
+        } else {
+        Resource.Failure(Exception("User with id $userId not found"))
+        }
+    }
+
   // Helper method to set the current user ID for testing
   fun updateCurrentUserId(userId: String?) {
     currentUserId = userId
