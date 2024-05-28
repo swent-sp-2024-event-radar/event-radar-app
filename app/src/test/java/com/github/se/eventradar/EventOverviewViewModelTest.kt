@@ -544,4 +544,19 @@ class EventsOverviewViewModelTest {
     }
     unmockkAll()
   }
+
+  @Test
+  fun testRadiusQueryLessThanZero() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    val newQuery = "-10.0"
+    viewModel.onRadiusQueryChanged(newQuery)
+    assert(newQuery == viewModel.uiState.value.radiusQuery)
+    viewModel.filterEvents()
+
+    verify { Log.d("EventsOverviewViewModel", "Invalid radius query: $newQuery") }
+    assert(viewModel.uiState.value.radiusQuery == "")
+    unmockkAll()
+  }
 }
