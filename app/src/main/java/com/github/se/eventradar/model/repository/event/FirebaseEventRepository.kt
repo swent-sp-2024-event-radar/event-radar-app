@@ -155,10 +155,10 @@ class FirebaseEventRepository(db: FirebaseFirestore = Firebase.firestore) : IEve
   }
 
   override fun observeAllEvents(): Flow<Resource<List<Event>>> = callbackFlow {
-    //    val currentDateTimeString = LocalDateTime.now().format(formatter)
-
+        val currentDateTimeString = LocalDateTime.now().format(formatter)
+    val query = eventRef.whereGreaterThan("end", currentDateTimeString)
     val listener =
-        eventRef.addSnapshotListener { snapshot, error ->
+      query.addSnapshotListener { snapshot, error ->
           if (error != null) {
             trySend(
                 Resource.Failure(Exception("Error listening to event updates: ${error.message}")))
