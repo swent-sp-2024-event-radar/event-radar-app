@@ -3,6 +3,7 @@ package com.github.se.eventradar.model.repository.event
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventTicket
+import java.time.LocalDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +16,8 @@ class MockEventRepository : IEventRepository {
   val eventsFlow = MutableStateFlow<Resource<List<Event>>>(Resource.Success(mockEvents))
 
   override suspend fun getEvents(): Resource<List<Event>> {
-    return Resource.Success(mockEvents)
+    val validEvents = mockEvents.filter { it.end.isAfter(LocalDateTime.now()) }
+    return Resource.Success(validEvents)
   }
 
   override suspend fun getEvent(id: String): Resource<Event?> {
@@ -56,7 +58,9 @@ class MockEventRepository : IEventRepository {
     }
   }
 
-  override suspend fun getEventsByIds(ids: List<String>): Resource<List<Event>> {
+  override suspend fun getEventsByIds(
+      ids: List<String>
+  ): Resource<List<Event>> { // TODO add filter for non expired?
     val events = mutableListOf<Event>()
     for (id in ids) {
       val event = mockEvents.find { it.fireBaseID == id }
@@ -69,13 +73,27 @@ class MockEventRepository : IEventRepository {
     return Resource.Success(events)
   }
 
-  override fun observeAllEvents(): Flow<Resource<List<Event>>> = eventsFlow.asStateFlow()
+  override fun observeAllEvents(): Flow<Resource<List<Event>>> {
+    return eventsFlow.asStateFlow().map { resource ->
+      when (resource) {
+        is Resource.Success -> {
+          val upcomingEvents = resource.data
+          //            .filter { it.end.isAfter(LocalDateTime.now()) } //TODO?
+          Resource.Success(upcomingEvents)
+        }
+        is Resource.Failure -> resource
+      }
+    }
+  }
 
   override fun observeUpcomingEvents(userId: String): Flow<Resource<List<Event>>> {
     return eventsFlow.asStateFlow().map { resource ->
       when (resource) {
         is Resource.Success -> {
-          val upcomingEvents = resource.data.filter { it.attendeeList.contains(userId) }
+          val upcomingEvents =
+              resource.data
+                  .filter { it.attendeeList.contains(userId) }
+                  .filter { it.end.isAfter(LocalDateTime.now()) }
           Resource.Success(upcomingEvents)
         }
         is Resource.Failure -> resource

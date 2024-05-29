@@ -52,8 +52,8 @@ class ViewEventDetailsUserFlow : TestCase() {
       Event(
           "Test 1",
           "",
-          LocalDateTime.parse("2021-12-31T09:00:00"),
-          LocalDateTime.parse("2022-01-01T00:00:00"),
+          LocalDateTime.parse("2025-12-31T09:00:00"),
+          LocalDateTime.parse("2025-01-01T00:00:00"),
           Location(0.0, 0.0, "EPFL"),
           "Test Description",
           EventTicket("Test Ticket", 0.0, 100, 0),

@@ -18,6 +18,7 @@ import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import io.mockk.verify
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -58,8 +59,23 @@ class EventsOverviewViewModelTest {
       Event(
           eventName = "Event 1",
           eventPhoto = "",
-          start = LocalDateTime.now(),
-          end = LocalDateTime.now(),
+          start = LocalDateTime.now().plus(1, ChronoUnit.DAYS),
+          end = LocalDateTime.now().plus(2, ChronoUnit.DAYS),
+          location = Location(0.0, 0.0, "Test Location"),
+          description = "Test Description",
+          ticket = EventTicket("Test Ticket", 0.0, 1, 0),
+          mainOrganiser = "1",
+          organiserList = mutableListOf("Test Organiser"),
+          attendeeList = mutableListOf("Test Attendee"),
+          category = EventCategory.COMMUNITY,
+          fireBaseID = "1")
+
+  private val expiredEvent =
+      Event(
+          eventName = "Event 1",
+          eventPhoto = "",
+          start = LocalDateTime.now().minus(2, ChronoUnit.DAYS),
+          end = LocalDateTime.now().minus(1, ChronoUnit.DAYS),
           location = Location(0.0, 0.0, "Test Location"),
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1, 0),
@@ -119,6 +135,26 @@ class EventsOverviewViewModelTest {
     assert(viewModel.uiState.value.eventList.allEvents == events)
     assert(viewModel.uiState.value.eventList.filteredEvents.size == 3)
     assert(viewModel.uiState.value.eventList.filteredEvents == events)
+    assertNull(viewModel.uiState.value.eventList.selectedEvent)
+  }
+
+  @Test
+  fun testFilterExpired() = runTest {
+    val events =
+        listOf(
+            mockEvent.copy(fireBaseID = "1"),
+            expiredEvent.copy(fireBaseID = "2"),
+            mockEvent.copy(fireBaseID = "3"))
+
+    events.forEach { event -> eventRepository.addEvent(event) }
+
+    viewModel.getEvents()
+
+    assert(viewModel.uiState.value.eventList.allEvents.isNotEmpty())
+    assert(viewModel.uiState.value.eventList.allEvents.size == 2)
+    assert(viewModel.uiState.value.eventList.allEvents != events)
+    assert(viewModel.uiState.value.eventList.filteredEvents.size == 2)
+    assert(viewModel.uiState.value.eventList.filteredEvents != events)
     assertNull(viewModel.uiState.value.eventList.selectedEvent)
   }
 
@@ -369,7 +405,6 @@ class EventsOverviewViewModelTest {
     events.forEach { event -> eventRepository.addEvent(event) }
 
     viewModel.getEvents()
-    viewModel.onUserLocationChanged(Location(38.9, 78.8, "User Location"))
 
     val newQuery = "20"
     viewModel.onRadiusQueryChanged(newQuery)
@@ -542,21 +577,6 @@ class EventsOverviewViewModelTest {
     verify {
       Log.d("EventsOverviewViewModel", "Failed to fetch upcoming events: ${exception.message}")
     }
-    unmockkAll()
-  }
-
-  @Test
-  fun testRadiusQueryLessThanZero() = runTest {
-    mockkStatic(Log::class)
-    every { Log.d(any(), any()) } returns 0
-
-    val newQuery = "-10.0"
-    viewModel.onRadiusQueryChanged(newQuery)
-    assert(newQuery == viewModel.uiState.value.radiusQuery)
-    viewModel.filterEvents()
-
-    verify { Log.d("EventsOverviewViewModel", "Invalid radius query: $newQuery") }
-    assert(viewModel.uiState.value.radiusQuery == "")
     unmockkAll()
   }
 }

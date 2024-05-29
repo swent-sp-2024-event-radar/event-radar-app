@@ -8,6 +8,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -15,9 +17,13 @@ import kotlinx.coroutines.tasks.await
 
 class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : IEventRepository {
   private val eventRef: CollectionReference = db.collection("events")
+  private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
+  private val currentDateTimeString: String
+    get() = LocalDateTime.now().format(formatter)
 
   override suspend fun getEvents(): Resource<List<Event>> {
-    val resultDocument = eventRef.get().await()
+    val currentDateTimeString = currentDateTimeString
+    val resultDocument = eventRef.whereGreaterThan("end", currentDateTimeString).get().await()
 
     return try {
       val events = resultDocument.documents.map { document -> Event(document.data!!, document.id) }
@@ -108,8 +114,10 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
   }
 
   override fun observeAllEvents(): Flow<Resource<List<Event>>> = callbackFlow {
+    val currentDateTimeString = currentDateTimeString
+    val query = eventRef.whereGreaterThan("end", currentDateTimeString)
     val listener =
-        eventRef.addSnapshotListener { snapshot, error ->
+        query.addSnapshotListener { snapshot, error ->
           if (error != null) {
             trySend(
                 Resource.Failure(Exception("Error listening to event updates: ${error.message}")))
@@ -122,7 +130,11 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
   }
 
   override fun observeUpcomingEvents(userId: String): Flow<Resource<List<Event>>> = callbackFlow {
-    val query = eventRef.whereArrayContains("attendees_list", userId)
+    val currentDateTimeString = currentDateTimeString
+    val query =
+        eventRef
+            .whereGreaterThan("end", currentDateTimeString)
+            .whereArrayContains("attendees_list", userId)
 
     val listener =
         query.addSnapshotListener { snapshot, error ->
