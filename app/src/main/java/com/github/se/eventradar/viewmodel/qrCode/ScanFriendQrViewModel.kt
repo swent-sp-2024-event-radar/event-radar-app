@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 // TODO ViewModel & UI can be improved on by having a state where the UI reflects a loading icon if
@@ -169,17 +170,18 @@ constructor(
   }
 
   private fun changeAction(action: Action) {
-    _uiState.value = uiState.value.copy(action = action)
+
+    _uiState.update { uiState -> uiState.copy(action = action) }
     if (action == Action.NavigateToNextScreen) {
       navigationActions.navController.navigate(
           Route.PRIVATE_CHAT + "/${uiState.value.decodedResult}")
-      _uiState.value = _uiState.value.copy(action = Action.None)
+      _uiState.update { uiState -> uiState.copy(action = Action.None) }
       changeTabState(Tab.MyQR)
     }
   }
 
   fun changeTabState(tab: Tab) {
-    _uiState.value = uiState.value.copy(tabState = tab)
+    _uiState.update { uiState -> uiState.copy(tabState = tab) }
   }
 
   fun getUserDetails() {
@@ -190,9 +192,10 @@ constructor(
           // Now fetch the user data using the fetched user ID
           when (val userResult = userRepository.getUser(userId)) {
             is Resource.Success -> {
-              _uiState.value =
-                  _uiState.value.copy(
-                      username = userResult.data!!.username, qrCodeLink = userResult.data.qrCodeUrl)
+              _uiState.update { uiState ->
+                uiState.copy(
+                    username = userResult.data!!.username, qrCodeLink = userResult.data.qrCodeUrl)
+              }
             }
             is Resource.Failure -> {
               Log.d(
