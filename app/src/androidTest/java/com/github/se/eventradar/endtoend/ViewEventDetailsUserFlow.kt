@@ -29,7 +29,6 @@ import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -53,8 +52,8 @@ class ViewEventDetailsUserFlow : TestCase() {
       Event(
           "Test 1",
           "",
-          start = LocalDateTime.now().plus(1, ChronoUnit.DAYS),
-          end = LocalDateTime.now().plus(2, ChronoUnit.DAYS),
+          LocalDateTime.parse("2025-12-31T09:00:00"),
+          LocalDateTime.parse("2025-01-01T00:00:00"),
           Location(0.0, 0.0, "EPFL"),
           "Test Description",
           EventTicket("Test Ticket", 0.0, 100, 0),
