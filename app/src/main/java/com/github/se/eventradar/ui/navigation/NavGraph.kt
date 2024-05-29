@@ -22,9 +22,8 @@ import com.github.se.eventradar.util.toast
 import com.github.se.eventradar.viewmodel.ChatViewModel
 import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.viewmodel.ViewFriendsProfileViewModel
-import com.github.se.eventradar.viewmodel.qrCode.ScanTicketQrViewModel
 import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
-
+import com.github.se.eventradar.viewmodel.qrCode.ScanTicketQrViewModel
 
 @Composable
 fun NavGraph(
