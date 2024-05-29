@@ -56,7 +56,7 @@ constructor(
     }
   }
 
-  fun onFilterDialogOpen(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
+  fun onFilterDialogOpenChanged(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
     state.update { currentState ->
       currentState.copy(isFilterDialogOpen = !state.value.isFilterDialogOpen)
     }

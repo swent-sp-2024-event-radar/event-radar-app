@@ -50,121 +50,121 @@ fun HomeScreen(
     viewModel: EventsOverviewViewModel = hiltViewModel(),
     navigationActions: NavigationActions
 ) {
-    // Ui States handled by viewModel
-    val uiState by viewModel.uiState.collectAsState()
-    val context = LocalContext.current
+  // Ui States handled by viewModel
+  val uiState by viewModel.uiState.collectAsState()
+  val context = LocalContext.current
 
-    LaunchedEffect(key1 = uiState.isSearchActive, key2 = uiState.isFilterActive) {
-        if (uiState.isSearchActive || uiState.isFilterActive) {
-            viewModel.filterEvents()
-        }
+  LaunchedEffect(key1 = uiState.isSearchActive, key2 = uiState.isFilterActive) {
+    if (uiState.isSearchActive || uiState.isFilterActive) {
+      viewModel.filterEvents()
     }
+  }
 
-    LaunchedEffect(Unit) {
-        when {
-            (uiState.tab == Tab.BROWSE) -> viewModel.getEvents()
-            else -> viewModel.getUpcomingEvents()
-        }
+  LaunchedEffect(Unit) {
+    when {
+      (uiState.tab == Tab.BROWSE) -> viewModel.getEvents()
+      else -> viewModel.getUpcomingEvents()
     }
+  }
 
-    GetUserLocation(context, viewModel::onUserLocationChanged)
+  GetUserLocation(context, viewModel::onUserLocationChanged)
 
-    AppScaffold(
-        modifier = Modifier.testTag("homeScreen"),
-        floatingActionButton = {
-            ViewToggleFab(
-                modifier = Modifier.padding(16.dp).testTag("viewToggleFab"),
-                onClick = { viewModel.onViewListStatusChanged() },
-                iconVector = getIconFromViewListBool(uiState.viewList))
-        },
-        navigationActions = navigationActions,
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(it).padding(top = 16.dp).testTag("homeScreen"),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-            TabRow(
-                selectedTabIndex = getTabIndexFromTabEnum(uiState.tab),
-                modifier = Modifier.fillMaxWidth().testTag("tabs"),
-                contentColor = MaterialTheme.colorScheme.primary) {
+  AppScaffold(
+      modifier = Modifier.testTag("homeScreen"),
+      floatingActionButton = {
+        ViewToggleFab(
+            modifier = Modifier.padding(16.dp).testTag("viewToggleFab"),
+            onClick = { viewModel.onViewListStatusChanged() },
+            iconVector = getIconFromViewListBool(uiState.viewList))
+      },
+      navigationActions = navigationActions,
+  ) {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(it).padding(top = 16.dp).testTag("homeScreen"),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+          TabRow(
+              selectedTabIndex = getTabIndexFromTabEnum(uiState.tab),
+              modifier = Modifier.fillMaxWidth().testTag("tabs"),
+              contentColor = MaterialTheme.colorScheme.primary) {
                 Tab(
                     selected = getTabIndexFromTabEnum(uiState.tab) == 0,
                     onClick = {
-                        viewModel.onTabChanged(Tab.BROWSE)
-                        viewModel.getEvents()
+                      viewModel.onTabChanged(Tab.BROWSE)
+                      viewModel.getEvents()
                     },
                     modifier = Modifier.testTag("browseTab"),
                 ) {
-                    Text(
-                        text = "Browse",
-                        style =
-                        TextStyle(
-                            fontSize = 19.sp,
-                            lineHeight = 17.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto)),
-                            fontWeight = FontWeight(500),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            textAlign = TextAlign.Center,
-                            letterSpacing = 0.25.sp,
-                        ),
-                        modifier = Modifier.padding(bottom = 8.dp))
+                  Text(
+                      text = "Browse",
+                      style =
+                          TextStyle(
+                              fontSize = 19.sp,
+                              lineHeight = 17.sp,
+                              fontFamily = FontFamily(Font(R.font.roboto)),
+                              fontWeight = FontWeight(500),
+                              color = MaterialTheme.colorScheme.onPrimaryContainer,
+                              textAlign = TextAlign.Center,
+                              letterSpacing = 0.25.sp,
+                          ),
+                      modifier = Modifier.padding(bottom = 8.dp))
                 }
                 Tab(
                     selected = getTabIndexFromTabEnum(uiState.tab) == 1,
                     onClick = {
-                        viewModel.onTabChanged(Tab.UPCOMING)
-                        viewModel.getUpcomingEvents()
+                      viewModel.onTabChanged(Tab.UPCOMING)
+                      viewModel.getUpcomingEvents()
                     },
                     modifier = Modifier.testTag("upcomingTab")) {
-                    Text(
-                        text = "Upcoming",
-                        style =
-                        TextStyle(
-                            fontSize = 19.sp,
-                            lineHeight = 17.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto)),
-                            fontWeight = FontWeight(500),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            textAlign = TextAlign.Center,
-                            letterSpacing = 0.25.sp,
-                        ),
-                        modifier = Modifier.padding(bottom = 8.dp))
-                }
-            }
+                      Text(
+                          text = "Upcoming",
+                          style =
+                              TextStyle(
+                                  fontSize = 19.sp,
+                                  lineHeight = 17.sp,
+                                  fontFamily = FontFamily(Font(R.font.roboto)),
+                                  fontWeight = FontWeight(500),
+                                  color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                  textAlign = TextAlign.Center,
+                                  letterSpacing = 0.25.sp,
+                              ),
+                          modifier = Modifier.padding(bottom = 8.dp))
+                    }
+              }
 
-            SearchBarAndFilter(
-                onSearchQueryChanged = { viewModel.onSearchQueryChanged(it) },
-                searchQuery = uiState.searchQuery,
-                onSearchActiveChanged = { viewModel.onSearchActiveChanged(it) },
-                onFilterDialogOpen = { viewModel.onFilterDialogOpenChanged() },
-                modifier =
-                Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
-                    .testTag("searchBarAndFilter"),
-                placeholderStringResource = R.string.home_search_placeholder)
+          SearchBarAndFilter(
+              onSearchQueryChanged = { viewModel.onSearchQueryChanged(it) },
+              searchQuery = uiState.searchQuery,
+              onSearchActiveChanged = { viewModel.onSearchActiveChanged(it) },
+              onFilterDialogOpen = { viewModel.onFilterDialogOpenChanged() },
+              modifier =
+                  Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
+                      .testTag("searchBarAndFilter"),
+              placeholderStringResource = R.string.home_search_placeholder)
 
-            if (uiState.isFilterDialogOpen) {
-                FilterPopUp(
-                    onFreeSwitchChanged = { viewModel.onFreeSwitchChanged() },
-                    onFilterApply = {
-                        if (uiState.radiusQuery != "") {
-                            viewModel.onRadiusQueryChanged(uiState.radiusQuery)
-                        }
-                        viewModel.onFilterApply()
+          if (uiState.isFilterDialogOpen) {
+            FilterPopUp(
+                onFreeSwitchChanged = { viewModel.onFreeSwitchChanged() },
+                onFilterApply = {
+                  if (uiState.radiusQuery != "") {
+                    viewModel.onRadiusQueryChanged(uiState.radiusQuery)
+                  }
+                  viewModel.onFilterApply()
 
-                        // automatically close dialog
-                        viewModel.onFilterDialogOpenChanged()
-                    },
-                    uiState = uiState,
-                    onRadiusQueryChanged = { viewModel.onRadiusQueryChanged(it) },
-                    modifier = Modifier.testTag("filterPopUp"),
-                )
-            }
-
-            EventsOverview(
+                  // automatically close dialog
+                  viewModel.onFilterDialogOpenChanged()
+                },
                 uiState = uiState,
-                navigationActions = navigationActions,
+                onRadiusQueryChanged = { viewModel.onRadiusQueryChanged(it) },
+                modifier = Modifier.testTag("filterPopUp"),
             )
+          }
+
+          EventsOverview(
+              uiState = uiState,
+              navigationActions = navigationActions,
+          )
         }
-    }
+  }
 }
 
 @Composable
@@ -173,77 +173,77 @@ fun EventsOverview(
     navigationActions: NavigationActions,
     modifier: Modifier = Modifier
 ) {
-    val events = getEventsBasedOffUiState(uiState)
-    if (uiState.tab == Tab.BROWSE) {
-        when (uiState.viewList) {
-            true ->
-                EventList(events, modifier.testTag("eventList").fillMaxWidth()) { eventId ->
-                    navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-                }
-            false ->
-                EventMap(events, modifier.testTag("eventMap").fillMaxWidth(), uiState.userLocation!!) {
-                        eventId ->
-                    navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-                }
-        }
-    } else {
-        when {
-            (!uiState.userLoggedIn) ->
-                Text("Please log in", modifier = modifier.testTag("pleaseLogInText"))
-            (uiState.viewList && uiState.upcomingEventList.allEvents.isEmpty()) ->
-                Text(
-                    "You have no upcoming events",
-                    textAlign = TextAlign.Center,
-                    modifier = modifier.testTag("noUpcomingEventsText"))
-            // In list view + search or filter is active
-            uiState.viewList ->
-                EventList(
-                    events = events, modifier = modifier.testTag("eventListUpcoming").fillMaxWidth()) {
-                        eventId ->
-                    navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-                }
-            else ->
-                EventMap(
-                    events,
-                    modifier.testTag("eventMapUpcoming").fillMaxWidth(),
-                    uiState.userLocation!!) { eventId ->
-                    navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-                }
-        }
+  val events = getEventsBasedOffUiState(uiState)
+  if (uiState.tab == Tab.BROWSE) {
+    when (uiState.viewList) {
+      true ->
+          EventList(events, modifier.testTag("eventList").fillMaxWidth()) { eventId ->
+            navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+          }
+      false ->
+          EventMap(events, modifier.testTag("eventMap").fillMaxWidth(), uiState.userLocation!!) {
+              eventId ->
+            navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+          }
     }
+  } else {
+    when {
+      (!uiState.userLoggedIn) ->
+          Text("Please log in", modifier = modifier.testTag("pleaseLogInText"))
+      (uiState.viewList && uiState.upcomingEventList.allEvents.isEmpty()) ->
+          Text(
+              "You have no upcoming events",
+              textAlign = TextAlign.Center,
+              modifier = modifier.testTag("noUpcomingEventsText"))
+      // In list view + search or filter is active
+      uiState.viewList ->
+          EventList(
+              events = events, modifier = modifier.testTag("eventListUpcoming").fillMaxWidth()) {
+                  eventId ->
+                navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+              }
+      else ->
+          EventMap(
+              events,
+              modifier.testTag("eventMapUpcoming").fillMaxWidth(),
+              uiState.userLocation!!) { eventId ->
+                navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+              }
+    }
+  }
 }
 
 fun getTabIndexFromTabEnum(tab: Tab): Int {
-    val selectedTabIndex =
-        if (tab == Tab.BROWSE) {
-            0
-        } else {
-            1
-        }
-    return selectedTabIndex
+  val selectedTabIndex =
+      if (tab == Tab.BROWSE) {
+        0
+      } else {
+        1
+      }
+  return selectedTabIndex
 }
 
 fun getEventsBasedOffUiState(uiState: EventsOverviewUiState): List<Event> {
-    return if (uiState.tab == Tab.BROWSE) {
-        when {
-            uiState.isSearchActive || uiState.isFilterActive -> uiState.eventList.filteredEvents
-            else -> uiState.eventList.allEvents
-        }
-    } else {
-        when {
-            uiState.isSearchActive || uiState.isFilterActive -> uiState.upcomingEventList.filteredEvents
-            else -> uiState.upcomingEventList.allEvents
-        }
+  return if (uiState.tab == Tab.BROWSE) {
+    when {
+      uiState.isSearchActive || uiState.isFilterActive -> uiState.eventList.filteredEvents
+      else -> uiState.eventList.allEvents
     }
+  } else {
+    when {
+      uiState.isSearchActive || uiState.isFilterActive -> uiState.upcomingEventList.filteredEvents
+      else -> uiState.upcomingEventList.allEvents
+    }
+  }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @ExcludeFromJacocoGeneratedReport
 @Composable
 fun HomeScreenPreview() {
-    val mockEventRepo = MockEventRepository()
-    val mockUserRepo = MockUserRepository()
-    HomeScreen(
-        EventsOverviewViewModel(mockEventRepo, mockUserRepo),
-        NavigationActions(rememberNavController()))
+  val mockEventRepo = MockEventRepository()
+  val mockUserRepo = MockUserRepository()
+  HomeScreen(
+      EventsOverviewViewModel(mockEventRepo, mockUserRepo),
+      NavigationActions(rememberNavController()))
 }

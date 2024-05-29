@@ -104,6 +104,7 @@ constructor(
       currentState.copy(isFilterDialogOpen = !currentState.isFilterDialogOpen)
     }
   }
+
   fun onRadiusQueryChanged(
       radius: String,
       state: MutableStateFlow<HostedEventsUiState> = _uiState
