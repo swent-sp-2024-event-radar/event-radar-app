@@ -236,24 +236,33 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       searchBar {
         assertIsDisplayed()
         performClick()
-        performTextInput("Event 11")
+        performTextInput("Event not found")
       }
 
       // Update the UI state to reflect the change
-      sampleEventList.value = sampleEventList.value.copy(isSearchActive = true)
+      sampleEventList.value =
+          sampleEventList.value.copy(searchQuery = "Event not found", isSearchActive = true)
 
       noEventsFoundText { assertIsDisplayed() }
 
-      verify { mockEventsOverviewViewModel.onSearchQueryChanged("Event 11") }
+      verify { mockEventsOverviewViewModel.onSearchQueryChanged("Event not found") }
       verify { mockEventsOverviewViewModel.onSearchActiveChanged(true) }
       verify { mockEventsOverviewViewModel.uiState }
       verify { mockEventsOverviewViewModel.filterEvents() }
 
       searchBar { performTextClearance() }
 
+      sampleEventList.value = sampleEventList.value.copy(searchQuery = "", isSearchActive = false)
+
+      // Wait for the UI state to update
+      composeTestRule.waitForIdle()
+
       verify { mockEventsOverviewViewModel.onSearchQueryChanged("") }
       verify { mockEventsOverviewViewModel.onSearchActiveChanged(false) }
+      verify { mockEventsOverviewViewModel.uiState }
       verify { mockEventsOverviewViewModel.getEvents() }
+
+      noEventsFoundText { assertIsNotDisplayed() }
 
       confirmVerified(mockEventsOverviewViewModel)
     }

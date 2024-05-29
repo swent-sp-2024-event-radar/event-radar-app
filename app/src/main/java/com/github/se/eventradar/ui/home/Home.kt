@@ -181,7 +181,7 @@ fun EventsOverview(
     Text(
         "No events match the filter applied",
         textAlign = TextAlign.Center,
-        modifier = modifier.testTag("noEventsFoundText"))
+        modifier = Modifier.testTag("noEventsFoundText"))
   }
 
   if (uiState.tab == Tab.BROWSE) {

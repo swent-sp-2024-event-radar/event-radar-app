@@ -102,6 +102,15 @@ fun HostingScreen(
         placeholderStringResource = R.string.hosting_search_placeholder)
 
     val events = getEventsBasedOffUiState(uiState)
+
+    if ((uiState.isSearchActive || uiState.isFilterActive) &&
+        (uiState.eventList.filteredEvents.isEmpty())) {
+      Text(
+          "No events match the filter applied",
+          textAlign = TextAlign.Center,
+          modifier = Modifier.testTag("noEventsFoundText"))
+    }
+
     if (uiState.viewList) {
       EventList(
           events,
