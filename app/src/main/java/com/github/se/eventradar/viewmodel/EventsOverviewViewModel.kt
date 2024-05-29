@@ -85,7 +85,7 @@ constructor(
             }
             .allEvents
 
-    if (_uiState.value.radiusQuery.isEmpty() || _uiState.value.radiusQuery.toDouble() < 0.0) {
+    if (_uiState.value.radiusQuery.isNotEmpty() && _uiState.value.radiusQuery.toDouble() < 0.0) {
       Log.d("EventsOverviewViewModel", "Invalid radius query: ${_uiState.value.radiusQuery}")
       _uiState.value = _uiState.value.copy(radiusQuery = "")
     }

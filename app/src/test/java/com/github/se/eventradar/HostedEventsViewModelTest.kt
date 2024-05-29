@@ -383,4 +383,19 @@ class HostedEventsViewModelTest {
     assert(viewModel.uiState.value.eventList.filteredEvents.size == 2)
     assert(viewModel.uiState.value.eventList.filteredEvents == correctFilterEvents)
   }
+
+  @Test
+  fun testRadiusQueryLessThanZero() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    val newQuery = "-10.0"
+    viewModel.onRadiusQueryChanged(newQuery)
+    assert(newQuery == viewModel.uiState.value.radiusQuery)
+    viewModel.filterHostedEvents()
+
+    verify { Log.d("HostedEventsViewModel", "Invalid radius query: $newQuery") }
+    assert(viewModel.uiState.value.radiusQuery == "")
+    unmockkAll()
+  }
 }
