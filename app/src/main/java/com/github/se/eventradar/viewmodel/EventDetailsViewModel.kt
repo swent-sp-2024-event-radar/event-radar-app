@@ -90,7 +90,11 @@ constructor(
     return !(_uiState.value.ticket.price > 0.0)
   }
 
-  fun buyTicketForEvent() { // update the user attendee list, update the eventRepo ticket count
+  fun refreshAttendance() {
+    getEventData()
+  }
+
+  fun buyTicketForEvent() {
     viewModelScope.launch {
       if (!isTicketFree()) {
         Log.d(
@@ -106,97 +110,6 @@ constructor(
           errorOccurred.value = true
         }
       }
-      /*
-      if (!_isUserAttending.value) {
-        // TODO needs to be atomic to avoid concurrency issues
-        registrationUpdateEvent()
-        if (!errorOccurred.value) {
-          registrationUpdateUser()
-        }
-      }
-      if (!errorOccurred.value) {
-        registrationSuccessful.value = true
-        _isUserAttending.update { true }
-      }*/
-    }
-  }
-
-  fun refreshAttendance() {
-    getEventData()
-  }
-
-  private fun registrationUpdateEvent() {
-    if (displayedEvent != null) {
-      val event: Event = displayedEvent as Event
-
-      // add currentUserId to the event attendees list
-      event.attendeeList.add(currentUserId)
-
-      // decrement ticket capacity
-      if (event.ticket.purchases < event.ticket.capacity) {
-        event.ticket =
-            EventTicket(
-                event.ticket.name,
-                event.ticket.price,
-                event.ticket.capacity,
-                event.ticket.purchases + 1)
-
-        viewModelScope.launch {
-          // update event data to the database
-          when (val updateResponse = eventRepository.updateEvent(event)) {
-            is Resource.Success -> {
-              Log.i("EventDetailsViewModel", "Successfully updated event")
-            }
-            is Resource.Failure -> {
-              errorOccurred.value = true
-              Log.d(
-                  "EventDetailsViewModel",
-                  "Error updating event data: ${updateResponse.throwable.message}")
-            }
-          }
-        }
-      } else {
-        errorOccurred.value = true
-        Log.d("EventDetailsViewModel", "Error updating event data: No more tickets !}")
-      }
-    } else {
-      errorOccurred.value = true
-      Log.d("EventDetailsViewModel", "Error no such event}")
-    }
-  }
-
-  private fun registrationUpdateUser() {
-    viewModelScope.launch {
-      // fetch current user data
-      when (val userResponse = userRepository.getUser(currentUserId)) {
-        is Resource.Success -> {
-          val currentUser = userResponse.data
-          if (currentUser == null) {
-            Log.d("EventDetailsViewModel", "No existing users")
-          } else {
-            // adding eventId to current user attended event list
-            currentUser.eventsAttendeeList.add(eventId)
-
-            // update user data to the database
-            when (val updateResponse = userRepository.updateUser(currentUser)) {
-              is Resource.Success -> {
-                Log.i("EventDetailsViewModel", "Successfully updated user")
-              }
-              is Resource.Failure -> {
-                errorOccurred.value = true
-                Log.d(
-                    "EventDetailsViewModel",
-                    "Error updating user data: ${updateResponse.throwable.message}")
-              }
-            }
-          }
-        }
-        is Resource.Failure -> {
-          errorOccurred.value = true
-          Log.d(
-              "EventDetailsViewModel", "Error getting user data: ${userResponse.throwable.message}")
-        }
-      }
     }
   }
 
@@ -209,74 +122,6 @@ constructor(
         errorOccurred.value = true
       }
     }
-    /*
-    if (displayedEvent != null) {
-      val event: Event = displayedEvent as Event
-
-      // remove currentUserId from the event attendees list
-      event.attendeeList.remove(currentUserId)
-      event.ticket =
-        EventTicket(
-          event.ticket.name,
-          event.ticket.price,
-          event.ticket.capacity,
-          event.ticket.purchases - 1
-        )
-
-      viewModelScope.launch {
-        // update event data to the database
-        when (val updateResponse = eventRepository.updateEvent(event)) {
-          is Resource.Success -> {
-            Log.i("EventDetailsViewModel", "Successfully updated event")
-          }
-
-          is Resource.Failure -> {
-            errorOccurred.value = true
-            Log.d(
-              "EventDetailsViewModel",
-              "Error updating event: ${updateResponse.throwable.message}"
-            )
-          }
-        }
-        // update user data to the database
-        when (val userResponse = userRepository.getUser(currentUserId)) {
-          is Resource.Success -> {
-            val currentUser = userResponse.data
-            if (currentUser == null) {
-              Log.d("EventDetailsViewModel", "No existing users")
-            } else {
-              // remove eventId from current user attended event list
-              currentUser.eventsAttendeeList.remove(eventId)
-
-              when (val updateResponse = userRepository.updateUser(currentUser)) {
-                is Resource.Success -> {
-                  Log.i("EventDetailsViewModel", "Successfully updated user")
-                }
-
-                is Resource.Failure -> {
-                  errorOccurred.value = true
-                  Log.d(
-                    "EventDetailsViewModel",
-                    "Error updating user: ${updateResponse.throwable.message}"
-                  )
-                }
-              }
-            }
-          }
-
-          is Resource.Failure -> {
-            errorOccurred.value = true
-            Log.d("EventDetailsViewModel", "Error getting user: ${userResponse.throwable.message}")
-          }
-        }
-
-        getEventData()
-      }
-    } else {
-      errorOccurred.value = true
-      Log.d("EventDetailsViewModel", "Error getting event data: no event displayed")
-    }*/
-
   }
 
   private suspend fun unregistrationProcedure(eventId: String, userId: String): Boolean {
