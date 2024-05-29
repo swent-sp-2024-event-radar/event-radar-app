@@ -16,13 +16,13 @@ class MockEventRepository : IEventRepository {
   val eventsFlow = MutableStateFlow<Resource<List<Event>>>(Resource.Success(mockEvents))
 
   override suspend fun getEvents(): Resource<List<Event>> {
-    return Resource.Success(mockEvents)
+    val validEvents = mockEvents.filter { it.end.isAfter(LocalDateTime.now()) }
+    return Resource.Success(validEvents)
   }
 
-  override suspend fun getEvent(id: String): Resource<Event?> {
-
-    val validEvents = mockEvents.filter { it.end.isAfter(LocalDateTime.now()) }
-    val event = validEvents.find { it.fireBaseID == id }
+  override suspend fun getEvent(id: String): Resource<Event?> { //TODO change this too?
+//    val validEvents = mockEvents.filter { it.end.isAfter(LocalDateTime.now()) }
+    val event = mockEvents.find { it.fireBaseID == id }
 
     return if (event != null) {
       Resource.Success(event)
@@ -30,39 +30,6 @@ class MockEventRepository : IEventRepository {
       Resource.Failure(Exception("Event with id $id not found"))
     }
   }
-
-  //  override suspend fun cleanExpiredEvents(): Resource<Unit> {
-  //    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-  //    val currentDateTimeString = LocalDateTime.now().format(formatter)
-  //    val newExpired = mockEvents.filter { it.end.format(formatter) < currentDateTimeString }
-  //    for (passedEvent in newExpired) {
-  //      // Call addEventExpired directly with the document as argument
-  //      try {
-  //        addEventExpired(document)
-  //      } catch (e: Exception) {
-  //        return Resource.Failure(e)
-  //      }
-  //      // Call deleteEventByID with the document ID as argument
-  //      try {
-  //        deleteEventByID(document.id)
-  //      } catch (e: Exception) {
-  //        return Resource.Failure(e)
-  //      }
-  //    }
-  //    Resource.Success(Unit)
-  //  } catch (e: Exception) {
-  //    Resource.Failure(e)
-  //  }
-  // }
-  //  }
-
-  //  override suspend fun addEventExpired(document: DocumentSnapshot): Resource<Unit> {
-  //    TODO("Not yet implemented")
-  //  }
-  //
-  //  override suspend fun deleteEventByID(fireBaseID: String): Resource<Unit> {
-  //    TODO("Not yet implemented")
-  //  }
 
   override suspend fun getUniqueEventId(): Resource<String> {
     return Resource.Success(ticker++.toString())
@@ -95,7 +62,8 @@ class MockEventRepository : IEventRepository {
   override suspend fun getEventsByIds(ids: List<String>): Resource<List<Event>> {
     val events = mutableListOf<Event>()
     for (id in ids) {
-      val event = mockEvents.find { it.fireBaseID == id }
+      val validEvents = mockEvents.filter { it.end.isAfter(LocalDateTime.now()) } //added
+      val event = validEvents.find { it.fireBaseID == id }
       if (event != null) {
         events.add(event)
       } else {
