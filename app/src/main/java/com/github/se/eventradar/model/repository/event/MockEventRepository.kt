@@ -2,8 +2,8 @@ package com.github.se.eventradar.model.repository.event
 
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.event.Event
-import java.time.LocalDateTime
 import com.github.se.eventradar.model.event.EventTicket
+import java.time.LocalDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
