@@ -33,19 +33,9 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
     }
   }
 
-  override suspend fun addEvent(event: Event): Resource<Unit> {
-    val eventMap = event.toMap()
-    val eventId = event.fireBaseID
-    return try {
-      eventRef.document(eventId).set(eventMap).await()
-      Resource.Success(Unit)
-    } catch (e: Exception) {
-      Resource.Failure(e)
-    }
-  }
-
   override suspend fun getEvent(id: String): Resource<Event?> {
     val resultDocument = eventRef.document(id).get().await()
+
     return try {
       val event = Event(resultDocument.data!!, resultDocument.id)
       Resource.Success(event)
@@ -75,9 +65,11 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
     }
   }
 
-  override suspend fun deleteEvent(event: Event): Resource<Unit> {
+  override suspend fun addEvent(event: Event): Resource<Unit> {
+    val eventMap = event.toMap()
+    val eventId = event.fireBaseID
     return try {
-      eventRef.document(event.fireBaseID).delete().await()
+      eventRef.document(eventId).set(eventMap).await()
       Resource.Success(Unit)
     } catch (e: Exception) {
       Resource.Failure(e)
@@ -89,6 +81,15 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
 
     return try {
       eventRef.document(event.fireBaseID).update(eventMap as Map<String, Any>).await()
+      Resource.Success(Unit)
+    } catch (e: Exception) {
+      Resource.Failure(e)
+    }
+  }
+
+  override suspend fun deleteEvent(event: Event): Resource<Unit> {
+    return try {
+      eventRef.document(event.fireBaseID).delete().await()
       Resource.Success(Unit)
     } catch (e: Exception) {
       Resource.Failure(e)
