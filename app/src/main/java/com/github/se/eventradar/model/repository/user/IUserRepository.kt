@@ -21,9 +21,13 @@ interface IUserRepository {
 
   suspend fun doesUserExist(userId: String): Resource<Unit>
 
-  suspend fun uploadImage(selectedImageUri: Uri, uid: String, folderName: String): Resource<Unit>
+  suspend fun uploadImage(
+      selectedImageUri: Uri,
+      imageId: String,
+      folderName: String
+  ): Resource<Unit>
 
-  suspend fun getImage(uid: String, folderName: String): Resource<String>
+  suspend fun getImage(imageId: String, folderName: String): Resource<String>
 
   suspend fun uploadQRCode(data: ByteArray, userId: String): Resource<Unit>
 

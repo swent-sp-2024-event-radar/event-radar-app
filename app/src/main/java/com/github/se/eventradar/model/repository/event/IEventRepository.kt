@@ -9,6 +9,8 @@ interface IEventRepository {
 
   suspend fun getEvent(id: String): Resource<Event?>
 
+  suspend fun getUniqueEventId(): Resource<String>
+
   suspend fun addEvent(event: Event): Resource<Unit>
 
   suspend fun updateEvent(event: Event): Resource<Unit>
