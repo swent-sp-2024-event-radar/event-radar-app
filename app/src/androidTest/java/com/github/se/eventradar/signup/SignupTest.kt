@@ -110,7 +110,7 @@ class SignupTest : TestCase() {
       birthDateTextField {
         performScrollTo()
         assertIsDisplayed()
-        performTextInput("01/01/2000")
+        performTextInput("01.01.2000")
       }
 
       signUpButton {

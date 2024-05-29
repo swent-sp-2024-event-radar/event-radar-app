@@ -79,7 +79,7 @@ import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.getTopLevelDestination
-import com.github.se.eventradar.viewmodel.EventsOverviewUiState
+import com.github.se.eventradar.viewmodel.SearchFilterUiState
 
 fun getIconFromViewListBool(viewList: Boolean): ImageVector {
   return if (viewList) {
@@ -209,14 +209,14 @@ fun SearchBarField(
               unfocusedIndicatorColor = Color.Transparent,
               disabledIndicatorColor = Color.Transparent),
       placeholder = { Text(stringResource(id = placeholderStringResource)) },
-      trailingIcon = { Icon(Icons.Default.Search, contentDescription = null) })
+      leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) })
 }
 
 @Composable
 fun FilterPopUp(
     onFreeSwitchChanged: () -> Unit,
     onFilterApply: () -> Unit,
-    uiState: EventsOverviewUiState,
+    uiState: SearchFilterUiState,
     onRadiusQueryChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -314,7 +314,7 @@ fun FilterPopUp(
 }
 
 @Composable
-fun CategorySelection(uiState: EventsOverviewUiState, modifier: Modifier) {
+fun CategorySelection(uiState: SearchFilterUiState, modifier: Modifier) {
   LazyColumn(modifier = modifier) {
     items(EventCategory.entries.subList(0, EventCategory.entries.size / 2 + 1)) { category ->
       CategoryDisplayColumn(category, uiState)
@@ -332,7 +332,7 @@ fun CategorySelection(uiState: EventsOverviewUiState, modifier: Modifier) {
 @Composable
 fun CategoryDisplayColumn(
     category: EventCategory,
-    uiState: EventsOverviewUiState,
+    uiState: SearchFilterUiState,
 ) {
   var isChecked by remember { mutableStateOf(uiState.categoriesCheckedList.contains(category)) }
   Row(

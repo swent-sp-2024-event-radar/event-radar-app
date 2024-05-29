@@ -144,27 +144,27 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
 
   override suspend fun uploadImage(
       selectedImageUri: Uri,
-      uid: String,
+      imageId: String,
       folderName: String
   ): Resource<Unit> {
-    val storageRef = Firebase.storage.reference.child("$folderName/$uid")
-    try {
+    val storageRef = Firebase.storage.reference.child("$folderName/$imageId")
+    return try {
       val result = storageRef.putFile(selectedImageUri).await()
       Resource.Success(Unit)
-      return if (result.task.isSuccessful) {
+      if (result.task.isSuccessful) {
         Resource.Success(Unit)
       } else {
         val error = result.task.exception
         Resource.Failure(error ?: Exception("Upload failed without a specific error"))
       }
     } catch (e: Exception) {
-      return Resource.Failure(Exception("Error during upload image: ${e.localizedMessage}"))
+      Resource.Failure(Exception("Error during upload image: ${e.localizedMessage}"))
     }
   }
 
-  override suspend fun getImage(uid: String, folderName: String): Resource<String> {
+  override suspend fun getImage(imageId: String, folderName: String): Resource<String> {
 
-    val storageRef = Firebase.storage.reference.child("$folderName/$uid")
+    val storageRef = Firebase.storage.reference.child("$folderName/$imageId")
     return try {
       val result = storageRef.downloadUrl.await()
       val url = result.toString()

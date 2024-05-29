@@ -68,7 +68,7 @@ class HostedEventsViewModelTest {
   private val mockUser =
       User(
           userId = "userid1",
-          birthDate = "01/01/2000",
+          birthDate = "01.01.2000",
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",
@@ -135,6 +135,37 @@ class HostedEventsViewModelTest {
   }
 
   @Test
+  fun testGetHostedEventsFilteredSuccess() = runTest {
+    val events =
+        listOf(
+            mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
+            mockEvent.copy(eventName = "Event 2", fireBaseID = "2"),
+            mockEvent.copy(eventName = "Event 3", fireBaseID = "3"))
+    events.forEach { event -> eventRepository.addEvent(event) }
+
+    val listOfEventIds = events.map { event -> event.fireBaseID }.toMutableList()
+    val userWithHostedEvent = mockUser.copy(eventsHostList = listOfEventIds)
+    userRepository.addUser(userWithHostedEvent)
+    (userRepository as MockUserRepository).updateCurrentUserId(userWithHostedEvent.userId)
+    viewModel.getHostedEvents()
+
+    val anotherQuery = "Event 1"
+    viewModel.onSearchQueryChanged(anotherQuery)
+    assert(anotherQuery == viewModel.uiState.value.searchQuery)
+
+    viewModel.filterHostedEvents()
+
+    assert(viewModel.uiState.value.eventList.allEvents.isNotEmpty())
+    assert(viewModel.uiState.value.eventList.allEvents.size == 3)
+    assert(viewModel.uiState.value.eventList.allEvents.containsAll(events))
+    assert(viewModel.uiState.value.eventList.filteredEvents.size == 1)
+    assert(
+        viewModel.uiState.value.eventList.filteredEvents ==
+            listOf(mockEvent.copy(eventName = "Event 1", fireBaseID = "1")))
+    Assert.assertNull(viewModel.uiState.value.eventList.selectedEvent)
+  }
+
+  @Test
   fun testGetHostedEventsWithEventsNotInRepo() = runTest {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
@@ -179,5 +210,177 @@ class HostedEventsViewModelTest {
     assert(!viewModel.uiState.value.viewList)
     viewModel.onViewListStatusChanged()
     assert(viewModel.uiState.value.viewList)
+  }
+
+  @Test
+  fun testSetFilterDialogOpen() = runTest {
+    // init value is false
+    viewModel.onFilterDialogOpen()
+    assert(viewModel.uiState.value.isFilterDialogOpen)
+
+    viewModel.onFilterDialogOpen()
+    assert(!viewModel.uiState.value.isFilterDialogOpen)
+  }
+
+  @Test
+  fun testOnSearchQueryChange() = runTest {
+    val newQuery = "sample search"
+    viewModel.onSearchQueryChanged(newQuery)
+    assert(newQuery == viewModel.uiState.value.searchQuery)
+
+    val anotherQuery = "another search"
+    viewModel.onSearchQueryChanged(anotherQuery)
+    assert(anotherQuery == viewModel.uiState.value.searchQuery)
+  }
+
+  @Test
+  fun testOnSearchActiveChange() = runTest {
+    viewModel.onSearchActiveChanged(true)
+    assert(viewModel.uiState.value.isSearchActive)
+
+    viewModel.onSearchActiveChanged(false)
+    assert(!viewModel.uiState.value.isSearchActive)
+  }
+
+  @Test
+  fun testOnRadiusQueryChange() = runTest {
+    val newQuery = "10"
+    viewModel.onRadiusQueryChanged(newQuery)
+    assert(newQuery == viewModel.uiState.value.radiusQuery)
+
+    val anotherQuery = "5"
+    viewModel.onRadiusQueryChanged(anotherQuery)
+    assert(anotherQuery == viewModel.uiState.value.radiusQuery)
+  }
+
+  @Test
+  fun testOnFreeSwitchChange() = runTest {
+    // init value is false
+    viewModel.onFreeSwitchChanged()
+    assert(viewModel.uiState.value.isFreeSwitchOn)
+
+    viewModel.onFreeSwitchChanged()
+    assert(!viewModel.uiState.value.isFreeSwitchOn)
+  }
+
+  @Test
+  fun testOnFilterApply() = runTest {
+    // init value is false
+    viewModel.onFilterApply()
+    assert(viewModel.uiState.value.isFilterActive)
+
+    viewModel.onFilterApply()
+    assert(viewModel.uiState.value.isFilterActive)
+  }
+
+  @Test
+  fun testFilterEventsSearchSuccess() = runTest {
+    val events =
+        listOf(
+            mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
+            mockEvent.copy(eventName = "Event 2", fireBaseID = "2"),
+            mockEvent.copy(eventName = "Event 3", fireBaseID = "3"))
+    events.forEach { event -> eventRepository.addEvent(event) }
+
+    val listOfEventIds = events.map { event -> event.fireBaseID }.toMutableList()
+    val userWithHostedEvent = mockUser.copy(eventsHostList = listOfEventIds)
+    userRepository.addUser(userWithHostedEvent)
+    (userRepository as MockUserRepository).updateCurrentUserId(userWithHostedEvent.userId)
+    viewModel.getHostedEvents()
+
+    val newQuery = "Event"
+    viewModel.onSearchQueryChanged(newQuery)
+    assert(newQuery == viewModel.uiState.value.searchQuery)
+
+    viewModel.filterHostedEvents()
+    assert(viewModel.uiState.value.eventList.filteredEvents.isNotEmpty())
+    assert(viewModel.uiState.value.eventList.filteredEvents.size == 3)
+    assert(viewModel.uiState.value.eventList.filteredEvents == events)
+
+    val anotherQuery = "Event 1"
+    viewModel.onSearchQueryChanged(anotherQuery)
+    assert(anotherQuery == viewModel.uiState.value.searchQuery)
+
+    viewModel.filterHostedEvents()
+    assert(viewModel.uiState.value.eventList.filteredEvents.isNotEmpty())
+    assert(viewModel.uiState.value.eventList.filteredEvents.size == 1)
+    assert(
+        viewModel.uiState.value.eventList.filteredEvents ==
+            listOf(mockEvent.copy(fireBaseID = "1")))
+  }
+
+  @Test
+  fun testFilterEventsRadiusSuccess() = runTest {
+    val events =
+        listOf(
+            mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
+            mockEvent.copy(
+                eventName = "Event 2",
+                location = Location(38.92, 78.78, "Test Location near user"),
+                fireBaseID = "2"),
+            mockEvent.copy(
+                eventName = "Event 3",
+                location = Location(38.8, 78.7, "Test Location near user 2"),
+                fireBaseID = "3"))
+    events.forEach { event -> eventRepository.addEvent(event) }
+
+    val listOfEventIds = events.map { event -> event.fireBaseID }.toMutableList()
+    val userWithHostedEvent = mockUser.copy(eventsHostList = listOfEventIds)
+    userRepository.addUser(userWithHostedEvent)
+    (userRepository as MockUserRepository).updateCurrentUserId(userWithHostedEvent.userId)
+    viewModel.getHostedEvents()
+
+    val newQuery = "20"
+    viewModel.onRadiusQueryChanged(newQuery)
+    assert(newQuery == viewModel.uiState.value.radiusQuery)
+
+    val correctFilterEvents =
+        listOf(
+            mockEvent.copy(
+                eventName = "Event 2",
+                location = Location(38.92, 78.78, "Test Location near user"),
+                fireBaseID = "2"),
+            mockEvent.copy(
+                eventName = "Event 3",
+                location = Location(38.8, 78.7, "Test Location near user 2"),
+                fireBaseID = "3"))
+
+    viewModel.filterHostedEvents()
+    assert(viewModel.uiState.value.eventList.filteredEvents.isNotEmpty())
+    assert(viewModel.uiState.value.eventList.filteredEvents.size == 2)
+    assert(viewModel.uiState.value.eventList.filteredEvents == correctFilterEvents)
+  }
+
+  @Test
+  fun testFilterEventsFreeSuccess() = runTest {
+    val events =
+        listOf(
+            mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
+            mockEvent.copy(
+                eventName = "Event 2",
+                ticket = EventTicket("Test Ticket", 5.0, 1, 0),
+                fireBaseID = "2"),
+            mockEvent.copy(eventName = "Event 3", fireBaseID = "3"))
+
+    events.forEach { event -> eventRepository.addEvent(event) }
+
+    val listOfEventIds = events.map { event -> event.fireBaseID }.toMutableList()
+    val userWithHostedEvent = mockUser.copy(eventsHostList = listOfEventIds)
+    userRepository.addUser(userWithHostedEvent)
+    (userRepository as MockUserRepository).updateCurrentUserId(userWithHostedEvent.userId)
+    viewModel.getHostedEvents()
+
+    viewModel.onFreeSwitchChanged()
+    assert(viewModel.uiState.value.isFreeSwitchOn)
+
+    val correctFilterEvents =
+        listOf(
+            mockEvent.copy(eventName = "Event 1", fireBaseID = "1"),
+            mockEvent.copy(eventName = "Event 3", fireBaseID = "3"))
+
+    viewModel.filterHostedEvents()
+    assert(viewModel.uiState.value.eventList.filteredEvents.isNotEmpty())
+    assert(viewModel.uiState.value.eventList.filteredEvents.size == 2)
+    assert(viewModel.uiState.value.eventList.filteredEvents == correctFilterEvents)
   }
 }

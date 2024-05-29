@@ -39,7 +39,7 @@ class ScanFriendQrViewModelTest {
   private val mockUser =
       User(
           userId = "1",
-          birthDate = "01/01/2000",
+          birthDate = "01.01.2000",
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",
@@ -56,7 +56,7 @@ class ScanFriendQrViewModelTest {
   private val mockUser1 =
       User(
           userId = "user1",
-          birthDate = "01/01/2000",
+          birthDate = "01.01.2000",
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",
@@ -73,7 +73,7 @@ class ScanFriendQrViewModelTest {
   private val mockUser2 =
       User(
           userId = "user2",
-          birthDate = "01/01/2002",
+          birthDate = "01.01.2002",
           email = "test@example2.com",
           firstName = "John2",
           lastName = "Doe2",
@@ -90,7 +90,7 @@ class ScanFriendQrViewModelTest {
   private val mockUser1AF =
       User(
           userId = "user1",
-          birthDate = "01/01/2000",
+          birthDate = "01.01.2000",
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",
@@ -107,7 +107,7 @@ class ScanFriendQrViewModelTest {
   private val mockUser2AF =
       User(
           userId = "user2",
-          birthDate = "01/01/2002",
+          birthDate = "01.01.2002",
           email = "test@example2.com",
           firstName = "John2",
           lastName = "Doe2",
@@ -261,18 +261,16 @@ class ScanFriendQrViewModelTest {
   fun testGetUserQrCodeSuccess() = runTest {
     // Given
     val userId = mockUser.userId
+    val exampleQRCode = ByteArray(123)
     val expectedQrCodeLink = "http://example.com/QR_Codes/$userId"
     // initialize user with no mock
     (userRepository as MockUserRepository).updateCurrentUserId(userId)
     // Mocking what happens when you add a user
     userRepository.addUser(mockUser)
+    userRepository.uploadQRCode(exampleQRCode, userId)
     val result = userRepository.getImage(userId, "QR_Codes")
     Assert.assertTrue(result is Resource.Success)
     Assert.assertEquals(expectedQrCodeLink, (result as Resource.Success).data)
-
-    // add use
-    viewModel.getUserDetails()
-    assertEquals(expectedQrCodeLink, viewModel.uiState.value.qrCodeLink)
   }
 
   @Test

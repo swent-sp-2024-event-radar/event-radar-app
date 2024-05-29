@@ -114,7 +114,7 @@ class MessagesViewModelTest {
         userRepository.addUser(
             User(
                 userId = "1",
-                birthDate = "01/01/2000",
+                birthDate = "01.01.2000",
                 email = "",
                 firstName = "",
                 lastName = "",
@@ -179,7 +179,7 @@ class MessagesViewModelTest {
     val user =
         User(
             userId = "1",
-            birthDate = "01/01/2000",
+            birthDate = "01.01.2000",
             email = "",
             firstName = "",
             lastName = "",
@@ -225,7 +225,7 @@ class MessagesViewModelTest {
     val user =
         User(
             userId = "1",
-            birthDate = "01/01/2000",
+            birthDate = "01.01.2000",
             email = "",
             firstName = "",
             lastName = "",
@@ -269,7 +269,7 @@ class MessagesViewModelTest {
     val user =
         User(
             userId = "1",
-            birthDate = "01/01/2000",
+            birthDate = "01.01.2000",
             email = "",
             firstName = "",
             lastName = "",
