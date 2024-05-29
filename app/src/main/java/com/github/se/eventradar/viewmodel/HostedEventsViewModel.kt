@@ -98,6 +98,7 @@ constructor(
       currentState.copy(isFilterDialogOpen = false, isSearchActive = isSearchActive)
     }
   }
+
   fun onFilterDialogOpen(state: MutableStateFlow<HostedEventsUiState> = _uiState) {
     state.update { currentState ->
       currentState.copy(isFilterDialogOpen = !currentState.isFilterDialogOpen)
