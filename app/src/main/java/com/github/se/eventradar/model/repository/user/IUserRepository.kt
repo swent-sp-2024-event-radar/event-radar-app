@@ -32,4 +32,8 @@ interface IUserRepository {
   suspend fun uploadQRCode(data: ByteArray, userId: String): Resource<Unit>
 
   suspend fun getCurrentUserId(): Resource<String>
+
+  suspend fun addEventToAttendeeList(userId: String, attendingEventId: String): Resource<Unit>
+
+  suspend fun removeEventFromAttendeeList(userId: String, attendingEventId: String): Resource<Unit>
 }

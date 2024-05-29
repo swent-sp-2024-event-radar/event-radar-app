@@ -59,7 +59,7 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
 
   // Error
   GenericDialogBox(
-      viewModel.errorOccurred,
+      viewModel.showErrorOccurredDialog,
       modifier = Modifier.testTag("buyingTicketErrorDialog"),
       "Registration Failure",
       "We are sorry an error occurred during the registration process.") {
@@ -73,7 +73,7 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
 
   // Success
   GenericDialogBox(
-      viewModel.registrationSuccessful,
+      viewModel.showSuccessfulRegistrationDialog,
       modifier = Modifier.testTag("buyingTicketSuccessDialog"),
       "Successful registration",
       "You successfully joined that event",
