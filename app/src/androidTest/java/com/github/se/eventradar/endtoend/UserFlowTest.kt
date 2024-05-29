@@ -17,11 +17,15 @@ import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.screens.EventDetailsScreen
 import com.github.se.eventradar.screens.HomeScreen
+import com.github.se.eventradar.screens.MessagesScreen
+import com.github.se.eventradar.ui.chat.ChatScreen
 import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.home.HomeScreen
+import com.github.se.eventradar.ui.messages.MessagesScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.theme.MyApplicationTheme
+import com.github.se.eventradar.viewmodel.ChatViewModel
 import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -36,7 +40,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class ViewEventDetailsUserFlow : TestCase() {
+class UserFlowTests : TestCase() {
   @get:Rule val composeTestRule = createComposeRule()
 
   // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
@@ -87,6 +91,14 @@ class ViewEventDetailsUserFlow : TestCase() {
                 EventDetails(
                     EventDetailsViewModel(eventRepository, userRepository, eventId), mockNavActions)
               }
+          composable(Route.MESSAGE) { MessagesScreen(navigationActions = mockNavActions) }
+          composable(
+              "${Route.PRIVATE_CHAT}/{opponentId}",
+              arguments = listOf(navArgument("opponentId") { type = NavType.StringType })) {
+                val opponentId = it.arguments!!.getString("opponentId")!!
+                val viewModel = ChatViewModel.create(opponentId = opponentId)
+                ChatScreen(viewModel = viewModel, navigationActions = mockNavActions)
+              }
         }
       }
     }
@@ -134,6 +146,29 @@ class ViewEventDetailsUserFlow : TestCase() {
         dateContent { assertIsDisplayed() }
         timeTitle { assertIsDisplayed() }
         timeContent { assertIsDisplayed() }
+      }
+    }
+  }
+
+  // PATH: homeScreen to Message to friend to start a conversation to send a first message
+
+  @Test
+  fun homeScreenToMessageScreenAndSendFirstMessage() = run {
+    ComposeScreen.onComposeScreen<HomeScreen>(composeTestRule) {
+      step("Check if nav bar and tabs are present") {
+        bottomNav { assertIsDisplayed() }
+        messagesTab { assertIsDisplayed() }
+        homeTab { assertIsDisplayed() }
+      }
+      step("Navigate to messages") {
+        step("Click on the message icon") { messagesTab { performClick() } }
+      }
+    }
+
+    ComposeScreen.onComposeScreen<MessagesScreen>(composeTestRule) {
+      step("Check if all friends are listed") {
+        // Test the UI elements
+
       }
     }
   }
