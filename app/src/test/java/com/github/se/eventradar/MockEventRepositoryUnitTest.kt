@@ -20,34 +20,34 @@ class MockEventRepositoryUnitTest {
   private lateinit var eventRepository: IEventRepository
 
   private val mockEvent =
-      Event(
-          eventName = "Event 1",
-          eventPhoto = "",
-          start = LocalDateTime.now().plus(1, ChronoUnit.DAYS),
-          end = LocalDateTime.now().plus(2, ChronoUnit.DAYS),
-          location = Location(0.0, 0.0, "Test Location"),
-          description = "Test Description",
-          ticket = EventTicket("Test Ticket", 0.0, 1, 0),
-          mainOrganiser = "1",
-          organiserList = mutableListOf("Test Organiser"),
-          attendeeList = mutableListOf("Test Attendee"),
-          category = EventCategory.COMMUNITY,
-          fireBaseID = "1")
+    Event(
+      eventName = "Event 1",
+      eventPhoto = "",
+      start = LocalDateTime.now().plus(1, ChronoUnit.DAYS),
+      end = LocalDateTime.now().plus(2, ChronoUnit.DAYS),
+      location = Location(0.0, 0.0, "Test Location"),
+      description = "Test Description",
+      ticket = EventTicket("Test Ticket", 0.0, 1, 0),
+      mainOrganiser = "1",
+      organiserList = mutableListOf("Test Organiser"),
+      attendeeList = mutableListOf("Test Attendee"),
+      category = EventCategory.COMMUNITY,
+      fireBaseID = "1")
 
   private val expiredEvent =
-      Event(
-          eventName = "Event 1",
-          eventPhoto = "",
-          start = LocalDateTime.now().minus(2, ChronoUnit.DAYS),
-          end = LocalDateTime.now().minus(1, ChronoUnit.DAYS),
-          location = Location(0.0, 0.0, "Test Location"),
-          description = "Test Description",
-          ticket = EventTicket("Test Ticket", 0.0, 1, 0),
-          mainOrganiser = "1",
-          organiserList = mutableListOf("Test Organiser"),
-          attendeeList = mutableListOf("Test Attendee"),
-          category = EventCategory.COMMUNITY,
-          fireBaseID = "1")
+    Event(
+      eventName = "Event 1",
+      eventPhoto = "",
+      start = LocalDateTime.now().minus(2, ChronoUnit.DAYS),
+      end = LocalDateTime.now().minus(1, ChronoUnit.DAYS),
+      location = Location(0.0, 0.0, "Test Location"),
+      description = "Test Description",
+      ticket = EventTicket("Test Ticket", 0.0, 1, 0),
+      mainOrganiser = "1",
+      organiserList = mutableListOf("Test Organiser"),
+      attendeeList = mutableListOf("Test Attendee"),
+      category = EventCategory.COMMUNITY,
+      fireBaseID = "1")
 
   @Before
   fun setUp() {
@@ -129,8 +129,8 @@ class MockEventRepositoryUnitTest {
     val result = eventRepository.deleteEvent(mockEvent)
     assert(result is Resource.Failure)
     assert(
-        (result as Resource.Failure).throwable.message ==
-            "Event with id ${mockEvent.fireBaseID} not found")
+      (result as Resource.Failure).throwable.message ==
+              "Event with id ${mockEvent.fireBaseID} not found")
   }
 
   @Test
@@ -139,8 +139,8 @@ class MockEventRepositoryUnitTest {
     val result = eventRepository.updateEvent(mockEvent)
     assert(result is Resource.Failure)
     assert(
-        (result as Resource.Failure).throwable.message ==
-            "Event with id ${mockEvent.fireBaseID} not found")
+      (result as Resource.Failure).throwable.message ==
+              "Event with id ${mockEvent.fireBaseID} not found")
   }
 
   @Test
@@ -149,8 +149,8 @@ class MockEventRepositoryUnitTest {
     val result = eventRepository.getEvent(mockEvent.fireBaseID)
     assert(result is Resource.Failure)
     assert(
-        (result as Resource.Failure).throwable.message ==
-            "Event with id ${mockEvent.fireBaseID} not found")
+      (result as Resource.Failure).throwable.message ==
+              "Event with id ${mockEvent.fireBaseID} not found")
   }
 
   @Test
@@ -224,8 +224,8 @@ class MockEventRepositoryUnitTest {
     // Check that the response is a failure
     assert(events is Resource.Failure)
     assert(
-        (events as Resource.Failure).throwable.message ==
-            "Event with id 100 is missing") // Shows id of first missing event
+      (events as Resource.Failure).throwable.message ==
+              "Event with id 100 is missing") // Shows id of first missing event
   }
 
   @Test
@@ -240,7 +240,7 @@ class MockEventRepositoryUnitTest {
     eventRepository.addEvent(newEvent)
 
     (eventRepository as MockEventRepository).eventsFlow.value =
-        Resource.Success((eventRepository as MockEventRepository).mockEvents.toList())
+      Resource.Success((eventRepository as MockEventRepository).mockEvents.toList())
 
     delay(100)
     // Check if state holds both events
@@ -254,10 +254,10 @@ class MockEventRepositoryUnitTest {
   fun testObserveUpcomingEventsReflectsChanges() = runTest {
     val userId = "user1"
     val initialEvent =
-        mockEvent.copy(
-            fireBaseID = "1",
-            eventName = "Initial Event User Attends",
-            attendeeList = mutableListOf(userId))
+      mockEvent.copy(
+        fireBaseID = "1",
+        eventName = "Initial Event User Attends",
+        attendeeList = mutableListOf(userId))
     eventRepository.addEvent(initialEvent)
 
     // Start observing upcoming events
@@ -268,18 +268,18 @@ class MockEventRepositoryUnitTest {
 
     // Add a new upcoming event that the specified user will attend
     val newEvent =
-        mockEvent.copy(
-            fireBaseID = "2",
-            eventName = "New Upcoming Event",
-            attendeeList = mutableListOf(userId))
+      mockEvent.copy(
+        fireBaseID = "2",
+        eventName = "New Upcoming Event",
+        attendeeList = mutableListOf(userId))
     // Add a new event that the specified user will not attend
     val newEvent2 =
-        mockEvent.copy(fireBaseID = "3", eventName = "New Event", attendeeList = mutableListOf())
+      mockEvent.copy(fireBaseID = "3", eventName = "New Event", attendeeList = mutableListOf())
     eventRepository.addEvent(newEvent)
     eventRepository.addEvent(newEvent2)
 
     (eventRepository as MockEventRepository).eventsFlow.value =
-        Resource.Success(listOf(initialEvent, newEvent, newEvent2))
+      Resource.Success(listOf(initialEvent, newEvent, newEvent2))
 
     delay(100)
 
