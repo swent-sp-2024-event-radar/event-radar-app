@@ -67,12 +67,12 @@ constructor(
   }
 
   private fun resetAnalyser() {
-    //    qrCodeAnalyser.changeAnalysisState(true)
+    qrCodeAnalyser.changeAnalysisState(true)
     qrCodeAnalyser.onDecoded = { decodedString ->
-      val result = decodedString ?: null
-      updateDecodedString(result) // Update state flow
-      if (result != null) {
-        updatePermissions(result) // Directly call updateFriendList
+      // Update state flow
+      if (decodedString != null) {
+        updateDecodedString(decodedString)
+        updatePermissions(decodedString) // Directly call updateFriendList
       } else {
         changeAction(Action.AnalyserError)
       }
@@ -135,9 +135,9 @@ constructor(
   }
 
   fun resetConditions() {
-    qrCodeAnalyser.onDecoded = null
     changeAction(Action.ScanTicket)
-    _uiState.update { it.copy(decodedResult = "") }
+    _uiState.update { it.copy(decodedResult = null) }
+    qrCodeAnalyser.onDecoded = null
     changeTabState(Tab.MyEvent)
   }
 
@@ -146,6 +146,9 @@ constructor(
   }
 
   fun changeAction(action: Action) {
+    if (action == Action.ScanTicket) {
+      resetAnalyser()
+    }
     _uiState.update { it.copy(action = action) }
   }
 

@@ -221,7 +221,7 @@ class ScanFriendTicketViewModelTest {
   fun resetConditions() = runTest {
     viewModel.resetConditions()
     assert(viewModel.uiState.value.action == ScanTicketQrViewModel.Action.ScanTicket)
-    assert(viewModel.uiState.value.decodedResult.isEmpty())
+    assert(viewModel.uiState.value.decodedResult == null)
     assert(viewModel.uiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent)
     assert(qrCodeAnalyser.onDecoded == null)
   }
