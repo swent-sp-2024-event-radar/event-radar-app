@@ -17,6 +17,7 @@ import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -173,10 +174,10 @@ constructor(
     viewModelScope.launch {
       when (val result = locationRepository.fetchLocation(state.value.location)) {
         is Resource.Success -> {
-          state.value = state.value.copy(listOfLocations = result.data)
+            state.update { currentState -> currentState.copy(listOfLocations = result.data) }
         }
         is Resource.Failure -> {
-          state.value = state.value.copy(locationIsError = true)
+            state.update { currentState -> currentState.copy(locationIsError = true) }
         }
       }
     }
@@ -186,22 +187,22 @@ constructor(
       newErrorState: Boolean,
       state: MutableStateFlow<CreateEventUiState> = _uiState
   ) {
-    state.value = CreateEventUiState(eventUploadError = newErrorState)
+      state.update { currentState -> currentState.copy(eventUploadError = newErrorState) }
   }
 
   fun validateFields(state: MutableStateFlow<CreateEventUiState>): Boolean {
-    state.value =
-        state.value.copy(
-            eventNameIsError = state.value.eventName.isBlank(),
-            eventDescriptionIsError = state.value.eventDescription.isBlank(),
-            startDateIsError = !isValidDate(state.value.startDate),
-            endDateIsError = !isValidDate(state.value.endDate),
-            startTimeIsError = !isValidTime(state.value.startTime),
-            endTimeIsError = !isValidTime(state.value.endTime),
-            locationIsError = state.value.location.isBlank(),
-            ticketNameIsError = state.value.ticketName.isBlank(),
-            ticketCapacityIsError = !isValidNumber(state.value.ticketCapacity),
-            ticketPriceIsError = !isValidDouble(state.value.ticketPrice))
+
+      state.update { currentState -> currentState.copy(
+          eventNameIsError = state.value.eventName.isBlank(),
+          eventDescriptionIsError = state.value.eventDescription.isBlank(),
+          startDateIsError = !isValidDate(state.value.startDate),
+          endDateIsError = !isValidDate(state.value.endDate),
+          startTimeIsError = !isValidTime(state.value.startTime),
+          endTimeIsError = !isValidTime(state.value.endTime),
+          locationIsError = state.value.location.isBlank(),
+          ticketNameIsError = state.value.ticketName.isBlank(),
+          ticketCapacityIsError = !isValidNumber(state.value.ticketCapacity),
+          ticketPriceIsError = !isValidDouble(state.value.ticketPrice)) }
 
     return !state.value.eventNameIsError &&
         !state.value.eventDescriptionIsError &&
@@ -252,82 +253,84 @@ constructor(
       eventName: String,
       state: MutableStateFlow<CreateEventUiState> = _uiState
   ) {
-    state.value = state.value.copy(eventName = eventName)
+      state.update { currentState -> currentState.copy(eventName = eventName) }
   }
 
   fun onEventCategoryChanged(
       eventCategory: String,
       state: MutableStateFlow<CreateEventUiState> = _uiState
   ) {
-    state.value = state.value.copy(eventCategory = eventCategory)
+      state.update { currentState -> currentState.copy(eventCategory = eventCategory) }
   }
 
   fun onEventPhotoUriChanged(
       eventPhotoUri: Uri?,
       state: MutableStateFlow<CreateEventUiState> = _uiState
   ) {
-    state.value = state.value.copy(eventPhotoUri = eventPhotoUri)
+      state.update { currentState -> currentState.copy(eventPhotoUri = eventPhotoUri) }
   }
 
   fun onOrganiserListChanged(
       organiserList: MutableList<String>,
       state: MutableStateFlow<CreateEventUiState> = _uiState
   ) {
-    state.value = state.value.copy(organiserList = organiserList)
+      state.update { currentState -> currentState.copy(organiserList = organiserList) }
   }
 
   fun onEventDescriptionChanged(
       eventDescription: String,
       state: MutableStateFlow<CreateEventUiState> = _uiState
   ) {
-    state.value = state.value.copy(eventDescription = eventDescription)
+      state.update { currentState -> currentState.copy(eventDescription = eventDescription) }
   }
 
   fun onStartDateChanged(
       startDate: String,
       state: MutableStateFlow<CreateEventUiState> = _uiState
   ) {
-    state.value = state.value.copy(startDate = startDate)
+      state.update { currentState -> currentState.copy(startDate = startDate) }
   }
 
   fun onEndDateChanged(endDate: String, state: MutableStateFlow<CreateEventUiState> = _uiState) {
-    state.value = state.value.copy(endDate = endDate)
+      state.update { currentState -> currentState.copy(endDate = endDate) }
   }
 
   fun onStartTimeChanged(
       startTime: String,
       state: MutableStateFlow<CreateEventUiState> = _uiState
   ) {
-    state.value = state.value.copy(startTime = startTime)
+      state.update { currentState -> currentState.copy(startTime = startTime) }
   }
 
   fun onEndTimeChanged(endTime: String, state: MutableStateFlow<CreateEventUiState> = _uiState) {
-    state.value = state.value.copy(endTime = endTime)
+      state.update { currentState -> currentState.copy(endTime = endTime) }
   }
 
   fun onLocationChanged(location: String, state: MutableStateFlow<CreateEventUiState> = _uiState) {
-    state.value = state.value.copy(location = location)
+      state.update { currentState -> currentState.copy(location = location)}
+
   }
 
   fun onTicketNameChanged(
       ticketName: String,
       state: MutableStateFlow<CreateEventUiState> = _uiState
   ) {
-    state.value = state.value.copy(ticketName = ticketName)
+      state.update { currentState -> currentState.copy(ticketName = ticketName) }
   }
 
   fun onTicketCapacityChanged(
       ticketCapacity: String,
       state: MutableStateFlow<CreateEventUiState> = _uiState
   ) {
-    state.value = state.value.copy(ticketCapacity = ticketCapacity)
+      state.update { currentState -> currentState.copy(ticketCapacity = ticketCapacity) }
   }
 
   fun onTicketPriceChanged(
       ticketPrice: String,
       state: MutableStateFlow<CreateEventUiState> = _uiState
   ) {
-    state.value = state.value.copy(ticketPrice = ticketPrice)
+      state.update { currentState -> currentState.copy(ticketPrice = ticketPrice) }
+
   }
 }
 

@@ -14,6 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = ViewFriendsProfileViewModel.Factory::class)
@@ -32,16 +33,15 @@ constructor(
   }
 
   fun getFriendProfileDetails() {
+
     viewModelScope.launch {
       when (val friendUserObj = userRepository.getUser(friendUserId)) {
         is Resource.Success -> {
-          _uiState.value =
-              _uiState.value.copy(
-                  friendProfilePicLink = friendUserObj.data!!.profilePicUrl,
-                  friendFirstName = friendUserObj.data.firstName,
-                  friendLastName = friendUserObj.data.lastName,
-                  friendUserName = friendUserObj.data.username,
-                  bio = friendUserObj.data.bio)
+            _uiState.update { it.copy( friendProfilePicLink = friendUserObj.data!!.profilePicUrl,
+                friendFirstName = friendUserObj.data.firstName,
+                friendLastName = friendUserObj.data.lastName,
+                friendUserName = friendUserObj.data.username,
+                bio = friendUserObj.data.bio) }
         }
         is Resource.Failure ->
             Log.d(
