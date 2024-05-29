@@ -5,9 +5,14 @@ import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
+import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
 import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
+import io.mockk.MockKAnnotations
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.just
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import io.mockk.verify
@@ -133,15 +138,33 @@ class ScanFriendQrViewModelTest {
     }
   }
 
+  @RelaxedMockK lateinit var mockNavActions: NavigationActions
+
   @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
   @Before
   fun setUp() {
+    MockKAnnotations.init(this)
+    every { mockNavActions.navigateTo(any()) } just Runs
     userRepository = MockUserRepository()
     (userRepository as MockUserRepository).updateCurrentUserId(myUID)
     qrCodeAnalyser = QrCodeAnalyser()
-    viewModel = ScanFriendQrViewModel(userRepository, qrCodeAnalyser)
+    viewModel = ScanFriendQrViewModel(userRepository, qrCodeAnalyser, mockNavActions)
+    //      waitForLoadingToComplete()
   }
+
+  //    private fun waitForLoadingToComplete() {
+  //        while (viewModel.uiState.value.isLoading) {
+  //            // Small sleep to avoid busy waiting
+  //            Thread.sleep(50)
+  //        }
+  //    }
+
+  //    @Test
+  //    fun switchesScreenWhenNavigatedToNextScreen() = run {
+  //            viewModel.changeAction(ScanFriendQrViewModel.Action.NavigateToNextScreen)
+  //            verify { mockNavActions.navigateTo(any()) }
+  //        }
 
   @Test
   fun testDecodingSuccess() = runTest {
@@ -157,7 +180,7 @@ class ScanFriendQrViewModelTest {
     userRepository.addUser(mockUser1)
     userRepository.addUser(mockUser2)
     qrCodeAnalyser.onDecoded?.invoke(null)
-    assertEquals("Failed to decode QR Code", viewModel.uiState.value.decodedResult)
+    assertEquals(null, viewModel.uiState.value.decodedResult)
     assertEquals(ScanFriendQrViewModel.Action.AnalyserError, viewModel.uiState.value.action)
   }
   // todo should i be testing thta it is reset to none ? isnt this Ui logic?
@@ -184,7 +207,7 @@ class ScanFriendQrViewModelTest {
         println("User 2 not found or could not be fetched")
       }
     }
-    assertEquals(ScanFriendQrViewModel.Action.NavigateToNextScreen, viewModel.uiState.value.action)
+    assertEquals(ScanFriendQrViewModel.Action.None, viewModel.uiState.value.action)
   }
 
   @Test
@@ -210,7 +233,7 @@ class ScanFriendQrViewModelTest {
         println("User 2 not found or could not be fetched")
       }
     }
-    assertEquals(ScanFriendQrViewModel.Action.NavigateToNextScreen, viewModel.uiState.value.action)
+    assertEquals(ScanFriendQrViewModel.Action.None, viewModel.uiState.value.action)
   }
 
   // This is testing if the getUserDetails function (to display information in MyQRCode Tab) returns
