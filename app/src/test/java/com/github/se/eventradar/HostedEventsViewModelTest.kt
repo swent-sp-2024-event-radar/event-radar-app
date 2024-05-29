@@ -215,10 +215,10 @@ class HostedEventsViewModelTest {
   @Test
   fun testSetFilterDialogOpen() = runTest {
     // init value is false
-    viewModel.onFilterDialogOpen()
+    viewModel.onFilterDialogOpenChanged()
     assert(viewModel.uiState.value.isFilterDialogOpen)
 
-    viewModel.onFilterDialogOpen()
+    viewModel.onFilterDialogOpenChanged()
     assert(!viewModel.uiState.value.isFilterDialogOpen)
   }
 
@@ -329,6 +329,7 @@ class HostedEventsViewModelTest {
     userRepository.addUser(userWithHostedEvent)
     (userRepository as MockUserRepository).updateCurrentUserId(userWithHostedEvent.userId)
     viewModel.getHostedEvents()
+    viewModel.onUserLocationChanged(Location(38.9, 78.8, "User Location"))
 
     val newQuery = "20"
     viewModel.onRadiusQueryChanged(newQuery)
@@ -382,5 +383,20 @@ class HostedEventsViewModelTest {
     assert(viewModel.uiState.value.eventList.filteredEvents.isNotEmpty())
     assert(viewModel.uiState.value.eventList.filteredEvents.size == 2)
     assert(viewModel.uiState.value.eventList.filteredEvents == correctFilterEvents)
+  }
+
+  @Test
+  fun testRadiusQueryLessThanZero() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    val newQuery = "-10.0"
+    viewModel.onRadiusQueryChanged(newQuery)
+    assert(newQuery == viewModel.uiState.value.radiusQuery)
+    viewModel.filterHostedEvents()
+
+    verify { Log.d("HostedEventsViewModel", "Invalid radius query: $newQuery") }
+    assert(viewModel.uiState.value.radiusQuery == "")
+    unmockkAll()
   }
 }

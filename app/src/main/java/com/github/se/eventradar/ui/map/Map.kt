@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -22,6 +23,7 @@ import com.google.maps.android.compose.rememberMarkerState
 fun EventMap(
     events: List<Event>,
     modifier: Modifier = Modifier,
+    startingLocation: Location = Location(46.519962, 6.633597, "EPFL"),
     onCardClick: (String) -> Unit,
 ) {
   val mapProperties by remember {
@@ -30,7 +32,7 @@ fun EventMap(
   val mapUiSettings by remember { mutableStateOf(MapUiSettings(mapToolbarEnabled = false)) }
 
   // TODO: Use actual user location
-  val epflCameraPosition = LatLng(46.51890374606943, 6.566587868510539)
+  val epflCameraPosition = LatLng(startingLocation.latitude, startingLocation.longitude)
   val cameraPositionState: CameraPositionState = rememberCameraPositionState {
     position = CameraPosition.fromLatLngZoom(epflCameraPosition, 11f)
   }

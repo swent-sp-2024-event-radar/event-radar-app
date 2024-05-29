@@ -5,6 +5,7 @@ import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -179,6 +180,32 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
       Resource.Success(userId)
     } else {
       Resource.Failure(Exception("No user currently signed in"))
+    }
+  }
+
+  override suspend fun addEventToAttendeeList(
+      userId: String,
+      attendingEventId: String
+  ): Resource<Unit> {
+    return try {
+      userRef.document(userId).update("eventsAttendeeList", FieldValue.arrayUnion(attendingEventId))
+      Resource.Success(Unit)
+    } catch (e: Exception) {
+      Resource.Failure(e)
+    }
+  }
+
+  override suspend fun removeEventFromAttendeeList(
+      userId: String,
+      attendingEventId: String
+  ): Resource<Unit> {
+    return try {
+      userRef
+          .document(userId)
+          .update("eventsAttendeeList", FieldValue.arrayRemove(attendingEventId))
+      Resource.Success(Unit)
+    } catch (e: Exception) {
+      Resource.Failure(e)
     }
   }
 
