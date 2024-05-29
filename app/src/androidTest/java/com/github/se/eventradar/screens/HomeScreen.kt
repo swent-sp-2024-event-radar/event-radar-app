@@ -20,6 +20,7 @@ class HomeScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   val searchBarAndFilter: KNode = child { hasTestTag("searchBarAndFilter") }
   val filterButton: KNode = searchBarAndFilter.child { hasTestTag("filterButton") }
   val searchBar: KNode = searchBarAndFilter.child { hasTestTag("searchBar") }
+  val noEventsFoundText: KNode = child { hasTestTag("noEventsFoundText") }
   val filterPopUp: KNode = child { hasTestTag("filterPopUp") }
   val noUpcomingEventsText: KNode = child { hasTestTag("noUpcomingEventsText") }
   val pleaseLogInText: KNode = child { hasTestTag("pleaseLogInText") }

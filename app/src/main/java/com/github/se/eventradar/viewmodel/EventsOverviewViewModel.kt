@@ -288,6 +288,11 @@ constructor(
     // Reset search and filter when tab is changed
     state.value =
         state.value.copy(
+            eventList =
+                state.value.eventList.copy(filteredEvents = state.value.eventList.allEvents),
+            upcomingEventList =
+                state.value.upcomingEventList.copy(
+                    filteredEvents = state.value.upcomingEventList.allEvents),
             searchQuery = "",
             isSearchActive = false,
             isFilterDialogOpen = false,

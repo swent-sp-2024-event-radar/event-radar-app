@@ -231,6 +231,35 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
   }
 
   @Test
+  fun filterBrowseEventsWithNoResults() = run {
+    onComposeScreen<HomeScreen>(composeTestRule) {
+      searchBar {
+        assertIsDisplayed()
+        performClick()
+        performTextInput("Event 11")
+      }
+
+      // Update the UI state to reflect the change
+      sampleEventList.value = sampleEventList.value.copy(isSearchActive = true)
+
+      noEventsFoundText { assertIsDisplayed() }
+
+      verify { mockEventsOverviewViewModel.onSearchQueryChanged("Event 11") }
+      verify { mockEventsOverviewViewModel.onSearchActiveChanged(true) }
+      verify { mockEventsOverviewViewModel.uiState }
+      verify { mockEventsOverviewViewModel.filterEvents() }
+
+      searchBar { performTextClearance() }
+
+      verify { mockEventsOverviewViewModel.onSearchQueryChanged("") }
+      verify { mockEventsOverviewViewModel.onSearchActiveChanged(false) }
+      verify { mockEventsOverviewViewModel.getEvents() }
+
+      confirmVerified(mockEventsOverviewViewModel)
+    }
+  }
+
+  @Test
   fun typingInSearchBarShowsResults() = run {
     onComposeScreen<HomeScreen>(composeTestRule) {
       searchBar {

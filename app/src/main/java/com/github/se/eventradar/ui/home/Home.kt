@@ -174,6 +174,16 @@ fun EventsOverview(
     modifier: Modifier = Modifier
 ) {
   val events = getEventsBasedOffUiState(uiState)
+
+  if ((uiState.isSearchActive || uiState.isFilterActive) &&
+      (uiState.eventList.filteredEvents.isEmpty() ||
+          uiState.upcomingEventList.filteredEvents.isEmpty())) {
+    Text(
+        "No events match the filter applied",
+        textAlign = TextAlign.Center,
+        modifier = modifier.testTag("noEventsFoundText"))
+  }
+
   if (uiState.tab == Tab.BROWSE) {
     when (uiState.viewList) {
       true ->
@@ -195,7 +205,6 @@ fun EventsOverview(
               "You have no upcoming events",
               textAlign = TextAlign.Center,
               modifier = modifier.testTag("noUpcomingEventsText"))
-      // In list view + search or filter is active
       uiState.viewList ->
           EventList(
               events = events, modifier = modifier.testTag("eventListUpcoming").fillMaxWidth()) {
