@@ -11,17 +11,11 @@ interface IEventRepository {
 
   suspend fun getUniqueEventId(): Resource<String>
 
-  //  suspend fun cleanExpiredEvents(): Resource<Unit>
-
   suspend fun addEvent(event: Event): Resource<Unit>
-
-  //  suspend fun addEventExpired(document: DocumentSnapshot): Resource<Unit>
 
   suspend fun updateEvent(event: Event): Resource<Unit>
 
   suspend fun deleteEvent(event: Event): Resource<Unit>
-
-  //  suspend fun deleteEventByID(fireBaseID: String): Resource<Unit>
 
   suspend fun getEventsByIds(ids: List<String>): Resource<List<Event>>
 

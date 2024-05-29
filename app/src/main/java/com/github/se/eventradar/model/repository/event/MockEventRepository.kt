@@ -20,9 +20,8 @@ class MockEventRepository : IEventRepository {
     return Resource.Success(validEvents)
   }
 
-    //    val validEvents = mockEvents.filter { it.end.isAfter(LocalDateTime.now()) }
+  override suspend fun getEvent(id: String): Resource<Event?> {
     val event = mockEvents.find { it.fireBaseID == id }
-
     return if (event != null) {
       Resource.Success(event)
     } else {
@@ -61,8 +60,7 @@ class MockEventRepository : IEventRepository {
   override suspend fun getEventsByIds(ids: List<String>): Resource<List<Event>> {
     val events = mutableListOf<Event>()
     for (id in ids) {
-      val validEvents = mockEvents.filter { it.end.isAfter(LocalDateTime.now()) } // added
-      val event = validEvents.find { it.fireBaseID == id }
+      val event = mockEvents.find { it.fireBaseID == id }
       if (event != null) {
         events.add(event)
       } else {
@@ -76,15 +74,14 @@ class MockEventRepository : IEventRepository {
     return eventsFlow.asStateFlow().map { resource ->
       when (resource) {
         is Resource.Success -> {
-          val upcomingEvents = resource.data.filter { it.end.isAfter(LocalDateTime.now()) }
+          val upcomingEvents = resource.data
+          //            .filter { it.end.isAfter(LocalDateTime.now()) }
           Resource.Success(upcomingEvents)
         }
         is Resource.Failure -> resource
       }
     }
   }
-  //  override fun observeAllEvents(): Flow<Resource<List<Event>>> =
-  //    eventsFlow.asStateFlow()
 
   override fun observeUpcomingEvents(userId: String): Flow<Resource<List<Event>>> {
     return eventsFlow.asStateFlow().map { resource ->

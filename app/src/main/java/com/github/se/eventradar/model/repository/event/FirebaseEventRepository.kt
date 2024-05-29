@@ -16,9 +16,11 @@ import kotlinx.coroutines.tasks.await
 class FirebaseEventRepository(db: FirebaseFirestore = Firebase.firestore) : IEventRepository {
   private val eventRef: CollectionReference = db.collection("events")
   private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
+  private val currentDateTimeString: String
+    get() = LocalDateTime.now().format(formatter)
 
   override suspend fun getEvents(): Resource<List<Event>> {
-    val currentDateTimeString = LocalDateTime.now().format(formatter)
+    val currentDateTimeString = currentDateTimeString
     val resultDocument = eventRef.whereGreaterThan("end", currentDateTimeString).get().await()
 
     return try {
@@ -42,7 +44,6 @@ class FirebaseEventRepository(db: FirebaseFirestore = Firebase.firestore) : IEve
 
   override suspend fun getEvent(id: String): Resource<Event?> {
     val resultDocument = eventRef.document(id).get().await()
-
     return try {
       val event = Event(resultDocument.data!!, resultDocument.id)
       Resource.Success(event)
@@ -110,7 +111,7 @@ class FirebaseEventRepository(db: FirebaseFirestore = Firebase.firestore) : IEve
   }
 
   override fun observeAllEvents(): Flow<Resource<List<Event>>> = callbackFlow {
-    val currentDateTimeString = LocalDateTime.now().format(formatter)
+    val currentDateTimeString = currentDateTimeString
     val query = eventRef.whereGreaterThan("end", currentDateTimeString)
     val listener =
         query.addSnapshotListener { snapshot, error ->
@@ -126,7 +127,7 @@ class FirebaseEventRepository(db: FirebaseFirestore = Firebase.firestore) : IEve
   }
 
   override fun observeUpcomingEvents(userId: String): Flow<Resource<List<Event>>> = callbackFlow {
-    val currentDateTimeString = LocalDateTime.now().format(formatter)
+    val currentDateTimeString = currentDateTimeString
     val query =
         eventRef
             .whereGreaterThan("end", currentDateTimeString)
