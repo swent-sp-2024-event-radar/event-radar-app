@@ -132,8 +132,12 @@ class MockEventRepository : IEventRepository {
       is Resource.Success -> {
         val ticket = res.data?.ticket
         if (ticket != null) {
-          res.data.ticket =
-              EventTicket(ticket.name, ticket.price, ticket.capacity, ticket.purchases - 1)
+          if (ticket.purchases > 0) {
+            res.data.ticket =
+                EventTicket(ticket.name, ticket.price, ticket.capacity, ticket.purchases - 1)
+          } else {
+            return Resource.Failure(Exception("Ticket purchases is already 0"))
+          }
         }
         Resource.Success(Unit)
       }

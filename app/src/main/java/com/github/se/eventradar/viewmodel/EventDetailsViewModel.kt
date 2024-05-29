@@ -39,8 +39,8 @@ constructor(
   val isUserAttending: StateFlow<Boolean>
     get() = _isUserAttending
 
-  val errorOccurred = mutableStateOf(false)
-  val registrationSuccessful = mutableStateOf(false)
+  val showErrorOccurredDialog = mutableStateOf(false)
+  val showSuccessfulRegistrationDialog = mutableStateOf(false)
   val showCancelRegistrationDialog = mutableStateOf(false)
 
   private lateinit var currentUserId: String
@@ -104,10 +104,10 @@ constructor(
 
       if (!_isUserAttending.value) {
         if (registrationProcedure(eventId, currentUserId)) {
-          registrationSuccessful.value = true
+          showSuccessfulRegistrationDialog.value = true
           _isUserAttending.update { true }
         } else {
-          errorOccurred.value = true
+          showErrorOccurredDialog.value = true
         }
       }
     }
@@ -119,7 +119,7 @@ constructor(
         _isUserAttending.update { false }
         showCancelRegistrationDialog.value = false
       } else {
-        errorOccurred.value = true
+        showErrorOccurredDialog.value = true
       }
     }
   }
@@ -139,7 +139,7 @@ constructor(
           "EventDetailsViewModel",
           "Error decrementing purchases: ${resPurchases.throwable.message}")
     }
-    val resUser = userRepository.removeAttendingEvent(userId, eventId)
+    val resUser = userRepository.removeEventFromAttendeeList(userId, eventId)
     if (resUser is Resource.Failure) {
       Log.d(
           "EventDetailsViewModel",
@@ -165,7 +165,7 @@ constructor(
           "EventDetailsViewModel",
           "Error incrementing purchases: ${resPurchases.throwable.message}")
     }
-    val resUser = userRepository.addAttendingEvent(userId, eventId)
+    val resUser = userRepository.addEventToAttendeeList(userId, eventId)
     if (resUser is Resource.Failure) {
       Log.d(
           "EventDetailsViewModel", "Error adding attendance in user: ${resUser.throwable.message}")

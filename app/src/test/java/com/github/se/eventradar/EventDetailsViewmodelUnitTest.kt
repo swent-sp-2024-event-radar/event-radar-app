@@ -190,7 +190,7 @@ class EventDetailsViewmodelUnitTest {
 
     viewModel.buyTicketForEvent()
 
-    assert(viewModel.errorOccurred.value)
+    assert(viewModel.showErrorOccurredDialog.value)
 
     unmockkAll()
   }
@@ -205,7 +205,7 @@ class EventDetailsViewmodelUnitTest {
     viewModel.getEventData()
     viewModel.buyTicketForEvent()
 
-    assert(viewModel.errorOccurred.value)
+    assert(viewModel.showErrorOccurredDialog.value)
 
     unmockkAll()
   }
@@ -225,7 +225,7 @@ class EventDetailsViewmodelUnitTest {
 
     // assert error
     viewModel.buyTicketForEvent()
-    assert(viewModel.errorOccurred.value)
+    assert(viewModel.showErrorOccurredDialog.value)
 
     unmockkAll()
   }
@@ -245,7 +245,7 @@ class EventDetailsViewmodelUnitTest {
     assert(mockUser.eventsAttendeeList.contains(mockEvent.fireBaseID))
     assert(mockEvent.attendeeList.contains(mockUser.userId))
     assert(mockEvent.ticket.purchases == ticketPurchases + 1)
-    assert(viewModel.registrationSuccessful.value)
+    assert(viewModel.showSuccessfulRegistrationDialog.value)
 
     unmockkAll()
   }
@@ -270,7 +270,7 @@ class EventDetailsViewmodelUnitTest {
 
     viewModel.buyTicketForEvent()
 
-    assert(viewModel.errorOccurred.value)
+    assert(viewModel.showErrorOccurredDialog.value)
 
     unmockkAll()
   }
@@ -290,7 +290,7 @@ class EventDetailsViewmodelUnitTest {
     assert(mockUser.eventsAttendeeList.contains(mockEvent.fireBaseID))
     assert(mockEvent.attendeeList.contains(mockUser.userId))
     assert(mockEvent.ticket.purchases == ticketPurchases + 1)
-    assert(viewModel.registrationSuccessful.value)
+    assert(viewModel.showSuccessfulRegistrationDialog.value)
 
     viewModel.removeUserFromEvent()
 
@@ -316,14 +316,14 @@ class EventDetailsViewmodelUnitTest {
     assert(mockUser.eventsAttendeeList.contains(mockEvent.fireBaseID))
     assert(mockEvent.attendeeList.contains(mockUser.userId))
     assert(mockEvent.ticket.purchases == ticketPurchases + 1)
-    assert(viewModel.registrationSuccessful.value)
+    assert(viewModel.showSuccessfulRegistrationDialog.value)
 
     // corrupt db
     eventRepository.deleteEvent(mockEvent)
 
     viewModel.removeUserFromEvent()
 
-    assert(viewModel.errorOccurred.value)
+    assert(viewModel.showErrorOccurredDialog.value)
 
     verify {
       Log.d(
@@ -349,14 +349,14 @@ class EventDetailsViewmodelUnitTest {
     assert(mockUser.eventsAttendeeList.contains(mockEvent.fireBaseID))
     assert(mockEvent.attendeeList.contains(mockUser.userId))
     assert(mockEvent.ticket.purchases == ticketPurchases + 1)
-    assert(viewModel.registrationSuccessful.value)
+    assert(viewModel.showSuccessfulRegistrationDialog.value)
 
     // corrupt db
     userRepository.deleteUser(mockUser)
 
     viewModel.removeUserFromEvent()
 
-    assert(viewModel.errorOccurred.value)
+    assert(viewModel.showErrorOccurredDialog.value)
 
     verify {
       Log.d(
@@ -388,7 +388,7 @@ class EventDetailsViewmodelUnitTest {
     assert(mockUser.eventsAttendeeList.contains(mockEvent.fireBaseID))
     assert(mockEvent.attendeeList.contains(mockUser.userId))
     assert(mockEvent.ticket.purchases == ticketPurchases + 1)
-    assert(viewModel.registrationSuccessful.value)
+    assert(viewModel.showSuccessfulRegistrationDialog.value)
 
     // must mock the method here to avoid mocking it during the call to `buyTicketForEvent()`
     coEvery { userRepository.getUser(any()) } returns
@@ -396,7 +396,7 @@ class EventDetailsViewmodelUnitTest {
 
     viewModel.removeUserFromEvent()
 
-    assert(viewModel.errorOccurred.value)
+    assert(viewModel.showErrorOccurredDialog.value)
 
     verify {
       Log.d(

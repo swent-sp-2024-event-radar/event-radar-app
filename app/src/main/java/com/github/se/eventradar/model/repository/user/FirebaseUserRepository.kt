@@ -183,7 +183,10 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
     }
   }
 
-  override suspend fun addAttendingEvent(userId: String, attendingEventId: String): Resource<Unit> {
+  override suspend fun addEventToAttendeeList(
+      userId: String,
+      attendingEventId: String
+  ): Resource<Unit> {
     return try {
       userRef.document(userId).update("eventsAttendeeList", FieldValue.arrayUnion(attendingEventId))
       Resource.Success(Unit)
@@ -192,7 +195,7 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
     }
   }
 
-  override suspend fun removeAttendingEvent(
+  override suspend fun removeEventFromAttendeeList(
       userId: String,
       attendingEventId: String
   ): Resource<Unit> {

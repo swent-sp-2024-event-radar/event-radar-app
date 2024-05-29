@@ -126,7 +126,10 @@ class MockUserRepository : IUserRepository {
     }
   }
 
-  override suspend fun addAttendingEvent(userId: String, attendingEventId: String): Resource<Unit> {
+  override suspend fun addEventToAttendeeList(
+      userId: String,
+      attendingEventId: String
+  ): Resource<Unit> {
     return when (val res = getUser(userId)) {
       is Resource.Success -> {
         res.data?.eventsAttendeeList?.add(attendingEventId)
@@ -138,7 +141,7 @@ class MockUserRepository : IUserRepository {
     }
   }
 
-  override suspend fun removeAttendingEvent(
+  override suspend fun removeEventFromAttendeeList(
       userId: String,
       attendingEventId: String
   ): Resource<Unit> {

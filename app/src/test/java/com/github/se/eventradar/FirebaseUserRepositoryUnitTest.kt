@@ -652,7 +652,7 @@ class FirebaseUserRepositoryUnitTest {
     every { mockTask.isSuccessful } returns true
     every { mockTask.isComplete } returns true
 
-    val result = firebaseUserRepository.addAttendingEvent(uid, attendingEventId)
+    val result = firebaseUserRepository.addEventToAttendeeList(uid, attendingEventId)
 
     assert(result is Resource.Success)
   }
@@ -684,7 +684,7 @@ class FirebaseUserRepositoryUnitTest {
     every { mockTask.isSuccessful } returns true
     every { mockTask.isComplete } returns true
 
-    val result = firebaseUserRepository.removeAttendingEvent(uid, attendingEventId)
+    val result = firebaseUserRepository.removeEventFromAttendeeList(uid, attendingEventId)
 
     assert(result is Resource.Success)
   }
