@@ -329,6 +329,7 @@ class HostedEventsViewModelTest {
     userRepository.addUser(userWithHostedEvent)
     (userRepository as MockUserRepository).updateCurrentUserId(userWithHostedEvent.userId)
     viewModel.getHostedEvents()
+    viewModel.onUserLocationChanged(Location(38.9, 78.8, "User Location"))
 
     val newQuery = "20"
     viewModel.onRadiusQueryChanged(newQuery)
