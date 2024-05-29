@@ -70,7 +70,7 @@ fun HostingScreen(
   GetUserLocation(context, viewModel::onUserLocationChanged)
 
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("hostingScreen")) {
-    val (logo, title, divider, searchfilter, filter, eventList, eventMap, bottomNav, buttons) =
+    val (logo, title, divider, searchfilter, noEvents, filter, eventList, eventMap, bottomNav, buttons) =
         createRefs()
     Logo(
         modifier =
@@ -108,7 +108,9 @@ fun HostingScreen(
       Text(
           "No events match the filter applied",
           textAlign = TextAlign.Center,
-          modifier = Modifier.testTag("noEventsFoundText"))
+          modifier = Modifier
+              .testTag("noEventsFoundText")
+              .constrainAs(noEvents) { top.linkTo(searchfilter.bottom, margin = 10.dp) })
     }
 
     if (uiState.viewList) {
