@@ -1,5 +1,11 @@
 package com.github.se.eventradar.ui.component
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Looper
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -44,6 +50,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -69,9 +76,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.github.se.eventradar.R
+import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.ui.BottomNavigationMenu
@@ -80,6 +89,12 @@ import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 import com.github.se.eventradar.viewmodel.SearchFilterUiState
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 
 fun getIconFromViewListBool(viewList: Boolean): ImageVector {
   return if (viewList) {
@@ -459,5 +474,82 @@ fun GenericDialogBox(
               }
         },
         modifier = modifier)
+  }
+}
+
+@Composable
+fun GetUserLocation(
+    context: Context,
+    onUserLocationChanged: (Location) -> Unit,
+    locationProvider: FusedLocationProviderClient =
+        LocationServices.getFusedLocationProviderClient(context),
+) {
+  val locationCallback =
+      object : LocationCallback() {
+        // 1
+        override fun onLocationResult(result: LocationResult) {
+          if (ActivityCompat.checkSelfPermission(
+              context, Manifest.permission.ACCESS_FINE_LOCATION) !=
+              PackageManager.PERMISSION_GRANTED &&
+              ActivityCompat.checkSelfPermission(
+                  context, Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                  PackageManager.PERMISSION_GRANTED) {
+            // set default location
+            val epflLocation = Location(46.519962, 6.56637, "EPFL")
+            onUserLocationChanged(epflLocation)
+            return
+          }
+
+          locationProvider.lastLocation
+              .addOnSuccessListener { location ->
+                location?.let {
+                  val lat = location.latitude
+                  val long = location.longitude
+                  // Update data class with location data
+                  onUserLocationChanged(Location(lat, long, "User"))
+                }
+              }
+              .addOnFailureListener { Log.e("Location_error", "${it.message}") }
+        }
+      }
+
+  DisposableEffect(key1 = locationProvider) {
+    locationUpdate(locationProvider, locationCallback)
+
+    onDispose { stopLocationUpdate(locationProvider, locationCallback) }
+  }
+}
+
+@SuppressLint("MissingPermission")
+private fun locationUpdate(
+    locationProvider: FusedLocationProviderClient,
+    locationCallback: LocationCallback
+) {
+  locationCallback.let {
+    // An encapsulation of various parameters for requesting
+    // location through FusedLocationProviderClient.
+    val locationRequest: LocationRequest =
+        LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).build()
+    // use FusedLocationProviderClient to request location update
+    locationProvider.requestLocationUpdates(locationRequest, it, Looper.getMainLooper())
+  }
+}
+
+fun stopLocationUpdate(
+    locationProvider: FusedLocationProviderClient,
+    locationCallback: LocationCallback
+) {
+  try {
+    // Removes all location updates for the given callback.
+    val removeTask = locationProvider.removeLocationUpdates(locationCallback)
+    removeTask.addOnCompleteListener { task ->
+      if (task.isSuccessful) {
+        Log.d("LocationProvider", "Location Callback removed.")
+      } else {
+        Log.d("LocationProvider", "Failed to remove Location Callback.")
+      }
+    }
+  } catch (se: SecurityException) {
+    Log.e("LocationProvider", "Failed to remove Location Callback.. $se")
   }
 }

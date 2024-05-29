@@ -88,8 +88,10 @@ constructor(
             }
             .allEvents
 
-    // User location should ideally be dynamic but is fixed for the purpose of this example
-    val userLocation = Location(latitude = 38.92, longitude = 78.78, address = "Ecublens")
+    if (_uiState.value.radiusQuery.isNotEmpty() && _uiState.value.radiusQuery.toDouble() < 0.0) {
+      Log.d("EventsOverviewViewModel", "Invalid radius query: ${_uiState.value.radiusQuery}")
+      _uiState.value = _uiState.value.copy(radiusQuery = "")
+    }
 
     val filteredEvents =
         eventList.filter { event ->
@@ -97,7 +99,7 @@ constructor(
           event.eventName.contains(_uiState.value.searchQuery, ignoreCase = true) &&
               // Radius filter
               (_uiState.value.radiusQuery.isEmpty() ||
-                  calculateDistance(userLocation, event.location) <=
+                  calculateDistance(_uiState.value.userLocation, event.location) <=
                       _uiState.value.radiusQuery.toDouble()) &&
               // Free event filter
               (!_uiState.value.isFreeSwitchOn || event.ticket.price == 0.0) &&
@@ -309,6 +311,10 @@ constructor(
       currentState.copy(isFilterDialogOpen = false, viewList = !state.value.viewList)
     }
   }
+
+  fun onUserLocationChanged(location: Location) {
+    _uiState.update { currentState -> currentState.copy(userLocation = location) }
+  }
 }
 
 data class EventsOverviewUiState(
@@ -321,6 +327,7 @@ data class EventsOverviewUiState(
     override val radiusQuery: String = "",
     override val isFreeSwitchOn: Boolean = false,
     override val categoriesCheckedList: MutableSet<EventCategory> = mutableSetOf(),
+    override val userLocation: Location = Location(46.519962, 6.56637, "EPFL"),
     val viewList: Boolean = true,
     val tab: Tab = Tab.BROWSE,
     val userLoggedIn: Boolean = false,
