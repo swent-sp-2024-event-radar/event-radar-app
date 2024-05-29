@@ -99,11 +99,13 @@ constructor(
     }
   }
 
-  fun onFilterDialogOpen(state: MutableStateFlow<HostedEventsUiState> = _uiState) {
+  fun onFilterDialogOpenChanged(state: MutableStateFlow<HostedEventsUiState> = _uiState) {
     state.update { currentState ->
       currentState.copy(isFilterDialogOpen = !currentState.isFilterDialogOpen)
     }
   }
+
+
 
   fun onRadiusQueryChanged(
       radius: String,
