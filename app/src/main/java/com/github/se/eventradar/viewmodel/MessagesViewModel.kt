@@ -59,7 +59,7 @@ constructor(
 
           // Update the UI state with the sorted and filtered message list
 
-          _uiState.update { it.copy(messageList = sortedMessageList)}
+          _uiState.update { it.copy(messageList = sortedMessageList) }
         }
         is Resource.Failure -> {
           Log.d("MessagesViewModel", "Error getting messages: ${response.throwable.message}")
@@ -83,7 +83,7 @@ constructor(
                   "Error getting friend: ${(friend as Resource.Failure).throwable.message}")
             }
           }
-            _uiState.update { it.copy(friendsList = friendsList)}
+          _uiState.update { it.copy(friendsList = friendsList) }
         }
         is Resource.Failure -> {
           Log.d("MessagesViewModel", "Error getting friends: ${response.throwable.message}")
@@ -93,7 +93,7 @@ constructor(
   }
 
   fun onSearchQueryChanged(query: String, state: MutableStateFlow<MessagesUiState> = _uiState) {
-      state.update { it.copy(searchQuery = query)}
+    state.update { it.copy(searchQuery = query) }
     filterMessagesLists()
   }
 
@@ -101,13 +101,11 @@ constructor(
       isActive: Boolean,
       state: MutableStateFlow<MessagesUiState> = _uiState
   ) {
-      state.update { it.copy(isSearchActive = isActive)}
+    state.update { it.copy(isSearchActive = isActive) }
   }
 
   fun onSelectedTabIndexChanged(index: Int, state: MutableStateFlow<MessagesUiState> = _uiState) {
-      state.update { it.copy(selectedTabIndex = index,
-          isSearchActive = false,
-          searchQuery = "")}
+    state.update { it.copy(selectedTabIndex = index, isSearchActive = false, searchQuery = "") }
     if (index == 0) {
       getMessages()
     } else {
@@ -131,14 +129,14 @@ constructor(
                 friend.lastName.contains(query, ignoreCase = true)
           }
 
-        _uiState.update { it.copy(filteredMessageList = filteredMessageList)}
+      _uiState.update { it.copy(filteredMessageList = filteredMessageList) }
     } else {
       val filteredFriendsList =
           friendsList.filter { user ->
             user.firstName.contains(query, ignoreCase = true) or
                 user.lastName.contains(query, ignoreCase = true)
           }
-        _uiState.update { it.copy(filteredFriendsList = filteredFriendsList)}
+      _uiState.update { it.copy(filteredFriendsList = filteredFriendsList) }
     }
   }
 

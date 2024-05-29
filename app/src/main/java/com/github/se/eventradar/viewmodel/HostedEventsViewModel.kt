@@ -18,6 +18,7 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -40,8 +41,7 @@ constructor(
           }
           is Resource.Failure -> {
             Log.d("HostedEventsViewModel", "User not logged in or error fetching user ID")
-            _uiState.value =
-                _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+            _uiState.update { it.copy(eventList = EventList(emptyList(), emptyList(), null)) }
           }
         }
       }
@@ -56,38 +56,37 @@ constructor(
         if (eventsHostList.isNotEmpty()) {
           when (val events = eventRepository.getEventsByIds(eventsHostList.toList())) {
             is Resource.Success -> {
-              _uiState.value =
-                  _uiState.value.copy(
-                      eventList =
-                          EventList(
-                              events.data, events.data, _uiState.value.eventList.selectedEvent))
+              _uiState.update {
+                it.copy(
+                    eventList =
+                        EventList(events.data, events.data, _uiState.value.eventList.selectedEvent))
+              }
               filterHostedEvents()
             }
             is Resource.Failure -> {
               Log.d("HostedEventsViewModel", "Error getting hosted events for $uid")
-              _uiState.value =
-                  _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+              _uiState.update { it.copy(eventList = EventList(emptyList(), emptyList(), null)) }
             }
           }
         } else {
-          _uiState.value =
-              _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+          _uiState.update { it.copy(eventList = EventList(emptyList(), emptyList(), null)) }
         }
       }
       is Resource.Failure -> {
         Log.d("HostedEventsViewModel", "Error fetching user document")
-        _uiState.value = _uiState.value.copy(eventList = EventList(emptyList(), emptyList(), null))
+        _uiState.update { it.copy(eventList = EventList(emptyList(), emptyList(), null)) }
       }
     }
   }
 
   fun onViewListStatusChanged(state: MutableStateFlow<HostedEventsUiState> = _uiState) {
-    state.value = state.value.copy(isFilterDialogOpen = false)
-    state.value = state.value.copy(viewList = !state.value.viewList)
+    state.update { currentState ->
+      currentState.copy(isFilterDialogOpen = false, viewList = !currentState.viewList)
+    }
   }
 
   fun onSearchQueryChanged(query: String, state: MutableStateFlow<HostedEventsUiState> = _uiState) {
-    state.value = state.value.copy(searchQuery = query)
+    state.update { currentState -> currentState.copy(searchQuery = query) }
     filterHostedEvents()
   }
 
@@ -95,27 +94,32 @@ constructor(
       isSearchActive: Boolean,
       state: MutableStateFlow<HostedEventsUiState> = _uiState
   ) {
-    state.value = state.value.copy(isFilterDialogOpen = false)
-    state.value = state.value.copy(isSearchActive = isSearchActive)
+    state.update { currentState ->
+      currentState.copy(isFilterDialogOpen = false, isSearchActive = isSearchActive)
+    }
   }
 
   fun onFilterDialogOpen(state: MutableStateFlow<HostedEventsUiState> = _uiState) {
-    state.value = state.value.copy(isFilterDialogOpen = !state.value.isFilterDialogOpen)
+    state.update { currentState ->
+      currentState.copy(isFilterDialogOpen = !currentState.isFilterDialogOpen)
+    }
   }
 
   fun onRadiusQueryChanged(
       radius: String,
       state: MutableStateFlow<HostedEventsUiState> = _uiState
   ) {
-    state.value = state.value.copy(radiusQuery = radius)
+    state.update { currentState -> currentState.copy(radiusQuery = radius) }
   }
 
   fun onFreeSwitchChanged(state: MutableStateFlow<HostedEventsUiState> = _uiState) {
-    state.value = state.value.copy(isFreeSwitchOn = !state.value.isFreeSwitchOn)
+    state.update { currentState ->
+      currentState.copy(isFreeSwitchOn = !currentState.isFreeSwitchOn)
+    }
   }
 
   fun onFilterApply(state: MutableStateFlow<HostedEventsUiState> = _uiState) {
-    state.value = state.value.copy(isFilterActive = true)
+    state.update { currentState -> currentState.copy(isFilterActive = true) }
     filterHostedEvents()
   }
 
@@ -141,9 +145,9 @@ constructor(
         }
 
     // Update the UI state with the filtered events
-    _uiState.value =
-        _uiState.value.copy(
-            eventList = _uiState.value.eventList.copy(filteredEvents = filteredEvents))
+    _uiState.update {
+      it.copy(eventList = _uiState.value.eventList.copy(filteredEvents = filteredEvents))
+    }
   }
 
   // Calculates distance between 2 coordinate points based on Haversine formula

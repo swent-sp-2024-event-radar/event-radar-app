@@ -37,11 +37,14 @@ constructor(
     viewModelScope.launch {
       when (val friendUserObj = userRepository.getUser(friendUserId)) {
         is Resource.Success -> {
-            _uiState.update { it.copy( friendProfilePicLink = friendUserObj.data!!.profilePicUrl,
+          _uiState.update {
+            it.copy(
+                friendProfilePicLink = friendUserObj.data!!.profilePicUrl,
                 friendFirstName = friendUserObj.data.firstName,
                 friendLastName = friendUserObj.data.lastName,
                 friendUserName = friendUserObj.data.username,
-                bio = friendUserObj.data.bio) }
+                bio = friendUserObj.data.bio)
+          }
         }
         is Resource.Failure ->
             Log.d(

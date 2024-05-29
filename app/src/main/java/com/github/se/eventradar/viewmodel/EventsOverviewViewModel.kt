@@ -43,9 +43,7 @@ constructor(
       query: String,
       state: MutableStateFlow<EventsOverviewUiState> = _uiState
   ) {
-      state.update { currentState ->
-          currentState.copy(searchQuery = query)
-      }
+    state.update { currentState -> currentState.copy(searchQuery = query) }
     filterEvents()
   }
 
@@ -53,36 +51,30 @@ constructor(
       isSearchActive: Boolean,
       state: MutableStateFlow<EventsOverviewUiState> = _uiState
   ) {
-      state.update { currentState ->
-          currentState.copy(isFilterDialogOpen = false, isSearchActive = isSearchActive)
-      }
+    state.update { currentState ->
+      currentState.copy(isFilterDialogOpen = false, isSearchActive = isSearchActive)
+    }
   }
 
   fun onFilterDialogOpen(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
-      state.update { currentState ->
-          currentState.copy(isFilterDialogOpen = !state.value.isFilterDialogOpen)
-      }
+    state.update { currentState ->
+      currentState.copy(isFilterDialogOpen = !state.value.isFilterDialogOpen)
+    }
   }
 
   fun onRadiusQueryChanged(
       radius: String,
       state: MutableStateFlow<EventsOverviewUiState> = _uiState
   ) {
-      state.update { currentState ->
-          currentState.copy(radiusQuery = radius)
-      }
+    state.update { currentState -> currentState.copy(radiusQuery = radius) }
   }
 
   fun onFreeSwitchChanged(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
-      state.update { currentState ->
-          currentState.copy(isFreeSwitchOn = !state.value.isFreeSwitchOn)
-      }
+    state.update { currentState -> currentState.copy(isFreeSwitchOn = !state.value.isFreeSwitchOn) }
   }
 
   fun onFilterApply(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
-      state.update { currentState ->
-          currentState.copy(isFilterActive = true)
-      }
+    state.update { currentState -> currentState.copy(isFilterActive = true) }
     filterEvents()
   }
 
@@ -150,11 +142,11 @@ constructor(
     viewModelScope.launch {
       when (val response = eventRepository.getEvents()) {
         is Resource.Success -> {
-            _uiState.update { currentState ->
-                currentState.copy(eventList =
-                EventList(
-                    response.data, response.data, _uiState.value.eventList.selectedEvent))
-            }
+          _uiState.update { currentState ->
+            currentState.copy(
+                eventList =
+                    EventList(response.data, response.data, _uiState.value.eventList.selectedEvent))
+          }
           filterEvents()
         }
         is Resource.Failure ->
@@ -175,9 +167,9 @@ constructor(
             Log.d(
                 "EventsOverviewViewModel",
                 "Error fetching user ID: ${userIdResource.throwable.message}")
-              _uiState.update { currentState ->
-                  currentState.copy(upcomingEventList = EventList(emptyList(), emptyList(), null))
-              }
+            _uiState.update { currentState ->
+              currentState.copy(upcomingEventList = EventList(emptyList(), emptyList(), null))
+            }
           }
         }
       }
@@ -192,31 +184,31 @@ constructor(
         if (attendeeList.isNotEmpty()) {
           when (val events = eventRepository.getEventsByIds(attendeeList)) {
             is Resource.Success -> {
-                _uiState.update { currentState ->
-                    currentState.copy(upcomingEventList =
-                    EventList(
-                        events.data, events.data, _uiState.value.eventList.selectedEvent))
-                }
+              _uiState.update { currentState ->
+                currentState.copy(
+                    upcomingEventList =
+                        EventList(events.data, events.data, _uiState.value.eventList.selectedEvent))
+              }
               filterEvents()
             }
             is Resource.Failure -> {
               Log.d("EventsOverviewViewModel", "Error getting events for $uid")
-                _uiState.update { currentState ->
-                    currentState.copy(upcomingEventList = EventList(emptyList(), emptyList(), null))
-                }
+              _uiState.update { currentState ->
+                currentState.copy(upcomingEventList = EventList(emptyList(), emptyList(), null))
+              }
             }
           }
         } else {
-            _uiState.update { currentState ->
-                currentState.copy(upcomingEventList = EventList(emptyList(), emptyList(), null))
-            }
+          _uiState.update { currentState ->
+            currentState.copy(upcomingEventList = EventList(emptyList(), emptyList(), null))
+          }
         }
       }
       is Resource.Failure -> {
         Log.d("EventsOverviewViewModel", "Error fetching user document")
-          _uiState.update { currentState ->
-              currentState.copy(upcomingEventList = EventList(emptyList(), emptyList(), null))
-          }
+        _uiState.update { currentState ->
+          currentState.copy(upcomingEventList = EventList(emptyList(), emptyList(), null))
+        }
       }
     }
   }
@@ -227,7 +219,7 @@ constructor(
         when (resource) {
           is Resource.Success -> {
             _uiState.update { currentState ->
-                  currentState.copy(
+              currentState.copy(
                   eventList =
                       EventList(
                           resource.data, resource.data, _uiState.value.eventList.selectedEvent))
@@ -299,24 +291,23 @@ constructor(
 
   fun onTabChanged(tab: Tab, state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
     // Reset search and filter when tab is changed
-      state.update { currentState ->
-          currentState.copy(
-              searchQuery = "",
-              isSearchActive = false,
-              isFilterDialogOpen = false,
-              isFilterActive = false,
-              radiusQuery = "",
-              isFreeSwitchOn = false,
-              categoriesCheckedList = mutableSetOf(),
-              tab = tab
-          )
-      }
+    state.update { currentState ->
+      currentState.copy(
+          searchQuery = "",
+          isSearchActive = false,
+          isFilterDialogOpen = false,
+          isFilterActive = false,
+          radiusQuery = "",
+          isFreeSwitchOn = false,
+          categoriesCheckedList = mutableSetOf(),
+          tab = tab)
+    }
   }
 
   fun onViewListStatusChanged(state: MutableStateFlow<EventsOverviewUiState> = _uiState) {
-      state.update { currentState ->
-          currentState.copy(isFilterDialogOpen = false,viewList = !state.value.viewList)
-      }
+    state.update { currentState ->
+      currentState.copy(isFilterDialogOpen = false, viewList = !state.value.viewList)
+    }
   }
 }
 
