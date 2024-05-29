@@ -204,14 +204,14 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
             transaction.update(ref, "ticket_purchases", purchases - 1)
           } else {
             throw FirebaseFirestoreException(
-              "Ticket purchases is already 0",
-              FirebaseFirestoreException.Code.ABORTED,
+                "Ticket purchases is already 0",
+                FirebaseFirestoreException.Code.ABORTED,
             )
           }
         } else {
           throw FirebaseFirestoreException(
-            "Invalid data",
-            FirebaseFirestoreException.Code.ABORTED,
+              "Invalid data",
+              FirebaseFirestoreException.Code.ABORTED,
           )
         }
       }
@@ -220,6 +220,4 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
       return Resource.Failure(e)
     }
   }
-
-
 }

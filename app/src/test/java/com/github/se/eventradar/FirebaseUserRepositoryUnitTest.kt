@@ -21,7 +21,6 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.google.firebase.storage.storage
-import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
@@ -630,37 +629,62 @@ class FirebaseUserRepositoryUnitTest {
   fun `test addAttendingEvent()`() = runTest {
     val attendingEventId = "1"
 
-
     val mockTask: Task<Void> = mockk()
     mockkStatic(FieldValue::class)
     every { FieldValue.arrayUnion(attendingEventId) } returns mockk()
 
+    every { userRef.document(uid).get() } returns mockTask(mockDocumentSnapshot)
+    every { mockDocumentSnapshot.data } returns
+        mapOf(
+            "accountStatus" to "active",
+            "eventsAttendeeList" to mutableListOf<String>(),
+            "eventsHostList" to mutableListOf<String>(),
+            "friendsList" to mutableListOf<String>(),
+            "profilePicUrl" to "",
+            "qrCodeUrl" to "",
+            "bio" to "",
+            "username" to "",
+        )
+    every { mockDocumentSnapshot.id } returns uid
+    every {
+      userRef.document(uid).update("eventsAttendeeList", FieldValue.arrayUnion(attendingEventId))
+    } returns mockTask
+    every { mockTask.isSuccessful } returns true
+    every { mockTask.isComplete } returns true
+
+    val result = firebaseUserRepository.addAttendingEvent(uid, attendingEventId)
+
+    assert(result is Resource.Success)
+  }
+
+  @Test
+  fun `test removeAttendingEvent()`() = runTest {
+    val attendingEventId = "1"
+
+    val mockTask: Task<Void> = mockk()
+    mockkStatic(FieldValue::class)
+    every { FieldValue.arrayRemove(attendingEventId) } returns mockk()
 
     every { userRef.document(uid).get() } returns mockTask(mockDocumentSnapshot)
     every { mockDocumentSnapshot.data } returns
         mapOf(
-          "accountStatus" to "active",
-          "eventsAttendeeList" to mutableListOf<String>(),
-          "eventsHostList" to mutableListOf<String>(),
-          "friendsList" to mutableListOf<String>(),
-          "profilePicUrl" to "",
-          "qrCodeUrl" to "",
-          "bio" to "",
-          "username" to "",
+            "accountStatus" to "active",
+            "eventsAttendeeList" to mutableListOf("event1", "event2", attendingEventId),
+            "eventsHostList" to mutableListOf<String>(),
+            "friendsList" to mutableListOf<String>(),
+            "profilePicUrl" to "",
+            "qrCodeUrl" to "",
+            "bio" to "",
+            "username" to "",
         )
     every { mockDocumentSnapshot.id } returns uid
-    every { userRef.document(uid).update("eventsAttendeeList", FieldValue.arrayUnion(attendingEventId)) } returns
-        mockTask
+    every {
+      userRef.document(uid).update("eventsAttendeeList", FieldValue.arrayRemove(attendingEventId))
+    } returns mockTask
     every { mockTask.isSuccessful } returns true
     every { mockTask.isComplete } returns true
 
-    every { mockDocumentSnapshotPrivate["birthDate"] } returns ""
-    every { mockDocumentSnapshotPrivate["email"] } returns ""
-    every { mockDocumentSnapshotPrivate["firstName"] } returns ""
-    every { mockDocumentSnapshotPrivate["lastName"] } returns ""
-    every { mockDocumentSnapshotPrivate["phoneNumber"] } returns ""
-
-    val result = firebaseUserRepository.addAttendingEvent(uid, attendingEventId)
+    val result = firebaseUserRepository.removeAttendingEvent(uid, attendingEventId)
 
     assert(result is Resource.Success)
   }

@@ -3,9 +3,11 @@ package com.github.se.eventradar
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.repository.event.FirebaseEventRepository
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ListenerRegistration
@@ -16,6 +18,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.unmockkAll
 import java.time.LocalDateTime
@@ -217,5 +220,85 @@ class FirebaseEventRepositoryUnitTest {
             (results.first() as Resource.Failure).throwable.message)
 
     job.cancel()
+  }
+
+  @Test
+  fun `test addAttendee()`() = runTest {
+    val attendingUserId = "1"
+    val eventId = "1"
+
+    val mockTask: Task<Void> = mockk()
+    mockkStatic(FieldValue::class)
+    every { FieldValue.arrayUnion(attendingUserId) } returns mockk()
+
+    every { eventRef.document(eventId).get() } returns mockTask(mockDocumentSnapshot)
+    every { mockDocumentSnapshot.data } returns
+        mapOf(
+            "name" to "Sample Event",
+            "photo_url" to "http://example.com/photo.jpg",
+            "start" to "2021-01-01T00:00",
+            "end" to "2021-01-02T00:00",
+            "location_lat" to 10.0,
+            "location_lng" to 20.0,
+            "location_name" to "Event Venue",
+            "description" to "Description of the event",
+            "ticket_name" to "General Admission",
+            "ticket_price" to 100.0,
+            "ticket_capacity" to 100L,
+            "ticket_purchases" to 10L,
+            "main_organiser" to "Organiser Name",
+            "organisers_list" to listOf("Org1", "Org2"),
+            "attendees_list" to mutableListOf("User1", "User2"),
+            "category" to "MUSIC")
+    every { mockDocumentSnapshot.id } returns eventId
+    every {
+      eventRef.document(eventId).update("attendees_list", FieldValue.arrayUnion(attendingUserId))
+    } returns mockTask
+    every { mockTask.isSuccessful } returns true
+    every { mockTask.isComplete } returns true
+
+    val result = firebaseEventRepository.addAttendee(eventId, attendingUserId)
+
+    assert(result is Resource.Success)
+  }
+
+  @Test
+  fun `test removeAttendee()`() = runTest {
+    val attendingUserId = "1"
+    val eventId = "1"
+
+    val mockTask: Task<Void> = mockk()
+    mockkStatic(FieldValue::class)
+    every { FieldValue.arrayRemove(attendingUserId) } returns mockk()
+
+    every { eventRef.document(eventId).get() } returns mockTask(mockDocumentSnapshot)
+    every { mockDocumentSnapshot.data } returns
+        mapOf(
+            "name" to "Sample Event",
+            "photo_url" to "http://example.com/photo.jpg",
+            "start" to "2021-01-01T00:00",
+            "end" to "2021-01-02T00:00",
+            "location_lat" to 10.0,
+            "location_lng" to 20.0,
+            "location_name" to "Event Venue",
+            "description" to "Description of the event",
+            "ticket_name" to "General Admission",
+            "ticket_price" to 100.0,
+            "ticket_capacity" to 100L,
+            "ticket_purchases" to 10L,
+            "main_organiser" to "Organiser Name",
+            "organisers_list" to listOf("Org1", "Org2"),
+            "attendees_list" to mutableListOf("User1", "User2", attendingUserId),
+            "category" to "MUSIC")
+    every { mockDocumentSnapshot.id } returns eventId
+    every {
+      eventRef.document(eventId).update("attendees_list", FieldValue.arrayRemove(attendingUserId))
+    } returns mockTask
+    every { mockTask.isSuccessful } returns true
+    every { mockTask.isComplete } returns true
+
+    val result = firebaseEventRepository.removeAttendee(eventId, attendingUserId)
+
+    assert(result is Resource.Success)
   }
 }
