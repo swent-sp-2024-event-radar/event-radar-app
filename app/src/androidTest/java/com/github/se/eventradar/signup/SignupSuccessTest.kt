@@ -104,7 +104,7 @@ class SignupSuccessTest : TestCase() {
       birthDateTextField {
         performScrollTo()
         assertIsDisplayed()
-        performTextInput("01/01/2000")
+        performTextInput("01.01.2000")
       }
       sampleSignUpUiState.value = sampleSignUpUiState.value.copy(birthDate = "01/01/2000")
       signUpButton {

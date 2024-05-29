@@ -36,10 +36,32 @@ class FirebaseEventRepository(db: FirebaseFirestore = Firebase.firestore) : IEve
     }
   }
 
-  override suspend fun addEvent(event: Event): Resource<Unit> {
-
+  /**
+   * Retrieves a new unique identifier for an event from the Firestore database. This generates a
+   * newEventId from firestore without creating an actual document, which can be fed into a new
+   * event object that is added to the firebase event collection database. This ID is generated
+   * without creating an actual document in the database, ensuring that the ID can be used for a
+   * future event creation without risking ID collision or premature document instantiation.
+   *
+   * @return A [Resource<String>] object which encapsulates the operation result. If successful, it
+   *   returns [Resource.Success] containing the newly generated event ID as a string. If there is a
+   *   failure during the ID generation process, it returns [Resource.Failure] containing the
+   *   exception that was thrown.
+   */
+  override suspend fun getUniqueEventId(): Resource<String> {
     return try {
-      eventRef.add(event).await()
+      val nextEventId = eventRef.document().id
+      Resource.Success(nextEventId)
+    } catch (e: Exception) {
+      Resource.Failure(e)
+    }
+  }
+
+  override suspend fun addEvent(event: Event): Resource<Unit> {
+    val eventMap = event.toMap()
+    val eventId = event.fireBaseID
+    return try {
+      eventRef.document(eventId).set(eventMap).await()
       Resource.Success(Unit)
     } catch (e: Exception) {
       Resource.Failure(e)

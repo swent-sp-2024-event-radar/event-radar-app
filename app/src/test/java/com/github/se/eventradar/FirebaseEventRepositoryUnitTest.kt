@@ -58,8 +58,8 @@ class FirebaseEventRepositoryUnitTest {
         mapOf(
             "name" to "Sample Event",
             "photo_url" to "http://example.com/photo.jpg",
-            "start" to "2021-01-01T00:00:00",
-            "end" to "2021-01-02T00:00:00",
+            "start" to "2021-01-01T00:00",
+            "end" to "2021-01-02T00:00",
             "location_lat" to 10.0,
             "location_lng" to 20.0,
             "location_name" to "Event Venue",
@@ -97,7 +97,7 @@ class FirebaseEventRepositoryUnitTest {
     with(events.first()) {
       assert("Sample Event" == eventName)
       assert("http://example.com/photo.jpg" == eventPhoto)
-      assert(LocalDateTime.parse("2021-01-01T00:00:00") == start)
+      assert(LocalDateTime.parse("2021-01-01T00:00") == start)
       assert("Event Venue" == location.address)
     }
 
@@ -139,8 +139,8 @@ class FirebaseEventRepositoryUnitTest {
         mapOf(
             "name" to "User Specific Event",
             "photo_url" to "http://example.com/photo.jpg",
-            "start" to "2021-01-01T00:00:00",
-            "end" to "2021-01-02T00:00:00",
+            "start" to "2021-01-01T00:00",
+            "end" to "2021-01-02T00:00",
             "location_lat" to 10.0,
             "location_lng" to 20.0,
             "location_name" to "Event Venue",

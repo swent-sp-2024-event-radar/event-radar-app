@@ -57,10 +57,10 @@ class AuthenticationViewModelTest {
     }
   }
 
-  val mockUser =
+  private val mockUser =
       User(
           userId = "1",
-          birthDate = "01/01/2000",
+          birthDate = "01.01.2000",
           email = "test@test.com",
           firstName = "John",
           lastName = "Doe",
@@ -99,26 +99,26 @@ class AuthenticationViewModelTest {
 
   @Test
   fun testOnFirstNameChange() = runTest {
-    viewModel.onFirstNameChanged("John", mockUiState)
-    assert(mockUiState.value.firstName == "John")
+    viewModel.onFirstNameChanged(mockUser.firstName, mockUiState)
+    assert(mockUiState.value.firstName == mockUser.firstName)
   }
 
   @Test
   fun testOnLastNameChange() = runTest {
-    viewModel.onLastNameChanged("Doe", mockUiState)
-    assert(mockUiState.value.lastName == "Doe")
+    viewModel.onLastNameChanged(mockUser.lastName, mockUiState)
+    assert(mockUiState.value.lastName == mockUser.lastName)
   }
 
   @Test
   fun testOnUsernameChange() = runTest {
-    viewModel.onUsernameChanged("john_doe", mockUiState)
-    assert(mockUiState.value.username == "john_doe")
+    viewModel.onUsernameChanged(mockUser.username, mockUiState)
+    assert(mockUiState.value.username == mockUser.username)
   }
 
   @Test
   fun testOnBirthDateChange() = runTest {
-    viewModel.onBirthDateChanged("01/01/2000", mockUiState)
-    assert(mockUiState.value.birthDate == "01/01/2000")
+    viewModel.onBirthDateChanged(mockUser.birthDate, mockUiState)
+    assert(mockUiState.value.birthDate == mockUser.birthDate)
   }
 
   @Test
@@ -129,8 +129,8 @@ class AuthenticationViewModelTest {
 
   @Test
   fun testOnPhoneNumberChange() = runTest {
-    viewModel.onPhoneNumberChanged("1234567890", mockUiState)
-    assert(mockUiState.value.phoneNumber == "1234567890")
+    viewModel.onPhoneNumberChanged(mockUser.phoneNumber, mockUiState)
+    assert(mockUiState.value.phoneNumber == mockUser.phoneNumber)
   }
 
   @Test
@@ -141,15 +141,38 @@ class AuthenticationViewModelTest {
 
   @Test
   fun testValidateFieldsForCorrectFields() = runTest {
-    viewModel.onFirstNameChanged("John", mockUiState)
-    viewModel.onLastNameChanged("Doe", mockUiState)
-    viewModel.onUsernameChanged("john_doe", mockUiState)
-    viewModel.onBirthDateChanged("01/01/2000", mockUiState)
+    val swissPhoneNumber = "123456789"
+
+    viewModel.onFirstNameChanged(mockUser.firstName, mockUiState)
+    viewModel.onLastNameChanged(mockUser.lastName, mockUiState)
+    viewModel.onUsernameChanged(mockUser.username, mockUiState)
+    viewModel.onBirthDateChanged(mockUser.birthDate, mockUiState)
     viewModel.onCountryCodeChanged(CountryCode.CH, mockUiState)
-    viewModel.onPhoneNumberChanged("123456789", mockUiState)
+    viewModel.onPhoneNumberChanged(swissPhoneNumber, mockUiState)
     viewModel.onSelectedImageUriChanged(Uri.EMPTY, mockUiState)
 
     assert(viewModel.validateFields(mockUiState))
+  }
+
+  @Test
+  fun testValidateFieldTooOldBirthdate() = runTest {
+
+    // set valid initial state
+    val swissPhoneNumber = "123456789"
+    viewModel.onFirstNameChanged(mockUser.firstName, mockUiState)
+    viewModel.onLastNameChanged(mockUser.lastName, mockUiState)
+    viewModel.onUsernameChanged(mockUser.username, mockUiState)
+    viewModel.onBirthDateChanged(mockUser.birthDate, mockUiState)
+    viewModel.onCountryCodeChanged(CountryCode.CH, mockUiState)
+    viewModel.onPhoneNumberChanged(swissPhoneNumber, mockUiState)
+    viewModel.onSelectedImageUriChanged(Uri.EMPTY, mockUiState)
+    // assert state is valid
+    assert(viewModel.validateFields(mockUiState))
+
+    // change the birthdate with invalid
+    viewModel.onBirthDateChanged("02.09.1000", mockUiState)
+
+    assert(!viewModel.validateFields(mockUiState))
   }
 
   @Test
@@ -157,10 +180,10 @@ class AuthenticationViewModelTest {
 
   @Test
   fun testValidateForPartiallyFilledFields() = runTest {
-    viewModel.onFirstNameChanged("John", mockUiState)
-    viewModel.onLastNameChanged("Doe", mockUiState)
-    viewModel.onUsernameChanged("john_doe", mockUiState)
-    viewModel.onBirthDateChanged("01/01/2000", mockUiState)
+    viewModel.onFirstNameChanged(mockUser.firstName, mockUiState)
+    viewModel.onLastNameChanged(mockUser.lastName, mockUiState)
+    viewModel.onUsernameChanged(mockUser.username, mockUiState)
+    viewModel.onBirthDateChanged(mockUser.birthDate, mockUiState)
     viewModel.onCountryCodeChanged(CountryCode.AU, mockUiState)
 
     assert(!viewModel.validateFields(mockUiState))
@@ -168,12 +191,12 @@ class AuthenticationViewModelTest {
 
   @Test
   fun testAddUser() = runTest {
-    viewModel.onFirstNameChanged("John", mockUiState)
-    viewModel.onLastNameChanged("Doe", mockUiState)
-    viewModel.onUsernameChanged("john_doe", mockUiState)
-    viewModel.onBirthDateChanged("01/01/2000", mockUiState)
+    viewModel.onFirstNameChanged(mockUser.firstName, mockUiState)
+    viewModel.onLastNameChanged(mockUser.lastName, mockUiState)
+    viewModel.onUsernameChanged(mockUser.username, mockUiState)
+    viewModel.onBirthDateChanged(mockUser.birthDate, mockUiState)
     viewModel.onCountryCodeChanged(CountryCode.AU, mockUiState)
-    viewModel.onPhoneNumberChanged("1234567890", mockUiState)
+    viewModel.onPhoneNumberChanged(mockUser.phoneNumber, mockUiState)
     viewModel.onSelectedImageUriChanged(uri, mockUiState)
     // Mocks Sign In From Google, which sets the userId
     (userRepository as MockUserRepository).updateCurrentUserId(mockUser.userId)
