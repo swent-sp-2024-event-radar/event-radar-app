@@ -20,8 +20,7 @@ class MockEventRepository : IEventRepository {
     return Resource.Success(validEvents)
   }
 
-  override suspend fun getEvent(id: String): Resource<Event?> { //TODO change this too?
-//    val validEvents = mockEvents.filter { it.end.isAfter(LocalDateTime.now()) }
+    //    val validEvents = mockEvents.filter { it.end.isAfter(LocalDateTime.now()) }
     val event = mockEvents.find { it.fireBaseID == id }
 
     return if (event != null) {
@@ -62,7 +61,7 @@ class MockEventRepository : IEventRepository {
   override suspend fun getEventsByIds(ids: List<String>): Resource<List<Event>> {
     val events = mutableListOf<Event>()
     for (id in ids) {
-      val validEvents = mockEvents.filter { it.end.isAfter(LocalDateTime.now()) } //added
+      val validEvents = mockEvents.filter { it.end.isAfter(LocalDateTime.now()) } // added
       val event = validEvents.find { it.fireBaseID == id }
       if (event != null) {
         events.add(event)

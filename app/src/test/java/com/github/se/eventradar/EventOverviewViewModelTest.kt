@@ -153,9 +153,9 @@ class EventsOverviewViewModelTest {
     assert(viewModel.uiState.value.eventList.allEvents.isNotEmpty())
     assert(viewModel.uiState.value.eventList.allEvents.size == 2)
     assert(viewModel.uiState.value.eventList.allEvents != events)
-            assert(viewModel.uiState.value.eventList.filteredEvents.size == 2)
-            assert(viewModel.uiState.value.eventList.filteredEvents != events)
-            assertNull(viewModel.uiState.value.eventList.selectedEvent)
+    assert(viewModel.uiState.value.eventList.filteredEvents.size == 2)
+    assert(viewModel.uiState.value.eventList.filteredEvents != events)
+    assertNull(viewModel.uiState.value.eventList.selectedEvent)
   }
 
   @Test
