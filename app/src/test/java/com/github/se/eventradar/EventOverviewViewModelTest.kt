@@ -261,10 +261,10 @@ class EventsOverviewViewModelTest {
   @Test
   fun testSetFilterDialogOpen() = runTest {
     // init value is false
-    viewModel.onFilterDialogOpen()
+    viewModel.onFilterDialogOpenChanged()
     assert(viewModel.uiState.value.isFilterDialogOpen)
 
-    viewModel.onFilterDialogOpen()
+    viewModel.onFilterDialogOpenChanged()
     assert(!viewModel.uiState.value.isFilterDialogOpen)
   }
 
@@ -369,6 +369,7 @@ class EventsOverviewViewModelTest {
     events.forEach { event -> eventRepository.addEvent(event) }
 
     viewModel.getEvents()
+    viewModel.onUserLocationChanged(Location(38.9, 78.8, "User Location"))
 
     val newQuery = "20"
     viewModel.onRadiusQueryChanged(newQuery)
@@ -541,6 +542,21 @@ class EventsOverviewViewModelTest {
     verify {
       Log.d("EventsOverviewViewModel", "Failed to fetch upcoming events: ${exception.message}")
     }
+    unmockkAll()
+  }
+
+  @Test
+  fun testRadiusQueryLessThanZero() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    val newQuery = "-10.0"
+    viewModel.onRadiusQueryChanged(newQuery)
+    assert(newQuery == viewModel.uiState.value.radiusQuery)
+    viewModel.filterEvents()
+
+    verify { Log.d("EventsOverviewViewModel", "Invalid radius query: $newQuery") }
+    assert(viewModel.uiState.value.radiusQuery == "")
     unmockkAll()
   }
 }
