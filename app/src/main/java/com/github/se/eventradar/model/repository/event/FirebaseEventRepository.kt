@@ -170,15 +170,34 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
   }
 
   override suspend fun decrementPurchases(eventId: String): Resource<Unit> {
-    return addSubPurchases(eventId, -1)
-  }
+    try {
+      db.runTransaction { transaction ->
+        val ref = eventRef.document(eventId)
+        val resultDocument = transaction.get(ref)
+        val purchases = resultDocument.getLong("ticket_purchases")
+        val capacity = resultDocument.getLong("ticket_capacity")
 
-  private fun addSubPurchases(eventId: String, value: Long): Resource<Unit> {
-    return try {
-      eventRef.document(eventId).update("ticket_purchases", FieldValue.increment(value))
-      Resource.Success(Unit)
+        if (purchases != null && capacity != null) {
+          if (purchases > 0) {
+            transaction.update(ref, "ticket_purchases", purchases - 1)
+          } else {
+            throw FirebaseFirestoreException(
+              "Ticket purchases is already 0",
+              FirebaseFirestoreException.Code.ABORTED,
+            )
+          }
+        } else {
+          throw FirebaseFirestoreException(
+            "Invalid data",
+            FirebaseFirestoreException.Code.ABORTED,
+          )
+        }
+      }
+      return Resource.Success(Unit)
     } catch (e: Exception) {
-      Resource.Failure(e)
+      return Resource.Failure(e)
     }
   }
+
+
 }
