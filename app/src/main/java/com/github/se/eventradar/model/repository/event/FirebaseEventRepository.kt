@@ -141,7 +141,6 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
                     Exception("Error listening to upcoming event updates: ${error.message}")))
             return@addSnapshotListener
           }
-
           val upcomingEvents =
               snapshot
                   ?.documents
