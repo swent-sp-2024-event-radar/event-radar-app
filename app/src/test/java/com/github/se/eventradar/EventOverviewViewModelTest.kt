@@ -182,28 +182,6 @@ class EventsOverviewViewModelTest {
   }
 
   @Test
-  fun testUpcomingFilterExpired() = runTest {
-    val event1 = mockEvent.copy(fireBaseID = "1")
-    val event2 = expiredEvent
-    val event3 = mockEvent.copy(fireBaseID = "3")
-
-    eventRepository.addEvent(event1)
-    eventRepository.addEvent(event2)
-    eventRepository.addEvent(event3)
-    userRepository.addUser(mockUser)
-    // MockUser is on the attendeeList for events with id "1" and "2"  but 2 is expired so only 1
-    // should come up
-    (userRepository as MockUserRepository).updateCurrentUserId("user1")
-    viewModel.getUpcomingEvents()
-
-    assert(viewModel.uiState.value.upcomingEventList.allEvents.size == 1)
-    assert(viewModel.uiState.value.upcomingEventList.allEvents == listOf(event1))
-    assert(viewModel.uiState.value.upcomingEventList.filteredEvents.size == 1)
-    assert(viewModel.uiState.value.upcomingEventList.filteredEvents == listOf(event1))
-    assertNull(viewModel.uiState.value.upcomingEventList.selectedEvent)
-  }
-
-  @Test
   fun testGetUpcomingEventsFilteredSuccess() = runTest {
     viewModel.onTabChanged(Tab.UPCOMING)
     val events =

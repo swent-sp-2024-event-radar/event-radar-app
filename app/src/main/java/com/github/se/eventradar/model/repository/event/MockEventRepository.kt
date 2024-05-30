@@ -59,16 +59,14 @@ class MockEventRepository : IEventRepository {
   }
 
   override suspend fun getEventsByIds(ids: List<String>): Resource<List<Event>> {
-    val validEvents = mockEvents.filter { it.end.isAfter(LocalDateTime.now()) }
     val events = mutableListOf<Event>()
     for (id in ids) {
-      val event = validEvents.find { it.fireBaseID == id }
+      val event = mockEvents.find { it.fireBaseID == id }
       if (event != null) {
         events.add(event)
+      } else {
+        return Resource.Failure(Exception("Event with id $id is missing"))
       }
-    }
-    if (events.isEmpty()) {
-      return Resource.Failure(Exception("not a single event is valid"))
     }
     return Resource.Success(events)
   }
@@ -89,10 +87,7 @@ class MockEventRepository : IEventRepository {
     return eventsFlow.asStateFlow().map { resource ->
       when (resource) {
         is Resource.Success -> {
-          val upcomingEvents =
-              resource.data
-                  .filter { it.attendeeList.contains(userId) }
-                  .filter { it.end.isAfter(LocalDateTime.now()) }
+          val upcomingEvents = resource.data.filter { it.attendeeList.contains(userId) }
           Resource.Success(upcomingEvents)
         }
         is Resource.Failure -> resource

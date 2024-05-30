@@ -261,15 +261,13 @@ class FirebaseEventRepositoryUnitTest {
 
   @Test
   fun `observeUpcomingEvents emits Resource_Success with relevant events`() = runTest {
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
-    val currentDateTimeString = LocalDateTime.now().format(formatter)
     val userId = "user1"
     val mockEventMap =
         mapOf(
             "name" to "User Specific Event",
             "photo_url" to "http://example.com/photo.jpg",
-            "start" to "2025-01-01T00:00",
-            "end" to "2025-01-02T00:00",
+            "start" to "2021-01-01T00:00",
+            "end" to "2021-01-02T00:00",
             "location_lat" to 10.0,
             "location_lng" to 20.0,
             "location_name" to "Event Venue",
@@ -288,11 +286,7 @@ class FirebaseEventRepositoryUnitTest {
     every { mockQuerySnapshot.documents } returns listOf(mockDocumentSnapshot)
 
     val queryMock = mockk<Query>()
-    every {
-      eventRef
-          .whereGreaterThan("end", currentDateTimeString)
-          .whereArrayContains("attendees_list", userId)
-    } returns queryMock
+    every { eventRef.whereArrayContains("attendees_list", userId) } returns queryMock
 
     val slot = slot<EventListener<QuerySnapshot>>()
     val mockListenerRegistration = mockk<ListenerRegistration>()
@@ -319,19 +313,13 @@ class FirebaseEventRepositoryUnitTest {
 
   @Test
   fun `observeUpcomingEvents emits Resource_Failure on query error`() = runTest {
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
-    val currentDateTimeString = LocalDateTime.now().format(formatter)
     val userId = "user1"
     val errorMessage = "Query error"
     val mockFirestoreException = mockk<FirebaseFirestoreException>()
     every { mockFirestoreException.message } returns errorMessage
 
     val queryMock = mockk<Query>()
-    every {
-      eventRef
-          .whereGreaterThan("end", currentDateTimeString)
-          .whereArrayContains("attendees_list", userId)
-    } returns queryMock
+    every { eventRef.whereArrayContains("attendees_list", userId) } returns queryMock
 
     val slot = slot<EventListener<QuerySnapshot>>()
     val mockListenerRegistration = mockk<ListenerRegistration>()

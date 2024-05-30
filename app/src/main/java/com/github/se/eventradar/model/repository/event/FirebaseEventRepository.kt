@@ -96,17 +96,15 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
   }
 
   override suspend fun getEventsByIds(ids: List<String>): Resource<List<Event>> {
-    val events = mutableListOf<Event>()
-    val validEvents = eventRef.whereGreaterThan("end", currentDateTimeString).get().await()
     return try {
+      val events = mutableListOf<Event>()
       for (id in ids) {
-        val document = validEvents.documents.find { it.id == id }
-        if (document != null) { // if (document.exists())
+        val document = eventRef.document(id).get().await()
+        if (document.exists()) {
           events.add(Event(document.data!!, document.id))
+        } else {
+          return Resource.Failure(Exception("Event with id $id is missing"))
         }
-      }
-      if (events.isEmpty()) {
-        return Resource.Failure(Exception("not a single event is valid"))
       }
       Resource.Success(events)
     } catch (e: Exception) {
@@ -130,10 +128,7 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
   }
 
   override fun observeUpcomingEvents(userId: String): Flow<Resource<List<Event>>> = callbackFlow {
-    val query =
-        eventRef
-            .whereGreaterThan("end", currentDateTimeString)
-            .whereArrayContains("attendees_list", userId)
+    val query = eventRef.whereArrayContains("attendees_list", userId)
 
     val listener =
         query.addSnapshotListener { snapshot, error ->
@@ -143,42 +138,16 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
                     Exception("Error listening to upcoming event updates: ${error.message}")))
             return@addSnapshotListener
           }
+
           val upcomingEvents =
-              snapshot
-                  ?.documents
-                  //            ?.filter { (it.getString("end") ?: "") > currentDateTimeString }
-                  ?.mapNotNull { it.data?.let { data -> Event(data, it.id) } } ?: listOf()
+              snapshot?.documents?.mapNotNull { it.data?.let { data -> Event(data, it.id) } }
+                  ?: listOf()
 
           trySend(Resource.Success(upcomingEvents))
         }
 
     awaitClose { listener.remove() }
   }
-
-  //  override fun observeUpcomingEvents(userId: String): Flow<Resource<List<Event>>> = callbackFlow
-  // {
-  //    val query = eventRef.whereArrayContains("attendees_list", userId)
-  //    //           .whereGreaterThan("end", currentDateTimeString)
-  //
-  //    val listener =
-  //        query.addSnapshotListener { snapshot, error ->
-  //          if (error != null) {
-  //            trySend(
-  //                Resource.Failure(
-  //                    Exception("Error listening to upcoming event updates: ${error.message}")))
-  //            return@addSnapshotListener
-  //          }
-  //          val upcomingEvents =
-  //              snapshot
-  //                  ?.documents
-  //                  ?.filter { (it.getString("end") ?: "") > currentDateTimeString }
-  //                  ?.mapNotNull { it.data?.let { data -> Event(data, it.id) } } ?: listOf()
-  //
-  //          trySend(Resource.Success(upcomingEvents))
-  //        }
-  //
-  //    awaitClose { listener.remove() }
-  //  }
 
   override suspend fun addAttendee(eventId: String, attendeeUserId: String): Resource<Unit> {
     return try {
