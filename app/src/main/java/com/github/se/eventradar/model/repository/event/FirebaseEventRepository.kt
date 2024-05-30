@@ -18,7 +18,8 @@ import kotlinx.coroutines.tasks.await
 class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : IEventRepository {
   private val eventRef: CollectionReference = db.collection("events")
   private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
-  private val currentDateTimeString: String get() = LocalDateTime.now().format(formatter)
+  private val currentDateTimeString: String
+    get() = LocalDateTime.now().format(formatter)
 
   override suspend fun getEvents(): Resource<List<Event>> {
     val resultDocument = eventRef.whereGreaterThan("end", currentDateTimeString).get().await()
@@ -116,39 +117,39 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
   override fun observeAllEvents(): Flow<Resource<List<Event>>> = callbackFlow {
     val query = eventRef.whereGreaterThan("end", currentDateTimeString)
     val listener =
-      query.addSnapshotListener { snapshot, error ->
-        if (error != null) {
-          trySend(
-            Resource.Failure(Exception("Error listening to event updates: ${error.message}")))
-          return@addSnapshotListener
+        query.addSnapshotListener { snapshot, error ->
+          if (error != null) {
+            trySend(
+                Resource.Failure(Exception("Error listening to event updates: ${error.message}")))
+            return@addSnapshotListener
+          }
+          val events = snapshot?.documents?.mapNotNull { Event(it.data!!, it.id) }
+          trySend(Resource.Success(events ?: listOf()))
         }
-        val events = snapshot?.documents?.mapNotNull { Event(it.data!!, it.id) }
-        trySend(Resource.Success(events ?: listOf()))
-      }
     awaitClose { listener.remove() }
   }
 
   override fun observeUpcomingEvents(userId: String): Flow<Resource<List<Event>>> = callbackFlow {
     val query =
-      eventRef
-        .whereGreaterThan("end", currentDateTimeString)
-        .whereArrayContains("attendees_list", userId)
+        eventRef
+            .whereGreaterThan("end", currentDateTimeString)
+            .whereArrayContains("attendees_list", userId)
 
     val listener =
-      query.addSnapshotListener { snapshot, error ->
-        if (error != null) {
-          trySend(
-            Resource.Failure(
-              Exception("Error listening to upcoming event updates: ${error.message}")))
-          return@addSnapshotListener
+        query.addSnapshotListener { snapshot, error ->
+          if (error != null) {
+            trySend(
+                Resource.Failure(
+                    Exception("Error listening to upcoming event updates: ${error.message}")))
+            return@addSnapshotListener
+          }
+
+          val upcomingEvents =
+              snapshot?.documents?.mapNotNull { it.data?.let { data -> Event(data, it.id) } }
+                  ?: listOf()
+
+          trySend(Resource.Success(upcomingEvents))
         }
-
-        val upcomingEvents =
-          snapshot?.documents?.mapNotNull { it.data?.let { data -> Event(data, it.id) } }
-            ?: listOf()
-
-        trySend(Resource.Success(upcomingEvents))
-      }
 
     awaitClose { listener.remove() }
   }
@@ -184,14 +185,14 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
             transaction.update(ref, "ticket_purchases", purchases + 1)
           } else {
             throw FirebaseFirestoreException(
-              "No more available tickets",
-              FirebaseFirestoreException.Code.ABORTED,
+                "No more available tickets",
+                FirebaseFirestoreException.Code.ABORTED,
             )
           }
         } else {
           throw FirebaseFirestoreException(
-            "Invalid data",
-            FirebaseFirestoreException.Code.ABORTED,
+              "Invalid data",
+              FirebaseFirestoreException.Code.ABORTED,
           )
         }
       }
@@ -214,14 +215,14 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
             transaction.update(ref, "ticket_purchases", purchases - 1)
           } else {
             throw FirebaseFirestoreException(
-              "Ticket purchases is already 0",
-              FirebaseFirestoreException.Code.ABORTED,
+                "Ticket purchases is already 0",
+                FirebaseFirestoreException.Code.ABORTED,
             )
           }
         } else {
           throw FirebaseFirestoreException(
-            "Invalid data",
-            FirebaseFirestoreException.Code.ABORTED,
+              "Invalid data",
+              FirebaseFirestoreException.Code.ABORTED,
           )
         }
       }
