@@ -122,9 +122,7 @@ fun QrCodeTicketUi(
           }
           Tab(
               selected = qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.ScanQr,
-              onClick = {
-                viewModel.changeTabState(ScanTicketQrViewModel.Tab.ScanQr)
-              }, // selectedTabIndex = 1
+              onClick = { viewModel.changeTabState(ScanTicketQrViewModel.Tab.ScanQr) },
               modifier = Modifier.testTag("Scan QR Code")) {
                 Text(
                     text = "Scan Ticket",
@@ -192,13 +190,10 @@ fun QrCodeTicketUi(
             }
 
             item {
-              //              Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement =
-              // Arrangement.Center) {
               TicketsSold(
                   modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally),
                   eventUiState = uiState.eventUiState,
                   style = componentStyle)
-              //              }
             }
 
             item { Spacer(modifier = Modifier.height(8.dp)) }

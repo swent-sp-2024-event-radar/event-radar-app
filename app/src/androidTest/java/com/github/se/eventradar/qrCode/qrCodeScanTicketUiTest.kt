@@ -97,90 +97,57 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
       bottomNavMenu.assertIsDisplayed()
       goBackButton.assertIsDisplayed()
+      myQrTab.assertIsDisplayed()
+      scanQrTab.assertIsDisplayed()
     }
   }
 
   @Test
-  fun screenDisplaysContentElementsCorrectly1() = run {
+  fun screenDisplaysContentElementsCorrectly() = run {
     every { mockViewModel.uiState } returns myEventUiState
     onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-      composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
-      lazyEventDetails.assertIsDisplayed()
-      eventTitle {
-        assertIsDisplayed()
-        assertTextContains("Test_Event")
+      step("Title + Image + Description") {
+        composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
+        lazyEventDetails.assertIsDisplayed()
+        eventTitle {
+          assertIsDisplayed()
+          assertTextContains(myEventUiState.value.eventUiState.eventName)
+        }
+        eventImage { assertIsDisplayed() }
+        descriptionTitle { assertIsDisplayed() }
+        descriptionContent {
+          assertIsDisplayed()
+          assertTextContains(myEventUiState.value.eventUiState.description)
+        }
       }
-      eventImage { assertIsDisplayed() }
-      descriptionTitle { assertIsDisplayed() }
-      descriptionContent {
-        assertIsDisplayed()
-        assertTextContains("Test Description")
+      step("Distance") {
+        distanceTitle { assertIsDisplayed() }
+        distanceContent { assertIsDisplayed() }
       }
-    }
-  }
-
-  @Test
-  fun screenDisplaysContentElementsCorrectly2() = run {
-    every { mockViewModel.uiState } returns myEventUiState
-    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-      composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
-      distanceTitle { assertIsDisplayed() }
-      distanceContent { assertIsDisplayed() }
-    }
-  }
-
-  @Test
-  fun screenDisplaysContentElementsCorrectly3() = run {
-    every { mockViewModel.uiState } returns myEventUiState
-    onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-      composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
-      categoryTitle { assertIsDisplayed() }
-      categoryContent {
-        assertIsDisplayed()
-        assertTextContains("Community")
-      }
-    }
-  }
-
-  @Test
-  fun screenDisplaysContentElementsCorrectly4() =
-      //  Test(timeout = 45.seconds) {
-      run {
-        //      val viewModel = setupViewModelMyEventTab()
-        every { mockViewModel.uiState } returns myEventUiState
-        onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-          composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
+      step("Category") {
+        categoryTitle { assertIsDisplayed() }
+        categoryContent {
+          assertIsDisplayed()
+          assertTextContains("Community")
+        }
+        step("Date") {
           dateTitle { assertIsDisplayed() }
           dateContent { assertIsDisplayed() }
         }
-      }
-
-  @Test
-  fun screenDisplaysContentElementsCorrectly5() =
-      //  Test(timeout = 45.seconds) {
-      run {
-        //      val viewModel = setupViewModelMyEventTab()
-        every { mockViewModel.uiState } returns myEventUiState
-        onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-          composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
+        step("Time") {
           timeTitle { assertIsDisplayed() }
           timeContent { assertIsDisplayed() }
         }
-      }
-
-  @Test
-  fun screenDisplaysContentElementsCorrectly6() =
-      //  Test(timeout = 45.seconds) {
-      run {
-        every { mockViewModel.uiState } returns myEventUiState
-        onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
-          composeTestRule.setContent { QrCodeTicketUi(mockViewModel, mockNavActions) }
+        step("Tickets Sold") {
           ticketSoldContent {
             assertIsDisplayed()
-            assertTextContains("59 tickets sold")
+            assertTextContains(
+                myEventUiState.value.eventUiState.ticket.purchases.toString() + " tickets sold")
           }
         }
       }
+    }
+  }
 
   @Test
   fun goBackButtonTriggersBackNavigation() = run {

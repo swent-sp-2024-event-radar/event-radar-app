@@ -6,6 +6,7 @@
     <string name="event_date_and_time">Date and time</string>
     <string name="event_date">Date</string>
     <string name="event_time">Time</string>
+    <string name="tickets_sold">tickets sold </string>
     <string name="event_dt_start">Start</string>
     <string name="event_dt_end">End</string>
     <string name="event_categories">Categories</string>
