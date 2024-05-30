@@ -28,19 +28,17 @@ constructor(
 
   init {
     viewModelScope.launch {
-      _uiState.update {
-        val userId = userRepository.getCurrentUserId()
+      val userId = userRepository.getCurrentUserId()
 
-        if (userId is Resource.Success) {
-          it.copy(userId = userId.data)
-        } else {
-          Log.d(
-              "MessagesViewModel",
-              "Error getting user ID: ${(userId as Resource.Failure).throwable.message}")
-          it.copy(userId = null)
-        }
+      if (userId is Resource.Success) {
+        _uiState.update { it.copy(userId = userId.data) }
+        getMessages()
+      } else {
+        Log.d(
+            "MessagesViewModel",
+            "Error getting user ID: ${(userId as Resource.Failure).throwable.message}")
+        _uiState.update { it.copy(userId = null) }
       }
-      getMessages()
     }
   }
 
