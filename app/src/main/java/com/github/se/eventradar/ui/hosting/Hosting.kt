@@ -35,6 +35,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.ui.BottomNavigationMenu
+import com.github.se.eventradar.ui.Keyboard
 import com.github.se.eventradar.ui.component.EventList
 import com.github.se.eventradar.ui.component.FilterPopUp
 import com.github.se.eventradar.ui.component.GetUserLocation
@@ -42,6 +43,7 @@ import com.github.se.eventradar.ui.component.Logo
 import com.github.se.eventradar.ui.component.SearchBarAndFilter
 import com.github.se.eventradar.ui.component.ViewToggleFab
 import com.github.se.eventradar.ui.component.getIconFromViewListBool
+import com.github.se.eventradar.ui.keyboardAsState
 import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
@@ -124,10 +126,16 @@ fun HostingScreen(
           }
     }
     val context = LocalContext.current // TO DO: only needed for toasts
+    val isKeyboardOpen by keyboardAsState() // Keyboard.Opened or Keyboard.Closed
+
     Row(
         modifier =
             Modifier.constrainAs(ref = buttons) {
-                  bottom.linkTo(bottomNav.top)
+                  if (isKeyboardOpen == Keyboard.Opened) {
+                    bottom.linkTo(parent.bottom)
+                  } else {
+                    bottom.linkTo(bottomNav.top)
+                  }
                   centerHorizontallyTo(parent)
                 }
                 .testTag("floatingActionButtons")
