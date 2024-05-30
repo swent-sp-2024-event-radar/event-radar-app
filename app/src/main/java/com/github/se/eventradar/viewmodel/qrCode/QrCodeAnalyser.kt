@@ -14,7 +14,6 @@ import java.nio.ByteBuffer
 import javax.inject.Inject
 
 class QrCodeAnalyser @Inject constructor() : ImageAnalysis.Analyzer {
-
   // list of supported Image Formats
   private val supportedImageFormats =
       listOf(ImageFormat.YUV_420_888, ImageFormat.YUV_422_888, ImageFormat.YUV_444_888)
@@ -27,10 +26,6 @@ class QrCodeAnalyser @Inject constructor() : ImageAnalysis.Analyzer {
   }
 
   override fun analyze(image: ImageProxy) {
-    //      if (!activeAnalysis) {
-    //          image.close()
-    //          return
-    //      }
     if (activeAnalysis) {
       // only want to scan if it is a QR Code
       if (image.format in supportedImageFormats) {
