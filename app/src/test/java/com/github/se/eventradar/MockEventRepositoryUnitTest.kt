@@ -175,6 +175,8 @@ class MockEventRepositoryUnitTest {
     val event2 = expiredEvent.copy(fireBaseID = "2")
     val event3 = mockEvent.copy(fireBaseID = "3")
 
+    val expected = listOf(event1, event3)
+
     eventRepository.addEvent(event1)
     eventRepository.addEvent(event2)
     eventRepository.addEvent(event3)
@@ -182,6 +184,23 @@ class MockEventRepositoryUnitTest {
     val events = eventRepository.getEvents()
     assert(events is Resource.Success)
     assert((events as Resource.Success).data.size == 2)
+    assert(events.data == expected)
+  }
+
+  @Test
+  fun testUpcomingFilterExpired() = runTest {
+    val event1 = mockEvent.copy(fireBaseID = "1")
+    val event2 = expiredEvent.copy(fireBaseID = "2")
+    val event3 = mockEvent.copy(fireBaseID = "3")
+
+    eventRepository.addEvent(event1)
+    eventRepository.addEvent(event2)
+    eventRepository.addEvent(event3)
+
+    val upcomingEvents = eventRepository.getEventsByIds(mutableListOf("1", "2"))
+    assert(upcomingEvents is Resource.Success)
+    assert((upcomingEvents as Resource.Success).data.size == 1)
+    assert(upcomingEvents.data == listOf(event1))
   }
 
   @Test
@@ -204,8 +223,8 @@ class MockEventRepositoryUnitTest {
 
   @Test
   fun testGetEventsByIdsWithSomeInvalid() = runTest {
-    val event1 = mockEvent.copy(fireBaseID = "1")
-    val event2 = mockEvent.copy(fireBaseID = "2")
+    val event1 = expiredEvent.copy(fireBaseID = "1")
+    val event2 = expiredEvent.copy(fireBaseID = "2")
 
     eventRepository.addEvent(event1)
     eventRepository.addEvent(event2)
@@ -214,7 +233,7 @@ class MockEventRepositoryUnitTest {
 
     // Check that the response is a failure
     assert(events is Resource.Failure)
-    assert((events as Resource.Failure).throwable.message == "Event with id 4 is missing")
+    assert((events as Resource.Failure).throwable.message == "not a single event is valid")
   }
 
   @Test
@@ -225,7 +244,7 @@ class MockEventRepositoryUnitTest {
     assert(events is Resource.Failure)
     assert(
         (events as Resource.Failure).throwable.message ==
-            "Event with id 100 is missing") // Shows id of first missing event
+            "not a single event is valid") // Shows id of first missing event
   }
 
   @Test

@@ -22,7 +22,6 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
     get() = LocalDateTime.now().format(formatter)
 
   override suspend fun getEvents(): Resource<List<Event>> {
-    val currentDateTimeString = currentDateTimeString
     val resultDocument = eventRef.whereGreaterThan("end", currentDateTimeString).get().await()
 
     return try {
@@ -97,15 +96,17 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
   }
 
   override suspend fun getEventsByIds(ids: List<String>): Resource<List<Event>> {
+    val events = mutableListOf<Event>()
+    val validEvents = eventRef.whereGreaterThan("end", currentDateTimeString).get().await()
     return try {
-      val events = mutableListOf<Event>()
       for (id in ids) {
-        val document = eventRef.document(id).get().await()
-        if (document.exists()) {
+        val document = validEvents.documents.find { it.id == id }
+        if (document != null) { // if (document.exists())
           events.add(Event(document.data!!, document.id))
-        } else {
-          return Resource.Failure(Exception("Event with id $id is missing"))
         }
+      }
+      if (events.isEmpty()) {
+        return Resource.Failure(Exception("not a single event is valid"))
       }
       Resource.Success(events)
     } catch (e: Exception) {
@@ -114,7 +115,6 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
   }
 
   override fun observeAllEvents(): Flow<Resource<List<Event>>> = callbackFlow {
-    val currentDateTimeString = currentDateTimeString
     val query = eventRef.whereGreaterThan("end", currentDateTimeString)
     val listener =
         query.addSnapshotListener { snapshot, error ->
@@ -130,7 +130,6 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
   }
 
   override fun observeUpcomingEvents(userId: String): Flow<Resource<List<Event>>> = callbackFlow {
-    val currentDateTimeString = currentDateTimeString
     val query =
         eventRef
             .whereGreaterThan("end", currentDateTimeString)

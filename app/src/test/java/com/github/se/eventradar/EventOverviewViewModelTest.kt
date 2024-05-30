@@ -18,7 +18,6 @@ import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import io.mockk.verify
 import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -59,8 +58,8 @@ class EventsOverviewViewModelTest {
       Event(
           eventName = "Event 1",
           eventPhoto = "",
-          start = LocalDateTime.now().plus(1, ChronoUnit.DAYS),
-          end = LocalDateTime.now().plus(2, ChronoUnit.DAYS),
+          start = LocalDateTime.parse("2025-12-31T09:00:00"),
+          end = LocalDateTime.parse("2025-01-01T00:00:00"),
           location = Location(0.0, 0.0, "Test Location"),
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1, 0),
@@ -74,8 +73,8 @@ class EventsOverviewViewModelTest {
       Event(
           eventName = "Event 1",
           eventPhoto = "",
-          start = LocalDateTime.now().minus(2, ChronoUnit.DAYS),
-          end = LocalDateTime.now().minus(1, ChronoUnit.DAYS),
+          start = LocalDateTime.parse("2002-12-31T09:00:00"),
+          end = LocalDateTime.parse("2002-01-01T00:00:00"),
           location = Location(0.0, 0.0, "Test Location"),
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1, 0),
@@ -83,7 +82,7 @@ class EventsOverviewViewModelTest {
           organiserList = mutableListOf("Test Organiser"),
           attendeeList = mutableListOf("Test Attendee"),
           category = EventCategory.COMMUNITY,
-          fireBaseID = "1")
+          fireBaseID = "2")
 
   private val mockUser =
       User(
@@ -146,15 +145,17 @@ class EventsOverviewViewModelTest {
             expiredEvent.copy(fireBaseID = "2"),
             mockEvent.copy(fireBaseID = "3"))
 
+    val expectedEvents = listOf(mockEvent.copy(fireBaseID = "1"), mockEvent.copy(fireBaseID = "3"))
+
     events.forEach { event -> eventRepository.addEvent(event) }
 
     viewModel.getEvents()
 
     assert(viewModel.uiState.value.eventList.allEvents.isNotEmpty())
     assert(viewModel.uiState.value.eventList.allEvents.size == 2)
-    assert(viewModel.uiState.value.eventList.allEvents != events)
+    assert(viewModel.uiState.value.eventList.allEvents == expectedEvents)
     assert(viewModel.uiState.value.eventList.filteredEvents.size == 2)
-    assert(viewModel.uiState.value.eventList.filteredEvents != events)
+    assert(viewModel.uiState.value.eventList.filteredEvents == expectedEvents)
     assertNull(viewModel.uiState.value.eventList.selectedEvent)
   }
 
@@ -177,6 +178,28 @@ class EventsOverviewViewModelTest {
     assert(viewModel.uiState.value.upcomingEventList.allEvents == listOf(event1, event2))
     assert(viewModel.uiState.value.upcomingEventList.filteredEvents.size == 2)
     assert(viewModel.uiState.value.upcomingEventList.filteredEvents == listOf(event1, event2))
+    assertNull(viewModel.uiState.value.upcomingEventList.selectedEvent)
+  }
+
+  @Test
+  fun testUpcomingFilterExpired() = runTest {
+    val event1 = mockEvent.copy(fireBaseID = "1")
+    val event2 = expiredEvent
+    val event3 = mockEvent.copy(fireBaseID = "3")
+
+    eventRepository.addEvent(event1)
+    eventRepository.addEvent(event2)
+    eventRepository.addEvent(event3)
+    userRepository.addUser(mockUser)
+    // MockUser is on the attendeeList for events with id "1" and "2"  but 2 is expired so only 1
+    // should come up
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    viewModel.getUpcomingEvents()
+
+    assert(viewModel.uiState.value.upcomingEventList.allEvents.size == 1)
+    assert(viewModel.uiState.value.upcomingEventList.allEvents == listOf(event1))
+    assert(viewModel.uiState.value.upcomingEventList.filteredEvents.size == 1)
+    assert(viewModel.uiState.value.upcomingEventList.filteredEvents == listOf(event1))
     assertNull(viewModel.uiState.value.upcomingEventList.selectedEvent)
   }
 
