@@ -4,10 +4,12 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Looper
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -32,6 +35,9 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
@@ -40,9 +46,14 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -51,15 +62,20 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -78,9 +94,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import coil.compose.AsyncImage
+import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.ui.BottomNavigationMenu
@@ -374,6 +392,295 @@ fun CategoryDisplayColumn(
                 ),
             modifier = Modifier.padding(start = 16.dp).testTag("checkboxText"))
       }
+}
+
+@Composable
+fun ImagePicker(modifier: Modifier, imageUri: Uri?) {
+  Row(
+      modifier = Modifier.padding(top = 16.dp),
+      horizontalArrangement = Arrangement.Center,
+      verticalAlignment = Alignment.CenterVertically) {
+        if (imageUri != null) {
+          val imageBitmap = rememberImagePainter(data = imageUri)
+          Image(
+              painter = imageBitmap,
+              contentDescription = "Selected Image",
+              contentScale = ContentScale.Crop,
+              modifier = modifier)
+        } else {
+          Image(
+              painter =
+                  painterResource(
+                      id = R.drawable.placeholder), // Replace with your placeholder image resource
+              contentDescription = "Select Picture Placeholder",
+              contentScale = ContentScale.Crop,
+              modifier = modifier)
+        }
+      }
+}
+
+@Composable
+fun StandardInputTextField(
+    modifier: Modifier,
+    textFieldLabel: String,
+    textFieldValue: String,
+    placeHolderText: String = "",
+    onValueChange: ((String) -> Unit),
+    errorState: Boolean
+) {
+  OutlinedTextField(
+      value = textFieldValue,
+      onValueChange = onValueChange,
+      label = { Text(textFieldLabel) },
+      modifier = modifier,
+      placeholder = { Text(placeHolderText) },
+      colors =
+          OutlinedTextFieldDefaults.colors()
+              .copy(
+                  focusedPrefixColor = MaterialTheme.colorScheme.primary,
+                  unfocusedPrefixColor = MaterialTheme.colorScheme.primary),
+      shape = RoundedCornerShape(12.dp),
+      isError = errorState,
+  )
+}
+
+@Composable
+fun DropdownInputTextField(
+    modifier: Modifier = Modifier,
+    textFieldLabel: String,
+    textFieldValue: String,
+    onValueChange: (String) -> Unit,
+    errorState: Boolean,
+    options: List<String>
+) {
+  var expanded by remember { mutableStateOf(false) }
+  var selectedOption by remember { mutableStateOf(textFieldValue) }
+  val icon = Icons.Default.ArrowDropDown
+
+  Column {
+    OutlinedTextField(
+        value = selectedOption,
+        onValueChange = onValueChange,
+        label = { Text(textFieldLabel) },
+        modifier = modifier.clickable { expanded = !expanded }, // Open dropdown on text field click
+        colors =
+            OutlinedTextFieldDefaults.colors()
+                .copy(
+                    focusedPrefixColor = MaterialTheme.colorScheme.primary,
+                    unfocusedPrefixColor = MaterialTheme.colorScheme.primary),
+        shape = RoundedCornerShape(12.dp),
+        isError = errorState,
+        trailingIcon = {
+          Icon(
+              imageVector = icon,
+              contentDescription = "Drop down Icon",
+              modifier =
+                  Modifier.clickable { expanded = !expanded }.rotate(if (expanded) 180f else 0f))
+        },
+        readOnly = true // Make the text field read-only to handle input via dropdown
+        )
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+        modifier = Modifier.fillMaxWidth()) {
+          options.forEach { option ->
+            DropdownMenuItem(
+                text = { Text(text = option, fontSize = 16.sp) },
+                onClick = {
+                  selectedOption = option
+                  onValueChange(option)
+                  expanded = false
+                })
+          }
+        }
+  }
+}
+
+fun displayChosenOrganisers(organisers: List<String>): String {
+  var organisersString = ""
+  for (i in organisers.indices) {
+    val organiser = organisers[i]
+    if (i == organisers.size - 1) {
+      organisersString += organiser
+    } else {
+      organisersString += organiser + ", "
+    }
+  }
+  return organisersString
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MultiSelectDropDownMenu( // list of organisers
+    value: String,
+    onSelectedListChanged: ((List<String>) -> Unit),
+    label: @Composable () -> Unit,
+    placeholder: @Composable (() -> Unit),
+    modifier: Modifier = Modifier,
+    singleLine: Boolean = false,
+    getFriends: (() -> Unit), // this searches for the friends!
+    friendsList: List<User>, // map userId to userName?
+) {
+  getFriends() // initialize user friends
+  val selectedItems = remember { mutableStateListOf("") }
+  var isExpanded by remember { mutableStateOf(false) }
+  val icon = Icons.Default.ArrowDropDown
+
+  Column {
+    OutlinedTextField(
+        value = displayChosenOrganisers(selectedItems.toList()),
+        onValueChange = { isExpanded = true },
+        label = label,
+        modifier =
+            modifier.clickable { isExpanded = !isExpanded }, // Open dropdown on text field click
+        colors =
+            OutlinedTextFieldDefaults.colors()
+                .copy(
+                    focusedPrefixColor = MaterialTheme.colorScheme.primary,
+                    unfocusedPrefixColor = MaterialTheme.colorScheme.primary),
+        shape = RoundedCornerShape(12.dp),
+        leadingIcon = {
+          Icon(
+              imageVector = Icons.Default.Face,
+              contentDescription = "Search Icon",
+          )
+        },
+        trailingIcon = {
+          Icon(
+              imageVector = icon,
+              contentDescription = "Drop down Icon",
+              modifier =
+                  Modifier.clickable { isExpanded = !isExpanded }
+                      .rotate(if (isExpanded) 180f else 0f))
+        },
+        readOnly = true // Make the text field read-only to handle input via dropdown
+        )
+    DropdownMenu(
+        expanded = isExpanded,
+        onDismissRequest = { isExpanded = false },
+        modifier = Modifier.fillMaxWidth()) {
+          for (friend in friendsList) {
+            val isSelected = selectedItems.contains(friend.username)
+            DropdownMenuItem(
+                text = {
+                  Text(
+                      text = friend.username,
+                      fontSize = 16.sp,
+                      modifier = Modifier.padding(vertical = 4.dp))
+                },
+                onClick = {
+                  if (isSelected) {
+                    selectedItems.remove(friend.username)
+                  } else {
+                    selectedItems.add(friend.username)
+                  }
+                  onSelectedListChanged(selectedItems.toList())
+                },
+                modifier = Modifier.testTag("locationDropdownItem"))
+          }
+        }
+  }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LocationTextField(
+    value: String,
+    onLocationChanged: (String) -> Unit,
+    label: @Composable () -> Unit,
+    placeholder: @Composable (() -> Unit),
+    modifier: Modifier = Modifier,
+    singleLine: Boolean = false,
+    getLocations: () -> Unit,
+    locationList: List<Location>,
+) {
+  var isExpanded by remember { mutableStateOf(false) }
+  val focusRequester = remember { FocusRequester() }
+  Column {
+    OutlinedTextField(
+        value = value,
+        onValueChange = {
+          onLocationChanged(it) // what if you delegate this to getLocations?
+          getLocations()
+          isExpanded = true
+        },
+        label = label,
+        modifier =
+            modifier
+                .clickable { isExpanded = !isExpanded }
+                .focusRequester(focusRequester), // Open dropdown on text field click
+        colors =
+            OutlinedTextFieldDefaults.colors()
+                .copy(
+                    focusedPrefixColor = MaterialTheme.colorScheme.primary,
+                    unfocusedPrefixColor = MaterialTheme.colorScheme.primary),
+        shape = RoundedCornerShape(12.dp),
+        singleLine = singleLine,
+        leadingIcon = {
+          Icon(
+              imageVector = Icons.Default.Search,
+              contentDescription = "Search Icon",
+          )
+        })
+
+    DropdownMenu(
+        expanded = isExpanded,
+        onDismissRequest = { isExpanded = false },
+        modifier = Modifier.fillMaxWidth().wrapContentHeight(align = Alignment.Bottom),
+    ) {
+      for (location in locationList) {
+        DropdownMenuItem(
+            text = {
+              Text(
+                  text = location.address,
+                  fontSize = 16.sp,
+                  modifier = Modifier.padding(vertical = 4.dp))
+            },
+            onClick = {
+              onLocationChanged(location.address)
+              isExpanded = false
+            },
+            modifier = Modifier.testTag("locationDropdownItem"))
+      }
+    }
+      LaunchedEffect(isExpanded) {
+          if (!isExpanded){
+              focusRequester.requestFocus()
+          }
+      }
+  }
+}
+
+@Composable
+fun DateInputTextField(
+    modifier: Modifier,
+    textFieldLabel: String,
+    textFieldValue: String,
+    onValueChange: ((String) -> Unit),
+    errorState: Boolean
+) {
+  OutlinedTextField(
+      value = textFieldValue,
+      onValueChange = onValueChange,
+      label = { Text(textFieldLabel) },
+      modifier = modifier,
+      placeholder = { Text("DD/MM/YYYY") },
+      colors =
+          OutlinedTextFieldDefaults.colors()
+              .copy(
+                  focusedPrefixColor = MaterialTheme.colorScheme.primary,
+                  unfocusedPrefixColor = MaterialTheme.colorScheme.primary),
+      shape = RoundedCornerShape(12.dp),
+      isError = errorState,
+      trailingIcon = {
+        Icon(
+            imageVector = Icons.Default.DateRange,
+            contentDescription = "Select Date",
+            modifier =
+                Modifier.clickable {
+                  // launches something! also the time picker?
+                })
+      })
 }
 
 @Composable
