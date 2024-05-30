@@ -255,7 +255,7 @@ fun SignUpScreen(
           OutlinedTextField(
               value = uiState.birthDate,
               onValueChange = viewModel::onBirthDateChanged,
-              label = { Text("Birth Date (DD/MM/YYYY)") },
+              label = { Text("Birth Date (DD.MM.YYYY)") },
               modifier = Modifier.width(320.dp).testTag("signUpBirthDateTextField"),
               colors =
                   OutlinedTextFieldDefaults.colors()
@@ -263,6 +263,7 @@ fun SignUpScreen(
                           focusedPrefixColor = MaterialTheme.colorScheme.primary,
                           unfocusedPrefixColor = MaterialTheme.colorScheme.primary),
               shape = RoundedCornerShape(12.dp),
+              keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
               isError = uiState.birthDateIsError,
           )
         }

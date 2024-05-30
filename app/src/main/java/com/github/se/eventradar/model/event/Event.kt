@@ -20,7 +20,7 @@ data class Event(
 ) {
   constructor(
       map: Map<String, Any>,
-      id: String
+      id: String,
   ) : this(
       eventName = map["name"] as String,
       eventPhoto = map["photo_url"] as String,
@@ -56,7 +56,7 @@ data class Event(
     map["description"] = description
     map["ticket_name"] = ticket.name
     map["ticket_price"] = ticket.price
-    map["ticket_quantity"] = ticket.capacity
+    map["ticket_capacity"] = ticket.capacity
     map["main_organiser"] = mainOrganiser
     map["organisers_list"] = organiserList.toList()
     map["attendees_list"] = attendeeList.toList()

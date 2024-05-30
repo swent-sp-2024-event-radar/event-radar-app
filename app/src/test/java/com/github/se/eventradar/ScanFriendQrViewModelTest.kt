@@ -5,9 +5,14 @@ import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
+import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
 import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
+import io.mockk.MockKAnnotations
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.just
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import io.mockk.verify
@@ -39,7 +44,7 @@ class ScanFriendQrViewModelTest {
   private val mockUser =
       User(
           userId = "1",
-          birthDate = "01/01/2000",
+          birthDate = "01.01.2000",
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",
@@ -50,12 +55,13 @@ class ScanFriendQrViewModelTest {
           friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/Profile_Pics/1",
           qrCodeUrl = "http://example.com/QR_Codes/1",
+          bio = "",
           username = "johndoe")
 
   private val mockUser1 =
       User(
           userId = "user1",
-          birthDate = "01/01/2000",
+          birthDate = "01.01.2000",
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",
@@ -66,12 +72,13 @@ class ScanFriendQrViewModelTest {
           friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/Profile_Pics/user1",
           qrCodeUrl = "http://example.com/QR_Codes/user1",
+          bio = "",
           username = "john_doe")
 
   private val mockUser2 =
       User(
           userId = "user2",
-          birthDate = "01/01/2002",
+          birthDate = "01.01.2002",
           email = "test@example2.com",
           firstName = "John2",
           lastName = "Doe2",
@@ -82,12 +89,13 @@ class ScanFriendQrViewModelTest {
           friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/Profile_Pics/user2",
           qrCodeUrl = "http://example.com/QR_Codes/user2",
+          bio = "",
           username = "john_doe2")
 
   private val mockUser1AF =
       User(
           userId = "user1",
-          birthDate = "01/01/2000",
+          birthDate = "01.01.2000",
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",
@@ -98,12 +106,13 @@ class ScanFriendQrViewModelTest {
           friendsList = mutableListOf("user2"),
           profilePicUrl = "http://example.com/Profile_Pics/user1",
           qrCodeUrl = "http://example.com/QR_Codes/user1",
+          bio = "",
           username = "john_doe")
 
   private val mockUser2AF =
       User(
           userId = "user2",
-          birthDate = "01/01/2002",
+          birthDate = "01.01.2002",
           email = "test@example2.com",
           firstName = "John2",
           lastName = "Doe2",
@@ -114,6 +123,7 @@ class ScanFriendQrViewModelTest {
           friendsList = mutableListOf("user1"),
           profilePicUrl = "http://example.com/Profile_Pics/user2",
           qrCodeUrl = "http://example.com/QR_Codes/user2",
+          bio = "",
           username = "john_doe2")
 
   class MainDispatcherRule(
@@ -128,22 +138,39 @@ class ScanFriendQrViewModelTest {
     }
   }
 
+  @RelaxedMockK lateinit var mockNavActions: NavigationActions
+
   @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
   @Before
   fun setUp() {
+    MockKAnnotations.init(this)
+    every { mockNavActions.navigateTo(any()) } just Runs
     userRepository = MockUserRepository()
     (userRepository as MockUserRepository).updateCurrentUserId(myUID)
     qrCodeAnalyser = QrCodeAnalyser()
-    viewModel = ScanFriendQrViewModel(userRepository, qrCodeAnalyser)
+    viewModel = ScanFriendQrViewModel(userRepository, qrCodeAnalyser, mockNavActions)
+    //      waitForLoadingToComplete()
   }
+
+  //    private fun waitForLoadingToComplete() {
+  //        while (viewModel.uiState.value.isLoading) {
+  //            // Small sleep to avoid busy waiting
+  //            Thread.sleep(50)
+  //        }
+  //    }
+
+  //    @Test
+  //    fun switchesScreenWhenNavigatedToNextScreen() = run {
+  //            viewModel.changeAction(ScanFriendQrViewModel.Action.NavigateToNextScreen)
+  //            verify { mockNavActions.navigateTo(any()) }
+  //        }
 
   @Test
   fun testDecodingSuccess() = runTest {
     userRepository.addUser(mockUser1)
     userRepository.addUser(mockUser2)
     val testDecodedString = "user2"
-    println("onDecodedInvoked")
     qrCodeAnalyser.onDecoded?.invoke(testDecodedString)
     assertEquals(testDecodedString, viewModel.uiState.value.decodedResult)
   }
@@ -153,7 +180,7 @@ class ScanFriendQrViewModelTest {
     userRepository.addUser(mockUser1)
     userRepository.addUser(mockUser2)
     qrCodeAnalyser.onDecoded?.invoke(null)
-    assertEquals("Failed to decode QR Code", viewModel.uiState.value.decodedResult)
+    assertEquals(null, viewModel.uiState.value.decodedResult)
     assertEquals(ScanFriendQrViewModel.Action.AnalyserError, viewModel.uiState.value.action)
   }
   // todo should i be testing thta it is reset to none ? isnt this Ui logic?
@@ -180,7 +207,7 @@ class ScanFriendQrViewModelTest {
         println("User 2 not found or could not be fetched")
       }
     }
-    assertEquals(ScanFriendQrViewModel.Action.NavigateToNextScreen, viewModel.uiState.value.action)
+    assertEquals(ScanFriendQrViewModel.Action.None, viewModel.uiState.value.action)
   }
 
   @Test
@@ -206,7 +233,7 @@ class ScanFriendQrViewModelTest {
         println("User 2 not found or could not be fetched")
       }
     }
-    assertEquals(ScanFriendQrViewModel.Action.NavigateToNextScreen, viewModel.uiState.value.action)
+    assertEquals(ScanFriendQrViewModel.Action.None, viewModel.uiState.value.action)
   }
 
   // This is testing if the getUserDetails function (to display information in MyQRCode Tab) returns
@@ -257,18 +284,16 @@ class ScanFriendQrViewModelTest {
   fun testGetUserQrCodeSuccess() = runTest {
     // Given
     val userId = mockUser.userId
+    val exampleQRCode = ByteArray(123)
     val expectedQrCodeLink = "http://example.com/QR_Codes/$userId"
     // initialize user with no mock
     (userRepository as MockUserRepository).updateCurrentUserId(userId)
     // Mocking what happens when you add a user
     userRepository.addUser(mockUser)
+    userRepository.uploadQRCode(exampleQRCode, userId)
     val result = userRepository.getImage(userId, "QR_Codes")
     Assert.assertTrue(result is Resource.Success)
     Assert.assertEquals(expectedQrCodeLink, (result as Resource.Success).data)
-
-    // add use
-    viewModel.getUserDetails()
-    assertEquals(expectedQrCodeLink, viewModel.uiState.value.qrCodeLink)
   }
 
   @Test

@@ -5,6 +5,7 @@ import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -143,27 +144,27 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
 
   override suspend fun uploadImage(
       selectedImageUri: Uri,
-      uid: String,
+      imageId: String,
       folderName: String
   ): Resource<Unit> {
-    val storageRef = Firebase.storage.reference.child("$folderName/$uid")
-    try {
+    val storageRef = Firebase.storage.reference.child("$folderName/$imageId")
+    return try {
       val result = storageRef.putFile(selectedImageUri).await()
       Resource.Success(Unit)
-      return if (result.task.isSuccessful) {
+      if (result.task.isSuccessful) {
         Resource.Success(Unit)
       } else {
         val error = result.task.exception
         Resource.Failure(error ?: Exception("Upload failed without a specific error"))
       }
     } catch (e: Exception) {
-      return Resource.Failure(Exception("Error during upload image: ${e.localizedMessage}"))
+      Resource.Failure(Exception("Error during upload image: ${e.localizedMessage}"))
     }
   }
 
-  override suspend fun getImage(uid: String, folderName: String): Resource<String> {
+  override suspend fun getImage(imageId: String, folderName: String): Resource<String> {
 
-    val storageRef = Firebase.storage.reference.child("$folderName/$uid")
+    val storageRef = Firebase.storage.reference.child("$folderName/$imageId")
     return try {
       val result = storageRef.downloadUrl.await()
       val url = result.toString()
@@ -179,6 +180,32 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
       Resource.Success(userId)
     } else {
       Resource.Failure(Exception("No user currently signed in"))
+    }
+  }
+
+  override suspend fun addEventToAttendeeList(
+      userId: String,
+      attendingEventId: String
+  ): Resource<Unit> {
+    return try {
+      userRef.document(userId).update("eventsAttendeeList", FieldValue.arrayUnion(attendingEventId))
+      Resource.Success(Unit)
+    } catch (e: Exception) {
+      Resource.Failure(e)
+    }
+  }
+
+  override suspend fun removeEventFromAttendeeList(
+      userId: String,
+      attendingEventId: String
+  ): Resource<Unit> {
+    return try {
+      userRef
+          .document(userId)
+          .update("eventsAttendeeList", FieldValue.arrayRemove(attendingEventId))
+      Resource.Success(Unit)
+    } catch (e: Exception) {
+      Resource.Failure(e)
     }
   }
 
@@ -245,6 +272,7 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
             "accountStatus" to user.accountStatus,
             "eventsAttendeeList" to user.eventsAttendeeList,
             "eventsHostList" to user.eventsHostList,
+            "bio" to user.bio,
             "friendsList" to user.friendsList,
         )
 

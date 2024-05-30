@@ -39,8 +39,9 @@ constructor(
   val isUserAttending: StateFlow<Boolean>
     get() = _isUserAttending
 
-  val errorOccurred = mutableStateOf(false)
-  val registrationSuccessful = mutableStateOf(false)
+  val showErrorOccurredDialog = mutableStateOf(false)
+  val showSuccessfulRegistrationDialog = mutableStateOf(false)
+  val showCancelRegistrationDialog = mutableStateOf(false)
 
   private lateinit var currentUserId: String
   private var displayedEvent: Event? = null
@@ -89,7 +90,11 @@ constructor(
     return !(_uiState.value.ticket.price > 0.0)
   }
 
-  fun buyTicketForEvent() { // update the user attendee list, update the eventRepo ticket count
+  fun refreshAttendance() {
+    getEventData()
+  }
+
+  fun buyTicketForEvent() {
     viewModelScope.launch {
       if (!isTicketFree()) {
         Log.d(
@@ -98,96 +103,77 @@ constructor(
       }
 
       if (!_isUserAttending.value) {
-        // TODO needs to be atomic to avoid concurrency issues
-        registrationUpdateEvent()
-        if (!errorOccurred.value) {
-          registrationUpdateUser()
+        if (registrationProcedure(eventId, currentUserId)) {
+          showSuccessfulRegistrationDialog.value = true
+          _isUserAttending.update { true }
+        } else {
+          showErrorOccurredDialog.value = true
         }
-      }
-      if (!errorOccurred.value) {
-        registrationSuccessful.value = true
-        _isUserAttending.update { true }
       }
     }
   }
 
-  fun refreshAttendance() {
-    getEventData()
-  }
-
-  private fun registrationUpdateEvent() {
-    if (displayedEvent != null) {
-      val event: Event = displayedEvent as Event
-
-      // add currentUserId to the event attendees list
-      event.attendeeList.add(currentUserId)
-
-      // decrement ticket capacity
-      if (event.ticket.purchases < event.ticket.capacity) {
-        event.ticket =
-            EventTicket(
-                event.ticket.name,
-                event.ticket.price,
-                event.ticket.capacity,
-                event.ticket.purchases + 1)
-
-        viewModelScope.launch {
-          // update event data to the database
-          when (val updateResponse = eventRepository.updateEvent(event)) {
-            is Resource.Success -> {
-              Log.i("EventDetailsViewModel", "Successfully updated event")
-            }
-            is Resource.Failure -> {
-              errorOccurred.value = true
-              Log.d(
-                  "EventDetailsViewModel",
-                  "Error updating event data: ${updateResponse.throwable.message}")
-            }
-          }
-        }
-      } else {
-        errorOccurred.value = true
-        Log.d("EventDetailsViewModel", "Error updating event data: No more tickets !}")
-      }
-    } else {
-      errorOccurred.value = true
-      Log.d("EventDetailsViewModel", "Error no such event}")
-    }
-  }
-
-  private fun registrationUpdateUser() {
+  fun removeUserFromEvent() {
     viewModelScope.launch {
-      // fetch current user data
-      when (val userResponse = userRepository.getUser(currentUserId)) {
-        is Resource.Success -> {
-          val currentUser = userResponse.data
-          if (currentUser == null) {
-            Log.d("EventDetailsViewModel", "No existing users")
-          } else {
-            // adding eventId to current user attended event list
-            currentUser.eventsAttendeeList.add(eventId)
-
-            // update user data to the database
-            when (val updateResponse = userRepository.updateUser(currentUser)) {
-              is Resource.Success -> {
-                Log.i("EventDetailsViewModel", "Successfully updated user")
-              }
-              is Resource.Failure -> {
-                errorOccurred.value = true
-                Log.d(
-                    "EventDetailsViewModel",
-                    "Error updating user data: ${updateResponse.throwable.message}")
-              }
-            }
-          }
-        }
-        is Resource.Failure -> {
-          errorOccurred.value = true
-          Log.d(
-              "EventDetailsViewModel", "Error getting user data: ${userResponse.throwable.message}")
-        }
+      if (unregistrationProcedure(eventId, currentUserId)) {
+        _isUserAttending.update { false }
+        showCancelRegistrationDialog.value = false
+      } else {
+        showErrorOccurredDialog.value = true
       }
     }
+  }
+
+  private suspend fun unregistrationProcedure(eventId: String, userId: String): Boolean {
+    // is atomic but TODO no checks for consistency between these 3 values
+
+    val resEvent = eventRepository.removeAttendee(eventId, userId)
+    if (resEvent is Resource.Failure) {
+      Log.d(
+          "EventDetailsViewModel",
+          "Error removing attendee in event: ${resEvent.throwable.message}")
+    }
+    val resPurchases = eventRepository.decrementPurchases(eventId)
+    if (resPurchases is Resource.Failure) {
+      Log.d(
+          "EventDetailsViewModel",
+          "Error decrementing purchases: ${resPurchases.throwable.message}")
+    }
+    val resUser = userRepository.removeEventFromAttendeeList(userId, eventId)
+    if (resUser is Resource.Failure) {
+      Log.d(
+          "EventDetailsViewModel",
+          "Error removing attendance in user: ${resUser.throwable.message}")
+    }
+
+    return (resEvent is Resource.Success &&
+        resPurchases is Resource.Success &&
+        resUser is Resource.Success)
+  }
+
+  private suspend fun registrationProcedure(eventId: String, userId: String): Boolean {
+    // is atomic but TODO no checks for consistency between these 3 values
+
+    val resEvent = eventRepository.addAttendee(eventId, userId)
+    if (resEvent is Resource.Failure) {
+      Log.d(
+          "EventDetailsViewModel", "Error adding attendee in event: ${resEvent.throwable.message}")
+    }
+    val resPurchases = eventRepository.incrementPurchases(eventId)
+    if (resPurchases is Resource.Failure) {
+      Log.d(
+          "EventDetailsViewModel",
+          "Error incrementing purchases: ${resPurchases.throwable.message}")
+    }
+    val resUser = userRepository.addEventToAttendeeList(userId, eventId)
+    if (resUser is Resource.Failure) {
+      Log.d(
+          "EventDetailsViewModel", "Error adding attendance in user: ${resUser.throwable.message}")
+    }
+
+    return (resEvent is Resource.Success &&
+        resPurchases is Resource.Success &&
+        resUser is Resource.Success)
   }
 
   // Code for creating an instance of EventDetailsViewModel

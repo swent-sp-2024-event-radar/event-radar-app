@@ -1,16 +1,16 @@
 package com.github.se.eventradar.ui.event
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -18,10 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -32,15 +29,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.EventComponentsStyle
 import com.github.se.eventradar.ui.component.EventTitle
+import com.github.se.eventradar.ui.component.GenericDialogBox
 import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
@@ -63,7 +59,7 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
 
   // Error
   GenericDialogBox(
-      viewModel.errorOccurred,
+      viewModel.showErrorOccurredDialog,
       modifier = Modifier.testTag("buyingTicketErrorDialog"),
       "Registration Failure",
       "We are sorry an error occurred during the registration process.") {
@@ -77,7 +73,7 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
 
   // Success
   GenericDialogBox(
-      viewModel.registrationSuccessful,
+      viewModel.showSuccessfulRegistrationDialog,
       modifier = Modifier.testTag("buyingTicketSuccessDialog"),
       "Successful registration",
       "You successfully joined that event",
@@ -92,7 +88,9 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
 
   Scaffold(
       modifier = Modifier.testTag("joinEventScreen"),
-      topBar = {},
+      topBar = {
+        GoBackButton(modifier = Modifier.wrapContentSize()) { navigationActions.goBack() }
+      },
       bottomBar = {
         BottomNavigationMenu(
             onTabSelected = { tab -> navigationActions.navigateTo(tab) },
@@ -104,7 +102,7 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
         // buy ticket button
         FloatingActionButton(
             onClick = { viewModel.buyTicketForEvent() },
-            modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("buyButton"),
+            modifier = Modifier.testTag("buyButton"),
             containerColor = MaterialTheme.colorScheme.primaryContainer,
         ) {
           val icon = if (viewModel.isTicketFree()) R.drawable.check else R.drawable.credit_card
@@ -115,50 +113,28 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
               tint = MaterialTheme.colorScheme.onPrimaryContainer,
           )
         }
-      }) { innerPadding ->
-        ConstraintLayout(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-          val (backButton, title, ticketTitle, ticketCard) = createRefs()
-
-          GoBackButton(
-              modifier =
-                  Modifier.wrapContentSize().constrainAs(backButton) {
-                    top.linkTo(parent.top, margin = 12.dp)
-                    start.linkTo(parent.start)
-                  }) {
-                navigationActions.goBack()
-              }
-
+      }) {
+        Column(modifier = Modifier.fillMaxWidth().padding(it).padding(horizontal = 8.dp)) {
           EventTitle(
-              modifier =
-                  Modifier.constrainAs(title) {
-                    top.linkTo(backButton.bottom, margin = 42.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                  },
+              modifier = Modifier.align(Alignment.CenterHorizontally),
               eventUiState = eventUiState,
               style = componentStyle)
 
+          Spacer(modifier = Modifier.height(24.dp))
+
           Text(
               text = stringResource(id = R.string.tickets_title),
-              modifier =
-                  Modifier.constrainAs(ticketTitle) {
-                        top.linkTo(title.bottom, margin = 32.dp)
-                        start.linkTo(parent.start, margin = 32.dp)
-                      }
-                      .testTag("ticketsTitle"),
+              modifier = Modifier.testTag("ticketsTitle"),
               style = componentStyle.subTitleStyle)
+
+          Spacer(modifier = Modifier.height(8.dp))
 
           Card(
               modifier =
-                  Modifier.padding(horizontal = 32.dp, vertical = 8.dp)
+                  Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                       .height(IntrinsicSize.Min)
                       .fillMaxWidth()
-                      .testTag("ticketCard")
-                      .constrainAs(ticketCard) {
-                        top.linkTo(ticketTitle.bottom, margin = 32.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                      },
+                      .testTag("ticketCard"),
               colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
               elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
               onClick = {
@@ -192,44 +168,4 @@ fun SelectTicket(viewModel: EventDetailsViewModel, navigationActions: Navigation
               }
         }
       }
-}
-
-@Composable
-fun GenericDialogBox(
-    openErrorDialog: MutableState<Boolean>,
-    modifier: Modifier = Modifier,
-    title: String,
-    message: String,
-    onClick: () -> Unit = {},
-    boxIcon: @Composable (() -> Unit)?,
-) {
-  val display by openErrorDialog
-  if (display) {
-    AlertDialog(
-        icon = boxIcon,
-        text = {
-          Text(
-              text = message,
-              textAlign = TextAlign.Center,
-              modifier = Modifier.testTag("ErrorDisplayText"))
-        },
-        title = {
-          Text(
-              text = title,
-              modifier = Modifier.testTag("ErrorTitle"),
-          )
-        },
-        onDismissRequest = { openErrorDialog.value = false },
-        confirmButton = {
-          TextButton(
-              onClick = {
-                openErrorDialog.value = false
-                onClick()
-              },
-              modifier = Modifier.testTag("dialogConfirmButton")) {
-                Text("Ok")
-              }
-        },
-        modifier = modifier)
-  }
 }

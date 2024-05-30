@@ -36,4 +36,6 @@ app/.idea/misc.xml
 local.properties
 secrets.properties
 app/local.properties
+*.keystore
+keystore.properties
 app/.gradle/config.properties

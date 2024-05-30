@@ -1,5 +1,6 @@
 package com.github.se.eventradar.event
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.model.Location
@@ -56,14 +57,15 @@ class EventDetailsAttendingUITest :
   private val eventId = "tdjWMT9Eon2ROTVakQb"
 
   private var isTicketFree = true
+  private var isUserAttending = true
 
   @Before
   fun testSetup() {
-
-    every { mockViewModel.isUserAttending } returns MutableStateFlow(true)
+    every { mockViewModel.isUserAttending } returns MutableStateFlow(isUserAttending)
     every { mockViewModel.isTicketFree() } returns isTicketFree
     every { mockViewModel.uiState } returns sampleEventDetailsUiState
     every { mockViewModel.eventId } returns eventId
+    every { mockViewModel.showCancelRegistrationDialog } returns mutableStateOf(false)
 
     composeTestRule.setContent { EventDetails(mockViewModel, navigationActions = mockNavActions) }
   }
@@ -71,9 +73,11 @@ class EventDetailsAttendingUITest :
   @Test
   fun screenDisplaysNavigationElementsCorrectly() = run {
     ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
-      ticketButton { assertIsNotDisplayed() }
-      goBackButton { assertIsDisplayed() }
-      bottomNav { assertIsDisplayed() }
+      step("Check if navigation elements are displayed correctly") {
+        registrationButton { assertIsDisplayed() }
+        goBackButton { assertIsDisplayed() }
+        bottomNav { assertIsDisplayed() }
+      }
     }
   }
 
@@ -94,9 +98,10 @@ class EventDetailsAttendingUITest :
         assertIsDisplayed()
         assertTextContains("Community")
       }
-      dateTimeTitle { assertIsDisplayed() }
-      dateTimeStartContent { assertIsDisplayed() }
-      dateTimeEndContent { assertIsDisplayed() }
+      dateTitle { assertIsDisplayed() }
+      dateContent { assertIsDisplayed() }
+      timeTitle { assertIsDisplayed() }
+      timeContent { assertIsDisplayed() }
 
       attendance { assertIsDisplayed() }
     }
@@ -117,5 +122,19 @@ class EventDetailsAttendingUITest :
     // assert: the nav action has been called
     verify { mockNavActions.goBack() }
     confirmVerified(mockNavActions)
+  }
+
+  @Test
+  fun cancelRegistrationShowsConfirmationDialog() = run {
+    ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
+      step("Click on the cancel registration button") {
+        registrationButton {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+
+      step("Check if the dialog is displayed") { cancelRegistrationDialog { assertIsDisplayed() } }
+    }
   }
 }

@@ -33,9 +33,13 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.se.eventradar.R
+import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.EventList
+import com.github.se.eventradar.ui.component.FilterPopUp
+import com.github.se.eventradar.ui.component.GetUserLocation
 import com.github.se.eventradar.ui.component.Logo
+import com.github.se.eventradar.ui.component.SearchBarAndFilter
 import com.github.se.eventradar.ui.component.ViewToggleFab
 import com.github.se.eventradar.ui.component.getIconFromViewListBool
 import com.github.se.eventradar.ui.map.EventMap
@@ -44,6 +48,7 @@ import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 import com.github.se.eventradar.util.toast
+import com.github.se.eventradar.viewmodel.HostedEventsUiState
 import com.github.se.eventradar.viewmodel.HostedEventsViewModel
 
 @Composable
@@ -53,9 +58,20 @@ fun HostingScreen(
 ) {
   // Ui States handled by viewModel
   val uiState by viewModel.uiState.collectAsState()
-  LaunchedEffect(key1 = uiState.eventList) { viewModel.getHostedEvents() }
+  val context = LocalContext.current
+
+  LaunchedEffect(key1 = uiState.isSearchActive, key2 = uiState.isFilterActive) {
+    if (uiState.isSearchActive || uiState.isFilterActive) {
+      viewModel.filterHostedEvents()
+    }
+  }
+  LaunchedEffect(Unit) { viewModel.getHostedEvents() }
+
+  GetUserLocation(context, viewModel::onUserLocationChanged)
+
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("hostingScreen")) {
-    val (logo, title, divider, eventList, eventMap, bottomNav, buttons) = createRefs()
+    val (logo, title, divider, searchfilter, filter, eventList, eventMap, bottomNav, buttons) =
+        createRefs()
     Logo(
         modifier =
             Modifier.fillMaxWidth()
@@ -66,21 +82,31 @@ fun HostingScreen(
                 .testTag("logo"))
     Title(
         modifier =
-            Modifier.testTag("myHostedEventsTitle")
-                .constrainAs(
-                    title,
-                    {
-                      top.linkTo(logo.bottom, margin = 16.dp)
-                      start.linkTo(parent.start)
-                      end.linkTo(parent.end)
-                    }))
+            Modifier.testTag("myHostedEventsTitle").constrainAs(title) {
+              top.linkTo(logo.bottom, margin = 16.dp)
+              start.linkTo(parent.start)
+              end.linkTo(parent.end)
+            })
     HorizontalDivider(
-        modifier = Modifier.constrainAs(divider, { top.linkTo(title.bottom, margin = 10.dp) }))
+        modifier = Modifier.constrainAs(divider) { top.linkTo(title.bottom, margin = 10.dp) })
+
+    SearchBarAndFilter(
+        onSearchQueryChanged = { viewModel.onSearchQueryChanged(it) },
+        searchQuery = uiState.searchQuery,
+        onSearchActiveChanged = { viewModel.onSearchActiveChanged(it) },
+        onFilterDialogOpen = { viewModel.onFilterDialogOpenChanged() },
+        modifier =
+            Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
+                .testTag("searchBarAndFilter")
+                .constrainAs(searchfilter) { top.linkTo(divider.bottom, margin = 10.dp) },
+        placeholderStringResource = R.string.hosting_search_placeholder)
+
+    val events = getEventsBasedOffUiState(uiState)
     if (uiState.viewList) {
       EventList(
-          uiState.eventList.filteredEvents,
+          events,
           Modifier.testTag("eventList").fillMaxWidth().constrainAs(eventList) {
-            top.linkTo(divider.bottom, margin = 8.dp)
+            top.linkTo(searchfilter.bottom, margin = 8.dp)
             start.linkTo(parent.start)
             end.linkTo(parent.end)
           }) { eventId ->
@@ -88,16 +114,16 @@ fun HostingScreen(
           }
     } else {
       EventMap(
-          uiState.eventList.filteredEvents,
+          events,
           Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
-            top.linkTo(divider.bottom, margin = 8.dp)
+            top.linkTo(searchfilter.bottom, margin = 8.dp)
             start.linkTo(parent.start)
             end.linkTo(parent.end)
           }) { eventId ->
             navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
           }
     }
-    val context = LocalContext.current
+    val context = LocalContext.current // TO DO: only needed for toasts
     Row(
         modifier =
             Modifier.constrainAs(ref = buttons) {
@@ -118,6 +144,27 @@ fun HostingScreen(
               onClick = { viewModel.onViewListStatusChanged() },
               iconVector = getIconFromViewListBool(uiState.viewList))
         }
+
+    if (uiState.isFilterDialogOpen) {
+      FilterPopUp(
+          onFreeSwitchChanged = { viewModel.onFreeSwitchChanged() },
+          onFilterApply = {
+            if (uiState.radiusQuery != "") {
+              viewModel.onRadiusQueryChanged(uiState.radiusQuery)
+            }
+            viewModel.onFilterApply()
+
+            // automatically close dialog
+            viewModel.onFilterDialogOpenChanged()
+          },
+          uiState = uiState,
+          onRadiusQueryChanged = { viewModel.onRadiusQueryChanged(it) },
+          modifier =
+              Modifier.testTag("filterPopUp").constrainAs(filter) {
+                top.linkTo(searchfilter.bottom, margin = 10.dp)
+              },
+      )
+    }
     BottomNavigationMenu(
         onTabSelected = navigationActions::navigateTo,
         tabList = TOP_LEVEL_DESTINATIONS,
@@ -167,4 +214,12 @@ fun CreateEventFab(onClick: () -> Unit, modifier: Modifier = Modifier) {
       icon = { Icon(Icons.Filled.Add, "Create Event Icon") },
       onClick = onClick,
       modifier = modifier.fillMaxWidth(0.8f))
+}
+
+fun getEventsBasedOffUiState(uiState: HostedEventsUiState): List<Event> {
+  return if (uiState.isSearchActive || uiState.isFilterActive) {
+    uiState.eventList.filteredEvents
+  } else {
+    uiState.eventList.allEvents
+  }
 }

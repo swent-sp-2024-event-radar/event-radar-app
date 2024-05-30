@@ -1,5 +1,6 @@
 package com.github.se.eventradar.event
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.model.Location
@@ -44,8 +45,8 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
           EventUiState(
               eventName = "Debugging",
               eventPhoto = "path",
-              start = LocalDateTime.MIN,
-              end = LocalDateTime.MAX,
+              start = LocalDateTime.parse("2022-01-01T10:00:00"),
+              end = LocalDateTime.parse("2022-01-01T12:00:00"),
               location = Location(0.0, 0.0, "base address"),
               description = "Let's debug some code together because we all enjoy kotlin !",
               ticket = EventTicket("Luck", 0.0, 7, 0),
@@ -61,6 +62,7 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
     every { mockViewModel.isUserAttending } returns MutableStateFlow(false)
     every { mockViewModel.uiState } returns sampleEventDetailsUiState
     every { mockViewModel.eventId } returns eventId
+    every { mockViewModel.showCancelRegistrationDialog } returns mutableStateOf(false)
 
     composeTestRule.setContent { EventDetails(mockViewModel, navigationActions = mockNavActions) }
   }
@@ -68,7 +70,7 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   @Test
   fun screenDisplaysNavigationElementsCorrectly() = run {
     ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
-      ticketButton { assertIsDisplayed() }
+      registrationButton { assertIsDisplayed() }
       goBackButton { assertIsDisplayed() }
       bottomNav { assertIsDisplayed() }
     }
@@ -91,9 +93,10 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
         assertIsDisplayed()
         assertTextContains("Community")
       }
-      dateTimeTitle { assertIsDisplayed() }
-      dateTimeStartContent { assertIsDisplayed() }
-      dateTimeEndContent { assertIsDisplayed() }
+      dateTitle { assertIsDisplayed() }
+      dateContent { assertIsDisplayed() }
+      timeTitle { assertIsDisplayed() }
+      timeContent { assertIsDisplayed() }
     }
   }
 
@@ -117,7 +120,7 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   @Test
   fun ticketButtonTriggersNavigation() = run {
     ComposeScreen.onComposeScreen<EventDetailsScreen>(composeTestRule) {
-      ticketButton {
+      registrationButton {
         // arrange: verify the pre-conditions
         assertIsDisplayed()
         assertIsEnabled()

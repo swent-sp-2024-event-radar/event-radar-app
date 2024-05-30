@@ -2,9 +2,17 @@ package com.github.se.eventradar.model.repository.event
 
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.event.Event
+import com.github.se.eventradar.model.event.EventTicket
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 
 class MockEventRepository : IEventRepository {
-  private val mockEvents = mutableListOf<Event>()
+
+  val mockEvents = mutableListOf<Event>()
+  private var ticker = 0
+  val eventsFlow = MutableStateFlow<Resource<List<Event>>>(Resource.Success(mockEvents))
 
   override suspend fun getEvents(): Resource<List<Event>> {
     return Resource.Success(mockEvents)
@@ -18,6 +26,10 @@ class MockEventRepository : IEventRepository {
     } else {
       Resource.Failure(Exception("Event with id $id not found"))
     }
+  }
+
+  override suspend fun getUniqueEventId(): Resource<String> {
+    return Resource.Success(ticker++.toString())
   }
 
   override suspend fun addEvent(event: Event): Resource<Unit> {
@@ -55,5 +67,83 @@ class MockEventRepository : IEventRepository {
       }
     }
     return Resource.Success(events)
+  }
+
+  override fun observeAllEvents(): Flow<Resource<List<Event>>> = eventsFlow.asStateFlow()
+
+  override fun observeUpcomingEvents(userId: String): Flow<Resource<List<Event>>> {
+    return eventsFlow.asStateFlow().map { resource ->
+      when (resource) {
+        is Resource.Success -> {
+          val upcomingEvents = resource.data.filter { it.attendeeList.contains(userId) }
+          Resource.Success(upcomingEvents)
+        }
+        is Resource.Failure -> resource
+      }
+    }
+  }
+
+  override suspend fun addAttendee(eventId: String, attendeeUserId: String): Resource<Unit> {
+    return when (val res = getEvent(eventId)) {
+      is Resource.Success -> {
+        res.data?.attendeeList?.add(attendeeUserId)
+        Resource.Success(Unit)
+      }
+      is Resource.Failure -> {
+        Resource.Failure(res.throwable)
+      }
+    }
+  }
+
+  override suspend fun removeAttendee(eventId: String, attendeeUserId: String): Resource<Unit> {
+    return when (val res = getEvent(eventId)) {
+      is Resource.Success -> {
+        res.data?.attendeeList?.remove(attendeeUserId)
+        Resource.Success(Unit)
+      }
+      is Resource.Failure -> {
+        Resource.Failure(res.throwable)
+      }
+    }
+  }
+
+  override suspend fun incrementPurchases(eventId: String): Resource<Unit> {
+    return when (val res = getEvent(eventId)) {
+      is Resource.Success -> {
+        val ticket = res.data?.ticket
+        if (ticket != null) {
+          if (ticket.purchases < ticket.capacity) {
+            res.data.ticket =
+                EventTicket(ticket.name, ticket.price, ticket.capacity, ticket.purchases + 1)
+          } else {
+            return Resource.Failure(Exception("No more ticket"))
+          }
+        }
+        Resource.Success(Unit)
+      }
+      is Resource.Failure -> {
+        Resource.Failure(res.throwable)
+      }
+    }
+  }
+
+  override suspend fun decrementPurchases(eventId: String): Resource<Unit> {
+    return when (val res = getEvent(eventId)) {
+      is Resource.Success -> {
+        val ticket = res.data?.ticket
+        if (ticket != null) {
+          if (ticket.purchases > 0) {
+            res.data.ticket =
+                EventTicket(ticket.name, ticket.price, ticket.capacity, ticket.purchases - 1)
+          } else {
+            return Resource.Failure(Exception("Ticket purchases is already 0"))
+          }
+        }
+        Resource.Success(Unit)
+      }
+      is Resource.Failure -> {
+        Resource.Failure(res.throwable)
+      }
+    }
   }
 }

@@ -21,9 +21,13 @@ interface IUserRepository {
 
   suspend fun doesUserExist(userId: String): Resource<Unit>
 
-  suspend fun uploadImage(selectedImageUri: Uri, uid: String, folderName: String): Resource<Unit>
+  suspend fun uploadImage(
+      selectedImageUri: Uri,
+      imageId: String,
+      folderName: String
+  ): Resource<Unit>
 
-  suspend fun getImage(uid: String, folderName: String): Resource<String>
+  suspend fun getImage(imageId: String, folderName: String): Resource<String>
 
   suspend fun uploadQRCode(data: ByteArray, userId: String): Resource<Unit>
 
@@ -32,4 +36,8 @@ interface IUserRepository {
   suspend fun updateUserField(userId: String, field: String, value: Any): Resource<Unit>
 
   suspend fun getUserField(userId: String, field: String): Resource<Any>
+
+  suspend fun addEventToAttendeeList(userId: String, attendingEventId: String): Resource<Unit>
+
+  suspend fun removeEventFromAttendeeList(userId: String, attendingEventId: String): Resource<Unit>
 }

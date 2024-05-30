@@ -18,7 +18,7 @@ class MockUserRepositoryUnitTest {
   private val mockUser =
       User(
           userId = "1",
-          birthDate = "01/01/2000",
+          birthDate = "01.01.2000",
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",
@@ -29,6 +29,7 @@ class MockUserRepositoryUnitTest {
           friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/Profile_Pictures/1",
           qrCodeUrl = "http://example.com/QR_Codes/1",
+          bio = "",
           username = "johndoe")
 
   @Before
@@ -119,6 +120,7 @@ class MockUserRepositoryUnitTest {
     val mockURI = mock(Uri::class.java)
     // Add a User
     userRepository.addUser(mockUser)
+    (userRepository as MockUserRepository).updateCurrentUserId(mockUser.userId)
     // Upload a user Image
     val result = userRepository.uploadImage(mockURI, "1", "Profile_Pictures")
     assert(result is Resource.Success)
@@ -136,7 +138,7 @@ class MockUserRepositoryUnitTest {
 
     // Assert
     assertTrue(result is Resource.Failure)
-    assertEquals("User with id $userId not found", (result as Resource.Failure).throwable.message)
+    assertEquals("No user has been found", (result as Resource.Failure).throwable.message)
   }
 
   @Test
@@ -146,6 +148,7 @@ class MockUserRepositoryUnitTest {
     val userId = mockUser.userId
     val folderName = "Invalid_Folder"
     userRepository.addUser(mockUser)
+    (userRepository as MockUserRepository).updateCurrentUserId(mockUser.userId)
 
     // Act
     val result = userRepository.uploadImage(mockURI, userId, folderName)
@@ -159,9 +162,12 @@ class MockUserRepositoryUnitTest {
   @Test
   fun testGetImageUserExistsFolderExistsSuccess() = runTest {
     // Arrange
+    val mockURI = mock(Uri::class.java)
     val userId = mockUser.userId
     val expectedUrl = "http://example.com/Profile_Pictures/$userId"
     userRepository.addUser(mockUser)
+    (userRepository as MockUserRepository).updateCurrentUserId(userId)
+    userRepository.uploadImage(mockURI, userId, "Profile_Pictures")
     // Act
     val result = userRepository.getImage(userId, "Profile_Pictures")
     // Assert
@@ -179,7 +185,7 @@ class MockUserRepositoryUnitTest {
 
     // Assert
     assertTrue(result is Resource.Failure)
-    assertEquals("User with id $userId not found", (result as Resource.Failure).throwable.message)
+    assertEquals("No user has been found", (result as Resource.Failure).throwable.message)
   }
 
   @Test
@@ -187,7 +193,7 @@ class MockUserRepositoryUnitTest {
     // Arrange
     val userId = mockUser.userId
     userRepository.addUser(mockUser)
-    userRepository.uploadImage(mock(Uri::class.java), userId, "Profile_Pictures")
+    (userRepository as MockUserRepository).updateCurrentUserId(mockUser.userId)
 
     // Act
     val result = userRepository.getImage(userId, "Invalid_Folder")
@@ -203,6 +209,7 @@ class MockUserRepositoryUnitTest {
     // Arrange
     val userId = mockUser.userId
     val mockUserWithNoProfilePic = mockUser.copy(profilePicUrl = "")
+    (userRepository as MockUserRepository).updateCurrentUserId(mockUser.userId)
     userRepository.addUser(mockUserWithNoProfilePic)
 
     // Act
@@ -222,6 +229,7 @@ class MockUserRepositoryUnitTest {
     // initialize user with no mock
     val mockUserWithNoProfilePic = mockUser.copy(profilePicUrl = "")
     userRepository.addUser(mockUserWithNoProfilePic)
+    (userRepository as MockUserRepository).updateCurrentUserId(mockUser.userId)
     // Upload Image
     userRepository.uploadImage(mock(Uri::class.java), userId, "Profile_Pictures")
     // Get Image

@@ -106,7 +106,7 @@ class ViewEventDetailsUserFlow : TestCase() {
         searchBarAndFilter { assertIsDisplayed() }
         searchBar { performTextInput("Test 1") }
 
-        filteredEventList { assertIsDisplayed() }
+        eventList { assertIsDisplayed() }
         eventCard { assertIsDisplayed() }
       }
 
@@ -130,9 +130,10 @@ class ViewEventDetailsUserFlow : TestCase() {
           assertIsDisplayed()
           assertTextContains("Social")
         }
-        dateTimeTitle { assertIsDisplayed() }
-        dateTimeStartContent { assertIsDisplayed() }
-        dateTimeEndContent { assertIsDisplayed() }
+        dateTitle { assertIsDisplayed() }
+        dateContent { assertIsDisplayed() }
+        timeTitle { assertIsDisplayed() }
+        timeContent { assertIsDisplayed() }
       }
     }
   }

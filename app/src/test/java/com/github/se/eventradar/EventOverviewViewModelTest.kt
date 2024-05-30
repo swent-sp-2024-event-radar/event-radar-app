@@ -2,6 +2,7 @@ package com.github.se.eventradar
 
 import android.util.Log
 import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
@@ -19,6 +20,7 @@ import io.mockk.verify
 import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -70,7 +72,7 @@ class EventsOverviewViewModelTest {
   private val mockUser =
       User(
           userId = "user1",
-          birthDate = "01/01/2000",
+          birthDate = "01.01.2000",
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",
@@ -81,6 +83,7 @@ class EventsOverviewViewModelTest {
           friendsList = mutableListOf(),
           profilePicUrl = "http://example.com/pic.jpg",
           qrCodeUrl = "http://example.com/qr.jpg",
+          bio = "",
           username = "john_doe")
 
   @Before
@@ -258,10 +261,10 @@ class EventsOverviewViewModelTest {
   @Test
   fun testSetFilterDialogOpen() = runTest {
     // init value is false
-    viewModel.onFilterDialogOpen()
+    viewModel.onFilterDialogOpenChanged()
     assert(viewModel.uiState.value.isFilterDialogOpen)
 
-    viewModel.onFilterDialogOpen()
+    viewModel.onFilterDialogOpenChanged()
     assert(!viewModel.uiState.value.isFilterDialogOpen)
   }
 
@@ -366,6 +369,7 @@ class EventsOverviewViewModelTest {
     events.forEach { event -> eventRepository.addEvent(event) }
 
     viewModel.getEvents()
+    viewModel.onUserLocationChanged(Location(38.9, 78.8, "User Location"))
 
     val newQuery = "20"
     viewModel.onRadiusQueryChanged(newQuery)
@@ -439,5 +443,120 @@ class EventsOverviewViewModelTest {
     (userRepository as MockUserRepository).updateCurrentUserId(null)
     viewModel.checkUserLoginStatus()
     assert(!viewModel.uiState.value.userLoggedIn)
+  }
+
+  @Test
+  fun testObserveAllEvents() = runTest {
+    val testEvent1 = mockEvent.copy(fireBaseID = "1", eventName = "Test Event 1")
+    val testEvent2 = mockEvent.copy(fireBaseID = "2", eventName = "Test Event 2")
+
+    eventRepository.addEvent(testEvent1)
+
+    // Setup your ViewModel with mocked dependencies
+    // automatically triggers the 'init' block, which calls 'observeAllEvents()'
+
+    val viewModel = EventsOverviewViewModel(eventRepository, userRepository)
+
+    delay(100)
+    eventRepository.addEvent(testEvent2)
+
+    (eventRepository as MockEventRepository)
+        .eventsFlow
+        .emit(Resource.Success(listOf(testEvent1, testEvent2)))
+
+    assert(viewModel.uiState.value.eventList.allEvents.containsAll(listOf(testEvent1, testEvent2)))
+  }
+
+  @Test
+  fun testObserveAllEventsFailure() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    val exception = Exception("Network error")
+
+    (eventRepository as MockEventRepository).eventsFlow.emit(Resource.Failure(exception))
+
+    EventsOverviewViewModel(eventRepository, userRepository)
+
+    delay(500)
+
+    val expectedLogMessage = "Failed to fetch events: $exception"
+
+    verify { Log.d("EventsOverviewViewModel", expectedLogMessage) }
+
+    unmockkAll()
+  }
+
+  @Test
+  fun testObserveUpcomingEventsSuccess() = runTest {
+    val testEvent1 = mockEvent.copy(fireBaseID = "1", attendeeList = mutableListOf("user1"))
+    val testEvent2 = mockEvent.copy(fireBaseID = "2", attendeeList = mutableListOf("user1"))
+    val testEvent3 = mockEvent.copy(fireBaseID = "3", attendeeList = mutableListOf("user2"))
+    eventRepository.addEvent(testEvent1)
+    eventRepository.addEvent(testEvent2)
+    eventRepository.addEvent(testEvent3)
+
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+
+    val viewModel = EventsOverviewViewModel(eventRepository, userRepository)
+
+    (eventRepository as MockEventRepository)
+        .eventsFlow
+        .emit(Resource.Success(listOf(testEvent1, testEvent2, testEvent3)))
+
+    assert(viewModel.uiState.value.upcomingEventList.allEvents.size == 2)
+    assert(
+        viewModel.uiState.value.upcomingEventList.allEvents.containsAll(
+            listOf(testEvent1, testEvent2)))
+  }
+
+  @Test
+  fun testObserveUpcomingEventsUserIdFetchFailure() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    val exception = Exception("No user currently signed in")
+    (userRepository as MockUserRepository).updateCurrentUserId(null)
+
+    EventsOverviewViewModel(eventRepository, userRepository)
+
+    delay(500)
+
+    verify { Log.d("EventsOverviewViewModel", "Error fetching user ID: ${exception.message}") }
+    unmockkAll()
+  }
+
+  @Test
+  fun testObserveUpcomingEventsFetchFailure() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+    val exception = Exception("Network error")
+    (eventRepository as MockEventRepository).eventsFlow.emit(Resource.Failure(exception))
+
+    EventsOverviewViewModel(eventRepository, userRepository)
+
+    delay(500)
+
+    verify {
+      Log.d("EventsOverviewViewModel", "Failed to fetch upcoming events: ${exception.message}")
+    }
+    unmockkAll()
+  }
+
+  @Test
+  fun testRadiusQueryLessThanZero() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+
+    val newQuery = "-10.0"
+    viewModel.onRadiusQueryChanged(newQuery)
+    assert(newQuery == viewModel.uiState.value.radiusQuery)
+    viewModel.filterEvents()
+
+    verify { Log.d("EventsOverviewViewModel", "Invalid radius query: $newQuery") }
+    assert(viewModel.uiState.value.radiusQuery == "")
+    unmockkAll()
   }
 }
