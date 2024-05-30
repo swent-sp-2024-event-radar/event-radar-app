@@ -155,3 +155,14 @@ fun EventTime(modifier: Modifier, eventUiState: EventUiState, style: EventCompon
         modifier = Modifier.testTag("timeContent"))
   }
 }
+
+@Composable
+fun TicketsSold(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
+  Column(modifier = modifier) {
+    Text(
+        text = "${eventUiState.ticket.purchases} tickets sold",
+        style = style.subTitleStyle,
+        color = style.fieldTitleColor,
+        modifier = Modifier.testTag("ticketSoldContent"))
+  }
+}
