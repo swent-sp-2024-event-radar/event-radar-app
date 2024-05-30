@@ -40,6 +40,7 @@ constructor(
           it.copy(userId = null)
         }
       }
+      getMessages()
     }
   }
 

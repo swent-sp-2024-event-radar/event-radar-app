@@ -64,8 +64,6 @@ class UserFlowTests : TestCase() {
   // Relaxed mocks methods have a default implementation returning values
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
-  @RelaxedMockK lateinit var mockChatViewModel: ChatViewModel
-
   private var userRepository: IUserRepository = MockUserRepository()
   private var eventRepository: IEventRepository = MockEventRepository()
   private var messageRepository: IMessageRepository = MockMessageRepository()
@@ -326,9 +324,7 @@ class UserFlowTests : TestCase() {
           assertIsDisplayed()
           performTextInput("Test Message 3")
         }
-        mockChatViewModel.onMessageBarInputChange("Test Message 3")
         chatInputSendButton { performClick() }
-        mockChatViewModel.onMessageSend()
       }
 
       step("Check if message is displayed") {
@@ -412,9 +408,7 @@ class UserFlowTests : TestCase() {
           assertIsDisplayed()
           performTextInput("Test Message 3")
         }
-        mockChatViewModel.onMessageBarInputChange("Test Message 3")
         chatInputSendButton { performClick() }
-        mockChatViewModel.onMessageSend()
       }
 
       step("Check if message is displayed") {
