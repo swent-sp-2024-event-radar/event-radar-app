@@ -14,7 +14,7 @@ class MockEventRepository : IEventRepository {
   val mockEvents = mutableListOf<Event>()
 
   private var ticker = 0
-  val eventsFlow = MutableStateFlow<Resource<List<Event>>>(Resource.Success(mockEvents))
+  val eventsFlow = MutableStateFlow<Resource<List<Event>>>(Resource.Success(mutableListOf()))
 
   override suspend fun getEvents(): Resource<List<Event>> {
     val validEvents = mockEvents.filter { it.end.isAfter(LocalDateTime.now()) }
@@ -58,9 +58,7 @@ class MockEventRepository : IEventRepository {
     }
   }
 
-  override suspend fun getEventsByIds(
-      ids: List<String>
-  ): Resource<List<Event>> { // TODO add filter for non expired?
+  override suspend fun getEventsByIds(ids: List<String>): Resource<List<Event>> {
     val events = mutableListOf<Event>()
     for (id in ids) {
       val event = mockEvents.find { it.fireBaseID == id }
@@ -77,9 +75,8 @@ class MockEventRepository : IEventRepository {
     return eventsFlow.asStateFlow().map { resource ->
       when (resource) {
         is Resource.Success -> {
-          val upcomingEvents = resource.data
-          //            .filter { it.end.isAfter(LocalDateTime.now()) } //TODO?
-          Resource.Success(upcomingEvents)
+          val events = resource.data.filter { it.end.isAfter(LocalDateTime.now()) }
+          Resource.Success(events)
         }
         is Resource.Failure -> resource
       }

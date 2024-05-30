@@ -490,10 +490,8 @@ class EventsOverviewViewModelTest {
 
     // Setup your ViewModel with mocked dependencies
     // automatically triggers the 'init' block, which calls 'observeAllEvents()'
-
     val viewModel = EventsOverviewViewModel(eventRepository, userRepository)
 
-    delay(100)
     eventRepository.addEvent(testEvent2)
 
     (eventRepository as MockEventRepository)
@@ -529,12 +527,13 @@ class EventsOverviewViewModelTest {
     val testEvent2 = mockEvent.copy(fireBaseID = "2", attendeeList = mutableListOf("user1"))
     val testEvent3 = mockEvent.copy(fireBaseID = "3", attendeeList = mutableListOf("user2"))
     eventRepository.addEvent(testEvent1)
-    eventRepository.addEvent(testEvent2)
     eventRepository.addEvent(testEvent3)
 
     (userRepository as MockUserRepository).updateCurrentUserId("user1")
 
     val viewModel = EventsOverviewViewModel(eventRepository, userRepository)
+
+    eventRepository.addEvent(testEvent2)
 
     (eventRepository as MockEventRepository)
         .eventsFlow
