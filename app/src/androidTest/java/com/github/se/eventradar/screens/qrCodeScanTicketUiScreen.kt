@@ -41,6 +41,5 @@ class QrCodeScanTicketUiScreen(semanticsProvider: SemanticsNodeInteractionsProvi
   val timeContent: KNode = lazyEventDetails.child { hasTestTag("timeContent") }
   val categoryTitle: KNode = lazyEventDetails.child { hasTestTag("categoryTitle") }
   val categoryContent: KNode = lazyEventDetails.child { hasTestTag("categoryContent") }
-  val ticketSoldTitle: KNode = lazyEventDetails.child { hasTestTag("ticketSoldTitle") }
   val ticketSoldContent: KNode = lazyEventDetails.child { hasTestTag("ticketSoldContent") }
 }
