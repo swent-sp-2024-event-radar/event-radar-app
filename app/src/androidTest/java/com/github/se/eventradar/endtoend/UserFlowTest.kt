@@ -8,16 +8,24 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.eventradar.model.Location
+import com.github.se.eventradar.model.Resource
+import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventTicket
+import com.github.se.eventradar.model.message.Message
+import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.event.MockEventRepository
+import com.github.se.eventradar.model.repository.message.IMessageRepository
+import com.github.se.eventradar.model.repository.message.MockMessageRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
+import com.github.se.eventradar.screens.ChatScreen
 import com.github.se.eventradar.screens.EventDetailsScreen
 import com.github.se.eventradar.screens.HomeScreen
 import com.github.se.eventradar.screens.MessagesScreen
+import com.github.se.eventradar.screens.ViewFriendsProfileScreen
 import com.github.se.eventradar.ui.chat.ChatScreen
 import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.home.HomeScreen
@@ -25,14 +33,24 @@ import com.github.se.eventradar.ui.messages.MessagesScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.theme.MyApplicationTheme
+import com.github.se.eventradar.ui.viewProfile.ViewFriendsProfileUi
+import com.github.se.eventradar.viewmodel.ChatUiState
 import com.github.se.eventradar.viewmodel.ChatViewModel
 import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
+import com.github.se.eventradar.viewmodel.MessagesViewModel
+import com.github.se.eventradar.viewmodel.ViewFriendsProfileUiState
+import com.github.se.eventradar.viewmodel.ViewFriendsProfileViewModel
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
+import io.mockk.Runs
+import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
+import io.mockk.just
 import java.time.LocalDateTime
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -43,14 +61,19 @@ import org.junit.runner.RunWith
 class UserFlowTests : TestCase() {
   @get:Rule val composeTestRule = createComposeRule()
 
-  // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
+  // This rule automatically initializes lateinit properties with @MockK, @RelaxedMockK, etc.
   @get:Rule val mockkRule = MockKRule(this)
 
   // Relaxed mocks methods have a default implementation returning values
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
+  @RelaxedMockK lateinit var mockViewFriendsProfileViewModel: ViewFriendsProfileViewModel
+
+  @RelaxedMockK lateinit var mockChatViewModel: ChatViewModel
+
   private var userRepository: IUserRepository = MockUserRepository()
   private var eventRepository: IEventRepository = MockEventRepository()
+  private var messageRepository: IMessageRepository = MockMessageRepository()
 
   private val mockEvent =
       Event(
@@ -67,13 +90,130 @@ class UserFlowTests : TestCase() {
           EventCategory.SOCIAL,
           "1")
 
+  private val user1 =
+      User(
+          userId = "user1",
+          birthDate = "01.01.2000",
+          email = "test@example.com",
+          firstName = "John",
+          lastName = "Doe",
+          phoneNumber = "1234567890",
+          accountStatus = "active",
+          eventsAttendeeList = mutableListOf("event1", "event2"),
+          eventsHostList = mutableListOf("event3"),
+          friendsList = mutableListOf("user2"),
+          profilePicUrl = "http://example.com/Profile_Pictures/1",
+          qrCodeUrl = "http://example.com/QR_Codes/1",
+          bio = "",
+          username = "johndoe")
+
+  private val user2 =
+      User(
+          userId = "user2",
+          birthDate = "01.01.2000",
+          email = "test@example.com",
+          firstName = "Test",
+          lastName = "",
+          phoneNumber = "TestPhone",
+          accountStatus = "active",
+          eventsAttendeeList = mutableListOf("event1", "event2"),
+          eventsHostList = mutableListOf("event3"),
+          friendsList = mutableListOf("user1"),
+          profilePicUrl = "http://example.com/Profile_Pictures/1",
+          qrCodeUrl = "http://example.com/QR_Codes/1",
+          bio = "",
+          username = "pauldoe")
+
+  private val profileUiState =
+      MutableStateFlow(
+          ViewFriendsProfileUiState(
+              friendProfilePicLink = "",
+              friendFirstName = "Test",
+              friendUserName = "",
+              bio = "Available"))
+
+  private val chatUiState =
+      MutableStateFlow(
+          ChatUiState(
+              userId = "user1",
+              messageHistory =
+                  MessageHistory(
+                      user1 = "user1",
+                      user2 = "user2",
+                      "2",
+                      user1ReadMostRecentMessage = false,
+                      user2ReadMostRecentMessage = false,
+                      messages =
+                          mutableListOf(
+                              Message(
+                                  sender = "user1",
+                                  content = "Test Message 1",
+                                  dateTimeSent = LocalDateTime.now(),
+                                  id = "1"),
+                              Message(
+                                  sender = "user2",
+                                  content = "Test Message 2",
+                                  dateTimeSent = LocalDateTime.now(),
+                                  id = "2"),
+                          ),
+                      id = "1"),
+              opponentProfile = user2,
+              messageBarInput = ""))
+
   @Before
   fun setUp() = runBlocking {
     for (i in 0..2) {
       eventRepository.addEvent(mockEvent.copy(eventName = "Test $i", fireBaseID = "$i"))
     }
 
-    (userRepository as MockUserRepository).updateCurrentUserId("mock_user")
+    (userRepository as MockUserRepository).addUser(user1)
+    (userRepository as MockUserRepository).addUser(user2)
+    (userRepository as MockUserRepository).updateCurrentUserId("user1")
+
+    val mh = messageRepository.createNewMessageHistory("user1", "user2")
+    messageRepository.addMessage(
+        Message(
+            sender = "user1",
+            content = "Test Message 1",
+            dateTimeSent = LocalDateTime.now(),
+            id = "1"),
+        (mh as Resource.Success).data)
+
+    messageRepository.addMessage(
+        Message(
+            sender = "user2",
+            content = "Test Message 2",
+            dateTimeSent = LocalDateTime.now(),
+            id = "2"),
+        (mh).data)
+
+    val mockMessageVM = MessagesViewModel(messageRepository, userRepository)
+
+    every { mockViewFriendsProfileViewModel.getFriendProfileDetails() } returns Unit
+    every { mockViewFriendsProfileViewModel.uiState } returns profileUiState
+    every { mockViewFriendsProfileViewModel.friendUserId } returns "user2"
+
+    every { mockChatViewModel.opponentId } returns "user2"
+    every { mockChatViewModel.uiState } returns chatUiState
+    every { mockChatViewModel.onMessageBarInputChange(any()) } answers
+        {
+          chatUiState.value = chatUiState.value.copy(messageBarInput = firstArg())
+        }
+    every { mockChatViewModel.onMessageSend() } answers
+        {
+          val newMessages = chatUiState.value.messageHistory.messages
+          newMessages.add(
+              Message(
+                  sender = "user1",
+                  content = chatUiState.value.messageBarInput,
+                  dateTimeSent = LocalDateTime.now(),
+                  id = "3"))
+          chatUiState.value =
+              chatUiState.value.copy(
+                  messageHistory = chatUiState.value.messageHistory.copy(messages = newMessages))
+          chatUiState.value = chatUiState.value.copy(messageBarInput = "")
+        }
+    coEvery { mockChatViewModel.getMessages() } just Runs
 
     // Launch the Home screen
     composeTestRule.setContent {
@@ -91,13 +231,19 @@ class UserFlowTests : TestCase() {
                 EventDetails(
                     EventDetailsViewModel(eventRepository, userRepository, eventId), mockNavActions)
               }
-          composable(Route.MESSAGE) { MessagesScreen(navigationActions = mockNavActions) }
+          composable(Route.MESSAGE) {
+            MessagesScreen(mockMessageVM, navigationActions = mockNavActions)
+          }
           composable(
               "${Route.PRIVATE_CHAT}/{opponentId}",
               arguments = listOf(navArgument("opponentId") { type = NavType.StringType })) {
-                val opponentId = it.arguments!!.getString("opponentId")!!
-                val viewModel = ChatViewModel.create(opponentId = opponentId)
-                ChatScreen(viewModel = viewModel, navigationActions = mockNavActions)
+                ChatScreen(viewModel = mockChatViewModel, navigationActions = mockNavActions)
+              }
+          composable(
+              "${Route.PROFILE}/{friendUserId}",
+              arguments = listOf(navArgument("friendUserId") { type = NavType.StringType })) {
+                ViewFriendsProfileUi(
+                    viewModel = mockViewFriendsProfileViewModel, navigationActions = mockNavActions)
               }
         }
       }
@@ -150,25 +296,193 @@ class UserFlowTests : TestCase() {
     }
   }
 
-  // PATH: homeScreen to Message to friend to start a conversation to send a first message
-
+  // User flow: homeScreen => messageScreen => friendList tab => view a friend's profile => open
+  // conversation => send a message
   @Test
-  fun homeScreenToMessageScreenAndSendFirstMessage() = run {
+  fun homeScreenToOpenConversationAndSendMessage() = run {
     ComposeScreen.onComposeScreen<HomeScreen>(composeTestRule) {
-      step("Check if nav bar and tabs are present") {
+      step("Check if elements are present") {
+        logo { assertIsDisplayed() }
+        tabs { assertIsDisplayed() }
+        upcomingTab { assertIsDisplayed() }
+        browseTab { assertIsDisplayed() }
+        eventCard { assertIsDisplayed() }
         bottomNav { assertIsDisplayed() }
-        messagesTab { assertIsDisplayed() }
-        homeTab { assertIsDisplayed() }
+        viewToggleFab { assertIsDisplayed() }
+        searchBarAndFilter { assertIsDisplayed() }
+        eventList { assertIsDisplayed() }
+        filterPopUp { assertIsNotDisplayed() }
+        bottomNav { assertIsDisplayed() }
+        homeIcon { assertIsDisplayed() }
+        messageIcon { assertIsDisplayed() }
+        qrIcon { assertIsDisplayed() }
+        profileIcon { assertIsDisplayed() }
+        hostingIcon { assertIsDisplayed() }
       }
-      step("Navigate to messages") {
-        step("Click on the message icon") { messagesTab { performClick() } }
-      }
+      step("Click on the message icon") { messageIcon.performClick() }
     }
 
     ComposeScreen.onComposeScreen<MessagesScreen>(composeTestRule) {
-      step("Check if all friends are listed") {
-        // Test the UI elements
+      step("Check if tabs are present") {
+        messagesTab { assertIsDisplayed() }
+        friendsTab { assertIsDisplayed() }
+      }
+      step("Click on friends list") { friendsTab.performClick() }
 
+      step("Check if friendsList is displayed") {
+        friendsList { assertIsDisplayed() }
+        friendPreviewItem {
+          assertIsDisplayed()
+          assertHasClickAction()
+        }
+        friendProfilePic { assertIsDisplayed() }
+        friendName { assertIsDisplayed() }
+        friendPhoneNumber { assertIsDisplayed() }
+      }
+      step("View friend profile") { friendPreviewItem { performClick() } }
+    }
+    ComposeScreen.onComposeScreen<ViewFriendsProfileScreen>(composeTestRule) {
+      chatButton { assertIsDisplayed() }
+      goBackButton { assertIsDisplayed() }
+      bottomNav { assertIsDisplayed() }
+      centeredViewProfileColumn { assertIsDisplayed() }
+      friendProfilePic { assertIsDisplayed() }
+      friendName { assertIsDisplayed() }
+      friendUserName { assertIsDisplayed() }
+      leftAlignedViewProfileColumn { assertIsDisplayed() }
+      bioLabelText { assertIsDisplayed() }
+      bioInfoText { assertIsDisplayed() }
+
+      step("Start a conversation") { chatButton { performClick() } }
+    }
+
+    ComposeScreen.onComposeScreen<ChatScreen>(composeTestRule) {
+      step("Check if all elements are displayed") {
+        chatAppBar { assertIsDisplayed() }
+        chatAppBarTitle { assertIsDisplayed() }
+        chatAppBarTitleImage { assertIsDisplayed() }
+        chatAppBarTitleColumn {
+          assertIsDisplayed()
+          assertHasClickAction()
+        }
+        chatAppBarBackArrow {
+          assertIsDisplayed()
+          assertHasClickAction()
+        }
+
+        chatScreenMessagesList { assertIsDisplayed() }
+
+        chatInput { assertIsDisplayed() }
+        chatInputField { assertIsDisplayed() }
+        chatInputPlaceholder { assertIsDisplayed() }
+        chatInputSendButton { assertIsDisplayed() }
+        chatInputSendButtonIcon { assertIsDisplayed() }
+
+        receivedChatBubble { assertIsDisplayed() }
+        receivedChatBubbleText { assertIsDisplayed() }
+        sentChatBubble { assertIsDisplayed() }
+        sentChatBubbleText { assertIsDisplayed() }
+      }
+
+      step("Send a message") {
+        chatInputField {
+          assertIsDisplayed()
+          performTextInput("Test Message 3")
+        }
+        mockChatViewModel.onMessageBarInputChange("Test Message 3")
+        chatInputSendButton { performClick() }
+        mockChatViewModel.onMessageSend()
+      }
+
+      step("Check if message is displayed") {
+        chatScreenMessagesList { assertIsDisplayed() }
+        onNode { hasText("Test Message 3") }.assertIsDisplayed()
+      }
+    }
+  }
+  // User flow: homeScreen => messageScreen => messagesList => click on conversation => send a
+  // message
+  @Test
+  fun homeScreenToMessagesListAndSendMessage() = run {
+    ComposeScreen.onComposeScreen<HomeScreen>(composeTestRule) {
+      step("Check if nav bar and tabs are present") {
+        logo { assertIsDisplayed() }
+        tabs { assertIsDisplayed() }
+        upcomingTab { assertIsDisplayed() }
+        browseTab { assertIsDisplayed() }
+        eventCard { assertIsDisplayed() }
+        bottomNav { assertIsDisplayed() }
+        viewToggleFab { assertIsDisplayed() }
+        searchBarAndFilter { assertIsDisplayed() }
+        eventList { assertIsDisplayed() }
+        filterPopUp { assertIsNotDisplayed() }
+        bottomNav { assertIsDisplayed() }
+        homeIcon { assertIsDisplayed() }
+        messageIcon { assertIsDisplayed() }
+        qrIcon { assertIsDisplayed() }
+        profileIcon { assertIsDisplayed() }
+        hostingIcon { assertIsDisplayed() }
+      }
+      step("Click on the message icon") { messageIcon.performClick() }
+    }
+
+    ComposeScreen.onComposeScreen<MessagesScreen>(composeTestRule) {
+      step("Check if elements are displayed") {
+        logo { assertIsDisplayed() }
+        tabs { assertIsDisplayed() }
+        messagesTab { assertIsDisplayed() }
+        friendsTab { assertIsDisplayed() }
+        messagesList { assertIsDisplayed() }
+        messagePreviewItem {
+          assertIsDisplayed()
+          assertHasClickAction()
+        }
+        bottomNav { assertIsDisplayed() }
+        profilePic { assertIsDisplayed() }
+      }
+      step("Click on conversation") { messagePreviewItem.performClick() }
+    }
+    ComposeScreen.onComposeScreen<ChatScreen>(composeTestRule) {
+      step("Check if all elements are displayed") {
+        chatAppBar { assertIsDisplayed() }
+        chatAppBarTitle { assertIsDisplayed() }
+        chatAppBarTitleImage { assertIsDisplayed() }
+        chatAppBarTitleColumn {
+          assertIsDisplayed()
+          assertHasClickAction()
+        }
+        chatAppBarBackArrow {
+          assertIsDisplayed()
+          assertHasClickAction()
+        }
+
+        chatScreenMessagesList { assertIsDisplayed() }
+
+        chatInput { assertIsDisplayed() }
+        chatInputField { assertIsDisplayed() }
+        chatInputPlaceholder { assertIsDisplayed() }
+        chatInputSendButton { assertIsDisplayed() }
+        chatInputSendButtonIcon { assertIsDisplayed() }
+
+        receivedChatBubble { assertIsDisplayed() }
+        receivedChatBubbleText { assertIsDisplayed() }
+        sentChatBubble { assertIsDisplayed() }
+        sentChatBubbleText { assertIsDisplayed() }
+      }
+
+      step("Send a message") {
+        chatInputField {
+          assertIsDisplayed()
+          performTextInput("Test Message 3")
+        }
+        mockChatViewModel.onMessageBarInputChange("Test Message 3")
+        chatInputSendButton { performClick() }
+        mockChatViewModel.onMessageSend()
+      }
+
+      step("Check if message is displayed") {
+        chatScreenMessagesList { assertIsDisplayed() }
+        onNode { hasText("Test Message 3") }.assertIsDisplayed()
       }
     }
   }
