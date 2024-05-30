@@ -222,40 +222,46 @@ class HostingTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
     }
   }
 
-    @Test
-    fun typingInSearchBarWhenNoResults() = run {
-      onComposeScreen<HostingScreen>(composeTestRule) {
-        searchBar {
-          assertIsDisplayed()
-          performClick()
-          performTextInput("Event not found")
-        }
-
-        // Update the UI state to reflect the change
-        sampleEventList.value =
-            sampleEventList.value.copy(searchQuery = "Event not found", isSearchActive = true)
-
-        noEventsFoundText { assertIsDisplayed() }
-
-        verify { mockHostedEventsViewModel.onSearchQueryChanged("Event not found") }
-        verify { mockHostedEventsViewModel.onSearchActiveChanged(true) }
-        verify { mockHostedEventsViewModel.uiState }
-        verify { mockHostedEventsViewModel.filterHostedEvents() }
-
-        searchBar { performTextClearance() }
-
-        sampleEventList.value = sampleEventList.value.copy(searchQuery = "", isSearchActive = false)
-
-        verify { mockHostedEventsViewModel.onSearchQueryChanged("") }
-        verify { mockHostedEventsViewModel.onSearchActiveChanged(false) }
-        verify { mockHostedEventsViewModel.uiState }
-        verify { mockHostedEventsViewModel.getHostedEvents() }
-
-        noEventsFoundText { assertIsNotDisplayed() }
-
-        confirmVerified(mockHostedEventsViewModel)
+  @Test
+  fun typingInSearchBarWhenNoResults() = run {
+    onComposeScreen<HostingScreen>(composeTestRule) {
+      searchBar {
+        assertIsDisplayed()
+        performClick()
+        performTextInput("Event not found")
       }
+
+      // Update the UI state to reflect the change
+      sampleEventList.value =
+          sampleEventList.value.copy(
+              eventList = sampleEventList.value.eventList.copy(filteredEvents = emptyList()),
+              searchQuery = "Event not found",
+              isSearchActive = true)
+
+      noEventsFoundText { assertIsDisplayed() }
+
+      verify { mockHostedEventsViewModel.onSearchQueryChanged("Event not found") }
+      verify { mockHostedEventsViewModel.onSearchActiveChanged(true) }
+      verify { mockHostedEventsViewModel.uiState }
+      verify { mockHostedEventsViewModel.filterHostedEvents() }
+
+      searchBar { performTextClearance() }
+
+      sampleEventList.value = sampleEventList.value.copy(searchQuery = "", isSearchActive = false)
+
+      // Wait for the UI state to update
+      composeTestRule.waitForIdle()
+
+      verify { mockHostedEventsViewModel.onSearchQueryChanged("") }
+      verify { mockHostedEventsViewModel.onSearchActiveChanged(false) }
+      verify { mockHostedEventsViewModel.uiState }
+      verify { mockHostedEventsViewModel.getHostedEvents() }
+
+      noEventsFoundText { assertIsNotDisplayed() }
+
+      confirmVerified(mockHostedEventsViewModel)
     }
+  }
 
   @Test
   fun typingInSearchBarShowsResults() = run {

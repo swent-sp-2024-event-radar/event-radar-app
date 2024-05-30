@@ -70,7 +70,17 @@ fun HostingScreen(
   GetUserLocation(context, viewModel::onUserLocationChanged)
 
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("hostingScreen")) {
-    val (logo, title, divider, searchfilter, noEvents, filter, eventList, eventMap, bottomNav, buttons) =
+    val (
+        logo,
+        title,
+        divider,
+        searchfilter,
+        noEvents,
+        filter,
+        eventList,
+        eventMap,
+        bottomNav,
+        buttons) =
         createRefs()
     Logo(
         modifier =
@@ -102,15 +112,20 @@ fun HostingScreen(
         placeholderStringResource = R.string.hosting_search_placeholder)
 
     val events = getEventsBasedOffUiState(uiState)
+    var mapTopConstraint = searchfilter.bottom
 
     if ((uiState.isSearchActive || uiState.isFilterActive) &&
         (uiState.eventList.filteredEvents.isEmpty())) {
       Text(
           "No events match the filter applied",
           textAlign = TextAlign.Center,
-          modifier = Modifier
-              .testTag("noEventsFoundText")
-              .constrainAs(noEvents) { top.linkTo(searchfilter.bottom, margin = 10.dp) })
+          modifier =
+              Modifier.testTag("noEventsFoundText").constrainAs(noEvents) {
+                top.linkTo(searchfilter.bottom, margin = 10.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+              })
+      mapTopConstraint = noEvents.bottom
     }
 
     if (uiState.viewList) {
@@ -127,7 +142,7 @@ fun HostingScreen(
       EventMap(
           events,
           Modifier.testTag("map").fillMaxWidth().constrainAs(eventMap) {
-            top.linkTo(searchfilter.bottom, margin = 8.dp)
+            top.linkTo(mapTopConstraint, margin = 8.dp)
             start.linkTo(parent.start)
             end.linkTo(parent.end)
           }) { eventId ->
