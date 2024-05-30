@@ -130,10 +130,8 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
   }
 
   override fun observeUpcomingEvents(userId: String): Flow<Resource<List<Event>>> = callbackFlow {
-    val query =
-        eventRef
-            .whereGreaterThan("end", currentDateTimeString)
-            .whereArrayContains("attendees_list", userId)
+    val query = eventRef.whereArrayContains("attendees_list", userId)
+    //           .whereGreaterThan("end", currentDateTimeString)
 
     val listener =
         query.addSnapshotListener { snapshot, error ->
@@ -145,8 +143,10 @@ class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : 
           }
 
           val upcomingEvents =
-              snapshot?.documents?.mapNotNull { it.data?.let { data -> Event(data, it.id) } }
-                  ?: listOf()
+              snapshot
+                  ?.documents
+                  ?.filter { (it.getString("end") ?: "") > currentDateTimeString }
+                  ?.mapNotNull { it.data?.let { data -> Event(data, it.id) } } ?: listOf()
 
           trySend(Resource.Success(upcomingEvents))
         }
