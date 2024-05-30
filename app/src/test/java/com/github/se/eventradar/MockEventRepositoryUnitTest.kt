@@ -8,6 +8,7 @@ import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -22,8 +23,23 @@ class MockEventRepositoryUnitTest {
       Event(
           eventName = "Event 1",
           eventPhoto = "",
-          start = LocalDateTime.now(),
-          end = LocalDateTime.now(),
+          start = LocalDateTime.now().plus(1, ChronoUnit.DAYS),
+          end = LocalDateTime.now().plus(2, ChronoUnit.DAYS),
+          location = Location(0.0, 0.0, "Test Location"),
+          description = "Test Description",
+          ticket = EventTicket("Test Ticket", 0.0, 1, 0),
+          mainOrganiser = "1",
+          organiserList = mutableListOf("Test Organiser"),
+          attendeeList = mutableListOf("Test Attendee"),
+          category = EventCategory.COMMUNITY,
+          fireBaseID = "1")
+
+  private val expiredEvent =
+      Event(
+          eventName = "Event 1",
+          eventPhoto = "",
+          start = LocalDateTime.now().minus(2, ChronoUnit.DAYS),
+          end = LocalDateTime.now().minus(1, ChronoUnit.DAYS),
           location = Location(0.0, 0.0, "Test Location"),
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1, 0),
@@ -151,6 +167,24 @@ class MockEventRepositoryUnitTest {
     val events = eventRepository.getEvents()
     assert(events is Resource.Success)
     assert((events as Resource.Success).data.size == 3)
+  }
+
+  @Test
+  fun testFilterExpired() = runTest {
+    val event1 = mockEvent.copy(fireBaseID = "1")
+    val event2 = expiredEvent.copy(fireBaseID = "2")
+    val event3 = mockEvent.copy(fireBaseID = "3")
+
+    val expected = listOf(event1, event3)
+
+    eventRepository.addEvent(event1)
+    eventRepository.addEvent(event2)
+    eventRepository.addEvent(event3)
+
+    val events = eventRepository.getEvents()
+    assert(events is Resource.Success)
+    assert((events as Resource.Success).data.size == 2)
+    assert(events.data == expected)
   }
 
   @Test
