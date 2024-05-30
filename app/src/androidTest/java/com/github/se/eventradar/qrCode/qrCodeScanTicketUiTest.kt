@@ -32,8 +32,8 @@ import io.mockk.junit4.MockKRule
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
-import junit.framework.TestCase.assertEquals
 import java.time.LocalDateTime
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
@@ -89,7 +89,6 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
     qrCodeAnalyser = mockk<QrCodeAnalyser>(relaxed = true)
     mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
   }
-
 
   @Test
   fun screenDisplaysNavigationElementsCorrectly() = run {

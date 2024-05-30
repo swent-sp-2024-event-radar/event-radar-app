@@ -31,157 +31,156 @@ constructor(
     @Assisted private val myEventID: String
 ) : ViewModel() {
 
-    @AssistedFactory
-    interface Factory {
-        fun create(eventId: String): ScanTicketQrViewModel
+  @AssistedFactory
+  interface Factory {
+    fun create(eventId: String): ScanTicketQrViewModel
+  }
+
+  companion object {
+    @Composable
+    fun create(eventId: String): ScanTicketQrViewModel {
+      return hiltViewModel<ScanTicketQrViewModel, Factory>(
+          creationCallback = { factory -> factory.create(eventId = eventId) })
     }
+  }
 
-    companion object {
-        @Composable
-        fun create(eventId: String): ScanTicketQrViewModel {
-            return hiltViewModel<ScanTicketQrViewModel, Factory>(
-                creationCallback = { factory -> factory.create(eventId = eventId) })
-        }
+  private val _uiState = MutableStateFlow(QrCodeScanTicketState())
+  val uiState: StateFlow<QrCodeScanTicketState> = _uiState
+
+  enum class Action {
+    ScanTicket,
+    ApproveEntry,
+    DenyEntry,
+    FirebaseUpdateError,
+    FirebaseFetchError,
+    AnalyserError,
+  }
+
+  enum class Tab {
+    MyEvent,
+    ScanQr
+  }
+
+  init {
+    resetAnalyser()
+    getEventData()
+  }
+
+  private fun resetAnalyser() {
+    qrCodeAnalyser.changeAnalysisState(true)
+    qrCodeAnalyser.onDecoded = { decodedString ->
+      // Update state flow
+      if (decodedString != null) {
+        updateDecodedString(decodedString)
+        updatePermissions(decodedString) // Directly call updateFriendList
+      } else {
+        changeAction(Action.AnalyserError)
+      }
     }
+  }
 
-    private val _uiState = MutableStateFlow(QrCodeScanTicketState())
-    val uiState: StateFlow<QrCodeScanTicketState> = _uiState
+  private fun updatePermissions(decodedString: String) {
 
-    enum class Action {
-        ScanTicket,
-        ApproveEntry,
-        DenyEntry,
-        FirebaseUpdateError,
-        FirebaseFetchError,
-        AnalyserError,
+    println("entered updatePermissions")
+    val uiLength = 28
+    val attendeeID = decodedString.take(uiLength)
+    Log.d("QrCodeTicketViewModel", "Ticket User ID: $attendeeID")
+
+    viewModelScope.launch {
+      val attendeeUserDeferred = async { userRepository.getUser(attendeeID) }
+      val currentEventDeferred = async { eventRepository.getEvent(myEventID) }
+
+      val attendeeUser = attendeeUserDeferred.await()
+      val currentEvent = currentEventDeferred.await()
+
+      if (attendeeUser is Resource.Success && currentEvent is Resource.Success) {
+        retryUpdate(attendeeUser.data!!, currentEvent.data!!)
+      } else {
+        changeAction(Action.FirebaseFetchError)
+        return@launch
+      }
     }
+  }
 
-    enum class Tab {
-        MyEvent,
-        ScanQr
-    }
+  private suspend fun retryUpdate(user: User, event: Event) {
+    println("entered retryUpdate")
+    var maxNumberOfRetries = 3
+    var updateResult: Resource<Any>?
+    if (user.eventsAttendeeList.contains(myEventID) && event.attendeeList.contains(user.userId)) {
+      println("both contain one another")
+      user.eventsAttendeeList.remove(myEventID)
+      val userUpdateResult = userRepository.updateUser(user)
+      event.attendeeList.remove(user.userId)
+      val eventUpdateResult = eventRepository.updateEvent(event)
 
-    init {
-        resetAnalyser()
-        getEventData()
-    }
-
-    private fun resetAnalyser() {
-        qrCodeAnalyser.changeAnalysisState(true)
-        qrCodeAnalyser.onDecoded = { decodedString ->
-            // Update state flow
-            if (decodedString != null) {
-                updateDecodedString(decodedString)
-                updatePermissions(decodedString) // Directly call updateFriendList
+      do {
+        // Check if both updates were successful
+        updateResult =
+            if (userUpdateResult is Resource.Success && eventUpdateResult is Resource.Success) {
+              changeAction(Action.ApproveEntry)
+              Resource.Success(Unit)
             } else {
-                changeAction(Action.AnalyserError)
+              changeAction(Action.FirebaseUpdateError)
+              Resource.Failure(Exception("Failed to update user and event"))
             }
+      } while ((updateResult !is Resource.Success) && (maxNumberOfRetries-- > 0))
+    } else {
+      Log.d("error one does not contain the other", "one does not contain the other")
+      changeAction(Action.DenyEntry)
+    }
+  }
+
+  private fun updateDecodedString(result: String) {
+    _uiState.update { it.copy(decodedResult = result) }
+  }
+
+  fun resetConditions() {
+    changeAction(Action.ScanTicket)
+    _uiState.update { it.copy(decodedResult = null) }
+    qrCodeAnalyser.onDecoded = null
+    changeTabState(Tab.MyEvent)
+  }
+
+  fun changeTabState(tab: Tab) {
+    _uiState.update { it.copy(tabState = tab) }
+  }
+
+  fun changeAction(action: Action) {
+    if (action == Action.ScanTicket) {
+      resetAnalyser()
+    }
+    _uiState.update { it.copy(action = action) }
+  }
+
+  fun getEventData() {
+    viewModelScope.launch {
+      when (val response = eventRepository.getEvent(myEventID)) {
+        is Resource.Success -> {
+          _uiState.update {
+            it.copy(
+                eventUiState =
+                    EventUiState(
+                        eventName = response.data!!.eventName,
+                        eventPhoto = response.data.eventPhoto,
+                        start = response.data.start,
+                        end = response.data.end,
+                        location = response.data.location,
+                        description = response.data.description,
+                        ticket = response.data.ticket,
+                        mainOrganiser = response.data.mainOrganiser,
+                        category = response.data.category))
+          }
         }
+        is Resource.Failure ->
+            Log.d("EventDetailsViewModel", "Error getting event: ${response.throwable.message}")
+      }
     }
+  }
 
-    private fun updatePermissions(decodedString: String) {
-
-        println("entered updatePermissions")
-        val uiLength = 28
-        val attendeeID = decodedString.take(uiLength)
-        Log.d("QrCodeTicketViewModel", "Ticket User ID: $attendeeID")
-
-        viewModelScope.launch {
-            val attendeeUserDeferred = async { userRepository.getUser(attendeeID) }
-            val currentEventDeferred = async { eventRepository.getEvent(myEventID) }
-
-            val attendeeUser = attendeeUserDeferred.await()
-            val currentEvent = currentEventDeferred.await()
-
-            if (attendeeUser is Resource.Success && currentEvent is Resource.Success) {
-                retryUpdate(attendeeUser.data!!, currentEvent.data!!)
-            } else {
-                changeAction(Action.FirebaseFetchError)
-                return@launch
-            }
-        }
-    }
-
-    private suspend fun retryUpdate(user: User, event: Event) {
-        println("entered retryUpdate")
-        var maxNumberOfRetries = 3
-        var updateResult: Resource<Any>?
-        if (user.eventsAttendeeList.contains(myEventID) && event.attendeeList.contains(user.userId)) {
-            println("both contain one another")
-            user.eventsAttendeeList.remove(myEventID)
-            val userUpdateResult = userRepository.updateUser(user)
-            event.attendeeList.remove(user.userId)
-            val eventUpdateResult = eventRepository.updateEvent(event)
-
-            do {
-                // Check if both updates were successful
-                updateResult =
-                    if (userUpdateResult is Resource.Success && eventUpdateResult is Resource.Success) {
-                        changeAction(Action.ApproveEntry)
-                        Resource.Success(Unit)
-                    } else {
-                        changeAction(Action.FirebaseUpdateError)
-                        Resource.Failure(Exception("Failed to update user and event"))
-                    }
-            } while ((updateResult !is Resource.Success) && (maxNumberOfRetries-- > 0))
-        } else {
-            Log.d("error one does not contain the other", "one does not contain the other")
-            changeAction(Action.DenyEntry)
-        }
-    }
-
-    private fun updateDecodedString(result: String) {
-        _uiState.update { it.copy(decodedResult = result) }
-    }
-
-    fun resetConditions() {
-        changeAction(Action.ScanTicket)
-        _uiState.update { it.copy(decodedResult = null) }
-        qrCodeAnalyser.onDecoded = null
-        changeTabState(Tab.MyEvent)
-    }
-
-    fun changeTabState(tab: Tab) {
-        _uiState.update { it.copy(tabState = tab) }
-    }
-
-    fun changeAction(action: Action) {
-        if (action == Action.ScanTicket) {
-            resetAnalyser()
-        }
-        _uiState.update { it.copy(action = action) }
-    }
-
-    fun getEventData() {
-        viewModelScope.launch {
-            when (val response = eventRepository.getEvent(myEventID)) {
-                is Resource.Success -> {
-                    _uiState.update {
-                        it.copy(
-                            eventUiState =
-                            EventUiState(
-                                eventName = response.data!!.eventName,
-                                eventPhoto = response.data.eventPhoto,
-                                start = response.data.start,
-                                end = response.data.end,
-                                location = response.data.location,
-                                description = response.data.description,
-                                ticket = response.data.ticket,
-                                mainOrganiser = response.data.mainOrganiser,
-                                category = response.data.category))
-                    }
-                }
-                is Resource.Failure ->
-                    Log.d("EventDetailsViewModel", "Error getting event: ${response.throwable.message}")
-            }
-        }
-    }
-
-    data class QrCodeScanTicketState(
-        val decodedResult: String? = null,
-        val action: Action = Action.ScanTicket,
-        val tabState: Tab = Tab.MyEvent,
-        val eventUiState: EventUiState = EventUiState()
-    )
+  data class QrCodeScanTicketState(
+      val decodedResult: String? = null,
+      val action: Action = Action.ScanTicket,
+      val tabState: Tab = Tab.MyEvent,
+      val eventUiState: EventUiState = EventUiState()
+  )
 }
-
