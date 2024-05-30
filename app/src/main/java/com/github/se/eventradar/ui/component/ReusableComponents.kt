@@ -464,11 +464,11 @@ fun GenericDialogBox(
         },
         onDismissRequest = { openDialog.value = false },
         dismissButton = {
-            TextButton(
-                onClick = { openDialog.value = false },
-                modifier = Modifier.testTag("dialogDismissButton")) {
+          TextButton(
+              onClick = { openDialog.value = false },
+              modifier = Modifier.testTag("dialogDismissButton")) {
                 Text("Cancel")
-            }
+              }
         },
         confirmButton = {
           TextButton(
