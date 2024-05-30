@@ -1,9 +1,12 @@
 package com.github.se.eventradar.ui.qrCode
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -11,6 +14,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -20,20 +29,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberImagePainter
+import androidx.navigation.compose.rememberNavController
+import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
+import com.github.se.eventradar.model.repository.event.MockEventRepository
+import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.EventCategory
 import com.github.se.eventradar.ui.component.EventComponentsStyle
@@ -47,6 +64,7 @@ import com.github.se.eventradar.ui.component.Logo
 import com.github.se.eventradar.ui.component.TicketsSold
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
 import com.github.se.eventradar.viewmodel.qrCode.ScanTicketQrViewModel
 
 @Composable
@@ -56,8 +74,6 @@ fun QrCodeTicketUi(
 ) {
 
   val qrScanUiState = viewModel.uiState.collectAsStateWithLifecycle()
-
-  val context = LocalContext.current
 
   ConstraintLayout(
       modifier = Modifier.fillMaxSize().testTag("qrCodeScannerScreen"),
@@ -210,7 +226,25 @@ fun QrCodeTicketUi(
             item { Spacer(modifier = Modifier.height(8.dp)) }
           }
     } else {
-      Toast.makeText(context, "Scan Ticket Not implemented yet", Toast.LENGTH_SHORT).show()
+      when (qrScanUiState.value.action) {
+        ScanTicketQrViewModel.Action.ScanTicket -> {
+          Column(modifier = Modifier.testTag("QrScanner")) {
+            QrCodeScanner(viewModel.qrCodeAnalyser)
+          }
+        }
+        ScanTicketQrViewModel.Action.ApproveEntry -> {
+          println("ApprovedBox should now be displayed")
+          EntryDialog(0, viewModel)
+        }
+        ScanTicketQrViewModel.Action.DenyEntry -> {
+          EntryDialog(1, viewModel)
+        }
+        ScanTicketQrViewModel.Action.FirebaseUpdateError,
+        ScanTicketQrViewModel.Action.FirebaseFetchError,
+        ScanTicketQrViewModel.Action.AnalyserError -> {
+          EntryDialog(2, viewModel)
+        }
+      }
     }
     BottomNavigationMenu(
         onTabSelected = { tab ->
@@ -228,17 +262,80 @@ fun QrCodeTicketUi(
   }
 }
 
-// @Preview(showBackground = true)
-// @Composable
-// fun PreviewQrCodeTicketUi() {
-//  // Create a mock NavigationActions to pass into the function
-//  val userRepository = MockUserRepository()
-//  (userRepository as MockUserRepository).updateCurrentUserId("user1")
-//  val eventRepository = MockEventRepository()
-//  val qrCodeAnalyser = QrCodeAnalyser()
-//  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser, "1")
-//  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
-// }
+@Composable
+fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
+  Dialog(onDismissRequest = { viewModel.changeAction(ScanTicketQrViewModel.Action.ScanTicket) }) {
+    val boxColor =
+        when (edr) {
+          0 -> Color.Green
+          1 -> Color.Red
+          else -> Color.Yellow
+        }
+
+    Box(
+        modifier =
+            Modifier.size(400.dp) // Adjust the size here to make it larger
+                .background(boxColor, RoundedCornerShape(8.dp))
+                .padding(20.dp)
+                .semantics {
+                  testTag =
+                      when (boxColor) {
+                        Color.Green -> "ApprovedBox"
+                        Color.Red -> "DeniedBox"
+                        else -> "ErrorBox"
+                      }
+                },
+        // Aligning content to the top right corner
+    ) {
+      Column(
+          modifier = Modifier.fillMaxSize().padding(vertical = 16.dp),
+          verticalArrangement = Arrangement.Center,
+          horizontalAlignment = Alignment.CenterHorizontally) {
+            val textToShow =
+                when (edr) {
+                  0 -> "Entry Approved"
+                  1 -> "Entry Denied"
+                  else -> "Error, Please Retry"
+                }
+            Text(
+                text = textToShow,
+                style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp),
+                modifier =
+                    Modifier.semantics {
+                      testTag =
+                          when (edr) {
+                            0 -> "EntryApprovedText"
+                            1 -> "EntryDeniedText"
+                            else -> "ErrorText"
+                          }
+                    })
+          }
+      Box(modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)) {
+        IconButton(
+            onClick = { viewModel.changeAction(ScanTicketQrViewModel.Action.ScanTicket) },
+            modifier =
+                Modifier.semantics { testTag = "closeButton" } // Adding testTag to the IconButton
+            ) {
+              Icon(Icons.Default.Close, contentDescription = "Close")
+            }
+      }
+    }
+  }
+}
+
+@ExcludeFromJacocoGeneratedReport
+@Preview(showBackground = true)
+@Composable
+fun PreviewQrCodeTicketUi() {
+  // Create a mock NavigationActions to pass into the function
+  val userRepository = MockUserRepository()
+  userRepository.updateCurrentUserId("user1")
+  val eventRepository = MockEventRepository()
+  val qrCodeAnalyser = QrCodeAnalyser()
+  val viewModel = ScanTicketQrViewModel(userRepository, eventRepository, qrCodeAnalyser, "1")
+  QrCodeTicketUi(viewModel, NavigationActions(rememberNavController()))
+}
+
 //
 // @Preview(showBackground = true)
 // @Composable
