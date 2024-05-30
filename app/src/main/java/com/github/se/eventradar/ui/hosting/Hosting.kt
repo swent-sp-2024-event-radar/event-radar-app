@@ -110,7 +110,7 @@ fun HostingScreen(
             start.linkTo(parent.start)
             end.linkTo(parent.end)
           }) { eventId ->
-            navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+            navigationActions.navController.navigate("${Route.MY_EVENT}/${eventId}")
           }
     } else {
       EventMap(
@@ -120,7 +120,7 @@ fun HostingScreen(
             start.linkTo(parent.start)
             end.linkTo(parent.end)
           }) { eventId ->
-            navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+            navigationActions.navController.navigate("${Route.MY_EVENT}/${eventId}")
           }
     }
     val context = LocalContext.current // TO DO: only needed for toasts
