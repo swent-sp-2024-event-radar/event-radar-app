@@ -22,4 +22,12 @@ interface IEventRepository {
   fun observeAllEvents(): Flow<Resource<List<Event>>>
 
   fun observeUpcomingEvents(userId: String): Flow<Resource<List<Event>>>
+
+  suspend fun addAttendee(eventId: String, attendeeUserId: String): Resource<Unit>
+
+  suspend fun removeAttendee(eventId: String, attendeeUserId: String): Resource<Unit>
+
+  suspend fun incrementPurchases(eventId: String): Resource<Unit>
+
+  suspend fun decrementPurchases(eventId: String): Resource<Unit>
 }
