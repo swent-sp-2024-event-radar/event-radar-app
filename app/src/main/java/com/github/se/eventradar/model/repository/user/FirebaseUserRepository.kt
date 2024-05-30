@@ -231,29 +231,6 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
     }
   }
 
-  override suspend fun updateUserField(userId: String, field: String, value: Any): Resource<Unit> {
-    return try {
-      userRef.document(userId).update(field, value).await()
-      Resource.Success(Unit)
-    } catch (e: Exception) {
-      Resource.Failure(e)
-    }
-  }
-
-    override suspend fun getUserField(userId: String, field: String): Resource<Any> {
-        return try {
-        val result = userRef.document(userId).get().await()
-        val data = result.data?.get(field)
-        if (data != null) {
-            Resource.Success(data)
-        } else {
-            Resource.Failure(Exception("Field $field not found for user $userId"))
-        }
-        } catch (e: Exception) {
-        Resource.Failure(e)
-        }
-    }
-
   private fun getMaps(user: User): Pair<Map<String, Any?>, Map<String, Any?>> {
     val privateMap =
         mutableMapOf(

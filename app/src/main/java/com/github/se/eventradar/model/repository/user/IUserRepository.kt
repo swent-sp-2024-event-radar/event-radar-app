@@ -33,10 +33,6 @@ interface IUserRepository {
 
   suspend fun getCurrentUserId(): Resource<String>
 
-  suspend fun updateUserField(userId: String, field: String, value: Any): Resource<Unit>
-
-  suspend fun getUserField(userId: String, field: String): Resource<Any>
-
   suspend fun addEventToAttendeeList(userId: String, attendingEventId: String): Resource<Unit>
 
   suspend fun removeEventFromAttendeeList(userId: String, attendingEventId: String): Resource<Unit>

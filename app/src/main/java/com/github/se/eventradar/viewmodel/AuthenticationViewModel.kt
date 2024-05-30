@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(private val userRepository: IUserRepository) :
+open class LoginViewModel @Inject constructor(private val userRepository: IUserRepository) :
     ViewModel() {
   private val _uiState = MutableStateFlow(LoginUiState())
   val uiState: StateFlow<LoginUiState> = _uiState

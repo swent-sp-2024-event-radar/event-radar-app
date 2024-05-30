@@ -156,64 +156,6 @@ class MockUserRepository : IUserRepository {
     }
   }
 
-  override suspend fun updateUserField(userId: String, field: String, value: Any): Resource<Unit> {
-    val index = mockUsers.indexOfFirst { it.userId == userId }
-    return if (index != -1) {
-      val user = mockUsers[index]
-      val updatedUser =
-          when (field) {
-            "username" -> user.copy(username = value as? String ?: user.username)
-            "firstName" -> user.copy(firstName = value as? String ?: user.firstName)
-            "lastName" -> user.copy(lastName = value as? String ?: user.lastName)
-            "phoneNumber" -> user.copy(phoneNumber = value as? String ?: user.phoneNumber)
-            "birthDate" -> user.copy(birthDate = value as? String ?: user.birthDate)
-            "accountStatus" -> user.copy(accountStatus = value as? String ?: user.accountStatus)
-            "eventsAttendeeList" ->
-                user.copy(
-                    eventsAttendeeList = value as? MutableList<String> ?: user.eventsAttendeeList)
-            "eventsHostList" ->
-                user.copy(eventsHostList = value as? MutableList<String> ?: user.eventsHostList)
-            "friendsList" ->
-                user.copy(friendsList = value as? MutableList<String> ?: user.friendsList)
-            "profilePicUrl" -> user.copy(profilePicUrl = value as? String ?: user.profilePicUrl)
-            "qrCodeUrl" -> user.copy(qrCodeUrl = value as? String ?: user.qrCodeUrl)
-            else -> user
-          }
-      updateUser(updatedUser)
-    } else {
-      Resource.Failure(Exception("User with id $userId not found"))
-    }
-  }
-
-    override suspend fun getUserField(userId: String, field: String): Resource<Any> {
-        val index = mockUsers.indexOfFirst { it.userId == userId }
-        return if (index != -1) {
-        val user = mockUsers[index]
-        val value =
-            when (field) {
-                "username" -> user.username
-                "firstName" -> user.firstName
-                "lastName" -> user.lastName
-                "phoneNumber" -> user.phoneNumber
-                "birthDate" -> user.birthDate
-                "accountStatus" -> user.accountStatus
-                "eventsAttendeeList" -> user.eventsAttendeeList
-                "eventsHostList" -> user.eventsHostList
-                "friendsList" -> user.friendsList
-                "profilePicUrl" -> user.profilePicUrl
-                "qrCodeUrl" -> user.qrCodeUrl
-                else -> null
-            }
-        if (value != null) {
-            Resource.Success(value)
-        } else {
-            Resource.Failure(Exception("Field $field not found for user $userId"))
-        }
-        } else {
-        Resource.Failure(Exception("User with id $userId not found"))
-        }
-    }
-
   // Helper method to set the current user ID for testing
   fun updateCurrentUserId(userId: String?) {
     currentUserId = userId
