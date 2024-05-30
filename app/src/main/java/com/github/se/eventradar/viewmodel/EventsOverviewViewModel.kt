@@ -295,10 +295,11 @@ constructor(
     // Reset search and filter when tab is changed
     state.update { currentState ->
       currentState.copy(
-          eventList = state.value.eventList.copy(filteredEvents = state.value.eventList.allEvents),
+          eventList =
+              currentState.eventList.copy(filteredEvents = currentState.eventList.allEvents),
           upcomingEventList =
-              state.value.upcomingEventList.copy(
-                  filteredEvents = state.value.upcomingEventList.allEvents),
+              currentState.upcomingEventList.copy(
+                  filteredEvents = currentState.upcomingEventList.allEvents),
           searchQuery = "",
           isSearchActive = false,
           isFilterDialogOpen = false,
