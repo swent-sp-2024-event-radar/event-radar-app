@@ -14,7 +14,6 @@ import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.message.Message
-import com.github.se.eventradar.model.message.MessageHistory
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.message.IMessageRepository
@@ -34,31 +33,29 @@ import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.theme.MyApplicationTheme
 import com.github.se.eventradar.ui.viewProfile.ViewFriendsProfileUi
-import com.github.se.eventradar.viewmodel.ChatUiState
 import com.github.se.eventradar.viewmodel.ChatViewModel
 import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.github.se.eventradar.viewmodel.MessagesViewModel
-import com.github.se.eventradar.viewmodel.ViewFriendsProfileUiState
 import com.github.se.eventradar.viewmodel.ViewFriendsProfileViewModel
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import io.github.kakaocup.compose.node.element.ComposeScreen
-import io.mockk.Runs
-import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
-import io.mockk.just
 import java.time.LocalDateTime
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class UserFlowTests : TestCase() {
+  @get:Rule var hiltRule = HiltAndroidRule(this)
+
   @get:Rule val composeTestRule = createComposeRule()
 
   // This rule automatically initializes lateinit properties with @MockK, @RelaxedMockK, etc.
@@ -66,8 +63,6 @@ class UserFlowTests : TestCase() {
 
   // Relaxed mocks methods have a default implementation returning values
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
-
-  @RelaxedMockK lateinit var mockViewFriendsProfileViewModel: ViewFriendsProfileViewModel
 
   @RelaxedMockK lateinit var mockChatViewModel: ChatViewModel
 
@@ -121,47 +116,12 @@ class UserFlowTests : TestCase() {
           friendsList = mutableListOf("user1"),
           profilePicUrl = "http://example.com/Profile_Pictures/1",
           qrCodeUrl = "http://example.com/QR_Codes/1",
-          bio = "",
+          bio = "Available",
           username = "pauldoe")
-
-  private val profileUiState =
-      MutableStateFlow(
-          ViewFriendsProfileUiState(
-              friendProfilePicLink = "",
-              friendFirstName = "Test",
-              friendUserName = "",
-              bio = "Available"))
-
-  private val chatUiState =
-      MutableStateFlow(
-          ChatUiState(
-              userId = "user1",
-              messageHistory =
-                  MessageHistory(
-                      user1 = "user1",
-                      user2 = "user2",
-                      "2",
-                      user1ReadMostRecentMessage = false,
-                      user2ReadMostRecentMessage = false,
-                      messages =
-                          mutableListOf(
-                              Message(
-                                  sender = "user1",
-                                  content = "Test Message 1",
-                                  dateTimeSent = LocalDateTime.now(),
-                                  id = "1"),
-                              Message(
-                                  sender = "user2",
-                                  content = "Test Message 2",
-                                  dateTimeSent = LocalDateTime.now(),
-                                  id = "2"),
-                          ),
-                      id = "1"),
-              opponentProfile = user2,
-              messageBarInput = ""))
 
   @Before
   fun setUp() = runBlocking {
+    hiltRule.inject()
     for (i in 0..2) {
       eventRepository.addEvent(mockEvent.copy(eventName = "Test $i", fireBaseID = "$i"))
     }
@@ -175,7 +135,7 @@ class UserFlowTests : TestCase() {
         Message(
             sender = "user1",
             content = "Test Message 1",
-            dateTimeSent = LocalDateTime.now(),
+            dateTimeSent = LocalDateTime.parse("2021-01-01T00:00:00"),
             id = "1"),
         (mh as Resource.Success).data)
 
@@ -183,37 +143,9 @@ class UserFlowTests : TestCase() {
         Message(
             sender = "user2",
             content = "Test Message 2",
-            dateTimeSent = LocalDateTime.now(),
+            dateTimeSent = LocalDateTime.parse("2021-02-01T00:00:00"),
             id = "2"),
         (mh).data)
-
-    val mockMessageVM = MessagesViewModel(messageRepository, userRepository)
-
-    every { mockViewFriendsProfileViewModel.getFriendProfileDetails() } returns Unit
-    every { mockViewFriendsProfileViewModel.uiState } returns profileUiState
-    every { mockViewFriendsProfileViewModel.friendUserId } returns "user2"
-
-    every { mockChatViewModel.opponentId } returns "user2"
-    every { mockChatViewModel.uiState } returns chatUiState
-    every { mockChatViewModel.onMessageBarInputChange(any()) } answers
-        {
-          chatUiState.value = chatUiState.value.copy(messageBarInput = firstArg())
-        }
-    every { mockChatViewModel.onMessageSend() } answers
-        {
-          val newMessages = chatUiState.value.messageHistory.messages
-          newMessages.add(
-              Message(
-                  sender = "user1",
-                  content = chatUiState.value.messageBarInput,
-                  dateTimeSent = LocalDateTime.now(),
-                  id = "3"))
-          chatUiState.value =
-              chatUiState.value.copy(
-                  messageHistory = chatUiState.value.messageHistory.copy(messages = newMessages))
-          chatUiState.value = chatUiState.value.copy(messageBarInput = "")
-        }
-    coEvery { mockChatViewModel.getMessages() } just Runs
 
     // Launch the Home screen
     composeTestRule.setContent {
@@ -232,18 +164,23 @@ class UserFlowTests : TestCase() {
                     EventDetailsViewModel(eventRepository, userRepository, eventId), mockNavActions)
               }
           composable(Route.MESSAGE) {
-            MessagesScreen(mockMessageVM, navigationActions = mockNavActions)
+            MessagesScreen(
+                MessagesViewModel(messageRepository, userRepository),
+                navigationActions = mockNavActions)
           }
           composable(
               "${Route.PRIVATE_CHAT}/{opponentId}",
               arguments = listOf(navArgument("opponentId") { type = NavType.StringType })) {
-                ChatScreen(viewModel = mockChatViewModel, navigationActions = mockNavActions)
+                val opponentId = it.arguments!!.getString("opponentId")!!
+                val viewModel = ChatViewModel(messageRepository, userRepository, opponentId)
+                ChatScreen(viewModel = viewModel, navigationActions = mockNavActions)
               }
           composable(
               "${Route.PROFILE}/{friendUserId}",
               arguments = listOf(navArgument("friendUserId") { type = NavType.StringType })) {
-                ViewFriendsProfileUi(
-                    viewModel = mockViewFriendsProfileViewModel, navigationActions = mockNavActions)
+                val friendUserId = it.arguments!!.getString("friendUserId")!!
+                val viewModel = ViewFriendsProfileViewModel(userRepository, friendUserId)
+                ViewFriendsProfileUi(viewModel = viewModel, navigationActions = mockNavActions)
               }
         }
       }
