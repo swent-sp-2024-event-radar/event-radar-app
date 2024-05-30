@@ -3,7 +3,9 @@ package com.github.se.eventradar.model.repository.event
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.event.Event
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.channels.awaitClose
@@ -11,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-class FirebaseEventRepository(db: FirebaseFirestore = Firebase.firestore) : IEventRepository {
+class FirebaseEventRepository(val db: FirebaseFirestore = Firebase.firestore) : IEventRepository {
   private val eventRef: CollectionReference = db.collection("events")
 
   override suspend fun getEvents(): Resource<List<Event>> {
@@ -139,5 +141,83 @@ class FirebaseEventRepository(db: FirebaseFirestore = Firebase.firestore) : IEve
         }
 
     awaitClose { listener.remove() }
+  }
+
+  override suspend fun addAttendee(eventId: String, attendeeUserId: String): Resource<Unit> {
+    return try {
+      eventRef.document(eventId).update("attendees_list", FieldValue.arrayUnion(attendeeUserId))
+      Resource.Success(Unit)
+    } catch (e: Exception) {
+      Resource.Failure(e)
+    }
+  }
+
+  override suspend fun removeAttendee(eventId: String, attendeeUserId: String): Resource<Unit> {
+    return try {
+      eventRef.document(eventId).update("attendees_list", FieldValue.arrayRemove(attendeeUserId))
+      Resource.Success(Unit)
+    } catch (e: Exception) {
+      Resource.Failure(e)
+    }
+  }
+
+  override suspend fun incrementPurchases(eventId: String): Resource<Unit> {
+    try {
+      db.runTransaction { transaction ->
+        val ref = eventRef.document(eventId)
+        val resultDocument = transaction.get(ref)
+        val purchases = resultDocument.getLong("ticket_purchases")
+        val capacity = resultDocument.getLong("ticket_capacity")
+
+        if (purchases != null && capacity != null) {
+          if (purchases < capacity) {
+            transaction.update(ref, "ticket_purchases", purchases + 1)
+          } else {
+            throw FirebaseFirestoreException(
+                "No more available tickets",
+                FirebaseFirestoreException.Code.ABORTED,
+            )
+          }
+        } else {
+          throw FirebaseFirestoreException(
+              "Invalid data",
+              FirebaseFirestoreException.Code.ABORTED,
+          )
+        }
+      }
+      return Resource.Success(Unit)
+    } catch (e: Exception) {
+      return Resource.Failure(e)
+    }
+  }
+
+  override suspend fun decrementPurchases(eventId: String): Resource<Unit> {
+    try {
+      db.runTransaction { transaction ->
+        val ref = eventRef.document(eventId)
+        val resultDocument = transaction.get(ref)
+        val purchases = resultDocument.getLong("ticket_purchases")
+        val capacity = resultDocument.getLong("ticket_capacity")
+
+        if (purchases != null && capacity != null) {
+          if (purchases > 0) {
+            transaction.update(ref, "ticket_purchases", purchases - 1)
+          } else {
+            throw FirebaseFirestoreException(
+                "Ticket purchases is already 0",
+                FirebaseFirestoreException.Code.ABORTED,
+            )
+          }
+        } else {
+          throw FirebaseFirestoreException(
+              "Invalid data",
+              FirebaseFirestoreException.Code.ABORTED,
+          )
+        }
+      }
+      return Resource.Success(Unit)
+    } catch (e: Exception) {
+      return Resource.Failure(e)
+    }
   }
 }

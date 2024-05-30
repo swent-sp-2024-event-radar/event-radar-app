@@ -65,8 +65,8 @@ class EventSelectTicketUITest :
   @Before
   fun testSetup() {
 
-    every { mockViewModel.errorOccurred } returns error
-    every { mockViewModel.registrationSuccessful } returns success
+    every { mockViewModel.showErrorOccurredDialog } returns error
+    every { mockViewModel.showSuccessfulRegistrationDialog } returns success
     every { mockViewModel.isUserAttending } returns MutableStateFlow(isAttending)
     every { mockViewModel.uiState } returns sampleEventDetailsUiState
     every { mockViewModel.isTicketFree() } returns isTicketFree

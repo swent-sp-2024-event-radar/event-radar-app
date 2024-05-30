@@ -2,6 +2,7 @@ package com.github.se.eventradar.model.repository.event
 
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.event.Event
+import com.github.se.eventradar.model.event.EventTicket
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -78,6 +79,70 @@ class MockEventRepository : IEventRepository {
           Resource.Success(upcomingEvents)
         }
         is Resource.Failure -> resource
+      }
+    }
+  }
+
+  override suspend fun addAttendee(eventId: String, attendeeUserId: String): Resource<Unit> {
+    return when (val res = getEvent(eventId)) {
+      is Resource.Success -> {
+        res.data?.attendeeList?.add(attendeeUserId)
+        Resource.Success(Unit)
+      }
+      is Resource.Failure -> {
+        Resource.Failure(res.throwable)
+      }
+    }
+  }
+
+  override suspend fun removeAttendee(eventId: String, attendeeUserId: String): Resource<Unit> {
+    return when (val res = getEvent(eventId)) {
+      is Resource.Success -> {
+        res.data?.attendeeList?.remove(attendeeUserId)
+        Resource.Success(Unit)
+      }
+      is Resource.Failure -> {
+        Resource.Failure(res.throwable)
+      }
+    }
+  }
+
+  override suspend fun incrementPurchases(eventId: String): Resource<Unit> {
+    return when (val res = getEvent(eventId)) {
+      is Resource.Success -> {
+        val ticket = res.data?.ticket
+        if (ticket != null) {
+          if (ticket.purchases < ticket.capacity) {
+            res.data.ticket =
+                EventTicket(ticket.name, ticket.price, ticket.capacity, ticket.purchases + 1)
+          } else {
+            return Resource.Failure(Exception("No more ticket"))
+          }
+        }
+        Resource.Success(Unit)
+      }
+      is Resource.Failure -> {
+        Resource.Failure(res.throwable)
+      }
+    }
+  }
+
+  override suspend fun decrementPurchases(eventId: String): Resource<Unit> {
+    return when (val res = getEvent(eventId)) {
+      is Resource.Success -> {
+        val ticket = res.data?.ticket
+        if (ticket != null) {
+          if (ticket.purchases > 0) {
+            res.data.ticket =
+                EventTicket(ticket.name, ticket.price, ticket.capacity, ticket.purchases - 1)
+          } else {
+            return Resource.Failure(Exception("Ticket purchases is already 0"))
+          }
+        }
+        Resource.Success(Unit)
+      }
+      is Resource.Failure -> {
+        Resource.Failure(res.throwable)
       }
     }
   }

@@ -37,6 +37,7 @@ import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.EventList
 import com.github.se.eventradar.ui.component.FilterPopUp
+import com.github.se.eventradar.ui.component.GetUserLocation
 import com.github.se.eventradar.ui.component.Logo
 import com.github.se.eventradar.ui.component.SearchBarAndFilter
 import com.github.se.eventradar.ui.component.ViewToggleFab
@@ -57,12 +58,16 @@ fun HostingScreen(
 ) {
   // Ui States handled by viewModel
   val uiState by viewModel.uiState.collectAsState()
+  val context = LocalContext.current
+
   LaunchedEffect(key1 = uiState.isSearchActive, key2 = uiState.isFilterActive) {
     if (uiState.isSearchActive || uiState.isFilterActive) {
       viewModel.filterHostedEvents()
     }
   }
   LaunchedEffect(Unit) { viewModel.getHostedEvents() }
+
+  GetUserLocation(context, viewModel::onUserLocationChanged)
 
   ConstraintLayout(modifier = Modifier.fillMaxSize().testTag("hostingScreen")) {
     val (logo, title, divider, searchfilter, filter, eventList, eventMap, bottomNav, buttons) =
@@ -89,7 +94,7 @@ fun HostingScreen(
         onSearchQueryChanged = { viewModel.onSearchQueryChanged(it) },
         searchQuery = uiState.searchQuery,
         onSearchActiveChanged = { viewModel.onSearchActiveChanged(it) },
-        onFilterDialogOpen = { viewModel.onFilterDialogOpen() },
+        onFilterDialogOpen = { viewModel.onFilterDialogOpenChanged() },
         modifier =
             Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
                 .testTag("searchBarAndFilter")
@@ -145,10 +150,12 @@ fun HostingScreen(
           onFreeSwitchChanged = { viewModel.onFreeSwitchChanged() },
           onFilterApply = {
             if (uiState.radiusQuery != "") {
-              viewModel.onRadiusQueryChanged("")
-              context.toast("Radius filtering not yet implemented")
+              viewModel.onRadiusQueryChanged(uiState.radiusQuery)
             }
             viewModel.onFilterApply()
+
+            // automatically close dialog
+            viewModel.onFilterDialogOpenChanged()
           },
           uiState = uiState,
           onRadiusQueryChanged = { viewModel.onRadiusQueryChanged(it) },

@@ -164,7 +164,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
           performClick()
         }
       }
-      verify(exactly = 2) { mockEventsOverviewViewModel.onFilterDialogOpen() }
+      verify(exactly = 2) { mockEventsOverviewViewModel.onFilterDialogOpenChanged() }
 
       // Update the UI state to reflect the change
       sampleEventList.value = sampleEventList.value.copy(isFilterDialogOpen = false)
@@ -185,7 +185,7 @@ class HomeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppor
       // Update the UI state to reflect the change
       sampleEventList.value = sampleEventList.value.copy(isFilterDialogOpen = true)
       step("Check if filter pop up is displayed") { filterPopUp { assertIsDisplayed() } }
-      verify { mockEventsOverviewViewModel.onFilterDialogOpen() }
+      verify { mockEventsOverviewViewModel.onFilterDialogOpenChanged() }
 
       // 2. Enter radius filter
       radiusLabel { assertIsDisplayed() }

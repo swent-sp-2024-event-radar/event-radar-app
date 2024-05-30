@@ -1,5 +1,6 @@
 package com.github.se.eventradar.viewmodel
 
+import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.event.EventCategory
 
 // This class represents a common uiState for search and filter operations
@@ -12,4 +13,5 @@ sealed class SearchFilterUiState {
   abstract val radiusQuery: String
   abstract val isFreeSwitchOn: Boolean
   abstract val categoriesCheckedList: MutableSet<EventCategory>
+  abstract val userLocation: Location
 }

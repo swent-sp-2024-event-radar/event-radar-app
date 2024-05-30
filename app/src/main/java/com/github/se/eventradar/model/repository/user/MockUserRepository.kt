@@ -126,6 +126,36 @@ class MockUserRepository : IUserRepository {
     }
   }
 
+  override suspend fun addEventToAttendeeList(
+      userId: String,
+      attendingEventId: String
+  ): Resource<Unit> {
+    return when (val res = getUser(userId)) {
+      is Resource.Success -> {
+        res.data?.eventsAttendeeList?.add(attendingEventId)
+        Resource.Success(Unit)
+      }
+      is Resource.Failure -> {
+        Resource.Failure(res.throwable)
+      }
+    }
+  }
+
+  override suspend fun removeEventFromAttendeeList(
+      userId: String,
+      attendingEventId: String
+  ): Resource<Unit> {
+    return when (val res = getUser(userId)) {
+      is Resource.Success -> {
+        res.data?.eventsAttendeeList?.remove(attendingEventId)
+        Resource.Success(Unit)
+      }
+      is Resource.Failure -> {
+        Resource.Failure(res.throwable)
+      }
+    }
+  }
+
   // Helper method to set the current user ID for testing
   fun updateCurrentUserId(userId: String?) {
     currentUserId = userId

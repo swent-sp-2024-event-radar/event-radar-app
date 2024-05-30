@@ -34,13 +34,13 @@ import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.component.AppScaffold
 import com.github.se.eventradar.ui.component.EventList
 import com.github.se.eventradar.ui.component.FilterPopUp
+import com.github.se.eventradar.ui.component.GetUserLocation
 import com.github.se.eventradar.ui.component.SearchBarAndFilter
 import com.github.se.eventradar.ui.component.ViewToggleFab
 import com.github.se.eventradar.ui.component.getIconFromViewListBool
 import com.github.se.eventradar.ui.map.EventMap
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
-import com.github.se.eventradar.util.toast
 import com.github.se.eventradar.viewmodel.EventsOverviewUiState
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.github.se.eventradar.viewmodel.Tab
@@ -52,6 +52,7 @@ fun HomeScreen(
 ) {
   // Ui States handled by viewModel
   val uiState by viewModel.uiState.collectAsState()
+  val context = LocalContext.current
 
   LaunchedEffect(key1 = uiState.isSearchActive, key2 = uiState.isFilterActive) {
     if (uiState.isSearchActive || uiState.isFilterActive) {
@@ -66,6 +67,8 @@ fun HomeScreen(
     }
   }
 
+  GetUserLocation(context, viewModel::onUserLocationChanged)
+
   AppScaffold(
       modifier = Modifier.testTag("homeScreen"),
       floatingActionButton = {
@@ -76,8 +79,6 @@ fun HomeScreen(
       },
       navigationActions = navigationActions,
   ) {
-    val context = LocalContext.current
-
     Column(
         modifier = Modifier.fillMaxSize().padding(it).padding(top = 16.dp).testTag("homeScreen"),
         horizontalAlignment = Alignment.CenterHorizontally) {
@@ -134,7 +135,7 @@ fun HomeScreen(
               onSearchQueryChanged = { viewModel.onSearchQueryChanged(it) },
               searchQuery = uiState.searchQuery,
               onSearchActiveChanged = { viewModel.onSearchActiveChanged(it) },
-              onFilterDialogOpen = { viewModel.onFilterDialogOpen() },
+              onFilterDialogOpen = { viewModel.onFilterDialogOpenChanged() },
               modifier =
                   Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
                       .testTag("searchBarAndFilter"),
@@ -145,10 +146,12 @@ fun HomeScreen(
                 onFreeSwitchChanged = { viewModel.onFreeSwitchChanged() },
                 onFilterApply = {
                   if (uiState.radiusQuery != "") {
-                    viewModel.onRadiusQueryChanged("")
-                    context.toast("Radius filtering not yet implemented")
+                    viewModel.onRadiusQueryChanged(uiState.radiusQuery)
                   }
                   viewModel.onFilterApply()
+
+                  // automatically close dialog
+                  viewModel.onFilterDialogOpenChanged()
                 },
                 uiState = uiState,
                 onRadiusQueryChanged = { viewModel.onRadiusQueryChanged(it) },
@@ -178,7 +181,8 @@ fun EventsOverview(
             navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
           }
       false ->
-          EventMap(events, modifier.testTag("eventMap").fillMaxWidth()) { eventId ->
+          EventMap(events, modifier.testTag("eventMap").fillMaxWidth(), uiState.userLocation!!) {
+              eventId ->
             navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
           }
     }
@@ -199,9 +203,12 @@ fun EventsOverview(
                 navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
               }
       else ->
-          EventMap(events, modifier.testTag("eventMapUpcoming").fillMaxWidth()) { eventId ->
-            navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
-          }
+          EventMap(
+              events,
+              modifier.testTag("eventMapUpcoming").fillMaxWidth(),
+              uiState.userLocation!!) { eventId ->
+                navigationActions.navController.navigate("${Route.EVENT_DETAILS}/${eventId}")
+              }
     }
   }
 }
