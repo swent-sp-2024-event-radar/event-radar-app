@@ -42,7 +42,6 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.github.kakaocup.compose.node.element.ComposeScreen
-import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import java.time.LocalDateTime
 import kotlinx.coroutines.runBlocking
@@ -61,8 +60,7 @@ class UserFlowTests : TestCase() {
   // This rule automatically initializes lateinit properties with @MockK, @RelaxedMockK, etc.
   @get:Rule val mockkRule = MockKRule(this)
 
-  // Relaxed mocks methods have a default implementation returning values
-  @RelaxedMockK lateinit var mockNavActions: NavigationActions
+  private lateinit var navActions: NavigationActions
 
   private var userRepository: IUserRepository = MockUserRepository()
   private var eventRepository: IEventRepository = MockEventRepository()
@@ -148,37 +146,37 @@ class UserFlowTests : TestCase() {
     // Launch the Home screen
     composeTestRule.setContent {
       val navController = rememberNavController()
-      mockNavActions = NavigationActions(navController)
+      navActions = NavigationActions(navController)
       MyApplicationTheme {
         NavHost(navController = navController, startDestination = Route.HOME) {
           composable(Route.HOME) {
-            HomeScreen(EventsOverviewViewModel(eventRepository, userRepository), mockNavActions)
+            HomeScreen(EventsOverviewViewModel(eventRepository, userRepository), navActions)
           }
           composable(
               "${Route.EVENT_DETAILS}/{eventId}",
               arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
                 val eventId = it.arguments!!.getString("eventId")!!
                 EventDetails(
-                    EventDetailsViewModel(eventRepository, userRepository, eventId), mockNavActions)
+                    EventDetailsViewModel(eventRepository, userRepository, eventId), navActions)
               }
           composable(Route.MESSAGE) {
             MessagesScreen(
                 MessagesViewModel(messageRepository, userRepository),
-                navigationActions = mockNavActions)
+                navigationActions = navActions)
           }
           composable(
               "${Route.PRIVATE_CHAT}/{opponentId}",
               arguments = listOf(navArgument("opponentId") { type = NavType.StringType })) {
                 val opponentId = it.arguments!!.getString("opponentId")!!
                 val viewModel = ChatViewModel(messageRepository, userRepository, opponentId)
-                ChatScreen(viewModel = viewModel, navigationActions = mockNavActions)
+                ChatScreen(viewModel = viewModel, navigationActions = navActions)
               }
           composable(
               "${Route.PROFILE}/{friendUserId}",
               arguments = listOf(navArgument("friendUserId") { type = NavType.StringType })) {
                 val friendUserId = it.arguments!!.getString("friendUserId")!!
                 val viewModel = ViewFriendsProfileViewModel(userRepository, friendUserId)
-                ViewFriendsProfileUi(viewModel = viewModel, navigationActions = mockNavActions)
+                ViewFriendsProfileUi(viewModel = viewModel, navigationActions = navActions)
               }
         }
       }
