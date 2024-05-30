@@ -29,5 +29,6 @@ public class EventDetailsScreen(semanticsProvider: SemanticsNodeInteractionsProv
   val attendance: KNode = onNode { hasTestTag("attendance") }
 
   val cancelRegistrationDialog: KNode = onNode { hasTestTag("cancelRegistrationDialog") }
+  val cancelButton: KNode = onNode { hasTestTag("dialogDismissButton") }
   val confirmButton: KNode = onNode { hasTestTag("dialogConfirmButton") }
 }
