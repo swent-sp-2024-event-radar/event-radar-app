@@ -77,14 +77,13 @@ class MessagesViewModelTest {
 
   @Test
   fun testGetMessages() = runTest {
-    // TODO: fix logic with add message
     val mh = messagesRepository.createNewMessageHistory("1", "2")
 
     assert(mh is Resource.Success)
 
     val expectedMessage = Message("1", "Hello", LocalDateTime.now(), "1")
 
-    (mh as Resource.Success).data.messages.add(expectedMessage)
+    messagesRepository.addMessage(expectedMessage, (mh as Resource.Success).data)
 
     viewModel = MessagesViewModel(messagesRepository, userRepository)
 

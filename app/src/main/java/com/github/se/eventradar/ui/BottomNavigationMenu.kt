@@ -30,7 +30,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.se.eventradar.R
 import com.github.se.eventradar.ui.navigation.TopLevelDestination
 
 @Composable
@@ -75,16 +74,7 @@ fun BottomNavigationMenu(
             selected = selectedItem == tab,
             onClick = { onTabSelected(tab) },
             modifier =
-                Modifier.align(Alignment.CenterVertically)
-                    .testTag(
-                        when (tab.textId) {
-                          R.string.scan_QR -> "scanQRBottomNav"
-                          R.string.message_chats -> "messageChatBottomNav"
-                          R.string.homeScreen_events -> "homeScreenEventBottomNav"
-                          R.string.user_profile -> "userProfileBottomNav"
-                          R.string.hosting -> "myHostingBottomNav"
-                          else -> "itemBottomNav"
-                        }))
+                Modifier.align(Alignment.CenterVertically).testTag(tag = tab.textId.toString()))
       }
     }
   }
