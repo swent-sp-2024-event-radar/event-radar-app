@@ -28,9 +28,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
+import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu
 import com.github.se.eventradar.ui.component.GoBackButton
+import com.github.se.eventradar.ui.component.Logo
 import com.github.se.eventradar.ui.component.NameText
 import com.github.se.eventradar.ui.component.StandardProfileInformationText
 import com.github.se.eventradar.ui.component.UserProfileImage
@@ -39,23 +41,25 @@ import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 import com.github.se.eventradar.viewmodel.ProfileViewModel
+import kotlinx.coroutines.runBlocking
 
 @Composable
-fun ProfileScreen(
+fun ProfileUi(
     isPublicView: Boolean,
     viewModel: ProfileViewModel,
     navigationActions: NavigationActions
 ) {
-    viewModel.getProfileDetails()
-    val uiState by viewModel.uiState.collectAsState()
-    val context = LocalContext.current
-    Scaffold(
-        modifier = Modifier.testTag("profileScreen"),
-        topBar = {
-            // row and text profile Information
-            Row(
-                modifier = Modifier.padding(vertical = 32.dp).fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically) {
+  viewModel.getProfileDetails()
+  val uiState by viewModel.uiState.collectAsState()
+  val context = LocalContext.current
+  Scaffold(
+      modifier = Modifier.testTag("profileScreen"),
+      topBar = {
+        // row and text profile Information
+        Row(
+            modifier = Modifier.padding(vertical = 32.dp).fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically) {
+              if (isPublicView) {
                 GoBackButton(
                     modifier = Modifier.testTag("goBackButton"), { navigationActions.goBack() })
                 Text(
@@ -65,102 +69,139 @@ fun ProfileScreen(
                     letterSpacing = 0.36.sp,
                     fontFamily = FontFamily.Default,
                     color = MaterialTheme.colorScheme.onBackground)
+              } else {
+                // Display the Event Radar logo when the view is private
+                Logo(
+                    modifier =
+                        Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp).testTag("logo"))
+              }
             }
-        },
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelected = navigationActions::navigateTo,
-                tabList = TOP_LEVEL_DESTINATIONS,
-                selectedItem = if (isPublicView) getTopLevelDestination(Route.MESSAGE) else getTopLevelDestination(Route.PROFILE),
-                modifier = Modifier.testTag("bottomNavMenu"))
-        },
-        floatingActionButton = {
-            if (isPublicView) {
-                FloatingActionButton(
-                    onClick = {
-                        navigationActions.navController.navigate(
-                            Route.PRIVATE_CHAT + "/${viewModel.userId}")
-                    },
-                    modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("chatButton"),
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.chat_bubble),
-                        contentDescription = "Chat Button",
-                        modifier = Modifier.size(32.dp),
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                    )
-                }
-            }
-        },
-        content = {
-            Column(
-                modifier =
+      },
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelected = navigationActions::navigateTo,
+            tabList = TOP_LEVEL_DESTINATIONS,
+            selectedItem =
+                if (isPublicView) getTopLevelDestination(Route.MESSAGE)
+                else getTopLevelDestination(Route.PROFILE),
+            modifier = Modifier.testTag("bottomNavMenu"))
+      },
+      floatingActionButton = {
+        if (isPublicView) {
+          FloatingActionButton(
+              onClick = {
+                navigationActions.navController.navigate(
+                    Route.PRIVATE_CHAT + "/${viewModel.userId}")
+              },
+              modifier = Modifier.padding(bottom = 16.dp, end = 16.dp).testTag("chatButton"),
+              containerColor = MaterialTheme.colorScheme.primaryContainer,
+          ) {
+            Icon(
+                painter = painterResource(id = R.drawable.chat_bubble),
+                contentDescription = "Chat Button",
+                modifier = Modifier.size(32.dp),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+          }
+        }
+      },
+      content = {
+        Column(
+            modifier =
                 Modifier.padding(it)
                     .padding(horizontal = 41.dp, vertical = 20.dp)
                     .fillMaxWidth()
                     .testTag("centeredViewProfileColumn"),
-                verticalArrangement = Arrangement.Center, // Vertically center the content
-                horizontalAlignment =
+            verticalArrangement = Arrangement.Center, // Vertically center the content
+            horizontalAlignment =
                 Alignment.CenterHorizontally) { // Horizontally center the content) {
-                UserProfileImage(
-                    uiState.profilePicUrl,
-                    uiState.firstName,
-                    Modifier.size(150.dp)
-                        .testTag("profilePic")
-                        .padding(10.dp)
-                        .clip(RoundedCornerShape(10.dp)))
-                NameText(
-                    name = "${uiState.firstName} ${uiState.lastName}",
-                    modifier = Modifier.testTag("name"))
-                StandardProfileInformationText(
-                    text = "@${uiState.username}",
-                    modifier = Modifier.testTag("username"))
-                ProfileInformationText(
-                    label = "Bio",
-                    info = uiState.bio,
-                    modifier = Modifier.testTag("bioInfoText")
-                )
-                if (!isPublicView) {
-                    ProfileInformationText(
-                        label = "Phone Number",
-                        info = uiState.phoneNumber,
-                        modifier = Modifier.testTag("phoneNumberInfoText")
-                    )
-                    ProfileInformationText(
-                        label = "Birth Date",
-                        info = uiState.birthDate,
-                        modifier = Modifier.testTag("birthDateInfoText")
-                    )
-                }
+              UserProfileImage(
+                  uiState.profilePicUrl,
+                  uiState.firstName,
+                  Modifier.size(150.dp)
+                      .testTag("profilePic")
+                      .padding(10.dp)
+                      .clip(RoundedCornerShape(10.dp)))
+              NameText(
+                  name = "${uiState.firstName} ${uiState.lastName}",
+                  modifier = Modifier.testTag("name"))
+              StandardProfileInformationText(
+                  text = "@${uiState.username}", modifier = Modifier.testTag("username"))
+              Column(
+                  modifier = Modifier.fillMaxWidth().testTag("leftAlignedViewProfileColumn"),
+                  horizontalAlignment = Alignment.Start) {
+                    ProfileInformationText(label = "Bio", info = uiState.bio, testTagPrefix = "bio")
+                    if (!isPublicView) {
+                      Row(
+                          modifier = Modifier.fillMaxWidth().testTag("phoneNumberBirthDateRow"),
+                          horizontalArrangement = Arrangement.SpaceBetween) {
+                            Column(modifier = Modifier.testTag("phoneNumberColumn")) {
+                              ProfileInformationText(
+                                  label = "Phone Number",
+                                  info = uiState.phoneNumber,
+                                  testTagPrefix = "phoneNumber")
+                            }
+                            Column(
+                                modifier = Modifier.testTag("birthDateColumn"),
+                                horizontalAlignment = Alignment.Start) {
+                                  ProfileInformationText(
+                                      label = "Birth Date",
+                                      info = uiState.birthDate,
+                                      testTagPrefix = "birthDate")
+                                }
+                          }
+                    }
+                  }
             }
-        })
+      })
 }
 
 @Composable
-fun ProfileInformationText(label: String, info: String, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
-        Text(
-            text = label,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontSize = 12.sp,
-            fontFamily = FontFamily.SansSerif
-        )
-        Text(
-            text = info,
-            color = MaterialTheme.colorScheme.onSurface,
-            fontSize = 16.sp,
-            fontFamily = FontFamily.SansSerif
-        )
-    }
+fun ProfileInformationText(label: String, info: String, testTagPrefix: String) {
+  Text(
+      text = label,
+      modifier =
+          Modifier.testTag("${testTagPrefix}LabelText")
+              .padding(top = 16.dp), // Add padding below the label
+      color = MaterialTheme.colorScheme.onSurfaceVariant,
+      fontSize = 12.sp,
+      fontFamily = FontFamily.SansSerif)
+  Text(
+      text = info,
+      modifier =
+          Modifier.testTag("${testTagPrefix}InfoText")
+              .padding(top = 4.dp), // Add padding below the info
+      color = MaterialTheme.colorScheme.onSurface,
+      fontSize = 16.sp,
+      fontFamily = FontFamily.SansSerif)
 }
 
 @Preview(showSystemUi = true, showBackground = true)
 @ExcludeFromJacocoGeneratedReport
 @Composable
 fun PreviewProfile() {
-    val userRepository = MockUserRepository()
-    val viewModel = ProfileViewModel(userRepository, "")
-    ProfileScreen(
-        isPublicView = true, viewModel = viewModel, navigationActions = NavigationActions(rememberNavController()))
+  val userRepository = MockUserRepository()
+  val mockUser =
+      User(
+          userId = "1",
+          birthDate = "01/01/2000",
+          email = "test@example.com",
+          firstName = "John",
+          lastName = "Doe",
+          phoneNumber = "1234567890",
+          accountStatus = "active",
+          eventsAttendeeList = mutableListOf("event1", "event2"),
+          eventsHostList = mutableListOf("event3"),
+          friendsList = mutableListOf("2"),
+          profilePicUrl = "http://example.com/Profile_Pictures/1",
+          qrCodeUrl = "http://example.com/QR_Codes/1",
+          bio =
+              "Hi! My name is John Doe. I am a software engineer. I love to code. I am a fan of the Foo Fighters. \nI greatly enjoy fishes. I have a pet fish named Bubbles.",
+          username = "johndoe")
+  runBlocking { userRepository.addUser(mockUser) }
+  val viewModel = ProfileViewModel(userRepository, "1")
+  ProfileUi(
+      isPublicView = false,
+      viewModel = viewModel,
+      navigationActions = NavigationActions(rememberNavController()))
 }

@@ -16,13 +16,10 @@ import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.login.SignUpScreen
 import com.github.se.eventradar.ui.messages.MessagesScreen
 import com.github.se.eventradar.ui.qrCode.QrCodeScreen
-import com.github.se.eventradar.ui.viewProfile.ProfileScreen
-import com.github.se.eventradar.ui.viewProfile.ViewFriendsProfileUi
-import com.github.se.eventradar.util.toast
+import com.github.se.eventradar.ui.viewProfile.ProfileUi
 import com.github.se.eventradar.viewmodel.ChatViewModel
 import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.viewmodel.ProfileViewModel
-import com.github.se.eventradar.viewmodel.ViewFriendsProfileViewModel
 import com.github.se.eventradar.viewmodel.qrCode.ScanFriendQrViewModel
 
 @Composable
@@ -57,7 +54,7 @@ fun NavGraph(
           val viewModel = ChatViewModel.create(opponentId = opponentId)
           ChatScreen(viewModel = viewModel, navigationActions = navActions)
         }
-      /*
+    /*
     composable(
         "${Route.PROFILE}/{friendUserId}",
         arguments = listOf(navArgument("friendUserId") { type = NavType.StringType })) {
@@ -72,20 +69,20 @@ fun NavGraph(
       val viewModel = ScanFriendQrViewModel.create(navigationActions = navActions)
       QrCodeScreen(viewModel = viewModel, navigationActions = navActions)
     }
-      composable(
-          "${Route.PROFILE}/{friendUserId}",
-          arguments = listOf(
-              navArgument("friendUserId") { type = NavType.StringType },
-          )
-      ) {
+    composable(
+        "${Route.PROFILE}/{friendUserId}",
+        arguments =
+            listOf(
+                navArgument("friendUserId") { type = NavType.StringType },
+            )) {
           val userId = it.arguments!!.getString("friendUserId")!!
           val viewModel = ProfileViewModel.create(userId = userId)
-          ProfileScreen(viewModel = viewModel, navigationActions = navActions, isPublicView = true)
-      }
-      composable(Route.PROFILE) {
-          val viewModel = ProfileViewModel.create()
-          ProfileScreen(isPublicView = false, viewModel = viewModel, navigationActions = navActions)
-      }
+          ProfileUi(viewModel = viewModel, navigationActions = navActions, isPublicView = true)
+        }
+    composable(Route.PROFILE) {
+      val viewModel = ProfileViewModel.create()
+      ProfileUi(isPublicView = false, viewModel = viewModel, navigationActions = navActions)
+    }
     composable(Route.MY_HOSTING) { HostingScreen(navigationActions = navActions) }
   }
 }
