@@ -2,7 +2,6 @@ package com.github.se.eventradar.viewProfile
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.eventradar.model.User
 import com.github.se.eventradar.screens.ProfileScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.viewProfile.ProfileUi
@@ -32,38 +31,7 @@ class ProfileTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
   @RelaxedMockK lateinit var mockProfileViewModel: ProfileViewModel
-  private val mockUser =
-      User(
-          userId = "1",
-          birthDate = "01/01/2000",
-          email = "test@example.com",
-          firstName = "John",
-          lastName = "Doe",
-          phoneNumber = "1234567890",
-          accountStatus = "active",
-          eventsAttendeeList = mutableListOf("event1", "event2"),
-          eventsHostList = mutableListOf("event3"),
-          friendsList = mutableListOf("2"),
-          profilePicUrl = "http://example.com/Profile_Pictures/1",
-          qrCodeUrl = "http://example.com/QR_Codes/1",
-          bio = "",
-          username = "johndoe")
-  private val mockFriend =
-      User(
-          userId = "2",
-          birthDate = "02/02/2002",
-          email = "friend@example.com",
-          firstName = "Jim",
-          lastName = "Smith",
-          phoneNumber = "1234567890",
-          accountStatus = "active",
-          eventsAttendeeList = mutableListOf("event1", "event2"),
-          eventsHostList = mutableListOf("event3"),
-          friendsList = mutableListOf("1"),
-          profilePicUrl = "http://example.com/Profile_Pictures/2",
-          qrCodeUrl = "http://example.com/QR_Codes/2",
-          bio = "",
-          username = "jimsmith")
+
   private val sampleUiState =
       MutableStateFlow(
           ProfileUiState(
@@ -134,10 +102,8 @@ class ProfileTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
       phoneNumberBirthDateRow { assertIsDisplayed() }
       phoneNumberColumn { assertIsDisplayed() }
       phoneNumberLabelText { assertIsDisplayed() }
-      // phoneNumberInfoText { assertIsDisplayed() }
       birthDateColumn { assertIsDisplayed() }
       birthDateLabelText { assertIsDisplayed() }
-      // birthDateInfoText { assertIsDisplayed() }
     }
   }
 
@@ -162,35 +128,4 @@ class ProfileTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
     verify { mockNavActions.goBack() }
     confirmVerified(mockNavActions)
   }
-
-  /*
-  @Test
-  fun bottomNavigationBarPublicProfileSelectedIconIsCorrect() = run {
-      composeTestRule.setContent {
-          ProfileUi(
-              isPublicView = true, viewModel = mockProfileViewModel, navigationActions = mockNavActions)
-      }
-
-      ComposeScreen.onComposeScreen<ProfileScreen>(composeTestRule) {
-          val selectedTab = getSelectedTab()
-          // Check if the selected tab is the correct one
-          selectedTab.assertValueEquals("Messages")
-      }
-  }
-
-  @Test
-  fun bottomNavigationBarPrivateProfileSelectedIconIsCorrect() = run {
-      composeTestRule.setContent {
-          ProfileUi(
-              isPublicView = false, viewModel = mockProfileViewModel, navigationActions = mockNavActions)
-      }
-
-      ComposeScreen.onComposeScreen<ProfileScreen>(composeTestRule) {
-          val selectedTab = getSelectedTab()
-          // Check if the selected tab is the correct one
-          selectedTab.assertValueEquals("Profile")
-      }
-  }
-
-   */
 }

@@ -1,7 +1,6 @@
 package com.github.se.eventradar.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -29,8 +28,6 @@ fun NavGraph(
     navController: NavHostController,
     navActions: NavigationActions = NavigationActions(navController)
 ) {
-  val context = LocalContext.current
-
   NavHost(navController, startDestination = Route.LOGIN) {
     composable(Route.LOGIN) { LoginScreen(navigationActions = navActions) }
     composable(Route.SIGNUP) { SignUpScreen(navigationActions = navActions) }
@@ -57,17 +54,6 @@ fun NavGraph(
           val viewModel = ChatViewModel.create(opponentId = opponentId)
           ChatScreen(viewModel = viewModel, navigationActions = navActions)
         }
-    /*
-    composable(
-        "${Route.PROFILE}/{friendUserId}",
-        arguments = listOf(navArgument("friendUserId") { type = NavType.StringType })) {
-          val friendUserId = it.arguments!!.getString("friendUserId")!!
-          val viewModel = ViewFriendsProfileViewModel.create(friendUserId = friendUserId)
-          ViewFriendsProfileUi(viewModel = viewModel, navigationActions = navActions)
-        }
-       */
-    // TODO replace the Toast message with the corresponding screen function of the route
-
     composable(
         "${Route.MY_EVENT}/{eventId}",
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {

@@ -18,7 +18,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
@@ -51,7 +50,6 @@ fun ProfileUi(
 ) {
   viewModel.getProfileDetails()
   val uiState by viewModel.uiState.collectAsState()
-  val context = LocalContext.current
   Scaffold(
       modifier = Modifier.testTag("profileScreen"),
       topBar = {
@@ -60,8 +58,9 @@ fun ProfileUi(
             modifier = Modifier.padding(vertical = 32.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically) {
               if (isPublicView) {
-                GoBackButton(
-                    modifier = Modifier.testTag("goBackButton"), { navigationActions.goBack() })
+                GoBackButton(modifier = Modifier.testTag("goBackButton")) {
+                  navigationActions.goBack()
+                }
                 Text(
                     "Profile Information",
                     modifier = Modifier.testTag("username"),
