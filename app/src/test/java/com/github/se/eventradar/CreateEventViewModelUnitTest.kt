@@ -166,7 +166,7 @@ class CreateEventViewModelUnitTest {
     assert(mockUiState.value.ticketPrice.toDouble() == mockEvent.ticket.price)
     assert(mockUiState.value.ticketName == mockEvent.ticket.name)
     assert(mockUiState.value.eventPhotoUri == uri)
-    assert(mockUiState.value.organiserList == mockEvent.organiserList)
+    assert(mockUiState.value.organiserListDisplayed == mockEvent.organiserList)
     unmockkAll()
   }
 
@@ -216,7 +216,7 @@ class CreateEventViewModelUnitTest {
     assert(mockUiState.value.ticketPrice == "")
     assert(mockUiState.value.ticketName == "")
     assert(mockUiState.value.eventPhotoUri == null)
-    assert(mockUiState.value.organiserList == emptyList<String>())
+    assert(mockUiState.value.organiserListDisplayed == emptyList<String>())
     unmockkAll()
   }
 
@@ -263,7 +263,7 @@ class CreateEventViewModelUnitTest {
     assert(mockUiState.value.ticketPrice == "")
     assert(mockUiState.value.ticketName == "")
     assert(mockUiState.value.eventPhotoUri == null)
-    assert(mockUiState.value.organiserList == emptyList<String>())
+    assert(mockUiState.value.organiserListDisplayed == emptyList<String>())
     unmockkAll()
   }
 
@@ -284,7 +284,7 @@ class CreateEventViewModelUnitTest {
 
   @Test
   fun testResetStateAndSetEventUploadError() = runTest {
-    viewModel.resetStateAndSetEventUploadError(true, mockUiState)
+    viewModel.resetStateAndSetAddEventFailure(true, mockUiState)
     assert(mockUiState.value.eventUploadError == true)
   }
 
@@ -306,7 +306,7 @@ class CreateEventViewModelUnitTest {
   fun testOnOrganiserListChanged() = runTest {
     val newOrganiserList = mutableListOf("Organiser1", "Organiser2")
     viewModel.onOrganiserListChanged(newOrganiserList, mockUiState)
-    assertEquals(newOrganiserList, mockUiState.value.organiserList)
+    assertEquals(newOrganiserList, mockUiState.value.organiserListDisplayed)
   }
 
   @Test

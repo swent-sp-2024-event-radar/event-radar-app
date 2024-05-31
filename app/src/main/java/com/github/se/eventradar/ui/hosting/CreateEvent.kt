@@ -1,5 +1,6 @@
 package com.github.se.eventradar.ui.hosting
 
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -57,6 +58,7 @@ import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.component.ImagePicker
 import com.github.se.eventradar.ui.component.LocationDropDownMenu
 import com.github.se.eventradar.ui.component.MultiSelectDropDownMenu
+import com.github.se.eventradar.ui.component.StandardDialogBox
 import com.github.se.eventradar.ui.component.StandardInputTextField
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
@@ -260,22 +262,28 @@ fun CreateEventScreen(
                     modifier = Modifier.padding(start = 8.dp),
                 )
             }
-            val success = remember {mutableStateOf(uiState.updateUsersHostListSuccessState && uiState.addEventSuccessState)}
-            GenericDialogBox(
-                openDialog = success,
+            StandardDialogBox(
+                display = (uiState.showAddEventSuccess),
                 modifier = Modifier.testTag("successDialogBox"),
                 title = "Successfully Created Event",
                 message = "You have succesfully created your event, invite others over to join!",
-                onClickConfirmButton = {navigationActions.navigateTo(getTopLevelDestination(Route.MY_HOSTING))},
+                onClickConfirmButton = {
+                    Log.d("Called", "OnClick is called")
+                    //update the error states!
+                    viewModel.resetStateAndSetAddEventSuccess(false)
+                    navigationActions.goBack()
+                                       },
                 boxIcon = {Icon(Icons.Default.Check, "Success Icon")}
             )
-            val failure = remember{ mutableStateOf(uiState.eventUploadError || uiState.updateUsersHostListError)}
-            GenericDialogBox(
-                openDialog = failure,
+            StandardDialogBox(
+                display = (uiState.showAddEventFailure),
                 modifier = Modifier.testTag("failureDialogBox"),
                 title = "Creating Event has Failed",
                 message = "Something went wrong with creating your event, please retry.",
-                onClickConfirmButton = {},
+                onClickConfirmButton = {
+                    viewModel.resetStateAndSetAddEventFailure(false)
+                    navigationActions.goBack()
+                }, //reset or not idk!
                 boxIcon = {Icon(Icons.Default.Clear, "Failure Icon")}
             )
         }

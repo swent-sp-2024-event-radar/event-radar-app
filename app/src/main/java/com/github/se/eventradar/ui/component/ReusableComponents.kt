@@ -519,14 +519,14 @@ fun displayChosenOrganisers(organisers: List<String>): String {
 @Composable
 fun MultiSelectDropDownMenu( // list of organisers
     value : String,
-    onSelectedListChanged: ((List<String>) -> Unit),
+    onSelectedListChanged: ((List<User>) -> Unit),
     label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     getFriends: (() -> Unit), // this searches for the friends!
     friendsList: List<User>, // map userId to userName?
 ) {
   getFriends() // initialize user friends
-  val selectedItems = remember { mutableStateListOf<String>() }
+  val selectedItems = remember { mutableStateListOf<User>() }
   var isExpanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
@@ -534,7 +534,7 @@ fun MultiSelectDropDownMenu( // list of organisers
         onExpandedChange = { isExpanded = !isExpanded },
     ) {
     OutlinedTextField(
-        value = displayChosenOrganisers(selectedItems.toList()),
+        value = displayChosenOrganisers(selectedItems.map{eachUser -> eachUser.username}.toList()),
         onValueChange = {},
         label = label,
         modifier =
@@ -560,7 +560,7 @@ fun MultiSelectDropDownMenu( // list of organisers
         expanded = isExpanded,
         onDismissRequest = { isExpanded = false }) {
           for (friend in friendsList) {
-            val isSelected = selectedItems.contains(friend.username)
+            val isSelected = selectedItems.contains(friend)
             DropdownMenuItem(
                 text = {
                   Text(
@@ -568,9 +568,9 @@ fun MultiSelectDropDownMenu( // list of organisers
                 },
                 onClick = {
                   if (isSelected) {
-                    selectedItems.remove(friend.username)
+                    selectedItems.remove(friend)
                   } else {
-                    selectedItems.add(friend.username)
+                    selectedItems.add(friend)
                   }
                   onSelectedListChanged(selectedItems.toList())
                 }, //add an icon here
@@ -778,6 +778,44 @@ fun GenericDialogBox(
         modifier = modifier)
   }
 }
+
+@Composable
+fun StandardDialogBox(
+    display: Boolean,
+    modifier: Modifier = Modifier,
+    title: String,
+    message: String,
+    onClickConfirmButton: () -> Unit,
+    boxIcon: @Composable (() -> Unit)?,
+) {
+    if (display) {
+        AlertDialog(
+            icon = boxIcon,
+            text = {
+                Text(
+                    text = message,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.testTag("ErrorDisplayText"))
+            },
+            title = {
+                Text(
+                    text = title,
+                    modifier = Modifier.testTag("ErrorTitle"),
+                )
+            },
+            onDismissRequest = {},
+            confirmButton = {
+                TextButton(
+                    onClick = onClickConfirmButton
+                    ,
+                    modifier = Modifier.testTag("dialogConfirmButton")) {
+                    Text("Ok")
+                }
+            },
+            modifier = modifier)
+    }
+}
+
 
 @Composable
 fun GetUserLocation(

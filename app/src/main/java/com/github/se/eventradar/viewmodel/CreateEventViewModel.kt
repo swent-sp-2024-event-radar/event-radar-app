@@ -50,7 +50,7 @@ constructor(
                                 }
                                 is Resource.Failure -> {
                                     Log.d("CreateEventViewModel", "Error Generating Event Id")
-                                    resetStateAndSetEventUploadError(true, state)
+                                    resetStateAndSetAddEventFailure(true, state)
                                     return@launch
                                 }
                             }
@@ -63,7 +63,7 @@ constructor(
                                 }
                                 is Resource.Failure -> {
                                     Log.d("CreateEventViewModel", "Location Fetching Failed")
-                                    resetStateAndSetEventUploadError(true, state)
+                                    resetStateAndSetAddEventFailure(true, state)
                                     return@launch
                                 }
                             }
@@ -78,16 +78,11 @@ constructor(
                                 }
                                 is Resource.Failure -> {
                                     Log.d("CreateEventViewModel", "Fetching Profile Picture Error")
-                                    resetStateAndSetEventUploadError(true, state)
+                                    resetStateAndSetAddEventFailure(true, state)
                                     return@launch
                                 }
                             }
 
-
-                        Log.d("Field", state.value.eventName)
-                        Log.d("Field", fetchedLocation.latitude.toString())
-                        Log.d("Ticket Price", state.value.ticketPrice)
-                        Log.d("Ticket Capacity", state.value.ticketCapacity)
                         val eventHashMap =
                             hashMapOf(
                                 "name" to state.value.eventName,
@@ -103,17 +98,23 @@ constructor(
                                 "ticket_capacity" to state.value.ticketCapacity.toLong(),
                                 "ticket_purchases" to 0.toLong(),
                                 "main_organiser" to uid,
-                                "organisers_list" to state.value.organiserList,
+                                "organisers_list" to state.value.organiserList.map{user -> user.userId},
                                 "attendees_list" to mutableListOf<String>(),
                                 "category" to state.value.eventCategory,
                             )
-
+                        //get the userIds of the hosts
                         val newEvent = Event(eventHashMap, newEventId)
                         addUserEvent(uid, newEvent, state)
+
+                        val organisers = state.value.organiserList
+                        for (organiser in organisers){
+                            addUserEvent(organiser.userId, newEvent, state)
+                        }
+                        state.value = state.value.copy(showAddEventSuccess = true)
                     }
                     is Resource.Failure -> {
                         Log.d("CreateEventViewModel", "User not logged in or error fetching user ID")
-                        resetStateAndSetEventUploadError(true, state)
+                        resetStateAndSetAddEventFailure(true, state)
                     }
                 }
             }
@@ -130,7 +131,6 @@ constructor(
             when (eventRepository.addEvent(newEvent)) {
                 is Resource.Success -> {
                     Log.d("CreateEventViewModel", "Successfully added event")
-                    state.value = state.value.copy(addEventSuccessState = true)
                     updateUserHostList(uid, newEvent.fireBaseID, state)
                 }
                 is Resource.Failure -> {
@@ -147,33 +147,22 @@ constructor(
         state: MutableStateFlow<CreateEventUiState> = _uiState,
     ) {
         // Updates the user list
-        when (val userResource = userRepository.getUser(uid)) {
-            is Resource.Success -> {
-                val user = userResource.data!!
-                val userValues =
-                    hashMapOf(
-                        "private/firstName" to user.firstName,
-                        "private/lastName" to user.lastName,
-                        "private/phoneNumber" to user.phoneNumber,
-                        "private/birthDate" to user.birthDate,
-                        "private/email" to user.email,
-                        "profilePicUrl" to user.profilePicUrl,
-                        "qrCodeUrl" to user.qrCodeUrl,
-                        "username" to user.username,
-                        "accountStatus" to user.accountStatus,
-                        "bio" to user.bio,
-                        "eventsAttendeeList" to user.eventsAttendeeList,
-                        "eventsHostList" to user.eventsHostList.add(newEventId))
-                val newUser = User(userValues, uid)
-                userRepository.updateUser(newUser)
-                state.value = state.value.copy(updateUsersHostListSuccessState = true)
-                Log.d("CreateEventViewModel", "Successfully updated user ${uid} host list")
-            }
-            is Resource.Failure -> {
-                Log.d("CreateEventViewModel", "Failed to find user ${uid} in database")
-                state.value = CreateEventUiState()
-            }
+            when (val userResource = userRepository.getUser(uid)) {
+                is Resource.Success -> {
+                    val user = userResource.data!!
+                    user.eventsHostList.add(newEventId)
+                    val userValues = user.toMap()
+                    val updatedUser = User(userValues, uid)
+                    userRepository.updateUser(updatedUser)
+                    Log.d("CreateEventViewModel", "Successfully updated user ${uid} host list")
+                }
+                is Resource.Failure -> {
+                    Log.d("CreateEventViewModel", "Failed to find user ${uid} in database")
+                    state.value = CreateEventUiState()
+                }
+
         }
+
     }
     fun getHostFriendList(state: MutableStateFlow<CreateEventUiState> = _uiState){
         viewModelScope.launch {
@@ -206,7 +195,7 @@ constructor(
                     }
                     is Resource.Failure -> {
                         Log.d("CreateEventViewModel", "User not logged in or error fetching user ID")
-                        resetStateAndSetEventUploadError(true, state)
+                        resetStateAndSetAddEventFailure(true, state)
                     }
                 }
             }
@@ -227,11 +216,14 @@ constructor(
         }
     }
 
-    fun resetStateAndSetEventUploadError(
+    fun resetStateAndSetAddEventFailure(
         newErrorState: Boolean,
         state: MutableStateFlow<CreateEventUiState> = _uiState
     ) {
-        state.value = CreateEventUiState(eventUploadError = newErrorState)
+        state.value = CreateEventUiState(showAddEventFailure = newErrorState)
+    }
+    fun resetStateAndSetAddEventSuccess(newSuccessState : Boolean, state: MutableStateFlow<CreateEventUiState> = _uiState){
+        state.value = CreateEventUiState(showAddEventSuccess = newSuccessState)
     }
 
     fun validateFields(state: MutableStateFlow<CreateEventUiState> = _uiState): Boolean {
@@ -315,7 +307,7 @@ constructor(
     }
 
     fun onOrganiserListChanged(
-        organiserList: List<String>,
+        organiserList: List<User>,
         state: MutableStateFlow<CreateEventUiState> = _uiState
     ) {
         state.value = state.value.copy(organiserList = organiserList)
@@ -390,7 +382,7 @@ data class CreateEventUiState(
     val ticketName: String = "",
     val ticketCapacity: String = "",
     val ticketPrice: String = "",
-    val organiserList: List<String> = emptyList(),
+    val organiserList: List<User> = emptyList(),
     val eventNameIsError: Boolean = false,
     val eventDescriptionIsError: Boolean = false,
     val startDateIsError: Boolean = false,
@@ -401,11 +393,9 @@ data class CreateEventUiState(
     val ticketNameIsError: Boolean = false,
     val ticketCapacityIsError: Boolean = false,
     val ticketPriceIsError: Boolean = false,
-    val eventUploadError: Boolean = false,
-    val updateUsersHostListError : Boolean = false,
     val eventCategoryIsError : Boolean = false,
     val listOfLocations: List<Location> = emptyList(),
     val hostFriendsList : List<User> = emptyList(),
-    val updateUsersHostListSuccessState : Boolean = false,
-    val addEventSuccessState : Boolean = false
+    val showAddEventSuccess : Boolean = false,
+    val showAddEventFailure : Boolean = false,
 )
