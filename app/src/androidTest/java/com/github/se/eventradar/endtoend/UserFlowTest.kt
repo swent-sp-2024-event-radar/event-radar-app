@@ -24,7 +24,7 @@ import com.github.se.eventradar.screens.ChatScreen
 import com.github.se.eventradar.screens.EventDetailsScreen
 import com.github.se.eventradar.screens.HomeScreen
 import com.github.se.eventradar.screens.MessagesScreen
-import com.github.se.eventradar.screens.ViewFriendsProfileScreen
+import com.github.se.eventradar.screens.ProfileScreen
 import com.github.se.eventradar.ui.chat.ChatScreen
 import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.home.HomeScreen
@@ -32,12 +32,12 @@ import com.github.se.eventradar.ui.messages.MessagesScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.theme.MyApplicationTheme
-import com.github.se.eventradar.ui.viewProfile.ViewFriendsProfileUi
+import com.github.se.eventradar.ui.viewProfile.ProfileUi
 import com.github.se.eventradar.viewmodel.ChatViewModel
 import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.github.se.eventradar.viewmodel.MessagesViewModel
-import com.github.se.eventradar.viewmodel.ViewFriendsProfileViewModel
+import com.github.se.eventradar.viewmodel.ProfileViewModel
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -175,8 +175,9 @@ class UserFlowTests : TestCase() {
               "${Route.PROFILE}/{friendUserId}",
               arguments = listOf(navArgument("friendUserId") { type = NavType.StringType })) {
                 val friendUserId = it.arguments!!.getString("friendUserId")!!
-                val viewModel = ViewFriendsProfileViewModel(userRepository, friendUserId)
-                ViewFriendsProfileUi(viewModel = viewModel, navigationActions = navActions)
+                val viewModel = ProfileViewModel(userRepository, friendUserId)
+                ProfileUi(
+                    isPublicView = true, viewModel = viewModel, navigationActions = navActions)
               }
         }
       }
@@ -274,14 +275,14 @@ class UserFlowTests : TestCase() {
       }
       step("View friend profile") { friendPreviewItem { performClick() } }
     }
-    ComposeScreen.onComposeScreen<ViewFriendsProfileScreen>(composeTestRule) {
+    ComposeScreen.onComposeScreen<ProfileScreen>(composeTestRule) {
       chatButton { assertIsDisplayed() }
       goBackButton { assertIsDisplayed() }
       bottomNav { assertIsDisplayed() }
       centeredViewProfileColumn { assertIsDisplayed() }
-      friendProfilePic { assertIsDisplayed() }
-      friendName { assertIsDisplayed() }
-      friendUserName { assertIsDisplayed() }
+      profilePic { assertIsDisplayed() }
+      name { assertIsDisplayed() }
+      username { assertIsDisplayed() }
       leftAlignedViewProfileColumn { assertIsDisplayed() }
       bioLabelText { assertIsDisplayed() }
       bioInfoText { assertIsDisplayed() }
