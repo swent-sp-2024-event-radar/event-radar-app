@@ -75,7 +75,7 @@ fun CreateEventScreen(
         modifier = Modifier.testTag("createEventScreen"),
         topBar = {
             Row(
-                modifier = Modifier.padding(vertical = 32.dp).fillMaxWidth(),
+                modifier = Modifier.padding(vertical = 32.dp).fillMaxWidth().testTag("topBar"),
                 verticalAlignment = Alignment.CenterVertically) {
                 GoBackButton(modifier = Modifier.testTag("goBackButton"), navigationActions::goBack)
                 Text(
@@ -94,7 +94,6 @@ fun CreateEventScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .testTag("createEventScreenColumn"),
-            // verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally) {
             val imagePickerLauncher =
                 rememberLauncherForActivityResult(
@@ -105,7 +104,7 @@ fun CreateEventScreen(
                 modifier =
                 Modifier.size(150.dp) // Adjust size as needed
                     .clip(RoundedCornerShape(15.dp))
-                    .testTag("eventPhoto")
+                    .testTag("eventImagePicker")
                     .clickable { imagePickerLauncher.launch("image/*") },
                 uiState.eventPhotoUri)
 
@@ -132,7 +131,7 @@ fun CreateEventScreen(
             )
             DropdownInputTextField(
                 modifier =
-                Modifier.fillMaxWidth().padding(start = 35.dp, top = 8.dp, end = 35.dp),
+                Modifier.fillMaxWidth().padding(start = 35.dp, top = 8.dp, end = 35.dp).testTag("eventCategoryDropDown"),
                 textFieldLabel = "Event Category",
                 textFieldValue = uiState.eventCategory,
                 onValueChange = viewModel::onEventCategoryChanged,
@@ -187,13 +186,13 @@ fun CreateEventScreen(
                 label = { Text("Location") },
                 modifier = Modifier.fillMaxWidth()
                     .padding(start = 35.dp, top = 8.dp, end = 35.dp)
-                    .testTag("locationSearchTextField"),
+                    .testTag("locationDropDownMenuTextField"),
                 getLocations = viewModel::updateListOfLocations,
                 locationList = uiState.listOfLocations)
 
             DropdownInputTextField(
                 modifier =
-                Modifier.fillMaxWidth().padding(start = 35.dp, top = 8.dp, end = 35.dp),
+                Modifier.fillMaxWidth().padding(start = 35.dp, top = 8.dp, end = 35.dp).testTag("ticketNameDropDownMenu"),
                 textFieldLabel = "Ticket Name",
                 textFieldValue = uiState.ticketName,
                 onValueChange = viewModel::onTicketNameChanged,
@@ -227,7 +226,7 @@ fun CreateEventScreen(
                 label = { Text("Organisers")},
                 modifier = Modifier.fillMaxWidth()
                     .padding(start = 35.dp, top = 8.dp, end = 35.dp)
-                    .testTag("multiDropDownMenuTextField"),
+                    .testTag("organisersMultiDropDownMenuTextField"),
                 getFriends = viewModel::getHostFriendList,
                 friendsList = uiState.hostFriendsList)
             // add a Button!
@@ -242,7 +241,7 @@ fun CreateEventScreen(
                 Modifier.wrapContentSize()
                     .fillMaxWidth()
                     .padding(start = 35.dp, top = 16.dp, end = 35.dp)
-                    .testTag("signUpLoginButton"),
+                    .testTag("publishEventButton"),
                 border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
                 colors =
                 ButtonDefaults.buttonColors(

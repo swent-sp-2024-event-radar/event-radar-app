@@ -82,7 +82,6 @@ constructor(
                                     return@launch
                                 }
                             }
-
                         val eventHashMap =
                             hashMapOf(
                                 "name" to state.value.eventName,
@@ -105,7 +104,6 @@ constructor(
                         //get the userIds of the hosts
                         val newEvent = Event(eventHashMap, newEventId)
                         addUserEvent(uid, newEvent, state)
-
                         val organisers = state.value.organiserList
                         for (organiser in organisers){
                             addUserEvent(organiser.userId, newEvent, state)
@@ -135,7 +133,7 @@ constructor(
                 }
                 is Resource.Failure -> {
                     Log.d("CreateEventViewModel", "Failed to add event")
-                    state.value = CreateEventUiState()
+                    resetStateAndSetAddEventFailure(newErrorState = true)
                 }
             }
         }
@@ -158,7 +156,7 @@ constructor(
                 }
                 is Resource.Failure -> {
                     Log.d("CreateEventViewModel", "Failed to find user ${uid} in database")
-                    state.value = CreateEventUiState()
+                    resetStateAndSetAddEventFailure(newErrorState = true)
                 }
 
         }

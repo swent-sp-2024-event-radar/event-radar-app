@@ -401,7 +401,7 @@ fun CategoryDisplayColumn(
 @Composable
 fun ImagePicker(modifier: Modifier, imageUri: Uri?) {
   Row(
-      modifier = Modifier.padding(top = 16.dp),
+      modifier = modifier.padding(top = 16.dp),
       horizontalArrangement = Arrangement.Center,
       verticalAlignment = Alignment.CenterVertically) {
         if (imageUri != null) {
@@ -464,6 +464,7 @@ fun DropdownInputTextField(
     ExposedDropdownMenuBox(
         expanded = isExpanded,
         onExpandedChange = { isExpanded = !isExpanded },
+        modifier = Modifier.testTag("exposedDropDownMenuBox"),
     ) {
     OutlinedTextField(
         value = selectedOption,
@@ -486,7 +487,7 @@ fun DropdownInputTextField(
         ExposedDropdownMenu(
         expanded = isExpanded,
         onDismissRequest = { isExpanded = false },
-        modifier = Modifier.exposedDropdownSize(true)
+        modifier = modifier.exposedDropdownSize(true)
             .requiredSizeIn(maxHeight = 150.dp)) {
           options.forEach { option ->
             DropdownMenuItem(
@@ -532,13 +533,13 @@ fun MultiSelectDropDownMenu( // list of organisers
     ExposedDropdownMenuBox(
         expanded = isExpanded,
         onExpandedChange = { isExpanded = !isExpanded },
+        modifier = Modifier.testTag("multiSelectExposedDropDownMenuBox"),
     ) {
     OutlinedTextField(
         value = displayChosenOrganisers(selectedItems.map{eachUser -> eachUser.username}.toList()),
         onValueChange = {},
         label = label,
-        modifier =
-        modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),// Open dropdown on text field click
+        modifier = modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),// Open dropdown on text field click
         colors =
             OutlinedTextFieldDefaults.colors()
                 .copy(
@@ -558,7 +559,8 @@ fun MultiSelectDropDownMenu( // list of organisers
         )
         ExposedDropdownMenu(
         expanded = isExpanded,
-        onDismissRequest = { isExpanded = false }) {
+        onDismissRequest = { isExpanded = false },
+        modifier = Modifier.testTag("locationExposedDropdownMenu")) {
           for (friend in friendsList) {
             val isSelected = selectedItems.contains(friend)
             DropdownMenuItem(
@@ -584,7 +586,7 @@ fun MultiSelectDropDownMenu( // list of organisers
                 },
                 contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                 modifier = Modifier.exposedDropdownSize(true)
-                    .requiredSizeIn(maxHeight = 150.dp).testTag("locationDropdownItem"))
+                    .requiredSizeIn(maxHeight = 150.dp).testTag("locationDropdownMenuItem"))
           }
         }
   }
@@ -606,6 +608,7 @@ fun LocationDropDownMenu(
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = setExpanded,
+        modifier = Modifier.testTag("locationExposedDropDownMenuBox"),
     ) {
         OutlinedTextField(
             value = value,
@@ -626,6 +629,7 @@ fun LocationDropDownMenu(
             modifier = Modifier
                 .exposedDropdownSize(true)
                 .requiredSizeIn(maxHeight = 150.dp)
+                .testTag("locationDropDownMenu")
             ,
             expanded = expanded,
             onDismissRequest = { setExpanded(false) },
@@ -795,12 +799,12 @@ fun StandardDialogBox(
                 Text(
                     text = message,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.testTag("ErrorDisplayText"))
+                    modifier = Modifier.testTag("DisplayText"))
             },
             title = {
                 Text(
                     text = title,
-                    modifier = Modifier.testTag("ErrorTitle"),
+                    modifier = Modifier.testTag("DisplayTitle"),
                 )
             },
             onDismissRequest = {},
