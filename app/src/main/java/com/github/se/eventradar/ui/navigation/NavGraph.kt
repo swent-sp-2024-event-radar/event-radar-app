@@ -16,10 +16,8 @@ import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.login.SignUpScreen
 import com.github.se.eventradar.ui.messages.MessagesScreen
 import com.github.se.eventradar.ui.qrCode.QrCodeScreen
-import com.github.se.eventradar.ui.viewProfile.ProfileUi
 import com.github.se.eventradar.ui.qrCode.QrCodeTicketUi
-import com.github.se.eventradar.ui.viewProfile.ViewFriendsProfileUi
-import com.github.se.eventradar.util.toast
+import com.github.se.eventradar.ui.viewProfile.ProfileUi
 import com.github.se.eventradar.viewmodel.ChatViewModel
 import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.viewmodel.ProfileViewModel
