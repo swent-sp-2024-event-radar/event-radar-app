@@ -18,14 +18,20 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,12 +52,15 @@ import com.github.se.eventradar.model.repository.location.MockLocationRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.component.DateInputTextField
 import com.github.se.eventradar.ui.component.DropdownInputTextField
+import com.github.se.eventradar.ui.component.GenericDialogBox
 import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.component.ImagePicker
-import com.github.se.eventradar.ui.component.LocationTextField
+import com.github.se.eventradar.ui.component.LocationDropDownMenu
 import com.github.se.eventradar.ui.component.MultiSelectDropDownMenu
 import com.github.se.eventradar.ui.component.StandardInputTextField
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.Route
+import com.github.se.eventradar.ui.navigation.getTopLevelDestination
 import com.github.se.eventradar.viewmodel.CreateEventViewModel
 
 @Composable
@@ -170,11 +179,10 @@ fun CreateEventScreen(
                     onValueChange = viewModel::onEndTimeChanged,
                     errorState = uiState.endTimeIsError)
             }
-            LocationTextField(
+            LocationDropDownMenu(
                 value = uiState.location,
                 onLocationChanged = viewModel::onLocationChanged,
                 label = { Text("Location") },
-                placeholder = {},
                 modifier = Modifier.fillMaxWidth()
                     .padding(start = 35.dp, top = 8.dp, end = 35.dp)
                     .testTag("locationSearchTextField"),
@@ -215,13 +223,13 @@ fun CreateEventScreen(
                 value = "Organiser",
                 onSelectedListChanged = viewModel::onOrganiserListChanged,
                 label = { Text("Organisers")},
-                placeholder = {},
                 modifier = Modifier.fillMaxWidth()
                     .padding(start = 35.dp, top = 8.dp, end = 35.dp)
                     .testTag("multiDropDownMenuTextField"),
                 getFriends = viewModel::getHostFriendList,
                 friendsList = uiState.hostFriendsList)
             // add a Button!
+            //successful or not?
             Button(
                 onClick = {
                     if (viewModel.validateFields()) {
@@ -252,6 +260,24 @@ fun CreateEventScreen(
                     modifier = Modifier.padding(start = 8.dp),
                 )
             }
+            val success = remember {mutableStateOf(uiState.updateUsersHostListSuccessState && uiState.addEventSuccessState)}
+            GenericDialogBox(
+                openDialog = success,
+                modifier = Modifier.testTag("successDialogBox"),
+                title = "Successfully Created Event",
+                message = "You have succesfully created your event, invite others over to join!",
+                onClickConfirmButton = {navigationActions.navigateTo(getTopLevelDestination(Route.MY_HOSTING))},
+                boxIcon = {Icon(Icons.Default.Check, "Success Icon")}
+            )
+            val failure = remember{ mutableStateOf(uiState.eventUploadError || uiState.updateUsersHostListError)}
+            GenericDialogBox(
+                openDialog = failure,
+                modifier = Modifier.testTag("failureDialogBox"),
+                title = "Creating Event has Failed",
+                message = "Something went wrong with creating your event, please retry.",
+                onClickConfirmButton = {},
+                boxIcon = {Icon(Icons.Default.Clear, "Failure Icon")}
+            )
         }
     }
 }

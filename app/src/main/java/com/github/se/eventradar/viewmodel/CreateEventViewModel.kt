@@ -82,6 +82,12 @@ constructor(
                                     return@launch
                                 }
                             }
+
+
+                        Log.d("Field", state.value.eventName)
+                        Log.d("Field", fetchedLocation.latitude.toString())
+                        Log.d("Ticket Price", state.value.ticketPrice)
+                        Log.d("Ticket Capacity", state.value.ticketCapacity)
                         val eventHashMap =
                             hashMapOf(
                                 "name" to state.value.eventName,
@@ -95,7 +101,7 @@ constructor(
                                 "ticket_name" to state.value.ticketName,
                                 "ticket_price" to state.value.ticketPrice.toDouble(),
                                 "ticket_capacity" to state.value.ticketCapacity.toLong(),
-                                "ticket_purchases" to 0L,
+                                "ticket_purchases" to 0.toLong(),
                                 "main_organiser" to uid,
                                 "organisers_list" to state.value.organiserList,
                                 "attendees_list" to mutableListOf<String>(),
@@ -124,6 +130,7 @@ constructor(
             when (eventRepository.addEvent(newEvent)) {
                 is Resource.Success -> {
                     Log.d("CreateEventViewModel", "Successfully added event")
+                    state.value = state.value.copy(addEventSuccessState = true)
                     updateUserHostList(uid, newEvent.fireBaseID, state)
                 }
                 is Resource.Failure -> {
@@ -159,6 +166,7 @@ constructor(
                         "eventsHostList" to user.eventsHostList.add(newEventId))
                 val newUser = User(userValues, uid)
                 userRepository.updateUser(newUser)
+                state.value = state.value.copy(updateUsersHostListSuccessState = true)
                 Log.d("CreateEventViewModel", "Successfully updated user ${uid} host list")
             }
             is Resource.Failure -> {
@@ -357,6 +365,7 @@ constructor(
         ticketCapacity: String,
         state: MutableStateFlow<CreateEventUiState> = _uiState
     ) {
+        Log.d("Ticket Capacity", state.value.ticketCapacity)
         state.value = state.value.copy(ticketCapacity = ticketCapacity)
     }
 
@@ -393,7 +402,10 @@ data class CreateEventUiState(
     val ticketCapacityIsError: Boolean = false,
     val ticketPriceIsError: Boolean = false,
     val eventUploadError: Boolean = false,
+    val updateUsersHostListError : Boolean = false,
     val eventCategoryIsError : Boolean = false,
     val listOfLocations: List<Location> = emptyList(),
-    val hostFriendsList : List<User> = emptyList()
+    val hostFriendsList : List<User> = emptyList(),
+    val updateUsersHostListSuccessState : Boolean = false,
+    val addEventSuccessState : Boolean = false
 )

@@ -22,10 +22,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -35,7 +35,10 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Place
@@ -49,6 +52,9 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -62,7 +68,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -74,8 +79,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -92,6 +95,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.PopupProperties
 import androidx.core.app.ActivityCompat
 import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
@@ -444,6 +448,7 @@ fun StandardInputTextField(
   )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownInputTextField(
     modifier: Modifier = Modifier,
@@ -453,16 +458,18 @@ fun DropdownInputTextField(
     errorState: Boolean,
     options: List<String>
 ) {
-  var expanded by remember { mutableStateOf(false) }
+  var isExpanded by remember { mutableStateOf(false) }
   var selectedOption by remember { mutableStateOf(textFieldValue) }
-  val icon = Icons.Default.ArrowDropDown
 
-  Column {
+    ExposedDropdownMenuBox(
+        expanded = isExpanded,
+        onExpandedChange = { isExpanded = !isExpanded },
+    ) {
     OutlinedTextField(
         value = selectedOption,
         onValueChange = onValueChange,
         label = { Text(textFieldLabel) },
-        modifier = modifier.clickable { expanded = !expanded }, // Open dropdown on text field click
+        modifier = modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable), // Open dropdown on text field click
         colors =
             OutlinedTextFieldDefaults.colors()
                 .copy(
@@ -471,26 +478,26 @@ fun DropdownInputTextField(
         shape = RoundedCornerShape(12.dp),
         isError = errorState,
         trailingIcon = {
-          Icon(
-              imageVector = icon,
-              contentDescription = "Drop down Icon",
-              modifier =
-                  Modifier.clickable { expanded = !expanded }.rotate(if (expanded) 180f else 0f))
+            ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
         },
-        readOnly = true // Make the text field read-only to handle input via dropdown
+        readOnly = true, // Make the text field read-only to handle input via dropdown
+        singleLine = true
         )
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = { expanded = false },
-        modifier = Modifier.fillMaxWidth()) {
+        ExposedDropdownMenu(
+        expanded = isExpanded,
+        onDismissRequest = { isExpanded = false },
+        modifier = Modifier.exposedDropdownSize(true)
+            .requiredSizeIn(maxHeight = 150.dp)) {
           options.forEach { option ->
             DropdownMenuItem(
                 text = { Text(text = option, fontSize = 16.sp) },
                 onClick = {
                   selectedOption = option
                   onValueChange(option)
-                  expanded = false
-                })
+                  isExpanded = false
+                },
+                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+            )
           }
         }
   }
@@ -499,12 +506,11 @@ fun DropdownInputTextField(
 fun displayChosenOrganisers(organisers: List<String>): String {
   var organisersString = ""
   for (i in organisers.indices) {
-    val organiser = organisers[i]
-    if (i == organisers.size - 1) {
-      organisersString += organiser
-    } else {
-      organisersString += organiser + ", "
-    }
+      if (i == 0) {
+          organisersString += organisers[i]
+      } else {
+          organisersString += ", " + organisers[i]
+      }
   }
   return organisersString
 }
@@ -512,27 +518,27 @@ fun displayChosenOrganisers(organisers: List<String>): String {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MultiSelectDropDownMenu( // list of organisers
-    value: String,
+    value : String,
     onSelectedListChanged: ((List<String>) -> Unit),
     label: @Composable () -> Unit,
-    placeholder: @Composable (() -> Unit),
     modifier: Modifier = Modifier,
-    singleLine: Boolean = false,
     getFriends: (() -> Unit), // this searches for the friends!
     friendsList: List<User>, // map userId to userName?
 ) {
   getFriends() // initialize user friends
-  val selectedItems = remember { mutableStateListOf("") }
+  val selectedItems = remember { mutableStateListOf<String>() }
   var isExpanded by remember { mutableStateOf(false) }
-  val icon = Icons.Default.ArrowDropDown
 
-  Column {
+    ExposedDropdownMenuBox(
+        expanded = isExpanded,
+        onExpandedChange = { isExpanded = !isExpanded },
+    ) {
     OutlinedTextField(
         value = displayChosenOrganisers(selectedItems.toList()),
-        onValueChange = { isExpanded = true },
+        onValueChange = {},
         label = label,
         modifier =
-            modifier.clickable { isExpanded = !isExpanded }, // Open dropdown on text field click
+        modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),// Open dropdown on text field click
         colors =
             OutlinedTextFieldDefaults.colors()
                 .copy(
@@ -546,27 +552,19 @@ fun MultiSelectDropDownMenu( // list of organisers
           )
         },
         trailingIcon = {
-          Icon(
-              imageVector = icon,
-              contentDescription = "Drop down Icon",
-              modifier =
-                  Modifier.clickable { isExpanded = !isExpanded }
-                      .rotate(if (isExpanded) 180f else 0f))
+            ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
         },
         readOnly = true // Make the text field read-only to handle input via dropdown
         )
-    DropdownMenu(
+        ExposedDropdownMenu(
         expanded = isExpanded,
-        onDismissRequest = { isExpanded = false },
-        modifier = Modifier.fillMaxWidth()) {
+        onDismissRequest = { isExpanded = false }) {
           for (friend in friendsList) {
             val isSelected = selectedItems.contains(friend.username)
             DropdownMenuItem(
                 text = {
                   Text(
-                      text = friend.username,
-                      fontSize = 16.sp,
-                      modifier = Modifier.padding(vertical = 4.dp))
+                      text = friend.username,  style = MaterialTheme.typography.bodyLarge)
                 },
                 onClick = {
                   if (isSelected) {
@@ -575,8 +573,18 @@ fun MultiSelectDropDownMenu( // list of organisers
                     selectedItems.add(friend.username)
                   }
                   onSelectedListChanged(selectedItems.toList())
+                }, //add an icon here
+                trailingIcon =
+                {
+                    if (isSelected){
+                        Icon(Icons.Default.Clear,"Check")
+                    } else {
+                        Icon(Icons.Default.Add, "Add")
+                    }
                 },
-                modifier = Modifier.testTag("locationDropdownItem"))
+                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                modifier = Modifier.exposedDropdownSize(true)
+                    .requiredSizeIn(maxHeight = 150.dp).testTag("locationDropdownItem"))
           }
         }
   }
@@ -584,71 +592,58 @@ fun MultiSelectDropDownMenu( // list of organisers
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LocationTextField(
+fun LocationDropDownMenu(
     value: String,
     onLocationChanged: (String) -> Unit,
     label: @Composable () -> Unit,
-    placeholder: @Composable (() -> Unit),
     modifier: Modifier = Modifier,
-    singleLine: Boolean = false,
     getLocations: () -> Unit,
     locationList: List<Location>,
 ) {
-  var isExpanded by remember { mutableStateOf(false) }
-  val focusRequester = remember { FocusRequester() }
-  Column {
-    OutlinedTextField(
-        value = value,
-        onValueChange = {
-          onLocationChanged(it) // what if you delegate this to getLocations?
-          getLocations()
-          isExpanded = true
-        },
-        label = label,
-        modifier =
-            modifier
-                .clickable { isExpanded = !isExpanded }
-                .focusRequester(focusRequester), // Open dropdown on text field click
-        colors =
-            OutlinedTextFieldDefaults.colors()
-                .copy(
-                    focusedPrefixColor = MaterialTheme.colorScheme.primary,
-                    unfocusedPrefixColor = MaterialTheme.colorScheme.primary),
-        shape = RoundedCornerShape(12.dp),
-        singleLine = singleLine,
-        leadingIcon = {
-          Icon(
-              imageVector = Icons.Default.Search,
-              contentDescription = "Search Icon",
-          )
-        })
+    val (allowExpanded, setExpanded) = remember { mutableStateOf(false) }
+    val expanded = allowExpanded && locationList.isNotEmpty()
 
-    DropdownMenu(
-        expanded = isExpanded,
-        onDismissRequest = { isExpanded = false },
-        modifier = Modifier.fillMaxWidth().wrapContentHeight(align = Alignment.Bottom),
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = setExpanded,
     ) {
-      for (location in locationList) {
-        DropdownMenuItem(
-            text = {
-              Text(
-                  text = location.address,
-                  fontSize = 16.sp,
-                  modifier = Modifier.padding(vertical = 4.dp))
+        OutlinedTextField(
+            value = value,
+            onValueChange = {
+                onLocationChanged(it)
+                getLocations()
             },
-            onClick = {
-              onLocationChanged(location.address)
-              isExpanded = false
+            label = label,
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(
+                    expanded = expanded,
+                )
             },
-            modifier = Modifier.testTag("locationDropdownItem"))
-      }
+            shape = RoundedCornerShape(12.dp),
+            modifier = modifier.menuAnchor(MenuAnchorType.PrimaryEditable)
+        )
+        ExposedDropdownMenu(
+            modifier = Modifier
+                .exposedDropdownSize(true)
+                .requiredSizeIn(maxHeight = 150.dp)
+            ,
+            expanded = expanded,
+            onDismissRequest = { setExpanded(false) },
+        ) {
+            locationList.forEach { location ->
+                DropdownMenuItem(
+                    text = { Text(location.address,  style = MaterialTheme.typography.bodyLarge) },
+                    onClick = {
+                        onLocationChanged(location.address)
+                        setExpanded(false)
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                )
+            }
+        }
+
+
     }
-      LaunchedEffect(isExpanded) {
-          if (!isExpanded){
-              focusRequester.requestFocus()
-          }
-      }
-  }
 }
 
 @Composable
@@ -664,7 +659,7 @@ fun DateInputTextField(
       onValueChange = onValueChange,
       label = { Text(textFieldLabel) },
       modifier = modifier,
-      placeholder = { Text("DD/MM/YYYY") },
+      placeholder = { Text("YYYY-MM-DD") },
       colors =
           OutlinedTextFieldDefaults.colors()
               .copy(
