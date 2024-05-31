@@ -54,8 +54,8 @@ class HostedEventsViewModelTest {
       Event(
           eventName = "Event 1",
           eventPhoto = "",
-          start = LocalDateTime.now(),
-          end = LocalDateTime.now(),
+          start = LocalDateTime.parse("2025-12-31T09:00:00"),
+          end = LocalDateTime.parse("2025-01-01T00:00:00"),
           location = Location(0.0, 0.0, "Test Location"),
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1, 0),

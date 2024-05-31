@@ -62,16 +62,21 @@ constructor(
   }
 
   init {
+    resetAnalyser()
+    getEventData()
+  }
+
+  private fun resetAnalyser() {
+    qrCodeAnalyser.changeAnalysisState(true)
     qrCodeAnalyser.onDecoded = { decodedString ->
-      val result = decodedString ?: "Failed to decode QR Code"
-      updateDecodedString(result) // Update state flow
-      if (result != "Failed to decode QR Code") {
-        updatePermissions(result) // Directly call updateFriendList
+      // Update state flow
+      if (decodedString != null) {
+        updateDecodedString(decodedString)
+        updatePermissions(decodedString) // Directly call updateFriendList
       } else {
         changeAction(Action.AnalyserError)
       }
     }
-    getEventData()
   }
 
   private fun updatePermissions(decodedString: String) {
@@ -130,9 +135,9 @@ constructor(
   }
 
   fun resetConditions() {
-    qrCodeAnalyser.onDecoded = null
     changeAction(Action.ScanTicket)
-    _uiState.update { it.copy(decodedResult = "") }
+    _uiState.update { it.copy(decodedResult = null) }
+    qrCodeAnalyser.onDecoded = null
     changeTabState(Tab.MyEvent)
   }
 
@@ -141,6 +146,9 @@ constructor(
   }
 
   fun changeAction(action: Action) {
+    if (action == Action.ScanTicket) {
+      resetAnalyser()
+    }
     _uiState.update { it.copy(action = action) }
   }
 
@@ -170,7 +178,7 @@ constructor(
   }
 
   data class QrCodeScanTicketState(
-      val decodedResult: String = "",
+      val decodedResult: String? = null,
       val action: Action = Action.ScanTicket,
       val tabState: Tab = Tab.MyEvent,
       val eventUiState: EventUiState = EventUiState()
