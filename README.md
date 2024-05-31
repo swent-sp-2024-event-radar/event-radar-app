@@ -8,17 +8,18 @@ Event Radar is an innovative app designed to effortlessly facilitate connections
 
 ### Features
 
-- **Event Discovery:** Effortlessly find events based on your interests and location.
+- **Event Discovery:** Effortlessly find events based on your interests and location and view their position on the map.
 
 - **Easy Registration:** Register for events with just a few taps.
-
-- **QR Code Integration:** Use QR codes to register and interact with other attendees.
-
-- **Event Hosting:** Create and manage events with robust tools for ticketing and attendee tracking.
 
 - **Networking:** Connect with new friends and save their contact information by scanning QR codes.
 
 - **Messaging:** Continue the conversation with new acquaintances after the event.
+
+- **Event Hosting:** Create and manage events with robust tools for ticketing and attendee tracking.
+
+- **Quick verification:** Scan attendees' QR codes to confirm their presence on the event's participant list.
+
 
 ### Testing
 
@@ -31,18 +32,17 @@ Download the built APK on your android phone from the release branch M4.
 
 ## Packages structure
 
-Here is a description of the more important packages in the main folder.
+Here is a description of the more important packages in the main folder. We have clearly separated fronted Ui from backend functionalities and data interactions.
 
-- **Model** holds all the model for our app such as event, user and the differents repositories to interact with the database
+- **Model** holds all the model for our app such as event, user, messages and the differents repositories to interact with the database
 
   - **di** is used to store the setup files for data dependencies injection
 
-  - **repository** holds the repositories used to bridge between the data source and the rest of the app. It contains repositories for : event, users, messages, and location.
+  - **repository** holds the repositories used to bridge between the data source and the rest of the app. It contains repositories for : event, users, messages, and location. In our case we are working the Firebase and Nominatim.
 
-- **Ui** sort all the kotlin files containing our composable function to display the ui
+- **Ui** sort all the kotlin files containing our composable function to display the ui. Our main screens (brow)
 
 - **ViewModel** contains all our viewModels used in the app. ViewModels manage the data for the UI components, handling logic and surviving configuration changes, based on the Model View ViewModel design. 
-
 
 
 ## Figma
