@@ -86,6 +86,6 @@ fun NavGraph(
       context.toast("Profile screen needs to be implemented")
     }
     composable(Route.MY_HOSTING) { HostingScreen(navigationActions = navActions) }
-      composable(Route.CREATE_EVENT) { CreateEventScreen(navigationActions = navActions) }
+    composable(Route.CREATE_EVENT) { CreateEventScreen(navigationActions = navActions) }
   }
 }

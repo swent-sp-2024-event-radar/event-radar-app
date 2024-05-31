@@ -36,8 +36,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Face
@@ -49,15 +47,14 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -77,7 +74,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -95,7 +91,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.PopupProperties
 import androidx.core.app.ActivityCompat
 import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
@@ -456,21 +451,24 @@ fun DropdownInputTextField(
     textFieldValue: String,
     onValueChange: (String) -> Unit,
     errorState: Boolean,
-    options: List<String>
+    options: List<String>,
+    toggleIconTestTag: String,
 ) {
   var isExpanded by remember { mutableStateOf(false) }
   var selectedOption by remember { mutableStateOf(textFieldValue) }
 
-    ExposedDropdownMenuBox(
-        expanded = isExpanded,
-        onExpandedChange = { isExpanded = !isExpanded },
-        modifier = Modifier.testTag("exposedDropDownMenuBox"),
-    ) {
+  ExposedDropdownMenuBox(
+      expanded = isExpanded,
+      onExpandedChange = { isExpanded = !isExpanded },
+      modifier = Modifier.testTag("exposedDropDownMenuBox"),
+  ) {
     OutlinedTextField(
         value = selectedOption,
         onValueChange = onValueChange,
         label = { Text(textFieldLabel) },
-        modifier = modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable), // Open dropdown on text field click
+        modifier =
+            modifier.menuAnchor(
+                MenuAnchorType.PrimaryNotEditable), // Open dropdown on text field click
         colors =
             OutlinedTextFieldDefaults.colors()
                 .copy(
@@ -479,16 +477,18 @@ fun DropdownInputTextField(
         shape = RoundedCornerShape(12.dp),
         isError = errorState,
         trailingIcon = {
-            ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
+          ExposedDropdownMenuDefaults.TrailingIcon(
+              expanded = isExpanded, modifier = Modifier.testTag(toggleIconTestTag))
         },
         readOnly = true, // Make the text field read-only to handle input via dropdown
-        singleLine = true
-        )
-        ExposedDropdownMenu(
+        singleLine = true)
+    ExposedDropdownMenu(
         expanded = isExpanded,
         onDismissRequest = { isExpanded = false },
-        modifier = modifier.exposedDropdownSize(true)
-            .requiredSizeIn(maxHeight = 150.dp)) {
+        modifier =
+            Modifier.exposedDropdownSize(true)
+                .testTag("exposedDropDownMenu")
+                .requiredSizeIn(maxHeight = 150.dp)) {
           options.forEach { option ->
             DropdownMenuItem(
                 text = { Text(text = option, fontSize = 16.sp) },
@@ -507,11 +507,11 @@ fun DropdownInputTextField(
 fun displayChosenOrganisers(organisers: List<String>): String {
   var organisersString = ""
   for (i in organisers.indices) {
-      if (i == 0) {
-          organisersString += organisers[i]
-      } else {
-          organisersString += ", " + organisers[i]
-      }
+    if (i == 0) {
+      organisersString += organisers[i]
+    } else {
+      organisersString += ", " + organisers[i]
+    }
   }
   return organisersString
 }
@@ -519,7 +519,7 @@ fun displayChosenOrganisers(organisers: List<String>): String {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MultiSelectDropDownMenu( // list of organisers
-    value : String,
+    value: String,
     onSelectedListChanged: ((List<User>) -> Unit),
     label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -530,16 +530,19 @@ fun MultiSelectDropDownMenu( // list of organisers
   val selectedItems = remember { mutableStateListOf<User>() }
   var isExpanded by remember { mutableStateOf(false) }
 
-    ExposedDropdownMenuBox(
-        expanded = isExpanded,
-        onExpandedChange = { isExpanded = !isExpanded },
-        modifier = Modifier.testTag("multiSelectExposedDropDownMenuBox"),
-    ) {
+  ExposedDropdownMenuBox(
+      expanded = isExpanded,
+      onExpandedChange = { isExpanded = !isExpanded },
+      modifier = Modifier.testTag("multiSelectExposedDropDownMenuBox"),
+  ) {
     OutlinedTextField(
-        value = displayChosenOrganisers(selectedItems.map{eachUser -> eachUser.username}.toList()),
+        value =
+            displayChosenOrganisers(selectedItems.map { eachUser -> eachUser.username }.toList()),
         onValueChange = {},
         label = label,
-        modifier = modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),// Open dropdown on text field click
+        modifier =
+            modifier.menuAnchor(
+                MenuAnchorType.PrimaryNotEditable), // Open dropdown on text field click
         colors =
             OutlinedTextFieldDefaults.colors()
                 .copy(
@@ -553,21 +556,19 @@ fun MultiSelectDropDownMenu( // list of organisers
           )
         },
         trailingIcon = {
-            ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
+          ExposedDropdownMenuDefaults.TrailingIcon(
+              expanded = isExpanded, modifier = Modifier.testTag("multiSelectDropDownToggleIcon"))
         },
         readOnly = true // Make the text field read-only to handle input via dropdown
         )
-        ExposedDropdownMenu(
+    ExposedDropdownMenu(
         expanded = isExpanded,
         onDismissRequest = { isExpanded = false },
-        modifier = Modifier.testTag("locationExposedDropdownMenu")) {
+        modifier = Modifier.testTag("multiSelectExposedDropdownMenu")) {
           for (friend in friendsList) {
             val isSelected = selectedItems.contains(friend)
             DropdownMenuItem(
-                text = {
-                  Text(
-                      text = friend.username,  style = MaterialTheme.typography.bodyLarge)
-                },
+                text = { Text(text = friend.username, style = MaterialTheme.typography.bodyLarge) },
                 onClick = {
                   if (isSelected) {
                     selectedItems.remove(friend)
@@ -575,18 +576,16 @@ fun MultiSelectDropDownMenu( // list of organisers
                     selectedItems.add(friend)
                   }
                   onSelectedListChanged(selectedItems.toList())
-                }, //add an icon here
-                trailingIcon =
-                {
-                    if (isSelected){
-                        Icon(Icons.Default.Clear,"Check")
-                    } else {
-                        Icon(Icons.Default.Add, "Add")
-                    }
+                }, // add an icon here
+                trailingIcon = {
+                  if (isSelected) {
+                    Icon(Icons.Default.Clear, "Check")
+                  } else {
+                    Icon(Icons.Default.Add, "Add")
+                  }
                 },
                 contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                modifier = Modifier.exposedDropdownSize(true)
-                    .requiredSizeIn(maxHeight = 150.dp).testTag("locationDropdownMenuItem"))
+                modifier = Modifier.exposedDropdownSize(true).requiredSizeIn(maxHeight = 150.dp))
           }
         }
   }
@@ -602,52 +601,47 @@ fun LocationDropDownMenu(
     getLocations: () -> Unit,
     locationList: List<Location>,
 ) {
-    val (allowExpanded, setExpanded) = remember { mutableStateOf(false) }
-    val expanded = allowExpanded && locationList.isNotEmpty()
+  val (allowExpanded, setExpanded) = remember { mutableStateOf(false) }
+  val expanded = allowExpanded && locationList.isNotEmpty()
 
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = setExpanded,
-        modifier = Modifier.testTag("locationExposedDropDownMenuBox"),
-    ) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = {
-                onLocationChanged(it)
-                getLocations()
-            },
-            label = label,
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(
-                    expanded = expanded,
-                )
-            },
-            shape = RoundedCornerShape(12.dp),
-            modifier = modifier.menuAnchor(MenuAnchorType.PrimaryEditable)
-        )
-        ExposedDropdownMenu(
-            modifier = Modifier
-                .exposedDropdownSize(true)
+  ExposedDropdownMenuBox(
+      expanded = expanded,
+      onExpandedChange = setExpanded,
+      modifier = Modifier.testTag("locationExposedDropDownMenuBox"),
+  ) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = {
+          onLocationChanged(it)
+          getLocations()
+        },
+        label = label,
+        trailingIcon = {
+          ExposedDropdownMenuDefaults.TrailingIcon(
+              expanded = expanded, modifier = Modifier.testTag("locationDropDownMenuToggleIcon"))
+        },
+        shape = RoundedCornerShape(12.dp),
+        modifier = modifier.menuAnchor(MenuAnchorType.PrimaryEditable))
+    ExposedDropdownMenu(
+        modifier =
+            Modifier.exposedDropdownSize(true)
                 .requiredSizeIn(maxHeight = 150.dp)
-                .testTag("locationDropDownMenu")
-            ,
-            expanded = expanded,
-            onDismissRequest = { setExpanded(false) },
-        ) {
-            locationList.forEach { location ->
-                DropdownMenuItem(
-                    text = { Text(location.address,  style = MaterialTheme.typography.bodyLarge) },
-                    onClick = {
-                        onLocationChanged(location.address)
-                        setExpanded(false)
-                    },
-                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                )
-            }
-        }
-
-
+                .testTag("locationExposedDropDownMenu"),
+        expanded = expanded,
+        onDismissRequest = { setExpanded(false) },
+    ) {
+      locationList.forEach { location ->
+        DropdownMenuItem(
+            text = { Text(location.address, style = MaterialTheme.typography.bodyLarge) },
+            onClick = {
+              onLocationChanged(location.address)
+              setExpanded(false)
+            },
+            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+        )
+      }
     }
+  }
 }
 
 @Composable
@@ -786,40 +780,37 @@ fun GenericDialogBox(
 @Composable
 fun StandardDialogBox(
     display: Boolean,
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     title: String,
     message: String,
     onClickConfirmButton: () -> Unit,
     boxIcon: @Composable (() -> Unit)?,
 ) {
-    if (display) {
-        AlertDialog(
-            icon = boxIcon,
-            text = {
-                Text(
-                    text = message,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.testTag("DisplayText"))
-            },
-            title = {
-                Text(
-                    text = title,
-                    modifier = Modifier.testTag("DisplayTitle"),
-                )
-            },
-            onDismissRequest = {},
-            confirmButton = {
-                TextButton(
-                    onClick = onClickConfirmButton
-                    ,
-                    modifier = Modifier.testTag("dialogConfirmButton")) {
-                    Text("Ok")
-                }
-            },
-            modifier = modifier)
-    }
+  if (display) {
+    AlertDialog(
+        icon = boxIcon,
+        text = {
+          Text(
+              text = message,
+              textAlign = TextAlign.Center,
+              modifier = Modifier.testTag("DisplayText"))
+        },
+        title = {
+          Text(
+              text = title,
+              modifier = Modifier.testTag("DisplayTitle"),
+          )
+        },
+        onDismissRequest = {},
+        confirmButton = {
+          TextButton(
+              onClick = onClickConfirmButton, modifier = Modifier.testTag("dialogConfirmButton")) {
+                Text("Ok")
+              }
+        },
+        modifier = modifier)
+  }
 }
-
 
 @Composable
 fun GetUserLocation(

@@ -79,21 +79,21 @@ class CreateEventViewModelUnitTest {
           bio = "",
           username = "john_doe")
   val mockUser2 =
-    User(
-      userId = "2",
-      birthDate = "01/01/2002",
-      email = "test2@test.com",
-      firstName = "John",
-      lastName = "Smith",
-      phoneNumber = "123456789",
-      accountStatus = "active",
-      eventsAttendeeList = mutableListOf(),
-      eventsHostList = mutableListOf(),
-      friendsList = mutableListOf(),
-      profilePicUrl = "",
-      qrCodeUrl = "",
-      bio = "",
-      username = "john_smith")
+      User(
+          userId = "2",
+          birthDate = "01/01/2002",
+          email = "test2@test.com",
+          firstName = "John",
+          lastName = "Smith",
+          phoneNumber = "123456789",
+          accountStatus = "active",
+          eventsAttendeeList = mutableListOf(),
+          eventsHostList = mutableListOf(),
+          friendsList = mutableListOf(),
+          profilePicUrl = "",
+          qrCodeUrl = "",
+          bio = "",
+          username = "john_smith")
 
   private val mockEvent =
       Event(
@@ -135,12 +135,13 @@ class CreateEventViewModelUnitTest {
   }
 
   @Test
-  fun testGetHostFriendListSuccess(){
+  fun testGetHostFriendListSuccess() {
     viewModel.getHostFriendList(mockUiState)
-    assert(mockUiState.value.hostFriendsList.map{user -> user.userId} == mockUser.friendsList)
+    assert(mockUiState.value.hostFriendsList.map { user -> user.userId } == mockUser.friendsList)
   }
+
   @Test
-  fun testGetHostFriendListFailure(){
+  fun testGetHostFriendListFailure() {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
     (userRepository as MockUserRepository).updateCurrentUserId(null)
@@ -151,7 +152,7 @@ class CreateEventViewModelUnitTest {
   }
 
   @Test
-  fun testResetStateAndSetAddEventSuccess(){
+  fun testResetStateAndSetAddEventSuccess() {
     viewModel.resetStateAndSetAddEventSuccess(true, mockUiState)
     assert(mockUiState.value.showAddEventSuccess)
   }
@@ -187,7 +188,7 @@ class CreateEventViewModelUnitTest {
     viewModel.onEventPhotoUriChanged(eventPhotoUri = uri, mockUiState)
 
     assert(viewModel.validateFields(mockUiState))
-    runBlocking { viewModel.addEvent(mockUiState) } //ohh it reset the state?
+    runBlocking { viewModel.addEvent(mockUiState) } // ohh it reset the state?
 
     verify { Log.d("CreateEventViewModel", "Successfully added event") }
     verify {
@@ -208,7 +209,7 @@ class CreateEventViewModelUnitTest {
     assert(mockUiState.value.ticketPrice.toDouble() == mockEvent.ticket.price)
     assert(mockUiState.value.ticketName == mockEvent.ticket.name)
     assert(mockUiState.value.eventPhotoUri == uri)
-    assert(mockUiState.value.organiserList.map{user -> user.userId} == listOf(mockUser2.userId))
+    assert(mockUiState.value.organiserList.map { user -> user.userId } == listOf(mockUser2.userId))
     unmockkAll()
   }
 
