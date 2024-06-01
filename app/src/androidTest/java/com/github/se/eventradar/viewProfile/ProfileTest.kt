@@ -116,26 +116,26 @@ class ProfileTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
 
         composeTestRule.waitForIdle()
 
-        ComposeScreen.onComposeScreen<ProfileScreen>(composeTestRule) {
-            chatButton { assertDoesNotExist() } // Chat button should not be displayed in private view
-            goBackButton { assertDoesNotExist() } // Go back button should not be displayed in private view
-            bottomNav { assertIsDisplayed() }
-            centeredViewProfileColumn { assertIsDisplayed() }
-            profilePic { assertIsDisplayed() }
-            name { assertIsDisplayed() }
-            username { assertIsDisplayed() }
-            leftAlignedViewProfileColumn { assertIsDisplayed() }
-            bioLabelText { assertIsDisplayed() }
-            bioInfoText { assertIsDisplayed() }
-            phoneNumberBirthDateRow { assertIsDisplayed() }
-            phoneNumberColumn { assertIsDisplayed() }
-            phoneNumberLabelText { assertIsDisplayed() }
-            // phoneNumberInfoText { assertIsDisplayed() }
-            birthDateColumn { assertIsDisplayed() }
-            birthDateLabelText { assertIsDisplayed() }
-            // birthDateInfoText { assertIsDisplayed() }
-        }
+    ComposeScreen.onComposeScreen<ProfileScreen>(composeTestRule) {
+      chatButton { assertDoesNotExist() } // Chat button should not be displayed in private view
+      goBackButton {
+        assertDoesNotExist()
+      } // Go back button should not be displayed in private view
+      bottomNav { assertIsDisplayed() }
+      centeredViewProfileColumn { assertIsDisplayed() }
+      profilePic { assertIsDisplayed() }
+      name { assertIsDisplayed() }
+      username { assertIsDisplayed() }
+      leftAlignedViewProfileColumn { assertIsDisplayed() }
+      bioLabelText { assertIsDisplayed() }
+      bioInfoText { assertIsDisplayed() }
+      phoneNumberBirthDateRow { assertIsDisplayed() }
+      phoneNumberColumn { assertIsDisplayed() }
+      phoneNumberLabelText { assertIsDisplayed() }
+      birthDateColumn { assertIsDisplayed() }
+      birthDateLabelText { assertIsDisplayed() }
     }
+  }
 
     @Test
     fun goBackButtonTriggersBackNavigation() = run {
@@ -150,43 +150,12 @@ class ProfileTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
                 assertIsDisplayed()
                 assertIsEnabled()
 
-                // act: go back !
-                performClick()
-            }
-        }
-        // assert: the nav action has been called
-        verify { mockNavActions.goBack() }
-        confirmVerified(mockNavActions)
+        // act: go back !
+        performClick()
+      }
     }
-
-    /*
-    @Test
-    fun bottomNavigationBarPublicProfileSelectedIconIsCorrect() = run {
-        composeTestRule.setContent {
-            ProfileUi(
-                isPublicView = true, viewModel = mockProfileViewModel, navigationActions = mockNavActions)
-        }
-
-        ComposeScreen.onComposeScreen<ProfileScreen>(composeTestRule) {
-            val selectedTab = getSelectedTab()
-            // Check if the selected tab is the correct one
-            selectedTab.assertValueEquals("Messages")
-        }
-    }
-
-    @Test
-    fun bottomNavigationBarPrivateProfileSelectedIconIsCorrect() = run {
-        composeTestRule.setContent {
-            ProfileUi(
-                isPublicView = false, viewModel = mockProfileViewModel, navigationActions = mockNavActions)
-        }
-
-        ComposeScreen.onComposeScreen<ProfileScreen>(composeTestRule) {
-            val selectedTab = getSelectedTab()
-            // Check if the selected tab is the correct one
-            selectedTab.assertValueEquals("Profile")
-        }
-    }
-
-     */
+    // assert: the nav action has been called
+    verify { mockNavActions.goBack() }
+    confirmVerified(mockNavActions)
+  }
 }

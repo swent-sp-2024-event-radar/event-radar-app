@@ -2,21 +2,23 @@ package com.github.se.eventradar
 
 import android.util.Log
 import com.github.se.eventradar.model.User
-import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
+import com.github.se.eventradar.viewmodel.ProfileUiState
 import com.github.se.eventradar.viewmodel.ProfileViewModel
 import io.mockk.every
-import io.mockk.mockk
+import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -26,9 +28,10 @@ import org.junit.runner.Description
 @OptIn(ExperimentalCoroutinesApi::class)
 class ProfileViewModelUnitTest {
 
-  private lateinit var viewModelFriend: ProfileViewModel
-  private lateinit var viewModelUser: ProfileViewModel
-  private var userRepository = mockk<IUserRepository>()
+  @RelaxedMockK private lateinit var viewModelFriend: ProfileViewModel
+  @RelaxedMockK private lateinit var viewModelUser: ProfileViewModel
+  private lateinit var userRepository: MockUserRepository
+  private lateinit var mockUiState: MutableStateFlow<ProfileUiState>
 
   class MainDispatcherRule(
       private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
@@ -84,26 +87,30 @@ class ProfileViewModelUnitTest {
         }
       }
 
-  @OptIn(ExperimentalCoroutinesApi::class)
   @Before
   fun setUp() {
     userRepository = MockUserRepository()
-    runBlocking { userRepository.updateUser(mockUser) }
-    runBlocking { userRepository.addUser(mockUser) }
+    mockUiState = MutableStateFlow(ProfileUiState())
+    userRepository.updateCurrentUserId("1")
     viewModelFriend = factory.create(userId = mockFriend.userId)
     viewModelUser = factory.create(null)
   }
 
+  @After
+  fun tearDown() {
+    unmockkAll()
+  }
+
   @Test
   fun viewFriendsProfileDetailsSuccessful() {
-    runBlocking { userRepository.addUser(mockFriend) }
-    viewModelFriend.getProfileDetails()
-    assert(viewModelFriend.userId == mockFriend.userId)
-    assert(viewModelFriend.uiState.value.profilePicUrl == mockFriend.profilePicUrl)
-    assert(viewModelFriend.uiState.value.bio == mockFriend.bio)
-    assert(viewModelFriend.uiState.value.username == mockFriend.username)
-    assert(viewModelFriend.uiState.value.firstName == mockFriend.firstName)
-    assert(viewModelFriend.uiState.value.lastName == mockFriend.lastName)
+    runBlocking { userRepository.addUser(mockUser) }
+    viewModelUser.getProfileDetails()
+    assert(viewModelUser.userId == mockUser.userId)
+    assert(viewModelUser.uiState.value.profilePicUrl == mockUser.profilePicUrl)
+    assert(viewModelUser.uiState.value.bio == mockUser.bio)
+    assert(viewModelUser.uiState.value.username == mockUser.username)
+    assert(viewModelUser.uiState.value.firstName == mockUser.firstName)
+    assert(viewModelUser.uiState.value.lastName == mockUser.lastName)
   }
 
   @Test
