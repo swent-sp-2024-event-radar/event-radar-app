@@ -9,7 +9,6 @@ import android.os.Looper
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -93,6 +93,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.github.se.eventradar.R
@@ -183,10 +184,15 @@ fun EventCard(event: Event, onCardClick: (String) -> Unit) {
                             color = MaterialTheme.colorScheme.onPrimaryContainer))
               }
           Image(
-              painter = painterResource(id = R.drawable.placeholder),
+              painter =
+                  if (event.eventPhoto == "") {
+                    painterResource(id = R.drawable.placeholder)
+                  } else {
+                    rememberAsyncImagePainter(event.eventPhoto)
+                  },
               contentDescription = "Event Image",
               contentScale = ContentScale.FillBounds,
-              modifier = Modifier.weight(0.3f).fillMaxHeight())
+              modifier = Modifier.weight(0.3f).fillMaxHeight().aspectRatio(1f))
         }
       }
 }
@@ -519,7 +525,6 @@ fun displayChosenOrganisers(organisers: List<String>): String {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MultiSelectDropDownMenu( // list of organisers
-    value: String,
     onSelectedListChanged: ((List<User>) -> Unit),
     label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -576,7 +581,7 @@ fun MultiSelectDropDownMenu( // list of organisers
                     selectedItems.add(friend)
                   }
                   onSelectedListChanged(selectedItems.toList())
-                }, // add an icon here
+                },
                 trailingIcon = {
                   if (isSelected) {
                     Icon(Icons.Default.Clear, "Check")
@@ -666,13 +671,7 @@ fun DateInputTextField(
       shape = RoundedCornerShape(12.dp),
       isError = errorState,
       trailingIcon = {
-        Icon(
-            imageVector = Icons.Default.DateRange,
-            contentDescription = "Select Date",
-            modifier =
-                Modifier.clickable {
-                  // launches something! also the time picker?
-                })
+        Icon(imageVector = Icons.Default.DateRange, contentDescription = "Select Date")
       })
 }
 

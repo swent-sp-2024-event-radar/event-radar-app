@@ -63,13 +63,13 @@ class CreateEventTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
               eventDescription = "A comprehensive tech conference.",
               eventCategory = "Technology",
               startDate = "2024-01-15",
-              endDate = "2024-01-18",
+              endDate = "3000-01-01",
               startTime = "10:00 AM",
               endTime = "5:00 PM",
               location = "",
               ticketName = "General Admission",
               ticketCapacity = "500",
-              ticketPrice = "299.99",
+              ticketPrice = "0.0",
               organiserList = listOf(mockUser),
               listOfLocations = listOf(Location(20.0, 20.0, "Location1")),
               hostFriendsList = listOf(),
@@ -116,80 +116,109 @@ class CreateEventTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   @Test
   fun successfulPressOnMultiSelectExposedDropDownMenuBox() = run {
     ComposeScreen.onComposeScreen<CreateEventScreen>(composeTestRule) {
-      multiSelectExposedDropDownMenuBox { assertIsDisplayed() }
-      organisersMultiDropDownMenuTextField {
-        assertIsDisplayed()
-        performClick()
+      step("Click on Organisers Drop Down Menu") {
+        organisersMultiDropDownMenuTextField {
+          assertIsDisplayed()
+          performClick()
+        }
       }
-      composeTestRule
-          .onNodeWithTag("multiSelectExposedDropdownMenu", useUnmergedTree = true)
-          .assertIsDisplayed()
-      composeTestRule
-          .onNodeWithTag("multiSelectDropDownToggleIcon", useUnmergedTree = true)
-          .performClick()
-      composeTestRule
-          .onNodeWithTag("multiSelectExposedDropdownMenu", useUnmergedTree = true)
-          .assertIsNotDisplayed()
+      step("Check if Organisers Drop Down Menu is displayed") {
+        composeTestRule
+            .onNodeWithTag("multiSelectExposedDropdownMenu", useUnmergedTree = true)
+            .assertIsDisplayed()
+      }
+      step("Click on Organisers Drop Down Toggle Icon") {
+        composeTestRule
+            .onNodeWithTag("multiSelectDropDownToggleIcon", useUnmergedTree = true)
+            .performClick()
+      }
+      step("Check if Organisers Drop Down is hidden") {
+        composeTestRule
+            .onNodeWithTag("multiSelectExposedDropdownMenu", useUnmergedTree = true)
+            .assertIsNotDisplayed()
+      }
     }
   }
 
   @Test
   fun successfulPressOnLocationDropDownInputMenu() = run {
     ComposeScreen.onComposeScreen<CreateEventScreen>(composeTestRule) {
-      locationExposedDropDownMenuBox { assertIsDisplayed() }
-      locationDropDownMenuTextField {
-        assertIsDisplayed()
-        performClick()
+      step("Click on Location text field") {
+        locationDropDownMenuTextField {
+          assertIsDisplayed()
+          performClick()
+        }
       }
-      composeTestRule
-          .onNodeWithTag("locationExposedDropDownMenu", useUnmergedTree = true)
-          .assertIsDisplayed()
-      composeTestRule
-          .onNodeWithTag("locationDropDownMenuToggleIcon", useUnmergedTree = true)
-          .performClick()
-      composeTestRule
-          .onNodeWithTag("locationExposedDropDownMenu", useUnmergedTree = true)
-          .assertIsNotDisplayed()
+      step("Check if Location Drop Down Menu is displayed") {
+        composeTestRule
+            .onNodeWithTag("locationExposedDropDownMenu", useUnmergedTree = true)
+            .assertIsDisplayed()
+      }
+      step("Click on location text field toggle icon") {
+        composeTestRule
+            .onNodeWithTag("locationDropDownMenuToggleIcon", useUnmergedTree = true)
+            .performClick()
+      }
+      step("Check if Location Drop Down Menu is hidden") {
+        composeTestRule
+            .onNodeWithTag("locationExposedDropDownMenu", useUnmergedTree = true)
+            .assertIsNotDisplayed()
+      }
     }
   }
 
   @Test
   fun successfulPressOnDropDownInputMenuTicketName() = run {
     ComposeScreen.onComposeScreen<CreateEventScreen>(composeTestRule) {
-      exposedDropDownMenuBox { assertIsDisplayed() }
-      ticketNameDropDownMenuTextField {
-        performScrollTo()
-        assertIsDisplayed()
-        performClick()
+      step("Click on ticket name text field") {
+        ticketNameDropDownMenuTextField {
+          performScrollTo()
+          assertIsDisplayed()
+          performClick()
+        }
       }
-      composeTestRule
-          .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
-          .assertIsDisplayed()
-      composeTestRule.onNodeWithTag("ticketNameToggleIcon", useUnmergedTree = true).performClick()
-      composeTestRule
-          .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
-          .assertIsNotDisplayed()
+      step("Check if ticketName drop down menu is displayed") {
+        composeTestRule
+            .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
+            .assertIsDisplayed()
+      }
+      step("Click on ticket name toggle icon") {
+        composeTestRule.onNodeWithTag("ticketNameToggleIcon", useUnmergedTree = true).performClick()
+      }
+      step("Check if ticketName drop down menu is hidden") {
+        composeTestRule
+            .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
+            .assertIsNotDisplayed()
+      }
     }
   }
 
   @Test
   fun successfulPressOnDropDownInputMenuEventCategory() = run {
     ComposeScreen.onComposeScreen<CreateEventScreen>(composeTestRule) {
-      exposedDropDownMenuBox { assertIsDisplayed() }
-      eventCategoryDropDown {
-        performScrollTo()
-        assertIsDisplayed()
-        performClick()
+      step("Click on Event Category Drop Down Menu") {
+        eventCategoryDropDown {
+          performScrollTo()
+          assertIsDisplayed()
+          performClick()
+        }
       }
-      composeTestRule
-          .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
-          .assertIsDisplayed()
-      composeTestRule
-          .onNodeWithTag("eventCategoryToggleIcon", useUnmergedTree = true)
-          .performClick()
-      composeTestRule
-          .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
-          .assertIsNotDisplayed()
+      step("Check if Event Category Drop Down Menu is displayed") {
+        composeTestRule
+            .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
+            .assertIsDisplayed()
+      }
+
+      step("Click on Event Category Toggle Icon") {
+        composeTestRule
+            .onNodeWithTag("eventCategoryToggleIcon", useUnmergedTree = true)
+            .performClick()
+      }
+      step("Check if Event Category Drop Down Menu is hidden") {
+        composeTestRule
+            .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
+            .assertIsNotDisplayed()
+      }
     }
   }
 
@@ -203,7 +232,6 @@ class CreateEventTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
         }
       }
       mockCreateEventUiState.value = mockCreateEventUiState.value.copy(showAddEventSuccess = true)
-
       composeTestRule.waitForIdle()
       step("Check if success dialog box is displayed") {
         composeTestRule
@@ -214,9 +242,6 @@ class CreateEventTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
         composeTestRule
             .onNodeWithTag("dialogConfirmButton", useUnmergedTree = true)
             .assertIsDisplayed()
-        //                successDisplayTitle {assertIsDisplayed()}
-        //                successDialogConfirmButton {assertIsDisplayed()} //one of these is
-        // failing, and wrong!
       }
       step("Click on confirm") {
         composeTestRule.onNodeWithTag("dialogConfirmButton", useUnmergedTree = true).performClick()
@@ -224,8 +249,6 @@ class CreateEventTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
       verify(exactly = 1) { mockCreateEventViewModel.resetStateAndSetAddEventSuccess(false) }
       verify(exactly = 1) { mockNavActions.goBack() }
       confirmVerified(mockNavActions)
-      // it should go navigate!
-      // click on Confirm!
     }
   }
 
@@ -238,7 +261,6 @@ class CreateEventTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
           performClick()
         }
       }
-      // ?
       mockCreateEventUiState.value = mockCreateEventUiState.value.copy(showAddEventFailure = true)
 
       composeTestRule.waitForIdle()
@@ -260,6 +282,4 @@ class CreateEventTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
       confirmVerified(mockNavActions)
     }
   }
-  // clicking on everything.
-
 }

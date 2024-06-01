@@ -38,16 +38,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.rememberNavController
-import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.model.event.EventCategory
-import com.github.se.eventradar.model.repository.event.MockEventRepository
-import com.github.se.eventradar.model.repository.location.MockLocationRepository
-import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.component.DateInputTextField
 import com.github.se.eventradar.ui.component.DropdownInputTextField
 import com.github.se.eventradar.ui.component.GoBackButton
@@ -96,7 +90,7 @@ fun CreateEventScreen(
 
               ImagePicker(
                   modifier =
-                      Modifier.size(150.dp) // Adjust size as needed
+                      Modifier.size(150.dp)
                           .clip(RoundedCornerShape(15.dp))
                           .testTag("eventImagePicker")
                           .clickable { imagePickerLauncher.launch("image/*") },
@@ -198,7 +192,7 @@ fun CreateEventScreen(
                   onValueChange = viewModel::onTicketNameChanged,
                   errorState = uiState.ticketNameIsError,
                   options = listOf("Standard", "VIP"),
-                  toggleIconTestTag = "ticketNameToggleIcon") // temporary
+                  toggleIconTestTag = "ticketNameToggleIcon")
 
               StandardInputTextField(
                   modifier =
@@ -222,7 +216,6 @@ fun CreateEventScreen(
                   errorState = uiState.ticketPriceIsError,
               )
               MultiSelectDropDownMenu(
-                  value = "Organiser",
                   onSelectedListChanged = viewModel::onOrganiserListChanged,
                   label = { Text("Organisers") },
                   modifier =
@@ -231,8 +224,6 @@ fun CreateEventScreen(
                           .testTag("organisersMultiDropDownMenuTextField"),
                   getFriends = viewModel::getHostFriendList,
                   friendsList = uiState.hostFriendsList)
-              // add a Button!
-              // successful or not?
               Button(
                   onClick = {
                     if (viewModel.validateFields()) {
@@ -269,7 +260,6 @@ fun CreateEventScreen(
                   title = "Successfully Created Event",
                   message = "You have succesfully created your event, invite others over to join!",
                   onClickConfirmButton = {
-                    // update the error states!
                     viewModel.resetStateAndSetAddEventSuccess(false)
                     navigationActions.goBack()
                   },
@@ -282,18 +272,18 @@ fun CreateEventScreen(
                   onClickConfirmButton = {
                     viewModel.resetStateAndSetAddEventFailure(false)
                     navigationActions.goBack()
-                  }, // reset or not idk!
+                  },
                   boxIcon = { Icon(Icons.Default.Clear, "Failure Icon") })
             }
       }
 }
 
-@Preview(showBackground = true)
-@ExcludeFromJacocoGeneratedReport
-@Composable
-fun CreateEventScreenPreview() {
-  val viewModel =
-      CreateEventViewModel(MockLocationRepository(), MockEventRepository(), MockUserRepository())
-  CreateEventScreen(
-      viewModel = viewModel, navigationActions = NavigationActions(rememberNavController()))
-}
+// @Preview(showBackground = true)
+// @ExcludeFromJacocoGeneratedReport
+// @Composable
+// fun CreateEventScreenPreview() {
+//  val viewModel =
+//      CreateEventViewModel(MockLocationRepository(), MockEventRepository(), MockUserRepository())
+//  CreateEventScreen(
+//      viewModel = viewModel, navigationActions = NavigationActions(rememberNavController()))
+// }
