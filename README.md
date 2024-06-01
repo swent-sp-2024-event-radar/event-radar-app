@@ -1,5 +1,6 @@
 # event-radar-app
-Holds all the code for the Android app
+Holds all the code for the Android app, Event Radar (see the demo).
+
 TODO: Add demo
 
 ## Overview of functionalities
@@ -23,24 +24,28 @@ Event Radar is an innovative app designed to effortlessly facilitate connections
 
 ### Testing
 
-The code is thoroughly tested, achieving 88% line coverage across our features with several hundred tests. Each screen displayed to users is covered by an Android UI test, ensuring the interface works correctly. Additionally, numerous unit tests verify the functionality of individual components. We also conduct end-to-end tests to ensure a smooth and accurate user flow, providing an optimal user experience.
+The code is thoroughly tested, achieving more than 80% line coverage across our features with several hundred tests. Each screen displayed to users is covered by an Android UI test, ensuring the interface works correctly. Additionally, numerous unit tests verify the functionality of individual components. We also conduct end-to-end tests to ensure a smooth and accurate user flow, providing an optimal user experience.
 
 ### Running the App
 
-Download the built APK on your android phone from the release branch M4.
+Download the built debug APK on your android phone from the release branch M4.
 
 
 ## Packages structure
 
-Here is a description of the more important packages in the main folder. We have clearly separated fronted Ui from backend functionalities and data interactions.
+Here is a description of the most important packages in the main folder. We have clearly separated frontend Ui from backend functionalities and data interactions, following Model View ViewModel (MVVM) architecture.
 
-- **Model** holds all the model for our app such as event, user, messages and the differents repositories to interact with the database
+- **Model** holds all the model for our app such as event, user, messages and the differents repositories to interact with the database.
 
-  - **di** is used to store the setup files for data dependencies injection
+  - **di** is used to store the setup files for data dependencies injection using Hilt.
 
   - **repository** holds the repositories used to bridge between the data source and the rest of the app. It contains repositories for : event, users, messages, and location. In our case we are working the Firebase and Nominatim.
 
-- **Ui** sort all the kotlin files containing our composable function to display the ui. Our main screens (brow)
+- **Ui** sort all the kotlin files containing our composable function to display the ui. It is built using Jetpack Compose Material3. 
+
+  - **component** contains a set of reusable UI elements to facilitate code maintenance and ensure a consistent look throughout the app.
+
+  - all other packages named after our screens
 
 - **ViewModel** contains all our viewModels used in the app. ViewModels manage the data for the UI components, handling logic and surviving configuration changes, based on the Model View ViewModel design. 
 
