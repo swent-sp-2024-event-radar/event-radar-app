@@ -86,8 +86,8 @@ class EventDetailsUITest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
         assertIsDisplayed()
         assertTextContains("Let's debug some code together because we all enjoy kotlin !")
       }
-      distanceTitle { assertIsDisplayed() }
-      distanceContent { assertIsDisplayed() }
+      locationTitle { assertIsDisplayed() }
+      locationContent { assertIsDisplayed() }
       categoryTitle { assertIsDisplayed() }
       categoryContent {
         assertIsDisplayed()

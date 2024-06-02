@@ -91,8 +91,8 @@ class EventDetailsAttendingUITest :
         assertIsDisplayed()
         assertTextContains("Let's debug some code together because we all enjoy kotlin !")
       }
-      distanceTitle { assertIsDisplayed() }
-      distanceContent { assertIsDisplayed() }
+      locationTitle { assertIsDisplayed() }
+      locationContent { assertIsDisplayed() }
       categoryTitle { assertIsDisplayed() }
       categoryContent {
         assertIsDisplayed()

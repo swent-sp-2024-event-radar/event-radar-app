@@ -18,8 +18,8 @@ public class EventDetailsScreen(semanticsProvider: SemanticsNodeInteractionsProv
   val eventTitle: KNode = onNode { hasTestTag("eventTitle") }
   val descriptionTitle: KNode = onNode { hasTestTag("descriptionTitle") }
   val descriptionContent: KNode = onNode { hasTestTag("descriptionContent") }
-  val distanceTitle: KNode = onNode { hasTestTag("distanceTitle") }
-  val distanceContent: KNode = onNode { hasTestTag("distanceContent") }
+  val locationTitle: KNode = onNode { hasTestTag("locationTitle") }
+  val locationContent: KNode = onNode { hasTestTag("locationContent") }
   val dateTitle: KNode = onNode { hasTestTag("dateTitle") }
   val dateContent: KNode = onNode { hasTestTag("dateContent") }
   val timeTitle: KNode = onNode { hasTestTag("timeTitle") }
@@ -29,5 +29,6 @@ public class EventDetailsScreen(semanticsProvider: SemanticsNodeInteractionsProv
   val attendance: KNode = onNode { hasTestTag("attendance") }
 
   val cancelRegistrationDialog: KNode = onNode { hasTestTag("cancelRegistrationDialog") }
+  val cancelButton: KNode = onNode { hasTestTag("dialogDismissButton") }
   val confirmButton: KNode = onNode { hasTestTag("dialogConfirmButton") }
 }
