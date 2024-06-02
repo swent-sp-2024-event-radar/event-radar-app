@@ -1,5 +1,6 @@
 package com.github.se.eventradar.viewmodel
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.Composable
@@ -11,15 +12,20 @@ import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.viewmodel.user.isValidDate
 import com.github.se.eventradar.viewmodel.user.isValidPhoneNumber
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @HiltViewModel(assistedFactory = ProfileViewModel.Factory::class)
 class ProfileViewModel
@@ -147,6 +153,34 @@ constructor(private val userRepository: IUserRepository, @Assisted var userId: S
 
   fun onBioChanged(bio: String, state: MutableStateFlow<ProfileUiState> = _uiState) {
     state.update { currentState -> currentState.copy(bio = bio) }
+  }
+
+  fun logOut(context: Context) {
+    // Clear user data from local storage
+    runBlocking {
+      when (userRepository.signOut()) {
+        is Resource.Success -> {
+          Log.d("ProfileViewModel", "User logged out successfully")
+        }
+        is Resource.Failure -> {
+          Log.d("ProfileViewModel", "Error logging out user")
+        }
+      }
+    }
+
+    // Cancel the viewModelScope
+    viewModelScope.cancel()
+
+    // Clear the userId
+    userId = null
+
+    // Clear the uiState
+    _uiState.value = ProfileUiState()
+
+    // Sign out from Google
+    val googleSignInClient: GoogleSignInClient =
+        GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN)
+    googleSignInClient.signOut()
   }
 
   fun validateFields(state: MutableStateFlow<ProfileUiState> = _uiState): Boolean {

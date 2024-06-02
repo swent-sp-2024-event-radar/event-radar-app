@@ -413,6 +413,19 @@ fun ProfileUi(
                                 style = MaterialTheme.typography.bodyMedium)
                           }
                         }
+
+                    Spacer(modifier = Modifier.weight(1f))
+                    Button(
+                        onClick = {
+                          viewModel.logOut(context)
+                          navigationActions.navController.navigate(Route.LOGIN)
+                        },
+                        modifier =
+                            Modifier.padding(top = 10.dp)
+                                .align(Alignment.CenterHorizontally)
+                                .testTag("logOutButton")) {
+                          Text("Log Out")
+                        }
                   }
                 }
               }

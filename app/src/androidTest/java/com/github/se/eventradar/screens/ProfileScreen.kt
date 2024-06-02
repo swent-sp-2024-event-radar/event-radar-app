@@ -46,4 +46,5 @@ class ProfileScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   val phoneNumberBirthDateSpacer: KNode =
       phoneNumberBirthDateRow.child { hasTestTag("phoneNumberBirthDateSpacer") }
   val saveButton: KNode = centeredViewProfileColumn.child { hasTestTag("saveButton") }
+  val logOutButton: KNode = centeredViewProfileColumn.child { hasTestTag("logOutButton") }
 }

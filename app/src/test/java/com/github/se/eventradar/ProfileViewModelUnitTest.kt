@@ -8,6 +8,7 @@ import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.viewmodel.CountryCode
 import com.github.se.eventradar.viewmodel.ProfileUiState
 import com.github.se.eventradar.viewmodel.ProfileViewModel
+import dagger.hilt.android.testing.HiltAndroidTest
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockkStatic
@@ -30,6 +31,7 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@HiltAndroidTest
 class ProfileViewModelUnitTest {
 
   @RelaxedMockK private lateinit var viewModelFriend: ProfileViewModel
