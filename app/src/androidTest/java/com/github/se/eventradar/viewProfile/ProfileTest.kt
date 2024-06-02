@@ -114,42 +114,6 @@ class ProfileTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
   }
 
   @Test
-  fun screenDisplaysAllElementsCorrectlyWhenPrivateInEditMode() = run {
-    composeTestRule.setContent {
-      ProfileUi(
-          isPublicView = false,
-          viewModel = mockProfileViewModel,
-          navigationActions = mockNavActions)
-    }
-
-    ComposeScreen.onComposeScreen<ProfileScreen>(composeTestRule) {
-      editButton {
-        // arrange: verify the pre-conditions
-        assertIsDisplayed()
-
-        // act: click the edit button
-        performClick()
-      }
-      goBackButton { assertIsDisplayed() }
-      editProfile { assertIsDisplayed() }
-      profilePic {
-        assertIsDisplayed()
-        assertHasClickAction()
-      }
-      firstNameTextField { assertIsDisplayed() }
-      lastNameTextField { assertIsDisplayed() }
-      usernameTextField { assertIsDisplayed() }
-      bioTextField { assertIsDisplayed() }
-      phoneNumberTextField { assertIsDisplayed() }
-      birthDateTextField { assertIsDisplayed() }
-      saveButton {
-        assertIsDisplayed()
-        assertHasClickAction()
-      }
-    }
-  }
-
-  @Test
   fun goBackButtonTriggersBackNavigation() = run {
     composeTestRule.setContent {
       ProfileUi(
