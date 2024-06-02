@@ -2,28 +2,50 @@ package com.github.se.eventradar
 
 import android.util.Log
 import com.github.se.eventradar.model.User
-import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
-import com.github.se.eventradar.viewmodel.ViewFriendsProfileViewModel
+import com.github.se.eventradar.viewmodel.ProfileUiState
+import com.github.se.eventradar.viewmodel.ProfileViewModel
 import io.mockk.every
+import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
-class ViewFriendsProfileViewModelUnitTest {
-  private lateinit var userRepository: IUserRepository
-  private lateinit var viewModel: ViewFriendsProfileViewModel
+@OptIn(ExperimentalCoroutinesApi::class)
+class ProfileViewModelUnitTest {
+
+  @RelaxedMockK private lateinit var viewModelFriend: ProfileViewModel
+  @RelaxedMockK private lateinit var viewModelUser: ProfileViewModel
+  private lateinit var userRepository: MockUserRepository
+  private lateinit var mockUiState: MutableStateFlow<ProfileUiState>
+
+  class MainDispatcherRule(
+      private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
+  ) : TestWatcher() {
+    override fun starting(description: Description) {
+      Dispatchers.setMain(testDispatcher)
+    }
+
+    override fun finished(description: Description) {
+      Dispatchers.resetMain()
+    }
+  }
+
+  @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
   private val mockUser =
       User(
@@ -58,58 +80,45 @@ class ViewFriendsProfileViewModelUnitTest {
           bio = "",
           username = "jimsmith")
 
-  class MainDispatcherRule(
-      private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
-  ) : TestWatcher() {
-    override fun starting(description: Description) {
-      Dispatchers.setMain(testDispatcher)
-    }
-
-    override fun finished(description: Description) {
-      Dispatchers.resetMain()
-    }
-  }
-
-  @get:Rule val mainDispatcherRule = ViewFriendsProfileViewModelUnitTest.MainDispatcherRule()
-
   private val factory =
-      object : ViewFriendsProfileViewModel.Factory {
-        override fun create(friendUserId: String): ViewFriendsProfileViewModel {
-          return ViewFriendsProfileViewModel(userRepository, friendUserId)
+      object : ProfileViewModel.Factory {
+        override fun create(userId: String?): ProfileViewModel {
+          return ProfileViewModel(userRepository, userId)
         }
       }
 
   @Before
   fun setUp() {
     userRepository = MockUserRepository()
-    runBlocking { userRepository.updateUser(mockUser) }
-    runBlocking { userRepository.addUser(mockUser) }
-    viewModel = factory.create(friendUserId = mockFriend.userId)
+    mockUiState = MutableStateFlow(ProfileUiState())
+    userRepository.updateCurrentUserId("1")
+    viewModelFriend = factory.create(userId = mockFriend.userId)
+    viewModelUser = factory.create(null)
+  }
+
+  @After
+  fun tearDown() {
+    unmockkAll()
   }
 
   @Test
   fun viewFriendsProfileDetailsSuccessful() {
-    runBlocking { userRepository.addUser(mockFriend) }
-    viewModel.getFriendProfileDetails()
-    assert(viewModel.friendUserId == mockFriend.userId)
-    assert(viewModel.uiState.value.friendProfilePicLink == mockFriend.profilePicUrl)
-    assert(viewModel.uiState.value.bio == mockFriend.bio)
-    assert(viewModel.uiState.value.friendUserName == mockFriend.username)
-    assert(viewModel.uiState.value.friendFirstName == mockFriend.firstName)
-    assert(viewModel.uiState.value.friendLastName == mockFriend.lastName)
+    runBlocking { userRepository.addUser(mockUser) }
+    viewModelUser.getProfileDetails()
+    assert(viewModelUser.userId == mockUser.userId)
+    assert(viewModelUser.uiState.value.profilePicUrl == mockUser.profilePicUrl)
+    assert(viewModelUser.uiState.value.bio == mockUser.bio)
+    assert(viewModelUser.uiState.value.username == mockUser.username)
+    assert(viewModelUser.uiState.value.firstName == mockUser.firstName)
+    assert(viewModelUser.uiState.value.lastName == mockUser.lastName)
   }
 
   @Test
-  fun viewFriendsProfileDetailsFailureFriendIdDoesNotExist() {
+  fun viewFriendsProfileDetailsFailure() {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
-    // does not add mockFriend as a user, so user does not exist
-    viewModel.getFriendProfileDetails()
-    verify {
-      Log.d(
-          "ViewFriendsProfileViewModel",
-          "Error getting friend's user details for friendUserId ${mockFriend.userId}")
-    }
+    viewModelFriend.getProfileDetails()
+    verify { Log.d("ProfileViewModel", "Error getting user details for user ${mockFriend.userId}") }
     unmockkAll()
   }
 }

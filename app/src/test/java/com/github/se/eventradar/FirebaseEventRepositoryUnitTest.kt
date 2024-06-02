@@ -25,6 +25,7 @@ import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.unmockkAll
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
@@ -196,7 +197,12 @@ class FirebaseEventRepositoryUnitTest {
     val mockListenerRegistration = mockk<ListenerRegistration>()
     every { mockListenerRegistration.remove() } just Runs
 
-    every { eventRef.addSnapshotListener(capture(slot)) } answers
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
+    val currentDateTimeString = LocalDateTime.now().format(formatter)
+    val queryMock = mockk<Query>()
+    every { eventRef.whereGreaterThan("end", currentDateTimeString) } returns queryMock
+
+    every { queryMock.addSnapshotListener(capture(slot)) } answers
         {
           slot.captured.onEvent(mockQuerySnapshot, null)
           mockListenerRegistration
@@ -229,7 +235,13 @@ class FirebaseEventRepositoryUnitTest {
     val mockListenerRegistration = mockk<ListenerRegistration>()
     every { mockListenerRegistration.remove() } just Runs
 
-    every { eventRef.addSnapshotListener(capture(slot)) } answers
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
+    val currentDateTimeString = LocalDateTime.now().format(formatter)
+
+    val queryMock = mockk<Query>()
+    every { eventRef.whereGreaterThan("end", currentDateTimeString) } returns queryMock
+
+    every { queryMock.addSnapshotListener(capture(slot)) } answers
         {
           slot.captured.onEvent(null, mockFirestoreException)
           mockListenerRegistration

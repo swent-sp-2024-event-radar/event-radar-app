@@ -58,8 +58,8 @@ class EventsOverviewViewModelTest {
       Event(
           eventName = "Event 1",
           eventPhoto = "",
-          start = LocalDateTime.now(),
-          end = LocalDateTime.now(),
+          start = LocalDateTime.parse("2025-12-31T09:00:00"),
+          end = LocalDateTime.parse("2025-01-01T00:00:00"),
           location = Location(0.0, 0.0, "Test Location"),
           description = "Test Description",
           ticket = EventTicket("Test Ticket", 0.0, 1, 0),
@@ -68,6 +68,21 @@ class EventsOverviewViewModelTest {
           attendeeList = mutableListOf("Test Attendee"),
           category = EventCategory.COMMUNITY,
           fireBaseID = "1")
+
+  private val expiredEvent =
+      Event(
+          eventName = "Event 1",
+          eventPhoto = "",
+          start = LocalDateTime.parse("2002-12-31T09:00:00"),
+          end = LocalDateTime.parse("2002-01-01T00:00:00"),
+          location = Location(0.0, 0.0, "Test Location"),
+          description = "Test Description",
+          ticket = EventTicket("Test Ticket", 0.0, 1, 0),
+          mainOrganiser = "1",
+          organiserList = mutableListOf("Test Organiser"),
+          attendeeList = mutableListOf("Test Attendee"),
+          category = EventCategory.COMMUNITY,
+          fireBaseID = "2")
 
   private val mockUser =
       User(
@@ -119,6 +134,28 @@ class EventsOverviewViewModelTest {
     assert(viewModel.uiState.value.eventList.allEvents == events)
     assert(viewModel.uiState.value.eventList.filteredEvents.size == 3)
     assert(viewModel.uiState.value.eventList.filteredEvents == events)
+    assertNull(viewModel.uiState.value.eventList.selectedEvent)
+  }
+
+  @Test
+  fun testFilterExpired() = runTest {
+    val events =
+        listOf(
+            mockEvent.copy(fireBaseID = "1"),
+            expiredEvent.copy(fireBaseID = "2"),
+            mockEvent.copy(fireBaseID = "3"))
+
+    val expectedEvents = listOf(mockEvent.copy(fireBaseID = "1"), mockEvent.copy(fireBaseID = "3"))
+
+    events.forEach { event -> eventRepository.addEvent(event) }
+
+    viewModel.getEvents()
+
+    assert(viewModel.uiState.value.eventList.allEvents.isNotEmpty())
+    assert(viewModel.uiState.value.eventList.allEvents.size == 2)
+    assert(viewModel.uiState.value.eventList.allEvents == expectedEvents)
+    assert(viewModel.uiState.value.eventList.filteredEvents.size == 2)
+    assert(viewModel.uiState.value.eventList.filteredEvents == expectedEvents)
     assertNull(viewModel.uiState.value.eventList.selectedEvent)
   }
 
@@ -454,10 +491,8 @@ class EventsOverviewViewModelTest {
 
     // Setup your ViewModel with mocked dependencies
     // automatically triggers the 'init' block, which calls 'observeAllEvents()'
-
     val viewModel = EventsOverviewViewModel(eventRepository, userRepository)
 
-    delay(100)
     eventRepository.addEvent(testEvent2)
 
     (eventRepository as MockEventRepository)
@@ -493,12 +528,13 @@ class EventsOverviewViewModelTest {
     val testEvent2 = mockEvent.copy(fireBaseID = "2", attendeeList = mutableListOf("user1"))
     val testEvent3 = mockEvent.copy(fireBaseID = "3", attendeeList = mutableListOf("user2"))
     eventRepository.addEvent(testEvent1)
-    eventRepository.addEvent(testEvent2)
     eventRepository.addEvent(testEvent3)
 
     (userRepository as MockUserRepository).updateCurrentUserId("user1")
 
     val viewModel = EventsOverviewViewModel(eventRepository, userRepository)
+
+    eventRepository.addEvent(testEvent2)
 
     (eventRepository as MockEventRepository)
         .eventsFlow

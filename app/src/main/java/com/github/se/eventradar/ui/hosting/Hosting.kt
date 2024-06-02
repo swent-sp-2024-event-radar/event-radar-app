@@ -49,7 +49,6 @@ import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.ui.navigation.getTopLevelDestination
-import com.github.se.eventradar.util.toast
 import com.github.se.eventradar.viewmodel.HostedEventsUiState
 import com.github.se.eventradar.viewmodel.HostedEventsViewModel
 
@@ -151,7 +150,6 @@ fun HostingScreen(
             navigationActions.navController.navigate("${Route.MY_EVENT}/${eventId}")
           }
     }
-    val context = LocalContext.current // TO DO: only needed for toasts
     val isKeyboardOpen by keyboardAsState() // Keyboard.Opened or Keyboard.Closed
 
     Row(
@@ -170,7 +168,7 @@ fun HostingScreen(
         horizontalArrangement = Arrangement.Absolute.Left,
         verticalAlignment = Alignment.CenterVertically) {
           CreateEventFab(
-              onClick = { context.toast("Create Event still needs to be implemented") },
+              onClick = { navigationActions.navController.navigate(Route.CREATE_EVENT) },
               modifier = Modifier.testTag("createEventFab"))
           Spacer(modifier = Modifier.width(16.dp))
           ViewToggleFab(
