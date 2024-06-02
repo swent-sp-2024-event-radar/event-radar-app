@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.TextStyle
@@ -47,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
 import com.github.se.eventradar.model.repository.event.MockEventRepository
@@ -155,7 +155,7 @@ fun QrCodeTicketUi(
 
       val imagePainter =
           if (qrScanUiState.value.eventUiState.eventPhoto == "") {
-            painterResource(id = R.drawable.placeholder)
+            rememberImagePainter(R.drawable.placeholderbig)
           } else {
             rememberAsyncImagePainter(qrScanUiState.value.eventUiState.eventPhoto)
           }
