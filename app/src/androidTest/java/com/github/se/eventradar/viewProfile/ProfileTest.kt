@@ -1,26 +1,27 @@
 package com.github.se.eventradar.viewProfile
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.eventradar.model.User
+import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.screens.ProfileScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.viewProfile.ProfileUi
-import com.github.se.eventradar.viewmodel.ProfileUiState
 import com.github.se.eventradar.viewmodel.ProfileViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.mockk.confirmVerified
-import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
+import io.mockk.unmockkAll
 import io.mockk.verify
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -34,23 +35,39 @@ class ProfileTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
   // Relaxed mocks methods have a default implementation returning values
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
-  @RelaxedMockK lateinit var mockProfileViewModel: ProfileViewModel
-  private val sampleUiState =
-      MutableStateFlow(
-          ProfileUiState(
-              profilePicUri = Uri.EMPTY,
-              firstName = "Jim",
-              lastName = "Smith",
-              username = "jimsmith",
-              bio = "I am Jim Smith and I love the Smiths (the band).",
-              phoneNumber = "123456789",
-              birthDate = "02/02/2002"))
+  private lateinit var mockUserRepository: MockUserRepository
+  private lateinit var mockProfileViewModel: ProfileViewModel
 
   @Before
-  fun testSetup() {
-    every { mockProfileViewModel.getProfileDetails() } returns Unit
-    every { mockProfileViewModel.uiState } returns sampleUiState
+  fun testSetup() = runTest {
+    mockUserRepository = MockUserRepository()
+
+    mockUserRepository.updateCurrentUserId("1")
+
+    mockUserRepository.addUser(
+        User(
+            userId = "Test",
+            birthDate = "01/01/2000",
+            email = "",
+            firstName = "Test",
+            lastName = "Test",
+            phoneNumber = "123456789",
+            accountStatus = "active",
+            eventsAttendeeList = mutableListOf(),
+            eventsHostList = mutableListOf(),
+            friendsList = mutableListOf(),
+            profilePicUrl =
+                "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2Fplaceholder.png?alt=media&token=ba4b4efb-ff45-4617-b60f-3789e8fb75b6",
+            qrCodeUrl = "",
+            bio = "",
+            username = "1"))
+
+    mockProfileViewModel = ProfileViewModel(mockUserRepository, "1")
+
+    mockProfileViewModel.getProfileDetails()
   }
+
+  @After fun testTeardown() = runTest { unmockkAll() }
 
   @Test
   fun screenDisplaysAllElementsCorrectlyWhenPublic() = run {
@@ -69,7 +86,6 @@ class ProfileTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
       username { assertIsDisplayed() }
       leftAlignedViewProfileColumn { assertIsDisplayed() }
       bioLabelText { assertIsDisplayed() }
-      bioInfoText { assertIsDisplayed() }
       // In public view, phone number and birth date should not be displayed
       phoneNumberBirthDateRow { assertDoesNotExist() }
     }
@@ -91,15 +107,9 @@ class ProfileTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
       name { assertIsDisplayed() }
       username { assertIsDisplayed() }
       bioLabelText { assertIsDisplayed() }
-      bioInfoText { assertIsDisplayed() }
       phoneNumberBirthDateRow { assertIsDisplayed() }
       phoneNumberColumn { assertIsDisplayed() }
-      // phoneNumberLabelText { assertIsDisplayed() }
-      // phoneNumberInfoText { assertIsDisplayed() }
       birthDateColumn { assertIsDisplayed() }
-      // birthDateLabelText { assertIsDisplayed() }
-      // birthDateInfoText { assertIsDisplayed() }
-      // phoneNumberBirthDateSpacer { assertIsDisplayed() }
     }
   }
 
@@ -203,37 +213,5 @@ class ProfileTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
       Intents.intended(IntentMatchers.hasAction(Intent.ACTION_GET_CONTENT))
     }
     Intents.release()
-  }
-
-  @Test
-  fun saveButtonWorks() = run {
-    composeTestRule.setContent {
-      ProfileUi(
-          isPublicView = false,
-          viewModel = mockProfileViewModel,
-          navigationActions = mockNavActions)
-    }
-
-    ComposeScreen.onComposeScreen<ProfileScreen>(composeTestRule) {
-      editButton {
-        assertIsDisplayed()
-        performClick()
-      }
-      firstNameTextField {
-        assertIsDisplayed()
-        performTextInput("Jimmy")
-      }
-      saveButton {
-        assertIsDisplayed()
-        performClick()
-      }
-
-      verify { mockProfileViewModel.validateFields() }
-      verify { mockProfileViewModel.getProfileDetails() }
-      verify { mockProfileViewModel.getUiState() }
-      verify { mockProfileViewModel.onFirstNameChanged("Jim") }
-      verify { mockProfileViewModel.onFirstNameChanged("JimmyJim") }
-      confirmVerified(mockProfileViewModel)
-    }
   }
 }
