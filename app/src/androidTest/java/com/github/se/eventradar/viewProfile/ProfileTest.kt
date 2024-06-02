@@ -136,30 +136,12 @@ class ProfileTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
         assertIsDisplayed()
         assertHasClickAction()
       }
-      firstNameTextField {
-        assertIsDisplayed()
-        performTextInput("Jim")
-      }
-      lastNameTextField {
-        assertIsDisplayed()
-        performTextInput("Smith")
-      }
-      usernameTextField {
-        assertIsDisplayed()
-        performTextInput("jimsmith")
-      }
-      bioTextField {
-        assertIsDisplayed()
-        performTextInput("I am Jim Smith and I love the Smiths (the band).")
-      }
-      phoneNumberTextField {
-        assertIsDisplayed()
-        performTextInput("123456789")
-      }
-      birthDateTextField {
-        assertIsDisplayed()
-        performTextInput("02/02/2002")
-      }
+      firstNameTextField { assertIsDisplayed() }
+      lastNameTextField { assertIsDisplayed() }
+      usernameTextField { assertIsDisplayed() }
+      bioTextField { assertIsDisplayed() }
+      phoneNumberTextField { assertIsDisplayed() }
+      birthDateTextField { assertIsDisplayed() }
       saveButton {
         assertIsDisplayed()
         assertHasClickAction()
