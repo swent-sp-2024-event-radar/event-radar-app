@@ -27,6 +27,7 @@ import com.github.se.eventradar.screens.CreateEventScreen
 import com.github.se.eventradar.screens.EventDetailsScreen
 import com.github.se.eventradar.screens.HomeScreen
 import com.github.se.eventradar.screens.HostingScreen
+import com.github.se.eventradar.screens.LoginScreen
 import com.github.se.eventradar.screens.MessagesScreen
 import com.github.se.eventradar.screens.ProfileScreen
 import com.github.se.eventradar.ui.chat.ChatScreen
@@ -34,6 +35,7 @@ import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.home.HomeScreen
 import com.github.se.eventradar.ui.hosting.CreateEventScreen
 import com.github.se.eventradar.ui.hosting.HostingScreen
+import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.messages.MessagesScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
@@ -199,6 +201,12 @@ class UserFlowTests : TestCase() {
                     CreateEventViewModel(locationRepository, eventRepository, userRepository),
                 navigationActions = navActions)
           }
+          composable(Route.PROFILE) {
+            val viewModel =
+                ProfileViewModel(userRepository, null) // userId = null leads to my prfile
+            ProfileUi(isPublicView = false, viewModel = viewModel, navigationActions = navActions)
+          }
+          composable(Route.LOGIN) { LoginScreen(navigationActions = navActions) }
         }
       }
     }
@@ -517,6 +525,37 @@ class UserFlowTests : TestCase() {
         eventList { assertIsDisplayed() }
         val newEvent = onNode { hasText("New Event") }
         newEvent { assertIsDisplayed() }
+      }
+    }
+  }
+  // User flow: homeScreen => my profile => edit profile => change first name => save => log out
+  @Test
+  fun homeScreenToEditProfileAndLogOut() = run {
+    ComposeScreen.onComposeScreen<HomeScreen>(composeTestRule) {
+      step("Check if elements are present") {
+        bottomNav { assertIsDisplayed() }
+        profileIcon { assertIsDisplayed() }
+      }
+      step("Click on the profile icon") { profileIcon.performClick() }
+    }
+    ComposeScreen.onComposeScreen<ProfileScreen>(composeTestRule) {
+      step("Check if edit button is displayed") { editProfile { assertIsDisplayed() } }
+      step("Click on edit") { editButton { performClick() } }
+      step("Edit profile") {
+        firstNameTextField { performTextInput("NewFirstName") }
+        saveButton { performClick() }
+      }
+
+      step("Log out") { logOutButton { performClick() } }
+    }
+
+    ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
+      step("Check if we are on the Login screen") {
+        eventRadarLogo { assertIsDisplayed() }
+        loginButton {
+          assertIsDisplayed()
+          assertHasClickAction()
+        }
       }
     }
   }
