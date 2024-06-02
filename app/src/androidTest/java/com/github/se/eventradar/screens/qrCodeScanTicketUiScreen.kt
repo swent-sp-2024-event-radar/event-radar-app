@@ -10,7 +10,6 @@ class QrCodeScanTicketUiScreen(semanticsProvider: SemanticsNodeInteractionsProvi
         viewBuilderAction = { hasTestTag("qrCodeScannerScreen") }) {
 
   // BOTH TABS
-  val logo: KNode = child { hasTestTag("logo") }
   val tabs: KNode = child { hasTestTag("tabs") }
   val myQrTab: KNode = tabs.child { hasTestTag("My Event") }
   val scanQrTab: KNode = tabs.child { hasTestTag("Scan QR Code") }
@@ -28,13 +27,13 @@ class QrCodeScanTicketUiScreen(semanticsProvider: SemanticsNodeInteractionsProvi
 
   // MY EvENt TAB
   val lazyEventDetails: KNode = child { hasTestTag("lazyEventDetails") }
-  val goBackButton: KNode = lazyEventDetails.child { hasTestTag("goBackButton") }
+  val goBackButton: KNode = onNode { hasTestTag("goBackButton") }
   val eventImage: KNode = lazyEventDetails.child { hasTestTag("eventImage") }
   val eventTitle: KNode = lazyEventDetails.child { hasTestTag("eventTitle") }
   val descriptionTitle: KNode = lazyEventDetails.child { hasTestTag("descriptionTitle") }
   val descriptionContent: KNode = lazyEventDetails.child { hasTestTag("descriptionContent") }
-  val distanceTitle: KNode = lazyEventDetails.child { hasTestTag("distanceTitle") }
-  val distanceContent: KNode = lazyEventDetails.child { hasTestTag("distanceContent") }
+  val locationTitle: KNode = lazyEventDetails.child { hasTestTag("locationTitle") }
+  val locationContent: KNode = lazyEventDetails.child { hasTestTag("locationContent") }
   val dateTitle: KNode = lazyEventDetails.child { hasTestTag("dateTitle") }
   val dateContent: KNode = lazyEventDetails.child { hasTestTag("dateContent") }
   val timeTitle: KNode = lazyEventDetails.child { hasTestTag("timeTitle") }

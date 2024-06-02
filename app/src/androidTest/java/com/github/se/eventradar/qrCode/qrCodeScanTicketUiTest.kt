@@ -120,9 +120,9 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
           assertTextContains(myEventUiState.value.eventUiState.description)
         }
       }
-      step("Distance") {
-        distanceTitle { assertIsDisplayed() }
-        distanceContent { assertIsDisplayed() }
+      step("Location") {
+        locationTitle { assertIsDisplayed() }
+        locationContent { assertIsDisplayed() }
       }
       step("Category") {
         categoryTitle { assertIsDisplayed() }
@@ -174,7 +174,6 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
       val viewModel = setupViewModelWithState(ScanTicketQrViewModel.Action.ScanTicket)
       composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
       scanQrTab.performClick()
-      logo.assertIsDisplayed()
       tabs.assertIsDisplayed()
       myQrTab.assertIsDisplayed()
       scanQrTab.assertIsDisplayed()
@@ -200,7 +199,6 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
     onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
       composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
       scanQrTab.performClick()
-      logo.assertIsDisplayed()
       tabs.assertIsDisplayed()
       myQrTab.assertIsDisplayed()
       scanQrTab.assertIsDisplayed()
@@ -217,7 +215,6 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
     onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
       composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
       scanQrTab.performClick()
-      logo.assertIsDisplayed()
       tabs.assertIsDisplayed()
       myQrTab.assertIsDisplayed()
       bottomNavMenu.assertIsDisplayed()
@@ -233,7 +230,6 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
     onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
       composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
       scanQrTab.performClick()
-      logo.assertIsDisplayed()
       tabs.assertIsDisplayed()
       myQrTab.assertIsDisplayed()
       scanQrTab.assertIsDisplayed()
@@ -250,7 +246,6 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
     onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
       composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
       scanQrTab.performClick()
-      logo.assertIsDisplayed()
       tabs.assertIsDisplayed()
       myQrTab.assertIsDisplayed()
       scanQrTab.assertIsDisplayed()
@@ -267,7 +262,6 @@ class QrCodeScanTicketUiTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
     onComposeScreen<QrCodeScanTicketUiScreen>(composeTestRule) {
       composeTestRule.setContent { QrCodeTicketUi(viewModel, mockNavActions) }
       scanQrTab.performClick()
-      logo.assertIsDisplayed()
       tabs.assertIsDisplayed()
       myQrTab.assertIsDisplayed()
       scanQrTab.assertIsDisplayed()

@@ -82,8 +82,8 @@ fun QrCodeTicketUi(
         modifier =
             Modifier.wrapContentSize().constrainAs(backButton) {
               top.linkTo(parent.top, margin = 32.dp)
-              start.linkTo(parent.start, margin = 16.dp)
-            }) {
+              start.linkTo(parent.start, margin = 16.dp) }
+              .testTag("goBackButton")) {
           navigationActions.goBack()
         }
     TabRow(
