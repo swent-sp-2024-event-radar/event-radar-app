@@ -1,7 +1,5 @@
 # event-radar-app
-Holds all the code for the Android app, Event Radar (see the demo).
-
-TODO: Add demo
+Holds all the code for the Android app, Event Radar (see the demos [here](https://www.swisstransfer.com/d/86df9f64-43c0-4d70-bb74-254fe1140f6f)).
 
 ## Overview of functionalities
 
