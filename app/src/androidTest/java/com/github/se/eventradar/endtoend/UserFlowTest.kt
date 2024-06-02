@@ -16,26 +16,34 @@ import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.message.Message
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.event.MockEventRepository
+import com.github.se.eventradar.model.repository.location.ILocationRepository
+import com.github.se.eventradar.model.repository.location.MockLocationRepository
 import com.github.se.eventradar.model.repository.message.IMessageRepository
 import com.github.se.eventradar.model.repository.message.MockMessageRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.screens.ChatScreen
+import com.github.se.eventradar.screens.CreateEventScreen
 import com.github.se.eventradar.screens.EventDetailsScreen
 import com.github.se.eventradar.screens.HomeScreen
+import com.github.se.eventradar.screens.HostingScreen
 import com.github.se.eventradar.screens.MessagesScreen
 import com.github.se.eventradar.screens.ProfileScreen
 import com.github.se.eventradar.ui.chat.ChatScreen
 import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.home.HomeScreen
+import com.github.se.eventradar.ui.hosting.CreateEventScreen
+import com.github.se.eventradar.ui.hosting.HostingScreen
 import com.github.se.eventradar.ui.messages.MessagesScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.theme.MyApplicationTheme
 import com.github.se.eventradar.ui.viewProfile.ProfileUi
 import com.github.se.eventradar.viewmodel.ChatViewModel
+import com.github.se.eventradar.viewmodel.CreateEventViewModel
 import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
+import com.github.se.eventradar.viewmodel.HostedEventsViewModel
 import com.github.se.eventradar.viewmodel.MessagesViewModel
 import com.github.se.eventradar.viewmodel.ProfileViewModel
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -65,6 +73,7 @@ class UserFlowTests : TestCase() {
   private var userRepository: IUserRepository = MockUserRepository()
   private var eventRepository: IEventRepository = MockEventRepository()
   private var messageRepository: IMessageRepository = MockMessageRepository()
+  private var locationRepository: ILocationRepository = MockLocationRepository()
 
   private val mockEvent =
       Event(
@@ -179,6 +188,17 @@ class UserFlowTests : TestCase() {
                 ProfileUi(
                     isPublicView = true, viewModel = viewModel, navigationActions = navActions)
               }
+          composable(Route.MY_HOSTING) {
+            HostingScreen(
+                viewModel = HostedEventsViewModel(eventRepository, userRepository),
+                navigationActions = navActions)
+          }
+          composable(Route.CREATE_EVENT) {
+            CreateEventScreen(
+                viewModel =
+                    CreateEventViewModel(locationRepository, eventRepository, userRepository),
+                navigationActions = navActions)
+          }
         }
       }
     }
@@ -413,6 +433,90 @@ class UserFlowTests : TestCase() {
       step("Check if message is displayed") {
         chatScreenMessagesList { assertIsDisplayed() }
         onNode { hasText("Test Message 3") }.assertIsDisplayed()
+      }
+    }
+  }
+  // User flow: homeScreen => my hosted screen => create an Event => fill fields => confirm event
+  // creation
+  @Test
+  fun homeScreenToCreateEvent() = run {
+    ComposeScreen.onComposeScreen<HomeScreen>(composeTestRule) {
+      step("Check if elements are present") {
+        bottomNav { assertIsDisplayed() }
+        hostingIcon { assertIsDisplayed() }
+      }
+      step("Click on the hosting icon") { hostingIcon.performClick() }
+    }
+
+    ComposeScreen.onComposeScreen<HostingScreen>(composeTestRule) {
+      createEventFab { assertIsDisplayed() }
+      step("Click on create event") { createEventFab.performClick() }
+    }
+    ComposeScreen.onComposeScreen<CreateEventScreen>(composeTestRule) {
+      topBar { assertIsDisplayed() }
+      goBackButton { assertIsDisplayed() }
+      createEventText { assertIsDisplayed() }
+      createEventScreenColumn { assertIsDisplayed() }
+      eventImagePicker { assertIsDisplayed() }
+      eventNameTextField { assertIsDisplayed() }
+      eventDescriptionTextField { assertIsDisplayed() }
+      datesRow { assertIsDisplayed() }
+      startDateTextField { assertIsDisplayed() }
+      endDateTextField { assertIsDisplayed() }
+      timesRow { assertIsDisplayed() }
+      startTimeTextField { assertIsDisplayed() }
+      endTimeTextField { assertIsDisplayed() }
+      locationExposedDropDownMenuBox { assertIsDisplayed() }
+      locationDropDownMenuTextField { assertIsDisplayed() }
+      exposedDropDownMenuBox { assertIsDisplayed() }
+      ticketNameDropDownMenuTextField { assertIsDisplayed() }
+      eventCategoryDropDown { assertIsDisplayed() }
+      ticketQuantityTextField { assertIsDisplayed() }
+      ticketPriceTextField { assertIsDisplayed() }
+      step("Fill in Event Details") {
+        eventNameTextField { performTextInput("New Event") }
+        eventDescriptionTextField { performTextInput("This is a test event") }
+        eventCategoryDropDown { performClick() }
+
+        val categoryOption = onNode { hasText("MUSIC") }
+
+        // categoryOption {
+        //     assertIsDisplayed()
+        //     performClick()
+        // }
+        startDateTextField { performTextInput("2025-12-31") }
+        endDateTextField { performTextInput("2026-01-01") }
+        startTimeTextField { performTextInput("10:00") }
+        endTimeTextField { performTextInput("18:00") }
+        eventCategoryDropDown { performClick() }
+
+        locationDropDownMenuTextField {
+          performClick()
+          performTextInput("EPFL")
+        }
+
+        ticketNameDropDownMenuTextField { performTextInput("General Admission") }
+        ticketQuantityTextField { performTextInput("100") }
+
+        ticketPriceTextField {
+          performScrollTo()
+          performTextInput("10.0")
+        }
+
+        organisersMultiDropDownMenuTextField { performClick() }
+        val organiser = onNode { hasText("John Doe") }
+        organiser {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+      step("Publish Event") { publishEventButton { performClick() } }
+    }
+    ComposeScreen.onComposeScreen<HostingScreen>(composeTestRule) {
+      step("Verify Event is Listed in Hosted Events") {
+        eventList { assertIsDisplayed() }
+        val newEvent = onNode { hasText("New Event") }
+        newEvent { assertIsDisplayed() }
       }
     }
   }
