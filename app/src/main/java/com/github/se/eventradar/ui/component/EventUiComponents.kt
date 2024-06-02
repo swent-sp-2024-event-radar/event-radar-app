@@ -165,14 +165,3 @@ fun TicketsSold(modifier: Modifier, eventUiState: EventUiState, style: EventComp
         modifier = Modifier.testTag("ticketSoldContent"))
   }
 }
-
-@Composable
-fun EventOrganisers(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
-    Column(modifier = modifier) {
-        Text(
-            text = stringResource(id = R.string.event_organisers),
-            style = style.fieldTitleStyle,
-            color = style.fieldTitleColor,
-            modifier = Modifier.testTag("organisersTitle"))
-    }
-}
