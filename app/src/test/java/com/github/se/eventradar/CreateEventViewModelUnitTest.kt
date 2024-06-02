@@ -73,11 +73,27 @@ class CreateEventViewModelUnitTest {
           accountStatus = "active",
           eventsAttendeeList = mutableListOf(),
           eventsHostList = mutableListOf(),
-          friendsList = mutableListOf(),
+          friendsList = mutableListOf("2"),
           profilePicUrl = "",
           qrCodeUrl = "",
           bio = "",
           username = "john_doe")
+  val mockUser2 =
+      User(
+          userId = "2",
+          birthDate = "01/01/2002",
+          email = "test2@test.com",
+          firstName = "John",
+          lastName = "Smith",
+          phoneNumber = "123456789",
+          accountStatus = "active",
+          eventsAttendeeList = mutableListOf(),
+          eventsHostList = mutableListOf(),
+          friendsList = mutableListOf(),
+          profilePicUrl = "",
+          qrCodeUrl = "",
+          bio = "",
+          username = "john_smith")
 
   private val mockEvent =
       Event(
@@ -112,9 +128,33 @@ class CreateEventViewModelUnitTest {
         }
     runBlocking {
       userRepository.addUser(mockUser)
+      userRepository.addUser(mockUser2)
       (userRepository as MockUserRepository).updateCurrentUserId(mockUser.userId)
     }
     viewModel = CreateEventViewModel(locationRepository, eventRepository, userRepository)
+  }
+
+  @Test
+  fun testGetHostFriendListSuccess() {
+    viewModel.getHostFriendList(mockUiState)
+    assert(mockUiState.value.hostFriendsList.map { user -> user.userId } == mockUser.friendsList)
+  }
+
+  @Test
+  fun testGetHostFriendListFailure() {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+    (userRepository as MockUserRepository).updateCurrentUserId(null)
+    viewModel.getHostFriendList(mockUiState)
+    Log.d("CreateEventViewModel", "User not logged in or error fetching user ID")
+    assert(mockUiState.value.showAddEventFailure)
+    unmockkAll()
+  }
+
+  @Test
+  fun testResetStateAndSetAddEventSuccess() {
+    viewModel.resetStateAndSetAddEventSuccess(true, mockUiState)
+    assert(mockUiState.value.showAddEventSuccess)
   }
 
   @Test
@@ -138,7 +178,7 @@ class CreateEventViewModelUnitTest {
     viewModel.onEndDateChanged(mockEvent.end.format(dateFormat), mockUiState)
     viewModel.onEndTimeChanged(mockEvent.end.format(timeFormat), mockUiState)
     viewModel.onEventCategoryChanged(mockEvent.category.toString(), mockUiState)
-    viewModel.onOrganiserListChanged(mockEvent.organiserList, mockUiState)
+    viewModel.onOrganiserListChanged(listOf(mockUser2), mockUiState)
 
     viewModel.onLocationChanged(mockEvent.location.address, mockUiState)
     viewModel.onTicketNameChanged(mockEvent.ticket.name, mockUiState)
@@ -148,11 +188,14 @@ class CreateEventViewModelUnitTest {
     viewModel.onEventPhotoUriChanged(eventPhotoUri = uri, mockUiState)
 
     assert(viewModel.validateFields(mockUiState))
-    runBlocking { viewModel.addEvent(mockUiState) }
+    runBlocking { viewModel.addEvent(mockUiState) } // ohh it reset the state?
 
     verify { Log.d("CreateEventViewModel", "Successfully added event") }
     verify {
       Log.d("CreateEventViewModel", "Successfully updated user ${mockUser.userId} host list")
+    }
+    verify {
+      Log.d("CreateEventViewModel", "Successfully updated user ${mockUser2.userId} host list")
     }
     assert(mockUiState.value.eventName == mockEvent.eventName)
     assert(mockUiState.value.eventDescription == mockEvent.description)
@@ -166,7 +209,7 @@ class CreateEventViewModelUnitTest {
     assert(mockUiState.value.ticketPrice.toDouble() == mockEvent.ticket.price)
     assert(mockUiState.value.ticketName == mockEvent.ticket.name)
     assert(mockUiState.value.eventPhotoUri == uri)
-    assert(mockUiState.value.organiserList == mockEvent.organiserList)
+    assert(mockUiState.value.organiserList.map { user -> user.userId } == listOf(mockUser2.userId))
     unmockkAll()
   }
 
@@ -191,7 +234,7 @@ class CreateEventViewModelUnitTest {
     viewModel.onEndDateChanged(mockEvent.end.format(dateFormat), mockUiState)
     viewModel.onEndTimeChanged(mockEvent.end.format(timeFormat), mockUiState)
     viewModel.onEventCategoryChanged(mockEvent.category.toString(), mockUiState)
-    viewModel.onOrganiserListChanged(mockEvent.organiserList, mockUiState)
+    viewModel.onOrganiserListChanged(listOf(mockUser2), mockUiState)
 
     viewModel.onLocationChanged(mockEvent.location.address, mockUiState)
     viewModel.onTicketNameChanged(mockEvent.ticket.name, mockUiState)
@@ -216,7 +259,7 @@ class CreateEventViewModelUnitTest {
     assert(mockUiState.value.ticketPrice == "")
     assert(mockUiState.value.ticketName == "")
     assert(mockUiState.value.eventPhotoUri == null)
-    assert(mockUiState.value.organiserList == emptyList<String>())
+    assert(mockUiState.value.organiserList == emptyList<User>())
     unmockkAll()
   }
 
@@ -237,7 +280,7 @@ class CreateEventViewModelUnitTest {
     viewModel.onEndDateChanged(mockEvent.end.format(dateFormat), mockUiState)
     viewModel.onEndTimeChanged(mockEvent.end.format(timeFormat), mockUiState)
     viewModel.onEventCategoryChanged(mockEvent.category.toString(), mockUiState)
-    viewModel.onOrganiserListChanged(mockEvent.organiserList, mockUiState)
+    viewModel.onOrganiserListChanged(listOf(mockUser2), mockUiState)
 
     viewModel.onLocationChanged(mockEvent.location.address, mockUiState)
     viewModel.onTicketNameChanged(mockEvent.ticket.name, mockUiState)
@@ -263,7 +306,7 @@ class CreateEventViewModelUnitTest {
     assert(mockUiState.value.ticketPrice == "")
     assert(mockUiState.value.ticketName == "")
     assert(mockUiState.value.eventPhotoUri == null)
-    assert(mockUiState.value.organiserList == emptyList<String>())
+    assert(mockUiState.value.organiserList == emptyList<User>())
     unmockkAll()
   }
 
@@ -283,9 +326,9 @@ class CreateEventViewModelUnitTest {
   }
 
   @Test
-  fun testResetStateAndSetEventUploadError() = runTest {
-    viewModel.resetStateAndSetEventUploadError(true, mockUiState)
-    assert(mockUiState.value.eventUploadError == true)
+  fun testResetStateAndSetShowAddEventFailure() = runTest {
+    viewModel.resetStateAndSetAddEventFailure(true, mockUiState)
+    assert(mockUiState.value.showAddEventFailure == true)
   }
 
   @Test
@@ -304,7 +347,7 @@ class CreateEventViewModelUnitTest {
 
   @Test
   fun testOnOrganiserListChanged() = runTest {
-    val newOrganiserList = mutableListOf("Organiser1", "Organiser2")
+    val newOrganiserList = listOf(mockUser2)
     viewModel.onOrganiserListChanged(newOrganiserList, mockUiState)
     assertEquals(newOrganiserList, mockUiState.value.organiserList)
   }

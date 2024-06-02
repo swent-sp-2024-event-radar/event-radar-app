@@ -98,7 +98,12 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
             modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(it)) {
               // TODO uncomment when image are implemented
               // val imagePainter: Painter = rememberAsyncImagePainter(eventUiState.eventPhoto)
-              val imagePainter: Painter = rememberAsyncImagePainter(R.drawable.placeholderbig)
+              val imagePainter: Painter =
+                  if (eventUiState.eventPhoto == "") {
+                    painterResource(id = R.drawable.placeholder)
+                  } else {
+                    rememberAsyncImagePainter(eventUiState.eventPhoto)
+                  }
               Image(
                   painter = imagePainter,
                   contentDescription = "Event banner image",

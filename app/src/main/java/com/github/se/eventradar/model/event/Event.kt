@@ -57,6 +57,7 @@ data class Event(
     map["ticket_name"] = ticket.name
     map["ticket_price"] = ticket.price
     map["ticket_capacity"] = ticket.capacity
+    map["ticket_purchases"] = ticket.purchases
     map["main_organiser"] = mainOrganiser
     map["organisers_list"] = organiserList.toList()
     map["attendees_list"] = attendeeList.toList()

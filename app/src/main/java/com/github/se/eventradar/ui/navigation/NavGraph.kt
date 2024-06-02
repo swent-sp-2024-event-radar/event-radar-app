@@ -10,6 +10,7 @@ import com.github.se.eventradar.ui.chat.ChatScreen
 import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.event.SelectTicket
 import com.github.se.eventradar.ui.home.HomeScreen
+import com.github.se.eventradar.ui.hosting.CreateEventScreen
 import com.github.se.eventradar.ui.hosting.HostingScreen
 import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.login.SignUpScreen
@@ -82,5 +83,6 @@ fun NavGraph(
       ProfileUi(isPublicView = false, viewModel = viewModel, navigationActions = navActions)
     }
     composable(Route.MY_HOSTING) { HostingScreen(navigationActions = navActions) }
+    composable(Route.CREATE_EVENT) { CreateEventScreen(navigationActions = navActions) }
   }
 }

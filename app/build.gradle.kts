@@ -83,7 +83,9 @@ dependencies {
   implementation("androidx.activity:activity-compose:1.8.2")
   implementation("androidx.compose.ui:ui-graphics")
   implementation("androidx.compose.material:material:1.1.1")
-  implementation("androidx.compose.material3:material3:1.1.2")
+  implementation("androidx.compose.material3:material3:1.2.1")
+  implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
+  implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.3.0-beta02")
   implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 
   // Navigation
