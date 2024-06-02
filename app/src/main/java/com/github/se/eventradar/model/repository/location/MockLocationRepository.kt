@@ -9,12 +9,7 @@ class MockLocationRepository : ILocationRepository {
       Resource.Failure(Exception("Empty location name is invalid"))
     } else {
       Resource.Success(
-          listOf(
-              Location(
-                  latitude = 100.0,
-                  longitude = 100.0,
-                  address = "École polytechnique fédérale de Lausanne"),
-              Location(latitude = 100.0, longitude = 100.0, address = locationName)))
+          listOf(Location(latitude = 100.0, longitude = 100.0, address = locationName)))
     }
   }
 }

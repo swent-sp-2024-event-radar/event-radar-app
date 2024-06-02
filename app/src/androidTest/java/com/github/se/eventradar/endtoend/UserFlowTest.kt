@@ -595,7 +595,7 @@ class UserFlowTests : TestCase() {
         startTimeTextField { performTextInput("10:00") }
         endTimeTextField { performTextInput("18:00") }
         val locationToSearch = "EPFL"
-        val locationToVerify = "École polytechnique fédérale de Lausanne"
+        val locationToVerify = "EPFL"
         step("Click on Location text field and type in it") {
           locationDropDownMenuTextField {
             assertIsDisplayed()
