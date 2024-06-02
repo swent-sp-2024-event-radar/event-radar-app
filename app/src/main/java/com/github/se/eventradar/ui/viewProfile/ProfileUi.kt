@@ -76,7 +76,7 @@ fun ProfileUi(
       topBar = {
         // row and text profile Information
         Row(
-            modifier = Modifier.padding(vertical = 32.dp).fillMaxWidth(),
+            modifier = Modifier.padding(vertical = 32.dp).fillMaxWidth().testTag("topBar"),
             verticalAlignment = Alignment.CenterVertically) {
               if (isPublicView) {
                 GoBackButton(

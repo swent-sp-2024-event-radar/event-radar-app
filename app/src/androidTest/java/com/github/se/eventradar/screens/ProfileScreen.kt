@@ -9,13 +9,16 @@ class ProfileScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
         semanticsProvider = semanticsProvider,
         viewBuilderAction = { hasTestTag("profileScreen") }) {
 
-  val chatButton: KNode = onNode { hasTestTag("chatButton") }
-  val editButton: KNode = onNode { hasTestTag("editButton") }
-  val logo: KNode = onNode { hasTestTag("logo") }
-  val goBackButton: KNode = onNode { hasTestTag("goBackButton") }
-  val editProfile: KNode = onNode { hasTestTag("editProfile") }
-  val bottomNav: KNode = onNode { hasTestTag("bottomNavMenu") }
-  val centeredViewProfileColumn: KNode = onNode { hasTestTag("centeredViewProfileColumn") }
+  val profileScreen: KNode = onNode { hasTestTag("profileScreen") }
+  val topBar: KNode = profileScreen.child { hasTestTag("topBar") }
+  val chatButton: KNode = profileScreen.child { hasTestTag("chatButton") }
+  val editButton: KNode = profileScreen.child { hasTestTag("editButton") }
+  val logo: KNode = topBar.child { hasTestTag("logo") }
+  val goBackButton: KNode = topBar.child { hasTestTag("goBackButton") }
+  val editProfile: KNode = topBar.child { hasTestTag("editProfile") }
+  val bottomNav: KNode = profileScreen.child { hasTestTag("bottomNavMenu") }
+  val centeredViewProfileColumn: KNode =
+      profileScreen.child { hasTestTag("centeredViewProfileColumn") }
   val profilePic: KNode = centeredViewProfileColumn.child { hasTestTag("profilePic") }
   val name: KNode = centeredViewProfileColumn.child { hasTestTag("name") }
   val nameRow: KNode = centeredViewProfileColumn.child { hasTestTag("nameRow") }

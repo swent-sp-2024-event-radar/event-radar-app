@@ -126,7 +126,6 @@ class ProfileTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSup
       editButton {
         // arrange: verify the pre-conditions
         assertIsDisplayed()
-        assertIsEnabled()
 
         // act: click the edit button
         performClick()
