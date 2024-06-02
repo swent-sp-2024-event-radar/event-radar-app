@@ -255,4 +255,13 @@ class FirebaseUserRepository(db: FirebaseFirestore = Firebase.firestore) : IUser
 
     return Pair(publicMap, privateMap)
   }
+
+  override suspend fun signOut(): Resource<Unit> {
+    return try {
+      Firebase.auth.signOut()
+      Resource.Success(Unit)
+    } catch (e: Exception) {
+      Resource.Failure(e)
+    }
+  }
 }

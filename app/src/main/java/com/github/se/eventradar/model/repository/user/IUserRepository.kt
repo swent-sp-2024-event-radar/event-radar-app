@@ -36,4 +36,6 @@ interface IUserRepository {
   suspend fun addEventToAttendeeList(userId: String, attendingEventId: String): Resource<Unit>
 
   suspend fun removeEventFromAttendeeList(userId: String, attendingEventId: String): Resource<Unit>
+
+  suspend fun signOut(): Resource<Unit>
 }
