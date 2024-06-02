@@ -474,18 +474,10 @@ class UserFlowTests : TestCase() {
     }
     ComposeScreen.onComposeScreen<CreateEventScreen>(composeTestRule) {
       ComposeScreen.onComposeScreen<CreateEventScreen>(composeTestRule) {
-        topBar {
-          assertIsDisplayed()
-        }
-        goBackButton {
-          assertIsDisplayed()
-        }
-        createEventText {
-          assertIsDisplayed()
-        }
-        createEventScreenColumn {
-          assertIsDisplayed()
-        }
+        topBar { assertIsDisplayed() }
+        goBackButton { assertIsDisplayed() }
+        createEventText { assertIsDisplayed() }
+        createEventScreenColumn { assertIsDisplayed() }
         eventImagePicker {
           performScrollTo()
           assertIsDisplayed()
@@ -567,9 +559,6 @@ class UserFlowTests : TestCase() {
         eventNameTextField { performTextInput("New Event") }
         eventDescriptionTextField { performTextInput("This is a test event") }
 
-//        eventCategoryDropDown { performClick() }
-      //event category, location, ticketname, organisers
-
         val eventCategoryOption = "MUSIC"
         step("Click on Event Category Drop Down Menu") {
           eventCategoryDropDown {
@@ -580,22 +569,26 @@ class UserFlowTests : TestCase() {
         }
         step("Check if Event Category Drop Down Menu is displayed") {
           composeTestRule
-            .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
-            .assertIsDisplayed()
+              .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
+              .assertIsDisplayed()
         }
 
         step("Click on Specific Event Category") {
-          composeTestRule.onNode(
-            hasText(eventCategoryOption).and(hasAnyAncestor(hasTestTag("exposedDropDownMenu")))
-          ).assertIsDisplayed()
-          composeTestRule.onNode(
-            hasText(eventCategoryOption).and(hasAnyAncestor(hasTestTag("exposedDropDownMenu")))
-          ).performClick()
+          composeTestRule
+              .onNode(
+                  hasText(eventCategoryOption)
+                      .and(hasAnyAncestor(hasTestTag("exposedDropDownMenu"))))
+              .assertIsDisplayed()
+          composeTestRule
+              .onNode(
+                  hasText(eventCategoryOption)
+                      .and(hasAnyAncestor(hasTestTag("exposedDropDownMenu"))))
+              .performClick()
         }
         step("Check if Event Category Drop Down Menu is hidden") {
           composeTestRule
-            .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
-            .assertIsNotDisplayed()
+              .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
+              .assertIsNotDisplayed()
         }
         startDateTextField { performTextInput("2025-12-31") }
         endDateTextField { performTextInput("2026-01-01") }
@@ -612,24 +605,28 @@ class UserFlowTests : TestCase() {
         }
         step("Check if Location Drop Down Menu is displayed") {
           composeTestRule
-            .onNodeWithTag("locationExposedDropDownMenu", useUnmergedTree = true)
-            .assertIsDisplayed()
+              .onNodeWithTag("locationExposedDropDownMenu", useUnmergedTree = true)
+              .assertIsDisplayed()
         }
         step("Click on Location Drop Down Menu Option") {
-          composeTestRule.onNode(
-            hasText(locationToVerify).and(hasAnyAncestor(hasTestTag("locationExposedDropDownMenu")))
-          ).assertIsDisplayed()
-          composeTestRule.onNode(
-            hasText(locationToVerify).and(hasAnyAncestor(hasTestTag("locationExposedDropDownMenu")))
-          ).performClick()
+          composeTestRule
+              .onNode(
+                  hasText(locationToVerify)
+                      .and(hasAnyAncestor(hasTestTag("locationExposedDropDownMenu"))))
+              .assertIsDisplayed()
+          composeTestRule
+              .onNode(
+                  hasText(locationToVerify)
+                      .and(hasAnyAncestor(hasTestTag("locationExposedDropDownMenu"))))
+              .performClick()
         }
         step("Check if Location Drop Down Menu is hidden") {
           composeTestRule
-            .onNodeWithTag("locationExposedDropDownMenu", useUnmergedTree = true)
-            .assertIsNotDisplayed()
+              .onNodeWithTag("locationExposedDropDownMenu", useUnmergedTree = true)
+              .assertIsNotDisplayed()
         }
 
-        //ticketName
+        // ticketName
         val ticketNameOption = "Standard"
         step("Click on ticket name text field") {
           ticketNameDropDownMenuTextField {
@@ -640,21 +637,23 @@ class UserFlowTests : TestCase() {
         }
         step("Check if ticketName drop down menu is displayed") {
           composeTestRule
-            .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
-            .assertIsDisplayed()
+              .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
+              .assertIsDisplayed()
         }
         step("Click on ticketName Option") {
-          composeTestRule.onNode(
-            hasText(ticketNameOption).and(hasAnyAncestor(hasTestTag("exposedDropDownMenu")))
-          ).assertIsDisplayed()
-          composeTestRule.onNode(
-            hasText(ticketNameOption).and(hasAnyAncestor(hasTestTag("exposedDropDownMenu")))
-          ).performClick()
+          composeTestRule
+              .onNode(
+                  hasText(ticketNameOption).and(hasAnyAncestor(hasTestTag("exposedDropDownMenu"))))
+              .assertIsDisplayed()
+          composeTestRule
+              .onNode(
+                  hasText(ticketNameOption).and(hasAnyAncestor(hasTestTag("exposedDropDownMenu"))))
+              .performClick()
         }
         step("Check if ticketName drop down menu is hidden") {
           composeTestRule
-            .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
-            .assertIsNotDisplayed()
+              .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
+              .assertIsNotDisplayed()
         }
 
         ticketQuantityTextField { performTextInput("100") }
@@ -674,56 +673,55 @@ class UserFlowTests : TestCase() {
         }
         step("Check if Organisers Drop Down Menu is displayed") {
           composeTestRule
-            .onNodeWithTag("multiSelectExposedDropdownMenu", useUnmergedTree = true)
-            .assertIsDisplayed()
+              .onNodeWithTag("multiSelectExposedDropdownMenu", useUnmergedTree = true)
+              .assertIsDisplayed()
         }
         step("Click on organiser Option") {
-          composeTestRule.onNode(
-            hasText(friendUserName).and(hasAnyAncestor(hasTestTag("multiSelectExposedDropdownMenu")))
-          ).assertIsDisplayed()
-          composeTestRule.onNode(
-            hasText(friendUserName).and(hasAnyAncestor(hasTestTag("multiSelectExposedDropdownMenu")))
-          ).performClick()
+          composeTestRule
+              .onNode(
+                  hasText(friendUserName)
+                      .and(hasAnyAncestor(hasTestTag("multiSelectExposedDropdownMenu"))))
+              .assertIsDisplayed()
+          composeTestRule
+              .onNode(
+                  hasText(friendUserName)
+                      .and(hasAnyAncestor(hasTestTag("multiSelectExposedDropdownMenu"))))
+              .performClick()
         }
         step("Click on Organisers Drop Down Toggle Icon") {
           composeTestRule
-            .onNodeWithTag("multiSelectDropDownToggleIcon", useUnmergedTree = true)
-            .performClick()
+              .onNodeWithTag("multiSelectDropDownToggleIcon", useUnmergedTree = true)
+              .performClick()
         }
         step("Check if Organisers Drop Down is hidden") {
           composeTestRule
-            .onNodeWithTag("multiSelectExposedDropdownMenu", useUnmergedTree = true)
-            .assertIsNotDisplayed()
+              .onNodeWithTag("multiSelectExposedDropdownMenu", useUnmergedTree = true)
+              .assertIsNotDisplayed()
         }
 
-        step("Publish Event") { publishEventButton {
-          performScrollTo()
-          performClick()
-        } }
+        step("Publish Event") {
+          publishEventButton {
+            performScrollTo()
+            performClick()
+          }
+        }
         step("Check if success dialog box is displayed") {
           composeTestRule
-            .onNodeWithTag("successDialogBox", useUnmergedTree = true)
-            .assertIsDisplayed()
+              .onNodeWithTag("successDialogBox", useUnmergedTree = true)
+              .assertIsDisplayed()
           composeTestRule.onNodeWithTag("DisplayText", useUnmergedTree = true).assertIsDisplayed()
           composeTestRule.onNodeWithTag("DisplayTitle", useUnmergedTree = true).assertIsDisplayed()
           composeTestRule
-            .onNodeWithTag("dialogConfirmButton", useUnmergedTree = true)
-            .assertIsDisplayed()
+              .onNodeWithTag("dialogConfirmButton", useUnmergedTree = true)
+              .assertIsDisplayed()
         }
         step("Click on confirm") {
-          composeTestRule.onNodeWithTag("dialogConfirmButton", useUnmergedTree = true).performClick()
+          composeTestRule
+              .onNodeWithTag("dialogConfirmButton", useUnmergedTree = true)
+              .performClick()
         }
-
       }
-
     }
-//    ComposeScreen.onComposeScreen<HostingScreen>(composeTestRule) {
-//      step("Verify Event is Listed in Hosted Events") {
-//        eventList { assertIsDisplayed() }
-//        val newEvent = onNode { hasText("New Event") }
-//        newEvent { assertIsDisplayed() }
-//      }
-//    }
   }
   // User flow: homeScreen => my profile => edit profile => change first name => save => log out
   @Test

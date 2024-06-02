@@ -10,10 +10,11 @@ class MockLocationRepository : ILocationRepository {
     } else {
       Resource.Success(
           listOf(
-            Location(latitude = 100.0, longitude = 100.0, address = "École polytechnique fédérale de Lausanne"),
-            Location(latitude = 100.0, longitude = 100.0, address = locationName)
-          )
-      )
+              Location(
+                  latitude = 100.0,
+                  longitude = 100.0,
+                  address = "École polytechnique fédérale de Lausanne"),
+              Location(latitude = 100.0, longitude = 100.0, address = locationName)))
     }
   }
 }
