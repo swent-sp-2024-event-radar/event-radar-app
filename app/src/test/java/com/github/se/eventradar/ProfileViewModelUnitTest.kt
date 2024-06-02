@@ -1,10 +1,14 @@
 package com.github.se.eventradar
 
+import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.user.MockUserRepository
+import com.github.se.eventradar.viewmodel.CountryCode
 import com.github.se.eventradar.viewmodel.ProfileUiState
 import com.github.se.eventradar.viewmodel.ProfileViewModel
+import dagger.hilt.android.testing.HiltAndroidTest
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockkStatic
@@ -17,6 +21,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
@@ -26,6 +31,7 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@HiltAndroidTest
 class ProfileViewModelUnitTest {
 
   @RelaxedMockK private lateinit var viewModelFriend: ProfileViewModel
@@ -54,14 +60,14 @@ class ProfileViewModelUnitTest {
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",
-          phoneNumber = "1234567890",
+          phoneNumber = "123456789",
           accountStatus = "active",
           eventsAttendeeList = mutableListOf("event1", "event2"),
           eventsHostList = mutableListOf("event3"),
           friendsList = mutableListOf("2"),
           profilePicUrl = "http://example.com/Profile_Pictures/1",
           qrCodeUrl = "http://example.com/QR_Codes/1",
-          bio = "",
+          bio = "This is my bio",
           username = "johndoe")
   private val mockFriend =
       User(
@@ -77,7 +83,7 @@ class ProfileViewModelUnitTest {
           friendsList = mutableListOf("1"),
           profilePicUrl = "http://example.com/Profile_Pictures/2",
           qrCodeUrl = "http://example.com/QR_Codes/2",
-          bio = "",
+          bio = "This is my bio",
           username = "jimsmith")
 
   private val factory =
@@ -103,14 +109,15 @@ class ProfileViewModelUnitTest {
 
   @Test
   fun viewFriendsProfileDetailsSuccessful() {
-    runBlocking { userRepository.addUser(mockUser) }
-    viewModelUser.getProfileDetails()
-    assert(viewModelUser.userId == mockUser.userId)
-    assert(viewModelUser.uiState.value.profilePicUrl == mockUser.profilePicUrl)
-    assert(viewModelUser.uiState.value.bio == mockUser.bio)
-    assert(viewModelUser.uiState.value.username == mockUser.username)
-    assert(viewModelUser.uiState.value.firstName == mockUser.firstName)
-    assert(viewModelUser.uiState.value.lastName == mockUser.lastName)
+    runBlocking { userRepository.addUser(mockFriend) }
+    viewModelFriend.getProfileDetails()
+    assert(viewModelFriend.userId == mockFriend.userId)
+    assert(viewModelFriend.uiState.value.profilePicUri == mockFriend.profilePicUrl.toUri())
+    assert(viewModelFriend.uiState.value.bio == mockFriend.bio)
+    assert(viewModelFriend.uiState.value.username == mockFriend.username)
+    assert(viewModelFriend.uiState.value.firstName == mockFriend.firstName)
+    assert(viewModelFriend.uiState.value.lastName == mockFriend.lastName)
+    tearDown()
   }
 
   @Test
@@ -120,5 +127,156 @@ class ProfileViewModelUnitTest {
     viewModelFriend.getProfileDetails()
     verify { Log.d("ProfileViewModel", "Error getting user details for user ${mockFriend.userId}") }
     unmockkAll()
+  }
+
+  @Test
+  fun viewMyProfileDetailsSuccessful() {
+    runBlocking { userRepository.addUser(mockUser) }
+    viewModelUser.getProfileDetails()
+    assert(viewModelUser.userId == mockUser.userId)
+    assert(viewModelUser.uiState.value.profilePicUri == mockUser.profilePicUrl.toUri())
+    assert(viewModelUser.uiState.value.bio == mockUser.bio)
+    assert(viewModelUser.uiState.value.username == mockUser.username)
+    assert(viewModelUser.uiState.value.firstName == mockUser.firstName)
+    assert(viewModelUser.uiState.value.lastName == mockUser.lastName)
+    tearDown()
+  }
+
+  /*
+  @Test
+  fun viewMyProfileDetailsFailure() {
+    val mockUserRepository = mockk<IUserRepository>()
+    val mockViewModel = ProfileViewModel(mockUserRepository, null)
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+    coEvery { mockUserRepository.getCurrentUserId() } returns
+        Resource.Failure(Exception("Error getting current user id"))
+    mockViewModel.getProfileDetails()
+    verify { Log.d("ProfileViewModel", "Error getting current user id") }
+    unmockkAll()
+  }
+
+   */
+
+  @Test
+  fun updateMyUserInfoSuccessful() {
+    runBlocking { userRepository.addUser(mockUser) }
+    viewModelUser.getProfileDetails()
+    viewModelUser.onFirstNameChanged("Jane")
+    viewModelUser.onLastNameChanged("Doe")
+    viewModelUser.onUsernameChanged("janedoe")
+    viewModelUser.onBirthDateChanged("01.01.2000")
+    viewModelUser.onCountryCodeChanged(CountryCode.CH)
+    viewModelUser.onPhoneNumberChanged("123456789")
+    viewModelUser.onSelectedImageUriChanged(Uri.EMPTY)
+    viewModelUser.onBioChanged("This is my bio")
+    viewModelUser.updateUserInfo()
+    assert(viewModelUser.uiState.value.firstName == "Jane")
+    assert(viewModelUser.uiState.value.lastName == "Doe")
+    assert(viewModelUser.uiState.value.username == "janedoe")
+    assert(viewModelUser.uiState.value.birthDate == "01.01.2000")
+    assert(viewModelUser.uiState.value.selectedCountryCode == CountryCode.CH)
+    assert(viewModelUser.uiState.value.phoneNumber == "123456789")
+    assert(viewModelUser.uiState.value.profilePicUri == Uri.EMPTY)
+    assert(viewModelUser.uiState.value.bio == "This is my bio")
+    tearDown()
+  }
+
+  @Test
+  fun updateMyUserInfoGettingUserFailure() {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+    viewModelUser.updateUserInfo()
+    verify { Log.d("ProfileViewModel", "Error getting User ${mockUser.userId}") }
+    unmockkAll()
+  }
+
+  @Test
+  fun testOnFirstNameChange() = runTest {
+    mockkStatic(Log::class)
+    every { Log.d(any(), any()) } returns 0
+    viewModelUser.onFirstNameChanged(mockUser.firstName, mockUiState)
+    assert(mockUiState.value.firstName == mockUser.firstName)
+    unmockkAll()
+  }
+
+  @Test
+  fun testOnLastNameChange() = runTest {
+    viewModelUser.onLastNameChanged(mockUser.lastName, mockUiState)
+    assert(mockUiState.value.lastName == mockUser.lastName)
+  }
+
+  @Test
+  fun testOnBirthDateChange() = runTest {
+    viewModelUser.onBirthDateChanged(mockUser.birthDate, mockUiState)
+    assert(mockUiState.value.birthDate == mockUser.birthDate)
+  }
+
+  @Test
+  fun testOnSelectedImageUriChange() = runTest {
+    viewModelUser.onSelectedImageUriChanged(Uri.EMPTY, mockUiState)
+    assert(mockUiState.value.profilePicUri == Uri.EMPTY)
+  }
+
+  @Test
+  fun testOnBioChange() = runTest {
+    viewModelUser.onBioChanged(mockFriend.bio, mockUiState)
+    assert(mockUiState.value.bio == mockFriend.bio)
+  }
+
+  @Test
+  fun testValidateFieldsForCorrectFields() = runTest {
+    viewModelUser.onFirstNameChanged(mockUser.firstName, mockUiState)
+    viewModelUser.onLastNameChanged(mockUser.lastName, mockUiState)
+    viewModelUser.onUsernameChanged(mockUser.username, mockUiState)
+    viewModelUser.onBirthDateChanged(mockUser.birthDate, mockUiState)
+    viewModelUser.onCountryCodeChanged(CountryCode.CH, mockUiState)
+    viewModelUser.onPhoneNumberChanged(mockUser.phoneNumber, mockUiState)
+    viewModelUser.onSelectedImageUriChanged(Uri.EMPTY, mockUiState)
+    viewModelUser.onBioChanged(mockUser.bio, mockUiState)
+
+    assert(viewModelUser.validateFields(mockUiState))
+  }
+
+  @Test
+  fun testValidateFieldTooOldBirthdate() = runTest {
+
+    // set valid initial state
+    viewModelUser.onFirstNameChanged(mockUser.firstName, mockUiState)
+    viewModelUser.onLastNameChanged(mockUser.lastName, mockUiState)
+    viewModelUser.onUsernameChanged(mockUser.username, mockUiState)
+    viewModelUser.onBirthDateChanged(mockUser.birthDate, mockUiState)
+    viewModelUser.onCountryCodeChanged(CountryCode.CH, mockUiState)
+    viewModelUser.onPhoneNumberChanged(mockUser.phoneNumber, mockUiState)
+    viewModelUser.onSelectedImageUriChanged(Uri.EMPTY, mockUiState)
+    viewModelUser.onBioChanged(mockUser.bio, mockUiState)
+    // assert state is valid
+    assert(viewModelUser.validateFields(mockUiState))
+
+    // change the birthdate with invalid
+    viewModelUser.onBirthDateChanged("02.09.1000", mockUiState)
+
+    assert(!viewModelUser.validateFields())
+  }
+
+  @Test
+  fun testValidateFieldForEmptyFields() = runTest {
+    assert(!viewModelUser.validateFields(mockUiState))
+  }
+
+  @Test
+  fun testValidateForPartiallyFilledFields() = runTest {
+    viewModelUser.onFirstNameChanged(mockUser.firstName, mockUiState)
+    viewModelUser.onLastNameChanged(mockUser.lastName, mockUiState)
+    viewModelUser.onUsernameChanged(mockUser.username, mockUiState)
+    viewModelUser.onBirthDateChanged(mockUser.birthDate, mockUiState)
+    viewModelUser.onCountryCodeChanged(CountryCode.AU, mockUiState)
+
+    assert(!viewModelUser.validateFields(mockUiState))
+  }
+
+  @Test
+  fun getUiState() {
+    assert(viewModelUser.getUiState() == mockUiState.value)
   }
 }

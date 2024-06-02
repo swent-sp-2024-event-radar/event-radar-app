@@ -175,6 +175,9 @@ dependencies {
     // Android Test
     androidTestImplementation ("androidx.test.uiautomator:uiautomator:$androidXEmulatorVersion")
 
+  // Google
+  implementation("com.google.android.gms:play-services-auth:19.2.0")
+
 }
 
 secrets {

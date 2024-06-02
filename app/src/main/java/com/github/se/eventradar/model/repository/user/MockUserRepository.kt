@@ -156,6 +156,11 @@ class MockUserRepository : IUserRepository {
     }
   }
 
+  override suspend fun signOut(): Resource<Unit> {
+    currentUserId = null
+    return Resource.Success(Unit)
+  }
+
   // Helper method to set the current user ID for testing
   fun updateCurrentUserId(userId: String?) {
     currentUserId = userId
