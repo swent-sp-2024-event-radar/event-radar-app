@@ -220,17 +220,6 @@ fun QrCodeTicketUi(
             item { Spacer(modifier = Modifier.height(8.dp)) }
           }
     } else {
-      EventTitle(
-          modifier =
-              Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally).constrainAs(
-                  title) {
-                    top.linkTo(tabs.bottom, margin = 16.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                  },
-          eventUiState = qrScanUiState.value.eventUiState,
-          style = componentStyle)
-
       when (qrScanUiState.value.action) {
         ScanTicketQrViewModel.Action.ScanTicket -> {
           Column(modifier = Modifier.testTag("QrScanner")) {
