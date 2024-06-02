@@ -15,7 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
@@ -31,6 +35,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.TextStyle
@@ -46,9 +52,11 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.github.se.eventradar.ExcludeFromJacocoGeneratedReport
 import com.github.se.eventradar.R
+import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.repository.event.MockEventRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.ui.BottomNavigationMenu
@@ -56,13 +64,16 @@ import com.github.se.eventradar.ui.component.EventCategory
 import com.github.se.eventradar.ui.component.EventComponentsStyle
 import com.github.se.eventradar.ui.component.EventDate
 import com.github.se.eventradar.ui.component.EventDescription
-import com.github.se.eventradar.ui.component.EventDistance
+import com.github.se.eventradar.ui.component.EventLocation
+import com.github.se.eventradar.ui.component.EventOrganisers
 import com.github.se.eventradar.ui.component.EventTime
 import com.github.se.eventradar.ui.component.EventTitle
 import com.github.se.eventradar.ui.component.GoBackButton
 import com.github.se.eventradar.ui.component.Logo
 import com.github.se.eventradar.ui.component.TicketsSold
+import com.github.se.eventradar.ui.messages.FriendPreviewItem
 import com.github.se.eventradar.ui.navigation.NavigationActions
+import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.eventradar.viewmodel.qrCode.QrCodeAnalyser
 import com.github.se.eventradar.viewmodel.qrCode.ScanTicketQrViewModel
@@ -78,24 +89,21 @@ fun QrCodeTicketUi(
   ConstraintLayout(
       modifier = Modifier.fillMaxSize().testTag("qrCodeScannerScreen"),
   ) {
-    val (logo, tabs, bottomNav) = createRefs()
-    Logo(
-        modifier =
-            Modifier.fillMaxWidth()
-                .fillMaxWidth()
-                .constrainAs(logo) {
-                  top.linkTo(parent.top, margin = 32.dp)
-                  start.linkTo(parent.start, margin = 16.dp)
-                }
-                .testTag("logo"),
-    )
+    val (backButton, tabs, title, bottomNav) = createRefs()
+    GoBackButton(modifier = Modifier
+          .wrapContentSize()
+          .constrainAs(backButton) {
+              top.linkTo(parent.top, margin = 32.dp)
+              start.linkTo(parent.start, margin = 16.dp)
+          }
+    ) { navigationActions.goBack() }
     TabRow(
         selectedTabIndex = qrScanUiState.value.tabState.ordinal,
         modifier =
             Modifier.fillMaxWidth()
                 .padding(top = 8.dp)
                 .constrainAs(tabs) {
-                  top.linkTo(logo.bottom, margin = 16.dp)
+                  top.linkTo(backButton.bottom, margin = 16.dp)
                   start.linkTo(parent.start)
                   end.linkTo(parent.end)
                 }
@@ -140,11 +148,6 @@ fun QrCodeTicketUi(
               }
         }
 
-    if (qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent) {
-      val imageHeight = 191.dp
-
-      val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-
       val componentStyle =
           EventComponentsStyle(
               MaterialTheme.colorScheme.onSurface,
@@ -152,15 +155,24 @@ fun QrCodeTicketUi(
               MaterialTheme.colorScheme.onSurface,
           )
 
+    if (qrScanUiState.value.tabState == ScanTicketQrViewModel.Tab.MyEvent) {
+      val imageHeight = 191.dp
+
+      val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+
       val (lazyEventDetails) = createRefs()
 
-      // TODO uncomment when image are implemented
-      // val imagePainter: Painter = rememberImagePainter(eventUiState.eventPhoto)
-      val imagePainter: Painter = rememberImagePainter(R.drawable.placeholderbig)
+        val imagePainter =
+        if (qrScanUiState.value.eventUiState.eventPhoto == "") {
+            painterResource(id = R.drawable.placeholder)
+        } else {
+            rememberAsyncImagePainter(qrScanUiState.value.eventUiState.eventPhoto)
+        }
 
-      LazyColumn(
+      Column(
           modifier =
               Modifier.fillMaxSize()
+                  .verticalScroll(rememberScrollState())
                   .padding(horizontal = 16.dp)
                   .constrainAs(lazyEventDetails) {
                     top.linkTo(tabs.bottom, margin = 0.dp)
@@ -168,18 +180,15 @@ fun QrCodeTicketUi(
                     end.linkTo(parent.end, margin = 0.dp)
                   }
                   .testTag("lazyEventDetails")) {
-            item {
+
               Image(
                   painter = imagePainter,
                   contentDescription = "Event banner image",
                   modifier = Modifier.fillMaxWidth().height(imageHeight).testTag("eventImage"),
                   contentScale = ContentScale.FillWidth)
-            }
-            item {
-              GoBackButton(modifier = Modifier.wrapContentSize()) { navigationActions.goBack() }
-            }
-            item { Spacer(modifier = Modifier.height(8.dp)) }
-            item {
+
+            Spacer(modifier = Modifier.height(8.dp))
+
               EventTitle(
                   modifier =
                       Modifier.fillMaxWidth()
@@ -187,40 +196,64 @@ fun QrCodeTicketUi(
                               Alignment.CenterHorizontally), // .(Alignment.CenterHorizontally),
                   eventUiState = qrScanUiState.value.eventUiState,
                   style = componentStyle)
-            }
 
-            item {
+
+
               TicketsSold(
                   modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally),
                   eventUiState = uiState.eventUiState,
                   style = componentStyle)
-            }
 
-            item { Spacer(modifier = Modifier.height(8.dp)) }
 
-            item {
-              EventDescription(
-                  modifier = Modifier, qrScanUiState.value.eventUiState, componentStyle)
-            }
+            Spacer(modifier = Modifier.height(8.dp))
 
-            item { Spacer(modifier = Modifier.height(16.dp)) }
-            item {
+              EventDescription(modifier = Modifier, qrScanUiState.value.eventUiState, componentStyle)
+
+
+            Spacer(modifier = Modifier.height(16.dp))
+
               Row(modifier = Modifier.fillMaxWidth()) {
-                EventDistance(modifier = Modifier.weight(2f), uiState.eventUiState, componentStyle)
+                EventLocation(modifier = Modifier.weight(2f), uiState.eventUiState, componentStyle)
                 EventDate(modifier = Modifier.weight(1f), uiState.eventUiState, componentStyle)
               }
-            }
-            item { Spacer(modifier = Modifier.height(8.dp)) }
 
-            item {
+            Spacer(modifier = Modifier.height(8.dp))
+
+
               Row(modifier = Modifier.fillMaxWidth()) {
                 EventCategory(modifier = Modifier.weight(2f), uiState.eventUiState, componentStyle)
                 EventTime(modifier = Modifier.weight(1f), uiState.eventUiState, componentStyle)
               }
-            }
-            item { Spacer(modifier = Modifier.height(8.dp)) }
+
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+
+              EventOrganisers(
+                  modifier = Modifier, qrScanUiState.value.eventUiState, componentStyle)
+
+
+
+                OrganisersList(
+                    organisersList = qrScanUiState.value.eventUiState.organisersList,
+                    onOrganiserClicked = { navigationActions.navController.navigate("${Route.PROFILE}/${it.userId}") },
+                    modifier = Modifier.fillMaxWidth())
+
           }
     } else {
+        EventTitle(
+            modifier =
+            Modifier.fillMaxWidth()
+                .wrapContentWidth(
+                    Alignment.CenterHorizontally)
+                .constrainAs(title) {
+                    top.linkTo(tabs.bottom, margin = 16.dp)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                },
+            eventUiState = qrScanUiState.value.eventUiState,
+            style = componentStyle)
+
       when (qrScanUiState.value.action) {
         ScanTicketQrViewModel.Action.ScanTicket -> {
           Column(modifier = Modifier.testTag("QrScanner")) {
@@ -316,6 +349,35 @@ fun EntryDialog(edr: Int, viewModel: ScanTicketQrViewModel) {
       }
     }
   }
+}
+
+@Composable
+fun OrganisersList(
+    organisersList: List<User>,
+    onOrganiserClicked: (User) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    if (organisersList.isEmpty()) {
+        Text(
+            text = stringResource(R.string.no_other_organisers),
+            style =
+            TextStyle(
+                fontSize = 16.sp,
+                lineHeight = 24.sp,
+                fontFamily = FontFamily(Font(R.font.roboto)),
+                fontWeight = FontWeight.Normal,
+                color = Color(0xFF49454F),
+                letterSpacing = 0.15.sp,
+                textAlign = TextAlign.Center),
+            modifier = Modifier.fillMaxSize().padding(top = 32.dp).testTag("noOrganisers"))
+    } else {
+        Column(modifier = modifier.padding(top = 16.dp)) {
+            organisersList.forEach { organiser ->
+                FriendPreviewItem(organiser, onOrganiserClicked)
+                Divider()
+            }
+        }
+    }
 }
 
 @ExcludeFromJacocoGeneratedReport

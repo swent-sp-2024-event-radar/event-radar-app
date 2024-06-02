@@ -215,8 +215,8 @@ class UserFlowTests : TestCase() {
           assertIsDisplayed()
           assertTextContains("Test Description")
         }
-        distanceTitle { assertIsDisplayed() }
-        distanceContent { assertIsDisplayed() }
+        locationTitle { assertIsDisplayed() }
+        locationContent { assertIsDisplayed() }
         categoryTitle { assertIsDisplayed() }
         categoryContent {
           assertIsDisplayed()

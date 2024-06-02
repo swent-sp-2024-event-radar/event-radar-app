@@ -30,6 +30,7 @@
     <string name="my_qr_code">My Qr Code</string>
     <string name="no_message_found_string">You have no messages, go to the Friends tab to start messaging a friend!</string>
     <string name="no_friends_found_string">No friends found. Scan QR codes at events to add friends!</string>
+    <string name="no_other_organisers">No other organisers, you are the only event host!</string>
     <string name="cancel_registration_message">Are you sure you want to cancel your event registration?</string>
 </resources>
 

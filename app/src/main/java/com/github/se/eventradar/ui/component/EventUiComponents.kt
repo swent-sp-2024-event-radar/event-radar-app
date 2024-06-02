@@ -82,19 +82,18 @@ fun EventDescription(modifier: Modifier, eventUiState: EventUiState, style: Even
 }
 
 @Composable
-fun EventDistance(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
+fun EventLocation(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
   Column(modifier = modifier) {
     Text(
-        text = stringResource(id = R.string.event_distance),
+        text = stringResource(id = R.string.event_location),
         style = style.fieldTitleStyle,
         color = style.fieldTitleColor,
-        modifier = Modifier.testTag("distanceTitle"))
+        modifier = Modifier.testTag("locationTitle"))
     Text(
-        // TODO the distance between the user and the event should be display instead
         text = eventUiState.location.address,
         style = style.contentStyle,
         color = style.contentColor,
-        modifier = Modifier.testTag("distanceContent"))
+        modifier = Modifier.testTag("locationContent"))
   }
 }
 
@@ -165,4 +164,15 @@ fun TicketsSold(modifier: Modifier, eventUiState: EventUiState, style: EventComp
         color = style.fieldTitleColor,
         modifier = Modifier.testTag("ticketSoldContent"))
   }
+}
+
+@Composable
+fun EventOrganisers(modifier: Modifier, eventUiState: EventUiState, style: EventComponentsStyle) {
+    Column(modifier = modifier) {
+        Text(
+            text = stringResource(id = R.string.event_organisers),
+            style = style.fieldTitleStyle,
+            color = style.fieldTitleColor,
+            modifier = Modifier.testTag("organisersTitle"))
+    }
 }

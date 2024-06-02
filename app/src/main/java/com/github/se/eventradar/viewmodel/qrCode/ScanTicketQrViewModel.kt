@@ -156,6 +156,18 @@ constructor(
     viewModelScope.launch {
       when (val response = eventRepository.getEvent(myEventID)) {
         is Resource.Success -> {
+          val organisersList = mutableListOf<User>()
+          for (organiserId in response.data!!.organiserList) {
+            val organiser = userRepository.getUser(organiserId)
+            if (organiser is Resource.Success) {
+              organisersList.add(organiser.data!!)
+            } else {
+              Log.d(
+                "EventDetailsViewModel",
+                "Error getting organiser: ${(organiser as Resource.Failure).throwable.message}")
+            }
+          }
+
           _uiState.update {
             it.copy(
                 eventUiState =
@@ -168,7 +180,8 @@ constructor(
                         description = response.data.description,
                         ticket = response.data.ticket,
                         mainOrganiser = response.data.mainOrganiser,
-                        category = response.data.category))
+                      organisersList = organisersList,
+                      category = response.data.category))
           }
         }
         is Resource.Failure ->

@@ -38,7 +38,7 @@ import com.github.se.eventradar.ui.component.EventCategory
 import com.github.se.eventradar.ui.component.EventComponentsStyle
 import com.github.se.eventradar.ui.component.EventDate
 import com.github.se.eventradar.ui.component.EventDescription
-import com.github.se.eventradar.ui.component.EventDistance
+import com.github.se.eventradar.ui.component.EventLocation
 import com.github.se.eventradar.ui.component.EventTime
 import com.github.se.eventradar.ui.component.EventTitle
 import com.github.se.eventradar.ui.component.GenericDialogBox
@@ -96,8 +96,6 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
       navigationActions = navigationActions) {
         Column(
             modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(it)) {
-              // TODO uncomment when image are implemented
-              // val imagePainter: Painter = rememberAsyncImagePainter(eventUiState.eventPhoto)
               val imagePainter: Painter =
                   if (eventUiState.eventPhoto == "") {
                     painterResource(id = R.drawable.placeholder)
@@ -125,7 +123,7 @@ fun EventDetails(viewModel: EventDetailsViewModel, navigationActions: Navigation
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Row(modifier = Modifier.fillMaxWidth()) {
-                      EventDistance(modifier = Modifier.weight(2f), eventUiState, componentStyle)
+                      EventLocation(modifier = Modifier.weight(2f), eventUiState, componentStyle)
 
                       EventDate(modifier = Modifier.weight(1f), eventUiState, componentStyle)
                     }

@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Location
 import com.github.se.eventradar.model.Resource
+import com.github.se.eventradar.model.User
 import com.github.se.eventradar.model.event.Event
 import com.github.se.eventradar.model.event.EventCategory
 import com.github.se.eventradar.model.event.EventTicket
@@ -77,8 +78,8 @@ constructor(
                 category = response.data.category,
             )
           }
-          displayedEvent = response.data!!
-          _isUserAttending.update { response.data.attendeeList.contains(currentUserId) }
+          displayedEvent = response.data
+          _isUserAttending.update { response.data!!.attendeeList.contains(currentUserId) }
         }
         is Resource.Failure ->
             Log.d("EventDetailsViewModel", "Error getting event: ${response.throwable.message}")
@@ -200,5 +201,6 @@ data class EventUiState(
     val description: String = "",
     val ticket: EventTicket = EventTicket("", 0.0, 0, 0),
     val mainOrganiser: String = "",
+    val organisersList: List<User> = emptyList(),
     val category: EventCategory = EventCategory.MUSIC,
 )
