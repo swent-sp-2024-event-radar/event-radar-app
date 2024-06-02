@@ -77,8 +77,8 @@ constructor(
                 category = response.data.category,
             )
           }
-          displayedEvent = response.data
-          _isUserAttending.update { response.data!!.attendeeList.contains(currentUserId) }
+          displayedEvent = response.data!!
+          _isUserAttending.update { response.data.attendeeList.contains(currentUserId) }
         }
         is Resource.Failure ->
             Log.d("EventDetailsViewModel", "Error getting event: ${response.throwable.message}")
