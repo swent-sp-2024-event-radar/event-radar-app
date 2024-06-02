@@ -1,6 +1,13 @@
 package com.github.se.eventradar.endtoend
 
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,26 +23,37 @@ import com.github.se.eventradar.model.event.EventTicket
 import com.github.se.eventradar.model.message.Message
 import com.github.se.eventradar.model.repository.event.IEventRepository
 import com.github.se.eventradar.model.repository.event.MockEventRepository
+import com.github.se.eventradar.model.repository.location.ILocationRepository
+import com.github.se.eventradar.model.repository.location.MockLocationRepository
 import com.github.se.eventradar.model.repository.message.IMessageRepository
 import com.github.se.eventradar.model.repository.message.MockMessageRepository
 import com.github.se.eventradar.model.repository.user.IUserRepository
 import com.github.se.eventradar.model.repository.user.MockUserRepository
 import com.github.se.eventradar.screens.ChatScreen
+import com.github.se.eventradar.screens.CreateEventScreen
 import com.github.se.eventradar.screens.EventDetailsScreen
 import com.github.se.eventradar.screens.HomeScreen
+import com.github.se.eventradar.screens.HostingScreen
+import com.github.se.eventradar.screens.LoginScreen
 import com.github.se.eventradar.screens.MessagesScreen
 import com.github.se.eventradar.screens.ProfileScreen
 import com.github.se.eventradar.ui.chat.ChatScreen
 import com.github.se.eventradar.ui.event.EventDetails
 import com.github.se.eventradar.ui.home.HomeScreen
+import com.github.se.eventradar.ui.hosting.CreateEventScreen
+import com.github.se.eventradar.ui.hosting.HostingScreen
+import com.github.se.eventradar.ui.login.LoginScreen
 import com.github.se.eventradar.ui.messages.MessagesScreen
 import com.github.se.eventradar.ui.navigation.NavigationActions
 import com.github.se.eventradar.ui.navigation.Route
 import com.github.se.eventradar.ui.theme.MyApplicationTheme
 import com.github.se.eventradar.ui.viewProfile.ProfileUi
 import com.github.se.eventradar.viewmodel.ChatViewModel
+import com.github.se.eventradar.viewmodel.CreateEventViewModel
 import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
+import com.github.se.eventradar.viewmodel.HostedEventsViewModel
+import com.github.se.eventradar.viewmodel.LoginViewModel
 import com.github.se.eventradar.viewmodel.MessagesViewModel
 import com.github.se.eventradar.viewmodel.ProfileViewModel
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -65,6 +83,7 @@ class UserFlowTests : TestCase() {
   private var userRepository: IUserRepository = MockUserRepository()
   private var eventRepository: IEventRepository = MockEventRepository()
   private var messageRepository: IMessageRepository = MockMessageRepository()
+  private var locationRepository: ILocationRepository = MockLocationRepository()
 
   private val mockEvent =
       Event(
@@ -88,14 +107,16 @@ class UserFlowTests : TestCase() {
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",
-          phoneNumber = "1234567890",
+          phoneNumber = "123456789",
           accountStatus = "active",
           eventsAttendeeList = mutableListOf("event1", "event2"),
           eventsHostList = mutableListOf("event3"),
           friendsList = mutableListOf("user2"),
-          profilePicUrl = "http://example.com/Profile_Pictures/1",
-          qrCodeUrl = "http://example.com/QR_Codes/1",
-          bio = "",
+          profilePicUrl =
+              "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FQKPpsHHs0NPkb5RzWgDMsL7cHQt2?alt=media&token=5769ac23-10b6-4013-a650-f81e79e6a276",
+          qrCodeUrl =
+              "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/QR_Codes%2FQKPpsHHs0NPkb5RzWgDMsL7cHQt2?alt=media&token=4a0ba161-dfbc-4568-95b4-6c29309d41d9",
+          bio = "Hey all",
           username = "johndoe")
 
   private val user2 =
@@ -179,6 +200,25 @@ class UserFlowTests : TestCase() {
                 ProfileUi(
                     isPublicView = true, viewModel = viewModel, navigationActions = navActions)
               }
+          composable(Route.MY_HOSTING) {
+            HostingScreen(
+                viewModel = HostedEventsViewModel(eventRepository, userRepository),
+                navigationActions = navActions)
+          }
+          composable(Route.CREATE_EVENT) {
+            CreateEventScreen(
+                viewModel =
+                    CreateEventViewModel(locationRepository, eventRepository, userRepository),
+                navigationActions = navActions)
+          }
+          composable(Route.PROFILE) {
+            val viewModel =
+                ProfileViewModel(userRepository, null) // userId = null leads to my profile
+            ProfileUi(isPublicView = false, viewModel = viewModel, navigationActions = navActions)
+          }
+          composable(Route.LOGIN) {
+            LoginScreen(LoginViewModel(userRepository), navigationActions = navActions)
+          }
         }
       }
     }
@@ -413,6 +453,322 @@ class UserFlowTests : TestCase() {
       step("Check if message is displayed") {
         chatScreenMessagesList { assertIsDisplayed() }
         onNode { hasText("Test Message 3") }.assertIsDisplayed()
+      }
+    }
+  }
+  // User flow: homeScreen => my hosted screen => create an Event => fill fields => confirm event
+  // creation
+  @Test
+  fun homeScreenToCreateEvent() = run {
+    ComposeScreen.onComposeScreen<HomeScreen>(composeTestRule) {
+      step("Check if elements are present") {
+        bottomNav { assertIsDisplayed() }
+        hostingIcon { assertIsDisplayed() }
+      }
+      step("Click on the hosting icon") { hostingIcon.performClick() }
+    }
+
+    ComposeScreen.onComposeScreen<HostingScreen>(composeTestRule) {
+      createEventFab { assertIsDisplayed() }
+      step("Click on create event") { createEventFab.performClick() }
+    }
+    ComposeScreen.onComposeScreen<CreateEventScreen>(composeTestRule) {
+      ComposeScreen.onComposeScreen<CreateEventScreen>(composeTestRule) {
+        topBar { assertIsDisplayed() }
+        goBackButton { assertIsDisplayed() }
+        createEventText { assertIsDisplayed() }
+        createEventScreenColumn { assertIsDisplayed() }
+        eventImagePicker {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+        eventNameTextField {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+        eventDescriptionTextField {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+        datesRow {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+        startDateTextField {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+        endDateTextField {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+        timesRow {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+        startTimeTextField {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+        endTimeTextField {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+        locationExposedDropDownMenuBox {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+        locationDropDownMenuTextField {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+        exposedDropDownMenuBox {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+        ticketNameDropDownMenuTextField {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+        eventCategoryDropDown {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+        ticketQuantityTextField {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+        ticketPriceTextField {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+        multiSelectExposedDropDownMenuBox {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+        organisersMultiDropDownMenuTextField {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+        publishEventButton {
+          performScrollTo()
+          assertIsDisplayed()
+        }
+      }
+      step("Fill in Event Details") {
+        eventNameTextField { performTextInput("New Event") }
+        eventDescriptionTextField { performTextInput("This is a test event") }
+
+        val eventCategoryOption = "MUSIC"
+        step("Click on Event Category Drop Down Menu") {
+          eventCategoryDropDown {
+            performScrollTo()
+            assertIsDisplayed()
+            performClick()
+          }
+        }
+        step("Check if Event Category Drop Down Menu is displayed") {
+          composeTestRule
+              .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
+              .assertIsDisplayed()
+        }
+
+        step("Click on Specific Event Category") {
+          composeTestRule
+              .onNode(
+                  hasText(eventCategoryOption)
+                      .and(hasAnyAncestor(hasTestTag("exposedDropDownMenu"))))
+              .assertIsDisplayed()
+          composeTestRule
+              .onNode(
+                  hasText(eventCategoryOption)
+                      .and(hasAnyAncestor(hasTestTag("exposedDropDownMenu"))))
+              .performClick()
+        }
+        step("Check if Event Category Drop Down Menu is hidden") {
+          composeTestRule
+              .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
+              .assertIsNotDisplayed()
+        }
+        startDateTextField { performTextInput("2025-12-31") }
+        endDateTextField { performTextInput("2026-01-01") }
+        startTimeTextField { performTextInput("10:00") }
+        endTimeTextField { performTextInput("18:00") }
+        val locationToSearch = "EPFL"
+        val locationToVerify = "EPFL"
+        step("Click on Location text field and type in it") {
+          locationDropDownMenuTextField {
+            assertIsDisplayed()
+            performClick()
+            performTextInput(locationToSearch)
+          }
+        }
+        step("Check if Location Drop Down Menu is displayed") {
+          composeTestRule
+              .onNodeWithTag("locationExposedDropDownMenu", useUnmergedTree = true)
+              .assertIsDisplayed()
+        }
+        step("Click on Location Drop Down Menu Option") {
+          composeTestRule
+              .onNode(
+                  hasText(locationToVerify)
+                      .and(hasAnyAncestor(hasTestTag("locationExposedDropDownMenu"))))
+              .assertIsDisplayed()
+          composeTestRule
+              .onNode(
+                  hasText(locationToVerify)
+                      .and(hasAnyAncestor(hasTestTag("locationExposedDropDownMenu"))))
+              .performClick()
+        }
+        step("Check if Location Drop Down Menu is hidden") {
+          composeTestRule
+              .onNodeWithTag("locationExposedDropDownMenu", useUnmergedTree = true)
+              .assertIsNotDisplayed()
+        }
+
+        // ticketName
+        val ticketNameOption = "Standard"
+        step("Click on ticket name text field") {
+          ticketNameDropDownMenuTextField {
+            performScrollTo()
+            assertIsDisplayed()
+            performClick()
+          }
+        }
+        step("Check if ticketName drop down menu is displayed") {
+          composeTestRule
+              .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
+              .assertIsDisplayed()
+        }
+        step("Click on ticketName Option") {
+          composeTestRule
+              .onNode(
+                  hasText(ticketNameOption).and(hasAnyAncestor(hasTestTag("exposedDropDownMenu"))))
+              .assertIsDisplayed()
+          composeTestRule
+              .onNode(
+                  hasText(ticketNameOption).and(hasAnyAncestor(hasTestTag("exposedDropDownMenu"))))
+              .performClick()
+        }
+        step("Check if ticketName drop down menu is hidden") {
+          composeTestRule
+              .onNodeWithTag("exposedDropDownMenu", useUnmergedTree = true)
+              .assertIsNotDisplayed()
+        }
+
+        ticketQuantityTextField { performTextInput("100") }
+
+        ticketPriceTextField {
+          performScrollTo()
+          performTextInput("10.0")
+        }
+
+        val friendUserName = user2.username
+        step("Click on Organisers Drop Down Menu") {
+          organisersMultiDropDownMenuTextField {
+            performScrollTo()
+            assertIsDisplayed()
+            performClick()
+          }
+        }
+        step("Check if Organisers Drop Down Menu is displayed") {
+          composeTestRule
+              .onNodeWithTag("multiSelectExposedDropdownMenu", useUnmergedTree = true)
+              .assertIsDisplayed()
+        }
+        step("Click on organiser Option") {
+          composeTestRule
+              .onNode(
+                  hasText(friendUserName)
+                      .and(hasAnyAncestor(hasTestTag("multiSelectExposedDropdownMenu"))))
+              .assertIsDisplayed()
+          composeTestRule
+              .onNode(
+                  hasText(friendUserName)
+                      .and(hasAnyAncestor(hasTestTag("multiSelectExposedDropdownMenu"))))
+              .performClick()
+        }
+        step("Click on Organisers Drop Down Toggle Icon") {
+          composeTestRule
+              .onNodeWithTag("multiSelectDropDownToggleIcon", useUnmergedTree = true)
+              .performClick()
+        }
+        step("Check if Organisers Drop Down is hidden") {
+          composeTestRule
+              .onNodeWithTag("multiSelectExposedDropdownMenu", useUnmergedTree = true)
+              .assertIsNotDisplayed()
+        }
+
+        step("Publish Event") {
+          publishEventButton {
+            performScrollTo()
+            performClick()
+          }
+        }
+        step("Check if success dialog box is displayed") {
+          composeTestRule
+              .onNodeWithTag("successDialogBox", useUnmergedTree = true)
+              .assertIsDisplayed()
+          composeTestRule.onNodeWithTag("DisplayText", useUnmergedTree = true).assertIsDisplayed()
+          composeTestRule.onNodeWithTag("DisplayTitle", useUnmergedTree = true).assertIsDisplayed()
+          composeTestRule
+              .onNodeWithTag("dialogConfirmButton", useUnmergedTree = true)
+              .assertIsDisplayed()
+        }
+        step("Click on confirm") {
+          composeTestRule
+              .onNodeWithTag("dialogConfirmButton", useUnmergedTree = true)
+              .performClick()
+        }
+      }
+    }
+  }
+  // User flow: homeScreen => my profile => edit profile => change first name => save => log out
+  @Test
+  fun homeScreenToEditProfileAndLogOut() = run {
+    ComposeScreen.onComposeScreen<HomeScreen>(composeTestRule) {
+      step("Check if elements are present") {
+        bottomNav { assertIsDisplayed() }
+        profileIcon { assertIsDisplayed() }
+      }
+      step("Click on the profile icon") { profileIcon.performClick() }
+    }
+    ComposeScreen.onComposeScreen<ProfileScreen>(composeTestRule) {
+      step("Check profile screen") { profileScreen { assertIsDisplayed() } }
+      step("Check if edit button is displayed") { editButton { assertIsDisplayed() } }
+      step("Click on edit") { editButton { performClick() } }
+      step("Edit profile") {
+        firstNameTextField {
+          performTextClearance()
+          performTextInput("NewFirstName")
+        }
+        saveButton {
+          assertIsDisplayed()
+          assertHasClickAction()
+          performClick()
+        }
+        name { assertTextContains("NewFirstName Doe") }
+        step("Log out is displayed") {
+          logOutButton {
+            assertIsDisplayed()
+            assertHasClickAction()
+            performClick()
+          }
+        }
+      }
+
+      ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
+        step("Check if we are on the Login screen") {
+          eventRadarLogo { assertIsDisplayed() }
+          loginButton {
+            assertIsDisplayed()
+            assertHasClickAction()
+          }
+          signUpButton {
+            assertIsDisplayed()
+            assertHasClickAction()
+          }
+        }
       }
     }
   }
