@@ -46,6 +46,7 @@ import com.github.se.eventradar.viewmodel.CreateEventViewModel
 import com.github.se.eventradar.viewmodel.EventDetailsViewModel
 import com.github.se.eventradar.viewmodel.EventsOverviewViewModel
 import com.github.se.eventradar.viewmodel.HostedEventsViewModel
+import com.github.se.eventradar.viewmodel.LoginViewModel
 import com.github.se.eventradar.viewmodel.MessagesViewModel
 import com.github.se.eventradar.viewmodel.ProfileViewModel
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -99,14 +100,16 @@ class UserFlowTests : TestCase() {
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",
-          phoneNumber = "1234567890",
+          phoneNumber = "123456789",
           accountStatus = "active",
           eventsAttendeeList = mutableListOf("event1", "event2"),
           eventsHostList = mutableListOf("event3"),
           friendsList = mutableListOf("user2"),
-          profilePicUrl = "http://example.com/Profile_Pictures/1",
-          qrCodeUrl = "http://example.com/QR_Codes/1",
-          bio = "",
+          profilePicUrl =
+              "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/Profile_Pictures%2FQKPpsHHs0NPkb5RzWgDMsL7cHQt2?alt=media&token=5769ac23-10b6-4013-a650-f81e79e6a276",
+          qrCodeUrl =
+              "https://firebasestorage.googleapis.com/v0/b/event-radar-e6a76.appspot.com/o/QR_Codes%2FQKPpsHHs0NPkb5RzWgDMsL7cHQt2?alt=media&token=4a0ba161-dfbc-4568-95b4-6c29309d41d9",
+          bio = "Hey all",
           username = "johndoe")
 
   private val user2 =
@@ -203,10 +206,12 @@ class UserFlowTests : TestCase() {
           }
           composable(Route.PROFILE) {
             val viewModel =
-                ProfileViewModel(userRepository, null) // userId = null leads to my prfile
+                ProfileViewModel(userRepository, null) // userId = null leads to my profile
             ProfileUi(isPublicView = false, viewModel = viewModel, navigationActions = navActions)
           }
-          composable(Route.LOGIN) { LoginScreen(navigationActions = navActions) }
+          composable(Route.LOGIN) {
+            LoginScreen(LoginViewModel(userRepository), navigationActions = navActions)
+          }
         }
       }
     }
@@ -539,22 +544,40 @@ class UserFlowTests : TestCase() {
       step("Click on the profile icon") { profileIcon.performClick() }
     }
     ComposeScreen.onComposeScreen<ProfileScreen>(composeTestRule) {
-      step("Check if edit button is displayed") { editProfile { assertIsDisplayed() } }
+      step("Check profile screen") { profileScreen { assertIsDisplayed() } }
+      step("Check if edit button is displayed") { editButton { assertIsDisplayed() } }
       step("Click on edit") { editButton { performClick() } }
       step("Edit profile") {
-        firstNameTextField { performTextInput("NewFirstName") }
-        saveButton { performClick() }
-      }
-
-      step("Log out") { logOutButton { performClick() } }
-    }
-
-    ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
-      step("Check if we are on the Login screen") {
-        eventRadarLogo { assertIsDisplayed() }
-        loginButton {
+        firstNameTextField {
+          performTextClearance()
+          performTextInput("NewFirstName")
+        }
+        saveButton {
           assertIsDisplayed()
           assertHasClickAction()
+          performClick()
+        }
+        name { assertTextContains("NewFirstName Doe") }
+        step("Log out is displayed") {
+          logOutButton {
+            assertIsDisplayed()
+            assertHasClickAction()
+            performClick()
+          }
+        }
+      }
+
+      ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
+        step("Check if we are on the Login screen") {
+          eventRadarLogo { assertIsDisplayed() }
+          loginButton {
+            assertIsDisplayed()
+            assertHasClickAction()
+          }
+          signUpButton {
+            assertIsDisplayed()
+            assertHasClickAction()
+          }
         }
       }
     }
