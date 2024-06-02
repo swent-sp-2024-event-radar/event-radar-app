@@ -224,7 +224,7 @@ fun ProfileUi(
                       modifier =
                           Modifier.fillMaxWidth().padding(top = 10.dp).testTag("bioTextField"),
                       label = { Text("Bio") },
-                      isError = uiState.firstNameIsError,
+                      isError = uiState.bioIsError,
                       colors =
                           OutlinedTextFieldDefaults.colors()
                               .copy(
@@ -239,7 +239,7 @@ fun ProfileUi(
                             onValueChange = viewModel::onPhoneNumberChanged,
                             modifier = Modifier.weight(1f).testTag("phoneNumberTextField"),
                             label = { Text("Phone Number") },
-                            isError = uiState.firstNameIsError,
+                            isError = uiState.phoneNumberIsError,
                             colors =
                                 OutlinedTextFieldDefaults.colors()
                                     .copy(
@@ -253,7 +253,7 @@ fun ProfileUi(
                             onValueChange = viewModel::onBirthDateChanged,
                             modifier = Modifier.weight(1f).testTag("birthDateTextField"),
                             label = { Text("Birth Date") },
-                            isError = uiState.firstNameIsError,
+                            isError = uiState.birthDateIsError,
                             colors =
                                 OutlinedTextFieldDefaults.colors()
                                     .copy(

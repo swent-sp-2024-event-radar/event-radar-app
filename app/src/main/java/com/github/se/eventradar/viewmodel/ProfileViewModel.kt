@@ -9,14 +9,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.repository.user.IUserRepository
+import com.github.se.eventradar.viewmodel.user.isValidDate
+import com.github.se.eventradar.viewmodel.user.isValidPhoneNumber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -159,37 +157,16 @@ constructor(private val userRepository: IUserRepository, @Assisted var userId: S
           lastNameIsError = state.value.lastName.isEmpty(),
           phoneNumberIsError =
               !isValidPhoneNumber(state.value.phoneNumber, state.value.selectedCountryCode),
-          birthDateIsError = !isValidDate(state.value.birthDate))
+          birthDateIsError = !isValidDate(state.value.birthDate),
+          bioIsError = state.value.bio.isEmpty())
     }
 
     return !state.value.userNameIsError &&
         !state.value.firstNameIsError &&
         !state.value.lastNameIsError &&
         !state.value.phoneNumberIsError &&
-        !state.value.birthDateIsError
-  }
-
-  private fun isValidPhoneNumber(phoneNumber: String, countryCode: CountryCode): Boolean {
-    return phoneNumber.length == countryCode.numberLength
-  }
-
-  private fun isValidDate(date: String): Boolean {
-    val format = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-    format.isLenient = false
-    return try {
-      val parsedDate = format.parse(date)
-
-      val currentDate = Date()
-      val calendar = Calendar.getInstance()
-      calendar.time = currentDate
-      calendar.add(Calendar.YEAR, -130) // set limit to 130 years ago
-      val pastDateLimit = calendar.time
-
-      // return true if date not null and date is between today and past limit
-      (parsedDate != null && parsedDate.before(currentDate) && parsedDate.after(pastDateLimit))
-    } catch (e: Exception) {
-      false
-    }
+        !state.value.birthDateIsError &&
+        !state.value.bioIsError
   }
 
   fun getUiState(): ProfileUiState {
@@ -224,4 +201,5 @@ data class ProfileUiState(
     val lastNameIsError: Boolean = false,
     val phoneNumberIsError: Boolean = false,
     val birthDateIsError: Boolean = false,
+    val bioIsError: Boolean = false
 )

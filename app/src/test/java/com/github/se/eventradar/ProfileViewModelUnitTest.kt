@@ -58,14 +58,14 @@ class ProfileViewModelUnitTest {
           email = "test@example.com",
           firstName = "John",
           lastName = "Doe",
-          phoneNumber = "1234567890",
+          phoneNumber = "123456789",
           accountStatus = "active",
           eventsAttendeeList = mutableListOf("event1", "event2"),
           eventsHostList = mutableListOf("event3"),
           friendsList = mutableListOf("2"),
           profilePicUrl = "http://example.com/Profile_Pictures/1",
           qrCodeUrl = "http://example.com/QR_Codes/1",
-          bio = "",
+          bio = "This is my bio",
           username = "johndoe")
   private val mockFriend =
       User(
@@ -224,15 +224,14 @@ class ProfileViewModelUnitTest {
 
   @Test
   fun testValidateFieldsForCorrectFields() = runTest {
-    val swissPhoneNumber = "123456789"
-
     viewModelUser.onFirstNameChanged(mockUser.firstName, mockUiState)
     viewModelUser.onLastNameChanged(mockUser.lastName, mockUiState)
     viewModelUser.onUsernameChanged(mockUser.username, mockUiState)
     viewModelUser.onBirthDateChanged(mockUser.birthDate, mockUiState)
     viewModelUser.onCountryCodeChanged(CountryCode.CH, mockUiState)
-    viewModelUser.onPhoneNumberChanged(swissPhoneNumber, mockUiState)
+    viewModelUser.onPhoneNumberChanged(mockUser.phoneNumber, mockUiState)
     viewModelUser.onSelectedImageUriChanged(Uri.EMPTY, mockUiState)
+    viewModelUser.onBioChanged(mockUser.bio, mockUiState)
 
     assert(viewModelUser.validateFields(mockUiState))
   }
@@ -241,14 +240,14 @@ class ProfileViewModelUnitTest {
   fun testValidateFieldTooOldBirthdate() = runTest {
 
     // set valid initial state
-    val swissPhoneNumber = "123456789"
     viewModelUser.onFirstNameChanged(mockUser.firstName, mockUiState)
     viewModelUser.onLastNameChanged(mockUser.lastName, mockUiState)
     viewModelUser.onUsernameChanged(mockUser.username, mockUiState)
     viewModelUser.onBirthDateChanged(mockUser.birthDate, mockUiState)
     viewModelUser.onCountryCodeChanged(CountryCode.CH, mockUiState)
-    viewModelUser.onPhoneNumberChanged(swissPhoneNumber, mockUiState)
+    viewModelUser.onPhoneNumberChanged(mockUser.phoneNumber, mockUiState)
     viewModelUser.onSelectedImageUriChanged(Uri.EMPTY, mockUiState)
+    viewModelUser.onBioChanged(mockUser.bio, mockUiState)
     // assert state is valid
     assert(viewModelUser.validateFields(mockUiState))
 

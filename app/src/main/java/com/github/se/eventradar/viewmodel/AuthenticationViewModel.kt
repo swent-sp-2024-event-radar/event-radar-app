@@ -8,14 +8,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.eventradar.model.Resource
 import com.github.se.eventradar.model.repository.user.IUserRepository
+import com.github.se.eventradar.viewmodel.user.isValidDate
+import com.github.se.eventradar.viewmodel.user.isValidPhoneNumber
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.ByteArrayOutputStream
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -213,29 +211,6 @@ class LoginViewModel @Inject constructor(private val userRepository: IUserReposi
         !state.value.lastNameIsError &&
         !state.value.phoneNumberIsError &&
         !state.value.birthDateIsError
-  }
-
-  private fun isValidPhoneNumber(phoneNumber: String, countryCode: CountryCode): Boolean {
-    return phoneNumber.length == countryCode.numberLength
-  }
-
-  private fun isValidDate(date: String): Boolean {
-    val format = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-    format.isLenient = false
-    return try {
-      val parsedDate = format.parse(date)
-
-      val currentDate = Date()
-      val calendar = Calendar.getInstance()
-      calendar.time = currentDate
-      calendar.add(Calendar.YEAR, -130) // set limit to 130 years ago
-      val pastDateLimit = calendar.time
-
-      // return true if date not null and date is between today and past limit
-      (parsedDate != null && parsedDate.before(currentDate) && parsedDate.after(pastDateLimit))
-    } catch (e: Exception) {
-      false
-    }
   }
 }
 
